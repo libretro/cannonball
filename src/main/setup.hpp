@@ -4,8 +4,15 @@
 #include "SDL_video.h"
 const static int SDL_FLAGS = SDL_SWSURFACE | SDL_DOUBLEBUF;
 #endif
+#ifndef __CELLOS_LV2__
 const static char* FILENAME_CONFIG = "./config.xml";
 const static char* FILENAME_SCORES = "./hiscores";
 const static char* FILENAME_TTRIAL = "./hiscores_timetrial";
 const static char* FILENAME_CONT   = "./hiscores_continuous";
+#else
+const static char* FILENAME_CONFIG = "/dev_hdd0/game/SSNE10000/USRDIR/cores/system/cannonball_config.xml";
+const static char* FILENAME_SCORES = "/dev_hdd0/game/SSNE10000/USRDIR/cores/system/cannonball_hiscores";
+const static char* FILENAME_TTRIAL = "/dev_hdd0/game/SSNE10000/USRDIR/cores/system/cannonball_hiscores_timetrial";
+const static char* FILENAME_CONT   = "/dev_hdd0/game/SSNE10000/USRDIR/cores/system/cannonball_hiscores_continuous";
+#endif
     
