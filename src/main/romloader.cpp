@@ -126,6 +126,13 @@ int RomLoader::load_binary(const char* filename)
     // --------------------------------------------------------------------------------------------
     // Read LayOut Data File
     // --------------------------------------------------------------------------------------------
+#ifdef __CELLOS_LV2__
+    extern char rom_path[1024];
+    std::string path;
+    path = std::string(rom_path);
+    path += std::string(filename);
+    filename = path.c_str();
+#endif
     std::ifstream src(filename, std::ios::in | std::ios::binary);
     if (!src)
     {

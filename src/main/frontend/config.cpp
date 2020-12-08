@@ -23,6 +23,8 @@
 #include "engine/audio/osoundint.hpp"
 
 #ifdef __CELLOS_LV2__
+#include <cell/cell_fs.h>
+#include <sys/stat.h>
 #define remove std::remove
 #endif
 
@@ -63,6 +65,10 @@ void Config::load(const std::string &filename)
     // is thrown.
    try
     {
+#ifdef __CELLOS_LV2__
+       struct CellFsStat st;
+       if (cellFsStat(filename.c_str(), &st) == 0 && ((st.st_mode & S_IFMT) == S_IFREG)) /* filename exist?*/
+#endif
         read_xml(filename, pt_config, boost::property_tree::xml_parser::trim_whitespace);
     }
     catch (std::exception &e)
@@ -272,6 +278,10 @@ void Config::load_scores(const std::string &filename)
 
     try
     {
+#ifdef __CELLOS_LV2__
+        struct CellFsStat st;
+        if (cellFsStat(filename.c_str(), &st) == 0 && ((st.st_mode & S_IFMT) == S_IFREG)) /* filename exist?*/
+#endif
         read_xml(engine.jap ? filename + "_jap.xml" : filename + ".xml" , pt, boost::property_tree::xml_parser::trim_whitespace);
     }
     catch (std::exception &e)
