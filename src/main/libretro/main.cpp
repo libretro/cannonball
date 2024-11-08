@@ -1,6 +1,6 @@
 /***************************************************************************
     Cannonball Main Entry Point.
-    
+
     Copyright Chris White.
     See license.txt for more details.
 ***************************************************************************/
@@ -41,18 +41,17 @@
 // Initialize Shared Variables
 using namespace cannonball;
 
-int    cannonball::state       = STATE_BOOT;
-int    cannonball::frame       = 0;
-bool   cannonball::tick_frame  = true;
-int    cannonball::fps_counter = 0;
+int cannonball::state = STATE_BOOT;
+int cannonball::frame = 0;
+bool cannonball::tick_frame = true;
+int cannonball::fps_counter = 0;
 
 #ifdef COMPILE_SOUND_CODE
 Audio cannonball::audio;
 #endif
 
-Menu* menu;
+Menu *menu;
 Interface cannonboard;
-
 
 // Pause Engine
 bool pause_engine;
@@ -61,47 +60,47 @@ static bool libretro_supports_bitmasks = false;
 
 static void config_init(void)
 {
-    // ------------------------------------------------------------------------
-    // Menu Settings
-    // ------------------------------------------------------------------------
+   // ------------------------------------------------------------------------
+   // Menu Settings
+   // ------------------------------------------------------------------------
 
-    config.menu.enabled           = 1;
-    config.menu.road_scroll_speed = 50;
+   config.menu.enabled = 1;
+   config.menu.road_scroll_speed = 50;
 
-    // ------------------------------------------------------------------------
-    // Video Settings
-    // ------------------------------------------------------------------------
+   // ------------------------------------------------------------------------
+   // Video Settings
+   // ------------------------------------------------------------------------
 
-    config.video.mode       = 0; // Video Mode: Default is Windowed
-    config.video.scale      = 1; // Video Scale: Default is 2x
-    config.video.scanlines  = 0; // Scanlines
+   config.video.mode = 0;      // Video Mode: Default is Windowed
+   config.video.scale = 1;     // Video Scale: Default is 2x
+   config.video.scanlines = 0; // Scanlines
 #ifdef LOW_FPS
-    config.video.fps        = 0; // Default is 30 fps
+   config.video.fps = 0; // Default is 30 fps
 #else
-    config.video.fps        = 2; // Default is 60 fps
+   config.video.fps = 2; // Default is 60 fps
 #endif
-    config.video.fps_count  = 0; // FPS Counter
+   config.video.fps_count = 0; // FPS Counter
 #ifdef DINGUX
-    config.video.widescreen = 0; // Enable Widescreen Mode
+   config.video.widescreen = 0; // Enable Widescreen Mode
 #else
-    config.video.widescreen = 1; // Enable Widescreen Mode
+   config.video.widescreen = 1; // Enable Widescreen Mode
 #endif
-    config.video.hires      = 0; // Hi-Resolution Mode
-    config.video.filtering  = 0; // Open GL Filtering Mode
+   config.video.hires = 0;     // Hi-Resolution Mode
+   config.video.filtering = 0; // Open GL Filtering Mode
 
-    config.set_fps(config.video.fps);
+   config.set_fps(config.video.fps);
 
-    // ------------------------------------------------------------------------
-    // Sound Settings
-    // ------------------------------------------------------------------------
+   // ------------------------------------------------------------------------
+   // Sound Settings
+   // ------------------------------------------------------------------------
 #ifdef COMPILE_SOUND_CODE
-    config.sound.enabled     = 1;
+   config.sound.enabled = 1;
 #else
-    config.sound.enabled     = 0;
+   config.sound.enabled = 0;
 #endif
-    config.sound.advertise   = 1;
-    config.sound.preview     = 1;
-    config.sound.fix_samples = 1;
+   config.sound.advertise = 1;
+   config.sound.preview = 1;
+   config.sound.fix_samples = 1;
 
 #if 0
     // Custom Music
@@ -117,104 +116,103 @@ static void config_init(void)
 #endif
 
 #ifdef CANNONBOARD
-    // ------------------------------------------------------------------------
-    // CannonBoard Settings
-    // ------------------------------------------------------------------------
-    cannonboard.enabled = 1;
-    cannonboard.port    = "COM6";
-    cannonboard.baud    = 57600;
-    cannonboard.debug   = 0;
-    cannonboard.cabinet = 0;
+   // ------------------------------------------------------------------------
+   // CannonBoard Settings
+   // ------------------------------------------------------------------------
+   cannonboard.enabled = 1;
+   cannonboard.port = "COM6";
+   cannonboard.baud = 57600;
+   cannonboard.debug = 0;
+   cannonboard.cabinet = 0;
 #endif
 
-    // ------------------------------------------------------------------------
-    // Controls
-    // ------------------------------------------------------------------------
-    config.controls.gear          = 0;
-    config.controls.steer_speed   = 3;
-    config.controls.pedal_speed   = 4;
-    config.controls.keyconfig[0]  = 273; /* up */
-    config.controls.keyconfig[1]  = 274; /* down */
-    config.controls.keyconfig[2]  = 276; /* left */
-    config.controls.keyconfig[3]  = 275; /* right */
-    config.controls.keyconfig[4]  = 122; /* accelerate */
-    config.controls.keyconfig[5]  = 120; /* brake */
-    config.controls.keyconfig[6]  = 32; /* gear1 */
-    config.controls.keyconfig[7]  = 33; /* gear2 */
-    config.controls.keyconfig[8]  = 49; /* start */
-    config.controls.keyconfig[9]  = 53; /* coin */
-    config.controls.keyconfig[10] = 286; /* menu */
-    config.controls.keyconfig[11] = 304; /* view */
-    config.controls.padconfig[0]  = 0; /* accelerate */
-    config.controls.padconfig[1]  = 1; /* brake */
-    config.controls.padconfig[2]  = 2; /* gear1 */
-    config.controls.padconfig[3]  = 2; /* gear2 */
-    config.controls.padconfig[4]  = 3; /* start */
-    config.controls.padconfig[5]  = 4; /* coin */
-    config.controls.padconfig[6]  = 5; /* padconfig menu */
-    config.controls.padconfig[7]  = 6; /* padconfig view */
-    config.controls.analog        = 1;
-    config.controls.pad_id        = 0; /* pad_id */
-    config.controls.axis[0]       = 0; /* wheel */
-    config.controls.axis[1]       = 2; /* accelerate */
-    config.controls.axis[2]       = 3; /* brake */
-    config.controls.asettings[0]  = 75; /* wheel zone */
-    config.controls.asettings[1]  = 0; /* wheel dead */
-    config.controls.asettings[2]  = 0; /* pedals dead */
+   // ------------------------------------------------------------------------
+   // Controls
+   // ------------------------------------------------------------------------
+   config.controls.gear = 0;
+   config.controls.steer_speed = 3;
+   config.controls.pedal_speed = 4;
+   config.controls.keyconfig[0] = 273;  /* up */
+   config.controls.keyconfig[1] = 274;  /* down */
+   config.controls.keyconfig[2] = 276;  /* left */
+   config.controls.keyconfig[3] = 275;  /* right */
+   config.controls.keyconfig[4] = 122;  /* accelerate */
+   config.controls.keyconfig[5] = 120;  /* brake */
+   config.controls.keyconfig[6] = 32;   /* gear1 */
+   config.controls.keyconfig[7] = 33;   /* gear2 */
+   config.controls.keyconfig[8] = 49;   /* start */
+   config.controls.keyconfig[9] = 53;   /* coin */
+   config.controls.keyconfig[10] = 286; /* menu */
+   config.controls.keyconfig[11] = 304; /* view */
+   config.controls.padconfig[0] = 0;    /* accelerate */
+   config.controls.padconfig[1] = 1;    /* brake */
+   config.controls.padconfig[2] = 2;    /* gear1 */
+   config.controls.padconfig[3] = 2;    /* gear2 */
+   config.controls.padconfig[4] = 3;    /* start */
+   config.controls.padconfig[5] = 4;    /* coin */
+   config.controls.padconfig[6] = 5;    /* padconfig menu */
+   config.controls.padconfig[7] = 6;    /* padconfig view */
+   config.controls.analog = 1;
+   config.controls.pad_id = 0;        /* pad_id */
+   config.controls.axis[0] = 0;       /* wheel */
+   config.controls.axis[1] = 2;       /* accelerate */
+   config.controls.axis[2] = 3;       /* brake */
+   config.controls.asettings[0] = 75; /* wheel zone */
+   config.controls.asettings[1] = 0;  /* wheel dead */
+   config.controls.asettings[2] = 0;  /* pedals dead */
 
-    config.controls.haptic        = 0;
-    config.controls.max_force     = 0xFFFF;
-    config.controls.min_force     = 0x1999;
-    config.controls.force_duration= 500;
+   config.controls.haptic = 0;
+   config.controls.max_force = 0xFFFF;
+   config.controls.min_force = 0x1999;
+   config.controls.force_duration = 500;
 
-    // ------------------------------------------------------------------------
-    // Engine Settings
-    // ------------------------------------------------------------------------
+   // ------------------------------------------------------------------------
+   // Engine Settings
+   // ------------------------------------------------------------------------
 
-    config.engine.dip_time      = 0;
-    config.engine.dip_traffic   = 1;
+   config.engine.dip_time = 0;
+   config.engine.dip_traffic = 1;
 
-    config.engine.freeze_timer    = config.engine.dip_time == 4;
-    config.engine.disable_traffic = config.engine.dip_traffic == 4;
-    config.engine.dip_time    &= 3;
-    config.engine.dip_traffic &= 3;
+   config.engine.freeze_timer = config.engine.dip_time == 4;
+   config.engine.disable_traffic = config.engine.dip_traffic == 4;
+   config.engine.dip_time &= 3;
+   config.engine.dip_traffic &= 3;
 
-    config.engine.freeplay      = 0;
-    config.engine.jap           = 0; /* japanese tracks */
-    config.engine.prototype     = 0;
+   config.engine.freeplay = 0;
+   config.engine.jap = 0; /* japanese tracks */
+   config.engine.prototype = 0;
 
-    // Additional Level Objects
-    config.engine.level_objects   = 1;
-    config.engine.randomgen       = 1;
-    config.engine.fix_bugs_backup = 
-    config.engine.fix_bugs        = 1;
-    config.engine.fix_timer       = 0;
-    config.engine.layout_debug    = 0;
-    config.engine.new_attract     = 1;
+   // Additional Level Objects
+   config.engine.level_objects = 1;
+   config.engine.randomgen = 1;
+   config.engine.fix_bugs_backup =
+       config.engine.fix_bugs = 1;
+   config.engine.fix_timer = 0;
+   config.engine.layout_debug = 0;
+   config.engine.new_attract = 1;
 
-    // ------------------------------------------------------------------------
-    // Time Trial Mode
-    // ------------------------------------------------------------------------
+   // ------------------------------------------------------------------------
+   // Time Trial Mode
+   // ------------------------------------------------------------------------
 
-    config.ttrial.laps    = 3;
-    config.ttrial.traffic = 3;
+   config.ttrial.laps = 3;
+   config.ttrial.traffic = 3;
 
-    config.cont_traffic   = 3;
+   config.cont_traffic = 3;
 }
-
 
 //  libretro.cpp
 
-retro_log_printf_t                 log_cb;
-retro_video_refresh_t              video_cb;
-static retro_input_poll_t          input_poll_cb;
-static retro_input_state_t         input_state_cb;
-retro_environment_t                environ_cb;
-static retro_audio_sample_t        audio_cb;
-retro_audio_sample_batch_t         audio_batch_cb;
+retro_log_printf_t log_cb;
+retro_video_refresh_t video_cb;
+static retro_input_poll_t input_poll_cb;
+static retro_input_state_t input_state_cb;
+retro_environment_t environ_cb;
+static retro_audio_sample_t audio_cb;
+retro_audio_sample_batch_t audio_batch_cb;
 
 static bool libretro_fps_record_inhibit = false;
-static int libretro_fps_prev            = 0;
+static int libretro_fps_prev = 0;
 
 char rom_path[1024];
 
@@ -223,16 +221,16 @@ char FILENAME_TTRIAL[1024];
 char FILENAME_CONT[1024];
 
 static bool option_visibility_set = false;
-static bool sound_enable_prev     = true;
-static bool analog_enable_prev    = true;
+static bool sound_enable_prev = true;
+static bool analog_enable_prev = true;
 
 static bool update_option_visibility(void)
 {
-   struct retro_variable var                       = {0};
+   struct retro_variable var = {0};
    struct retro_core_option_display option_display = {0};
-   bool sound_enable                               = true;
-   bool analog_enable                              = true;
-   bool updated                                    = false;
+   bool sound_enable = true;
+   bool analog_enable = true;
+   bool updated = false;
 
    /* Check if sound is enabled */
    var.key = "cannonball_sound_enable";
@@ -268,7 +266,7 @@ static bool update_option_visibility(void)
       environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
 
       sound_enable_prev = sound_enable;
-      updated           = true;
+      updated = true;
    }
 
    /* Hide auxiliary input options, if required */
@@ -284,7 +282,7 @@ static bool update_option_visibility(void)
       environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
 
       analog_enable_prev = analog_enable;
-      updated            = true;
+      updated = true;
    }
 
    option_visibility_set = true;
@@ -312,10 +310,10 @@ void retro_set_environment(retro_environment_t cb)
 
    update_display_cb.callback = update_option_visibility;
    environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_UPDATE_DISPLAY_CALLBACK,
-         &update_display_cb);
+              &update_display_cb);
 
    vfs_iface_info.required_interface_version = 1;
-   vfs_iface_info.iface                      = NULL;
+   vfs_iface_info.iface = NULL;
    if (environ_cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
       filestream_vfs_init(&vfs_iface_info);
 }
@@ -332,21 +330,21 @@ void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
 void update_geometry()
 {
-  struct retro_system_av_info av_info;
-  /* Calling 'RETRO_ENVIRONMENT_SET_GEOMETRY' does not
-   * update frontend timing; we must therefore inhibit
-   * any record of the last set frame rate value, or
-   * the next timing update may be skipped */
-  libretro_fps_record_inhibit = true;
-  retro_get_system_av_info(&av_info);
-  libretro_fps_record_inhibit = false;
-  environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &av_info);
+   struct retro_system_av_info av_info;
+   /* Calling 'RETRO_ENVIRONMENT_SET_GEOMETRY' does not
+    * update frontend timing; we must therefore inhibit
+    * any record of the last set frame rate value, or
+    * the next timing update may be skipped */
+   libretro_fps_record_inhibit = true;
+   retro_get_system_av_info(&av_info);
+   libretro_fps_record_inhibit = false;
+   environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &av_info);
 }
 
 static void update_variables(bool startup)
 {
    bool geometry_update = false;
-   bool timing_update   = false;
+   bool timing_update = false;
    struct retro_variable var;
 
    var.key = "cannonball_menu_enabled";
@@ -444,12 +442,12 @@ static void update_variables(bool startup)
       if (newval != config.sound.enabled)
       {
          config.sound.enabled = newval;
-         #ifdef COMPILE_SOUND_CODE
+#ifdef COMPILE_SOUND_CODE
          if (config.sound.enabled)
             cannonball::audio.start_audio();
          else
             cannonball::audio.stop_audio();
-         #endif
+#endif
       }
    }
 
@@ -494,9 +492,9 @@ static void update_variables(bool startup)
    {
       int min_force_last = config.controls.min_force;
       int max_force_last = config.controls.max_force;
-      int haptic_level   = atoi(var.value);
+      int haptic_level = atoi(var.value);
 
-      haptic_level = (haptic_level < 0)  ? 0  : haptic_level;
+      haptic_level = (haptic_level < 0) ? 0 : haptic_level;
       haptic_level = (haptic_level > 10) ? 10 : haptic_level;
 
       if (haptic_level == 0)
@@ -508,17 +506,17 @@ static void update_variables(bool startup)
       else
       {
          config.controls.min_force = 0x3F +
-               (haptic_level * ((0x1999 - 0x3F) / 10));
-         config.controls.max_force = 0x5  +
-               (haptic_level * (0xFFFF / 10));
+                                     (haptic_level * ((0x1999 - 0x3F) / 10));
+         config.controls.max_force = 0x5 +
+                                     (haptic_level * (0xFFFF / 10));
       }
 
       if ((config.controls.min_force != min_force_last) ||
           (config.controls.max_force != max_force_last))
          forcefeedback::update_force_limits(
-               config.controls.max_force,
-               config.controls.min_force,
-               config.controls.force_duration);
+             config.controls.max_force,
+             config.controls.min_force,
+             config.controls.force_duration);
    }
 
    var.key = "cannonball_freeplay";
@@ -775,38 +773,40 @@ end:
       menu->refresh_menu();
 }
 
-void retro_get_system_info(struct retro_system_info *info) {
-    memset(info, 0, sizeof(*info));
-    info->library_name     = "Cannonball";
-    info->library_version  = "git";
-    info->need_fullpath    = true;
-    info->valid_extensions = "game"; 
+void retro_get_system_info(struct retro_system_info *info)
+{
+   memset(info, 0, sizeof(*info));
+   info->library_name = "Cannonball";
+   info->library_version = "git";
+   info->need_fullpath = true;
+   info->valid_extensions = "game";
 }
 
-void retro_get_system_av_info(struct retro_system_av_info *info) {
+void retro_get_system_av_info(struct retro_system_av_info *info)
+{
    unsigned scale_factor = config.video.hires ? 2 : 1;
 
    memset(info, 0, sizeof(*info));
 
-   info->timing.fps            = config.fps;
+   info->timing.fps = config.fps;
    /* Due to integer rounding errors (44100/102 = 367.5),
     * we produce fewer than the expected 44100 samples
     * per second when running at 120 fps... */
-   info->timing.sample_rate    = (config.fps == 120) ? 44040 : 44100;
+   info->timing.sample_rate = (config.fps == 120) ? 44040 : 44100;
 
-   info->geometry.max_width    = S16_WIDTH_WIDE << 1;
-   info->geometry.max_height   = S16_HEIGHT     << 1;
+   info->geometry.max_width = S16_WIDTH_WIDE << 1;
+   info->geometry.max_height = S16_HEIGHT << 1;
 
    if (config.video.widescreen)
    {
-      info->geometry.base_width   = S16_WIDTH_WIDE * scale_factor;
-      info->geometry.base_height  = S16_HEIGHT     * scale_factor;
+      info->geometry.base_width = S16_WIDTH_WIDE * scale_factor;
+      info->geometry.base_height = S16_HEIGHT * scale_factor;
       info->geometry.aspect_ratio = 16.0 / 9.0;
    }
    else
    {
-      info->geometry.base_width   = S16_WIDTH  * scale_factor;
-      info->geometry.base_height  = S16_HEIGHT * scale_factor;
+      info->geometry.base_width = S16_WIDTH * scale_factor;
+      info->geometry.base_height = S16_HEIGHT * scale_factor;
       info->geometry.aspect_ratio = 4.0 / 3.0;
    }
 
@@ -821,12 +821,14 @@ void update_timing(void)
    environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &system_av_info);
 }
 
-void retro_set_controller_port_device(unsigned port, unsigned device) {
-    (void) port;
-    (void) device;
+void retro_set_controller_port_device(unsigned port, unsigned device)
+{
+   (void)port;
+   (void)device;
 }
 
-size_t retro_serialize_size(void) {
+size_t retro_serialize_size(void)
+{
    return 0;
 }
 
@@ -844,9 +846,9 @@ void retro_cheat_reset(void) {}
 
 void retro_cheat_set(unsigned index, bool enabled, const char *code)
 {
-    (void) index;
-    (void) enabled;
-    (void) code;
+   (void)index;
+   (void)enabled;
+   (void)code;
 }
 
 static void retro_osd_error_msg(const char *str)
@@ -857,24 +859,24 @@ static void retro_osd_error_msg(const char *str)
       return;
 
    environ_cb(RETRO_ENVIRONMENT_GET_MESSAGE_INTERFACE_VERSION,
-         &msg_interface_version);
+              &msg_interface_version);
 
    if (msg_interface_version >= 1)
    {
       struct retro_message_ext msg;
-      msg.msg      = str;
+      msg.msg = str;
       msg.duration = 3000;
       msg.priority = 3;
-      msg.level    = RETRO_LOG_ERROR;
-      msg.target   = RETRO_MESSAGE_TARGET_ALL;
-      msg.type     = RETRO_MESSAGE_TYPE_NOTIFICATION;
+      msg.level = RETRO_LOG_ERROR;
+      msg.target = RETRO_MESSAGE_TARGET_ALL;
+      msg.type = RETRO_MESSAGE_TYPE_NOTIFICATION;
       msg.progress = -1;
       environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE_EXT, &msg);
    }
    else
    {
       struct retro_message msg;
-      msg.msg    = str;
+      msg.msg = str;
       msg.frames = 180;
       environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
    }
@@ -892,20 +894,20 @@ static void retro_build_save_paths(void)
     * > Use game data directory as a fallback if
     *   no save directory is defined */
    if (!environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &save_dir) ||
-         !save_dir)
+       !save_dir)
       save_dir = rom_path;
 
    /* Build high score save paths
     * > Note: These are not 'full' paths;
     *   suffix + extension are added elsewhere */
    fill_pathname_join(FILENAME_SCORES, save_dir,
-         "hiscores", sizeof(FILENAME_SCORES));
+                      "hiscores", sizeof(FILENAME_SCORES));
 
    fill_pathname_join(FILENAME_TTRIAL, save_dir,
-         "hiscores_timetrial", sizeof(FILENAME_TTRIAL));
+                      "hiscores_timetrial", sizeof(FILENAME_TTRIAL));
 
    fill_pathname_join(FILENAME_CONT, save_dir,
-         "hiscores_continuous", sizeof(FILENAME_CONT));
+                      "hiscores_continuous", sizeof(FILENAME_CONT));
 }
 
 bool retro_load_game(const struct retro_game_info *info)
@@ -913,24 +915,24 @@ bool retro_load_game(const struct retro_game_info *info)
    enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_RGB565;
 
    struct retro_input_descriptor desc[] = {
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "Left"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "Up"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "Down"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "Right"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Gear (Low, 2 Buttons Mode)"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "Accelerate"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "Gear (High, 2 Buttons Mode)"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "Brake"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Coin"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,      "Adjust View"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,      "Go Back To Menu"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,     "Analog Brake"},
-      {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,     "Analog Accelerate"},
-      {0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "Analog X" },
-      {0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y, "Analog Y" },
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT, "Left"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP, "Up"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN, "Down"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "Right"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X, "Gear (Low, 2 Buttons Mode)"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B, "Accelerate"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A, "Gear (High, 2 Buttons Mode)"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y, "Brake"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Coin"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L, "Adjust View"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R, "Go Back To Menu"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2, "Analog Brake"},
+       {0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2, "Analog Accelerate"},
+       {0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "Analog X"},
+       {0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y, "Analog Y"},
 
-      {0},
+       {0},
    };
 
    environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
@@ -947,13 +949,12 @@ bool retro_load_game(const struct retro_game_info *info)
    else
    {
       const char *system_dir = NULL;
-      bool path_valid        = false;
+      bool path_valid = false;
 
-      if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_dir)
-            && system_dir)
+      if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_dir) && system_dir)
       {
          fill_pathname_join(rom_path, system_dir,
-               "cannonball", sizeof(rom_path));
+                            "cannonball", sizeof(rom_path));
          fill_pathname_slash(rom_path, sizeof(rom_path));
 
          path_valid = path_is_directory(rom_path);
@@ -1004,15 +1005,15 @@ bool retro_load_game(const struct retro_game_info *info)
 
    // Initialize controls
    input.init(config.controls.pad_id,
-         config.controls.keyconfig, config.controls.padconfig, 
-         config.controls.analog,    config.controls.axis, config.controls.asettings);
+              config.controls.keyconfig, config.controls.padconfig,
+              config.controls.analog, config.controls.axis, config.controls.asettings);
 
    config.controls.haptic = forcefeedback::init_rumble_interface(environ_cb);
-   if (config.controls.haptic) 
+   if (config.controls.haptic)
       config.controls.haptic = forcefeedback::init(
-            config.controls.max_force,
-            config.controls.min_force,
-            config.controls.force_duration);
+          config.controls.max_force,
+          config.controls.min_force,
+          config.controls.force_duration);
 
 #ifdef CANNONBOARD
    // Initialize CannonBoard (For use in original cabinets)
@@ -1030,41 +1031,41 @@ bool retro_load_game(const struct retro_game_info *info)
 }
 
 bool retro_load_game_special(unsigned game_type,
-      const struct retro_game_info *info, size_t num_info)
+                             const struct retro_game_info *info, size_t num_info)
 {
-    (void) game_type;
-    (void) info;
-    (void) num_info;
-    return false;
+   (void)game_type;
+   (void)info;
+   (void)num_info;
+   return false;
 }
 
 void retro_unload_game(void)
 {
 #ifdef COMPILE_SOUND_CODE
-    audio.stop_audio();
+   audio.stop_audio();
 #endif
-    input.close();
-    forcefeedback::close();
-    delete menu;
+   input.close();
+   forcefeedback::close();
+   delete menu;
 }
 
 unsigned retro_get_region(void)
 {
-    return RETRO_REGION_NTSC;
+   return RETRO_REGION_NTSC;
 }
 
 unsigned retro_api_version(void)
 {
-    return RETRO_API_VERSION;
+   return RETRO_API_VERSION;
 }
 
 void *retro_get_memory_data(unsigned id)
 {
    switch (id)
    {
-      case RETRO_MEMORY_SYSTEM_RAM:
-      default:
-         break;
+   case RETRO_MEMORY_SYSTEM_RAM:
+   default:
+      break;
    }
 
    return NULL;
@@ -1077,7 +1078,7 @@ size_t retro_get_memory_size(unsigned id)
 
 void retro_init(void)
 {
-   unsigned                  level = 2;
+   unsigned level = 2;
    environ_cb(RETRO_ENVIRONMENT_SET_PERFORMANCE_LEVEL, &level);
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
@@ -1086,8 +1087,8 @@ void retro_init(void)
    lr_options::init();
 
    option_visibility_set = false;
-   sound_enable_prev     = true;
-   analog_enable_prev    = true;
+   sound_enable_prev = true;
+   analog_enable_prev = true;
 }
 
 void retro_deinit(void)
@@ -1110,66 +1111,54 @@ struct button_bind
    unsigned joy_id;
 };
 
-static struct button_bind binds[] = { 
-   {273, RETRO_DEVICE_ID_JOYPAD_UP},
-   {274, RETRO_DEVICE_ID_JOYPAD_DOWN},
-   {276, RETRO_DEVICE_ID_JOYPAD_LEFT},
-   {275, RETRO_DEVICE_ID_JOYPAD_RIGHT},
-   {122, RETRO_DEVICE_ID_JOYPAD_B},      /* Accelerate */
-   {120, RETRO_DEVICE_ID_JOYPAD_Y},      /* Brake */
-   {32,  RETRO_DEVICE_ID_JOYPAD_X},      /* Gear 1 */
-   {33,  RETRO_DEVICE_ID_JOYPAD_A},      /* Gear 2 */
-   {49,  RETRO_DEVICE_ID_JOYPAD_START},  /* Start  */
-   {53,  RETRO_DEVICE_ID_JOYPAD_SELECT}, /* Coin  */
-   {304, RETRO_DEVICE_ID_JOYPAD_L},      /* View  */
-   {286, RETRO_DEVICE_ID_JOYPAD_R},      /* Menu  */
+static struct button_bind binds[] = {
+    {273, RETRO_DEVICE_ID_JOYPAD_UP},
+    {274, RETRO_DEVICE_ID_JOYPAD_DOWN},
+    {276, RETRO_DEVICE_ID_JOYPAD_LEFT},
+    {275, RETRO_DEVICE_ID_JOYPAD_RIGHT},
+    {122, RETRO_DEVICE_ID_JOYPAD_B},     /* Accelerate */
+    {120, RETRO_DEVICE_ID_JOYPAD_Y},     /* Brake */
+    {32, RETRO_DEVICE_ID_JOYPAD_X},      /* Gear 1 */
+    {33, RETRO_DEVICE_ID_JOYPAD_A},      /* Gear 2 */
+    {49, RETRO_DEVICE_ID_JOYPAD_START},  /* Start  */
+    {53, RETRO_DEVICE_ID_JOYPAD_SELECT}, /* Coin  */
+    {304, RETRO_DEVICE_ID_JOYPAD_L},     /* View  */
+    {286, RETRO_DEVICE_ID_JOYPAD_R},     /* Menu  */
 };
 
 static void process_events(void)
 {
    unsigned i;
    int analog_left_x, analog_r2, analog_l2;
-   int16_t ret = 0;
 
    input_poll_cb();
 
-   if (libretro_supports_bitmasks)
-      ret = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
-   else
+   for (i = 0; i < (RETRO_DEVICE_ID_JOYPAD_R + 1); i++)
    {
-      for (i = 0; i < (RETRO_DEVICE_ID_JOYPAD_R+1); i++)
-      {
-         if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, binds[i].joy_id))
-            ret |= (1 << i);
-      }
-   }
-
-   for (i = 0; i < (sizeof(binds) / sizeof(binds[0])); i++)
-   {
-      if (ret & (1 << binds[i].joy_id))
+      if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, binds[i].joy_id))
          input.handle_key(binds[i].id, true);
       else
          input.handle_key(binds[i].id, false);
    }
 
    analog_left_x = input_state_cb(0, RETRO_DEVICE_ANALOG,
-                     RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
-   analog_r2     = input_state_cb(0, RETRO_DEVICE_ANALOG,
-                     RETRO_DEVICE_INDEX_ANALOG_BUTTON, RETRO_DEVICE_ID_JOYPAD_R2);
-   analog_l2     = input_state_cb(0, RETRO_DEVICE_ANALOG,
-                     RETRO_DEVICE_INDEX_ANALOG_BUTTON, RETRO_DEVICE_ID_JOYPAD_L2);
+                                  RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
+   analog_r2 = input_state_cb(0, RETRO_DEVICE_ANALOG,
+                              RETRO_DEVICE_INDEX_ANALOG_BUTTON, RETRO_DEVICE_ID_JOYPAD_R2);
+   analog_l2 = input_state_cb(0, RETRO_DEVICE_ANALOG,
+                              RETRO_DEVICE_INDEX_ANALOG_BUTTON, RETRO_DEVICE_ID_JOYPAD_L2);
 
    /* Fallback to digital */
    if (config.controls.analog == 1)
    {
       if (analog_r2 == 0)
-         analog_r2 = (ret & (1 << RETRO_DEVICE_ID_JOYPAD_B )) ? 0x7FFF : 0;
+         analog_r2 = (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B)) ? 0x7FFF : 0;
       if (analog_l2 == 0)
-         analog_l2 = (ret & (1 << RETRO_DEVICE_ID_JOYPAD_Y )) ? 0x7FFF : 0;
+         analog_l2 = (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y)) ? 0x7FFF : 0;
       if (analog_left_x == 0)
       {
-         analog_left_x += (ret & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT )) ? -0x7FFF : 0;
-         analog_left_x += (ret & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT )) ? 0x7FFF : 0;
+         analog_left_x += (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT)) ? -0x7FFF : 0;
+         analog_left_x += (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT)) ? 0x7FFF : 0;
       }
    }
 
@@ -1178,130 +1167,135 @@ static void process_events(void)
 
 void retro_run(void)
 {
-    bool updated = false;
+   bool updated = false;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
-        update_variables(false);
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
+      update_variables(false);
 
-    if (config.fps != libretro_fps_prev)
-        update_timing();
+   if (config.fps != libretro_fps_prev)
+      update_timing();
 
-    frame++;
+   frame++;
 
-    // Get CannonBoard Packet Data
-    Packet* packet = NULL;
-    
+   // Get CannonBoard Packet Data
+   Packet *packet = NULL;
+
 #ifdef CANNONBOARD
-    if (config.cannonboard.enabled)
-       packet      = cannonboard.get_packet();
+   if (config.cannonboard.enabled)
+      packet = cannonboard.get_packet();
 #endif
 
-    switch (config.fps)
-    {
-        case 60:
-            /* 60 fps
-             * Non-standard: tick every second frame */
-            tick_frame = frame & 1;
-            break;
-        case 120:
-            /* 120 fps
-             * Non-standard: tick every fourth frame */
-            tick_frame = (frame & 3) == 1;
-            break;
-        case 30:
-        default:
-            /* 30 fps
-             * Standard rate: tick every frame */
-            tick_frame = true;
-            break;
-    }
+   switch (config.fps)
+   {
+   case 60:
+      /* 60 fps
+       * Non-standard: tick every second frame */
+      tick_frame = frame & 1;
+      break;
+   case 120:
+      /* 120 fps
+       * Non-standard: tick every fourth frame */
+      tick_frame = (frame & 3) == 1;
+      break;
+   case 30:
+   default:
+      /* 30 fps
+       * Standard rate: tick every frame */
+      tick_frame = true;
+      break;
+   }
 
-    process_events();
+   process_events();
 
-    if (tick_frame)
-    {
-        oinputs.tick(packet);           // Do Controls
-        oinputs.do_gear();        // Digital Gear
-    }
+   if (tick_frame)
+   {
+      oinputs.tick(packet); // Do Controls
+      oinputs.do_gear();    // Digital Gear
+   }
 
-    switch (state)
-    {
-        case STATE_GAME:
-        {
-            if (tick_frame)
-            {
-                if (input.has_pressed(Input::TIMER)) outrun.freeze_timer = !outrun.freeze_timer;
-                if (input.has_pressed(Input::PAUSE)) pause_engine = !pause_engine;
-                if (input.has_pressed(Input::MENU))  state = STATE_INIT_MENU;
-            }
+   switch (state)
+   {
+   case STATE_GAME:
+   {
+      if (tick_frame)
+      {
+         if (input.has_pressed(Input::TIMER))
+            outrun.freeze_timer = !outrun.freeze_timer;
+         if (input.has_pressed(Input::PAUSE))
+            pause_engine = !pause_engine;
+         if (input.has_pressed(Input::MENU))
+            state = STATE_INIT_MENU;
+      }
 
-            if (!pause_engine || input.has_pressed(Input::STEP))
-            {
-                outrun.tick(packet, tick_frame);
-                if (tick_frame) input.frame_done();
-
-                #ifdef COMPILE_SOUND_CODE
-                // Tick audio program code
-                osoundint.tick();
-                // Tick Audio
-                audio.tick();
-                #endif
-            }
-            else
-            {                
-                if (tick_frame) input.frame_done();
-            }
-        }
-        break;
-
-        case STATE_INIT_GAME:
-            if (config.engine.jap && !roms.load_japanese_roms())
-            {
-                state = STATE_QUIT;
-            }
-            else
-            {
-                pause_engine = false;
-                outrun.init();
-                state = STATE_GAME;
-            }
-            break;
-
-        case STATE_MENU:
-        {
-            menu->tick(packet);
+      if (!pause_engine || input.has_pressed(Input::STEP))
+      {
+         outrun.tick(packet, tick_frame);
+         if (tick_frame)
             input.frame_done();
-            #ifdef COMPILE_SOUND_CODE
-            // Tick audio program code
-            osoundint.tick();
-            // Tick Audio
-            audio.tick();
-            #endif
-        }
-        break;
 
-        case STATE_INIT_MENU:
-            oinputs.init();
-            outrun.outputs->init();
-            menu->init();
-            state = STATE_MENU;
-            break;
+#ifdef COMPILE_SOUND_CODE
+         // Tick audio program code
+         osoundint.tick();
+         // Tick Audio
+         audio.tick();
+#endif
+      }
+      else
+      {
+         if (tick_frame)
+            input.frame_done();
+      }
+   }
+   break;
 
-        case STATE_QUIT:
-            environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
-            return;
-    }
+   case STATE_INIT_GAME:
+      if (config.engine.jap && !roms.load_japanese_roms())
+      {
+         state = STATE_QUIT;
+      }
+      else
+      {
+         pause_engine = false;
+         outrun.init();
+         state = STATE_GAME;
+      }
+      break;
+
+   case STATE_MENU:
+   {
+      menu->tick(packet);
+      input.frame_done();
+#ifdef COMPILE_SOUND_CODE
+      // Tick audio program code
+      osoundint.tick();
+      // Tick Audio
+      audio.tick();
+#endif
+   }
+   break;
+
+   case STATE_INIT_MENU:
+      oinputs.init();
+      outrun.outputs->init();
+      menu->init();
+      state = STATE_MENU;
+      break;
+
+   case STATE_QUIT:
+      environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
+      return;
+   }
 
 #ifdef CANNONBOARD
-    // Write CannonBoard Outputs
-    if (config.cannonboard.enabled)
-        cannonboard.write(outrun.outputs->dig_out, outrun.outputs->hw_motor_control);
+   // Write CannonBoard Outputs
+   if (config.cannonboard.enabled)
+      cannonboard.write(outrun.outputs->dig_out, outrun.outputs->hw_motor_control);
 #endif
 
-    // Draw Video
-    video.draw_frame();
+   // Draw Video
+   video.draw_frame();
 
-    // Stop any haptic feedback effects if
-    // duration timer has elapsed
-    forcefeedback::update_rumble_interface();
+   // Stop any haptic feedback effects if
+   // duration timer has elapsed
+   forcefeedback::update_rumble_interface();
 }

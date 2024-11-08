@@ -542,7 +542,7 @@ WARNINGS := -Wall \
 	-Wno-uninitialized \
 	$(NEW_GCC_WARNING_FLAGS) \
 	-Wno-strict-aliasing
-EXTRA_GCC_FLAGS := -funroll-loops
+EXTRA_GCC_FLAGS := -funroll-loops -s
 endif
 
 ifeq ($(NO_GCC),1)
