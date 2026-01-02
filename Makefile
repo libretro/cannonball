@@ -83,6 +83,8 @@ ifneq (,$(findstring unix,$(platform)))
       endif
    endif
 
+   CXXFLAGS += --std=c++17
+
 # OS X
 else ifeq ($(platform), osx)
    TARGET := $(TARGET_NAME)_libretro.dylib
