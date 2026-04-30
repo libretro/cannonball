@@ -83,6 +83,15 @@ ifneq (,$(findstring unix,$(platform)))
       endif
    endif
 
+   # Use system Boost instead of vendored deps/boost (allow building with --std=c++20)
+   SYSTEM_BOOST ?= 0
+   ifneq ($(SYSTEM_BOOST), 1)
+      CXX17_SUPPORTED := $(shell $(CXX) -std=c++17 -x c++ /dev/null -fsyntax-only 2>/dev/null && echo 1)
+       ifeq ($(CXX17_SUPPORTED), 1)
+          CXXFLAGS += --std=c++17
+       endif
+   endif
+
 # OS X
 else ifeq ($(platform), osx)
    TARGET := $(TARGET_NAME)_libretro.dylib
