@@ -45,10 +45,12 @@ template<class T> T * get_pointer(T * p)
 #define BOOST_CORE_DETAIL_DISABLED_DEPRECATED_WARNINGS
 #endif
 
+#if !defined(__cplusplus) || __cplusplus < 201703L
 template<class T> T * get_pointer(std::auto_ptr<T> const& p)
 {
     return p.get();
 }
+#endif
 
 #if defined( BOOST_CORE_DETAIL_DISABLE_LIBSTDCXX_DEPRECATED_WARNINGS )
 #pragma GCC diagnostic pop
