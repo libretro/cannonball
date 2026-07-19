@@ -530,6 +530,10 @@ WINDOWS_VERSION=1
 
 endif
 
+ifneq (,$(or $(findstring webos,$(CROSS_COMPILE)),$(findstring starfish,$(CROSS_COMPILE))))
+   CXXFLAGS += -std=c++14
+endif
+
 include Makefile.common
 
 ifneq (,$(findstring msvc,$(platform)))
