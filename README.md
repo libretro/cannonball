@@ -1,87 +1,95 @@
-Cannonball - OutRun Engine
-==========================
+# CannonBall Libretro
 
-See [Reassembler Blog](http://reassembler.blogspot.co.uk/).
+CannonBall is an enhanced game engine for Sega's 1986 OutRun arcade
+game. The original 68000 and Z80 code was rewritten in C++ by Chris
+White, enabling enhancements such as smoother frame rates, widescreen
+rendering and additional game modes.
 
-Credits
--------
+This repository contains the Libretro core and synchronizes it with the
+modern CannonBall engine while retaining the Libretro integration.
 
-* Chris White - Project creator.
-* Arun Horne  - Cross platform work.
+## Requirements
 
-Getting Started
----------------
+CannonBall requires legally obtained ROM files from the OutRun Revision
+B arcade set. No copyrighted game data is included in this repository.
 
-Cannonball has been successfully built for Windows, Mac OS X, Linux, Open Pandora and the Raspberry Pi. 
+For instructions on downloading the CannonBall support files, arranging
+the ROM files and starting the core, see:
 
-* Install your favourite C++ environment (e.g. GCC, Visual Studio, Xcode, MingGW etc.)
-* Install [CMake](http://www.cmake.org/). This generates your platform and compiler build files. 
-* Extract the [Boost Library](http://www.boost.org/) somewhere, for example: c:\coding\lib\boost_1_51_0
-* Extract the [SDL Library](http://www.libsdl.org/download-1.2.php) somewhere, for example: c:\coding\lib\SDL-1.2.15
-* Read the SDL documentation & compile the SDL Library for your system.
-* Windows only, download and install the [Direct 8.1 SDK](http://stackoverflow.com/questions/5192384/looking-for-the-old-directx-8-1-sdk)
-* Extract the Cannonball code somewhere, for example: c:\coding\cannonball
-* You may need to create a .cmake file for your system to configure specific options. See the cmake subdirectory for more details. If not, the default.cmake file will be used.
+https://docs.libretro.com/library/cannonball/
 
-Build
------
+The core supports the `.game` and `.88` content entry points.
 
-* Run CMake to generate the relevant build files for your compiler. You can optionally pass -DTARGET=filename to pass a custom .cmake file
-* Compile using your chosen compiler. Further details below.
+## Features
 
-###
+- original, 30, 60 and 120 FPS rendering modes
+- widescreen and high-resolution rendering
+- Continuous and Time Trial game modes
+- analog steering, accelerator and brake controls
+- force feedback on supported frontend and input-driver combinations
+- custom track support
+- optional custom music support
+- additional car palette options
+- Libretro core reset support
+- persistent configuration and high scores
+- Libretro core options and input remapping
 
-    mkdir build
-    cd build
+Feature availability may depend on the Libretro frontend, operating
+system and selected input driver.
 
-### Non-IDE (e.g. straight GCC)
-    
-    cmake -G "Insert Generator Name Here" ../cmake
-    make
+## Building the Libretro core
 
-### MinGW
+The Libretro build uses `Makefile` and `Makefile.common`.
 
-    cmake -G "MinGW Makefiles" -DTARGET=mingw ../cmake
-    mingw32-make
-    
-### Visual Studio 2010
+Run:
 
-    cmake -G "Visual Studio 10" ../cmake
+    make platform=<target> -j<number-of-jobs>
 
-### Mac OSX
+For example, on macOS:
 
-    cmake -G "Unix Makefiles" -DTARGET:STRING=macosx ../cmake
-    make
+    make platform=osx -j"$(sysctl -n hw.ncpu)"
 
-* Copy SDL.DLL and the roms subdirectory to the build directory.
-* Right click the 'cannonball' project in the IDE and choose 'Set as StartUp project'. 
-* You can then compile, debug and run from Visual Studio as expected.
+The resulting core uses the platform-appropriate shared-library
+extension, such as:
 
-Run
----
+- `cannonball_libretro.so` on Linux and other Unix-like systems
+- `cannonball_libretro.dylib` on macOS
+- `cannonball_libretro.dll` on Windows
 
-* Copy the OutRun revision B romset to the roms subdirectory. Rename the files if necessary.
-* Copy or link the roms subdirectory to whereever your executable resides.
+Available targets and platform-specific settings are defined in the
+Makefile.
 
-###
+## Dependencies
 
-    ln -s ../roms roms
-    ./outrun
-    
-    
-Building SDL-1.2.15
--------------------
+The Libretro core includes the required Libretro common sources and
+pugixml in the repository.
 
-### Darwin
+Configuration and high-score XML handling use pugixml. The previous
+vendored Boost dependency is no longer required.
 
-    ./configure --prefix=~/SDL-1.2.15/build --disable-assembly
+The Libretro build does not require SDL2. SDL2 and CMake are used by the
+standalone CannonBall application instead.
 
-### MinGW
+## Standalone CannonBall
 
-See: [Setting up MSYS MinGW build system for compiling SDL OpenGL applications](http://blog.pantokrator.net/2006/08/08/setting-up-msysmingw-build-system-for-compiling-sdlopengl-applications/).
+Documentation and source code for the standalone application are
+available from the original project:
 
-Execute the below commands from the msys environment.
-    
-    ./configure --prefix=/mingw --enable-stdio-redirect=no
-    make
-    make install
+- Repository: https://github.com/djyt/cannonball
+- Manual and wiki: https://github.com/djyt/cannonball/wiki
+- Development blog: http://reassembler.blogspot.co.uk/
+
+## Credits
+
+- Chris White — CannonBall creator and original engine implementation
+- Arun Horne — cross-platform work
+- Libretro contributors — Libretro integration and maintenance
+- CannonBall contributors — continued engine development
+
+## License
+
+CannonBall is distributed under a non-commercial license. See the
+repository license files for the complete terms.
+
+The original OutRun ROM files and other copyrighted game data are not
+included.

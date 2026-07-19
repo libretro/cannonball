@@ -190,6 +190,42 @@ struct retro_core_option_v2_definition option_defs_us[] = {
       "ON"
    },
    {
+      "cannonball_sound_custom_wav_volume",
+      "Audio > Custom WAV Volume",
+      "Custom WAV Volume",
+      "Set playback volume of custom WAV music tracks. "
+      "Does not affect original arcade music or external BIN music. "
+      "50% matches the historical SDL attenuation; "
+      "values above 100% may clip when mixed with sound effects.",
+      NULL,
+      "audio",
+      {
+         { "0", "0%" },
+         { "10", "10%" },
+         { "20", "20%" },
+         { "30", "30%" },
+         { "40", "40%" },
+         { "50", "50%" },
+         { "60", "60%" },
+         { "70", "70%" },
+         { "80", "80%" },
+         { "90", "90%" },
+         { "100", "100%" },
+         { "110", "110%" },
+         { "120", "120%" },
+         { "130", "130%" },
+         { "140", "140%" },
+         { "150", "150%" },
+         { "160", "160%" },
+         { "170", "170%" },
+         { "180", "180%" },
+         { "190", "190%" },
+         { "200", "200%" },
+         { NULL, NULL },
+      },
+      "200"
+   },
+   {
       "cannonball_sound_advertise",
       "Audio > Advertise Sound (Restart)",
       "Advertise Sound (Restart)",
@@ -367,6 +403,81 @@ struct retro_core_option_v2_definition option_defs_us[] = {
          { NULL, NULL },
       },
       "OFF"
+   },
+   {
+      "cannonball_grippy_tyres",
+      "Engine > Grippy Tyres",
+      "Grippy Tyres",
+      "Increase tyre grip to reduce lateral sliding while cornering.",
+      NULL,
+      "engine",
+      {
+         { "OFF", NULL },
+         { "ON",  NULL },
+         { NULL, NULL },
+      },
+      "OFF"
+   },
+   {
+      "cannonball_offroad_tyres",
+      "Engine > Offroad Tyres",
+      "Offroad Tyres",
+      "Prevent the usual speed reduction when driving away from the road surface.",
+      NULL,
+      "engine",
+      {
+         { "OFF", NULL },
+         { "ON",  NULL },
+         { NULL, NULL },
+      },
+      "OFF"
+   },
+   {
+      "cannonball_strong_bumper",
+      "Engine > Strong Bumper",
+      "Strong Bumper",
+      "Reduce the effect of collisions with traffic vehicles.",
+      NULL,
+      "engine",
+      {
+         { "OFF", NULL },
+         { "ON",  NULL },
+         { NULL, NULL },
+      },
+      "OFF"
+   },
+   {
+      "cannonball_faster_car",
+      "Engine > Faster Car",
+      "Faster Car",
+      "Increase engine torque and raise the maximum vehicle speed.",
+      NULL,
+      "engine",
+      {
+         { "OFF", NULL },
+         { "ON",  NULL },
+         { NULL, NULL },
+      },
+      "OFF"
+   },
+   {
+      "cannonball_car_color",
+      "Engine > Car Color",
+      "Car Color",
+      "Select the Ferrari body colour.",
+      NULL,
+      "engine",
+      {
+         { "RED",    NULL },
+         { "BLUE",   NULL },
+         { "YELLOW", NULL },
+         { "GREEN",  NULL },
+         { "CYAN",   NULL },
+         { "BLACK",  NULL },
+         { "WHITE",  NULL },
+         { NULL, NULL },
+      },
+      "RED"
    },
    {
       "cannonball_dip_time",

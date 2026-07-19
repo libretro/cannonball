@@ -30,6 +30,9 @@ public:
     // Enable/Disable Sound
     bool sound_enabled;
 
+    // Playback volume of custom WAV music, in percent.
+    uint16_t custom_wav_volume;
+
     Audio();
     ~Audio();
 

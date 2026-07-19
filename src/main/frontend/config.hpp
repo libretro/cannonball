@@ -13,6 +13,25 @@
 #include <stdint.h>
 #include <set>
 #include <string>
+#include <vector>
+
+
+struct data_settings_t
+{
+    std::string res_path;
+};
+
+struct music_t
+{
+    const static int IS_YM_INT = 0;
+    const static int IS_YM_EXT = 1;
+    const static int IS_WAV    = 2;
+
+    int type;
+    int cmd;
+    std::string title;
+    std::string filename;
+};
 
 struct custom_music_t
 {
@@ -48,14 +67,18 @@ struct video_settings_t
     int fps_count;
     int hires;
     int filtering;
+    int shadow;
 };
 
 struct sound_settings_t
 {
     int enabled;
+    int rate;
     int advertise;
     int preview;
     int fix_samples;
+    int music_timer;
+    std::vector<music_t> music;
     custom_music_t custom_music[4];
 };
 
@@ -82,19 +105,6 @@ struct controls_settings_t
     int force_duration;
 };
 
-struct cannonboard_settings_t
-{
-    const static int CABINET_MOVING  = 0;
-    const static int CABINET_UPRIGHT = 1;
-    const static int CABINET_MINI    = 2;
-
-    int enabled;      // CannonBall used in conjunction with CannonBoard in arcade cabinet
-    std::string port; // Port Name
-    int baud;         // Baud Rate
-    int debug;        // Display Debug Information
-    int cabinet;      // Cabinet Type
-};
-
 struct engine_settings_t
 {
     int dip_time;
@@ -111,20 +121,27 @@ struct engine_settings_t
     bool fix_timer;
     bool layout_debug;
     bool force_ai;
+    bool hiscore_delete;
+    int hiscore_timer;
     int new_attract;
+    bool grippy_tyres;
+    bool offroad;
+    bool bumper;
+    bool turbo;
+    int car_pal;
     
 };
 
 class Config
 {
 public:
+    data_settings_t        data;
     menu_settings_t        menu;
     video_settings_t       video;
     sound_settings_t       sound;
     controls_settings_t    controls;
     engine_settings_t      engine;
     ttrial_settings_t      ttrial;
-    cannonboard_settings_t cannonboard;
 
     // Internal screen width and height
     uint16_t s16_width, s16_height;
@@ -145,6 +162,7 @@ public:
     ~Config(void);
 
     void init();
+    void load_custom_music(const std::string& filename);
     void load_scores(const std::string &filename);
     void save_scores(const std::string &filename);
     void load_tiletrial_scores();

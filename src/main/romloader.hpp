@@ -1,6 +1,6 @@
 /***************************************************************************
-    Binary File Loader. 
-    
+    Binary File Loader.
+
     Handles loading an individual binary file to memory.
     Supports reading bytes, words and longs from this area of memory.
 
@@ -10,58 +10,75 @@
 
 #pragma once
 
+#include <stdint.h>
+
 class RomLoader
 {
-
 public:
     enum {NORMAL = 1, INTERLEAVE2 = 2, INTERLEAVE4 = 4};
 
     uint8_t* rom;
-
-    // Size of rom
     uint32_t length;
-
-    // Successfully loaded
     bool loaded;
 
     RomLoader();
     ~RomLoader();
-    void init(uint32_t);
-    int load(const char* filename, const int offset, const int length, const uint32_t expected_crc, const uint8_t mode = NORMAL);
+
+    void init(uint32_t length);
+
+    // Retains the upstream call interface used by Roms. The Libretro
+    // implementation identifies ROMs by CRC32 first, then falls back to the
+    // canonical filename for compatibility with existing frontend setups.
+    int (RomLoader::*load)(const char*, const int, const int,
+                           const uint32_t, const uint8_t, const bool);
+
+    int load_auto(const char* filename, const int offset, const int length,
+                  const uint32_t expected_crc,
+                  const uint8_t mode = NORMAL,
+                  const bool verbose = true);
+
+    int load_rom(const char* filename, const int offset, const int length,
+                 const uint32_t expected_crc,
+                 const uint8_t mode = NORMAL,
+                 const bool verbose = true);
+
+    int load_crc32(const char* debug, const int offset, const int length,
+                   const uint32_t expected_crc,
+                   const uint8_t mode = NORMAL,
+                   const bool verbose = true);
+
     int load_binary(const char* filename);
     void unload(void);
 
-    // ----------------------------------------------------------------------------
-    // Used by translated 68000 Code
-    // ----------------------------------------------------------------------------
-
     inline uint32_t read32(uint32_t* addr)
-    {    
-        uint32_t data = (rom[*addr] << 24) | (rom[*addr+1] << 16) | (rom[*addr+2] << 8) | (rom[*addr+3]);
+    {
+        uint32_t data = (rom[*addr] << 24) | (rom[*addr + 1] << 16) |
+                        (rom[*addr + 2] << 8) | rom[*addr + 3];
         *addr += 4;
         return data;
     }
 
     inline uint16_t read16(uint32_t* addr)
     {
-        uint16_t data = (rom[*addr] << 8) | (rom[*addr+1]);
+        uint16_t data = (rom[*addr] << 8) | rom[*addr + 1];
         *addr += 2;
         return data;
     }
 
     inline uint8_t read8(uint32_t* addr)
     {
-        return rom[(*addr)++]; 
+        return rom[(*addr)++];
     }
 
     inline uint32_t read32(uint32_t addr)
-    {    
-        return (rom[addr] << 24) | (rom[addr+1] << 16) | (rom[addr+2] << 8) | rom[addr+3];
+    {
+        return (rom[addr] << 24) | (rom[addr + 1] << 16) |
+               (rom[addr + 2] << 8) | rom[addr + 3];
     }
 
     inline uint16_t read16(uint32_t addr)
     {
-        return (rom[addr] << 8) | rom[addr+1];
+        return (rom[addr] << 8) | rom[addr + 1];
     }
 
     inline uint8_t read8(uint32_t addr)
@@ -69,30 +86,28 @@ public:
         return rom[addr];
     }
 
-    // ----------------------------------------------------------------------------
-    // Used by translated Z80 Code
-    // Note that the endian is reversed compared with the 68000 code.
-    // ----------------------------------------------------------------------------
-
     inline uint16_t read16(uint16_t* addr)
     {
-        uint16_t data = (rom[*addr+1] << 8) | (rom[*addr]);
+        uint16_t data = (rom[*addr + 1] << 8) | rom[*addr];
         *addr += 2;
         return data;
     }
 
     inline uint8_t read8(uint16_t* addr)
     {
-        return rom[(*addr)++]; 
+        return rom[(*addr)++];
     }
 
     inline uint16_t read16(uint16_t addr)
     {
-        return (rom[addr+1] << 8) | rom[addr];
+        return (rom[addr + 1] << 8) | rom[addr];
     }
 
     inline uint8_t read8(uint16_t addr)
     {
         return rom[addr];
     }
+
+private:
+    int create_map();
 };

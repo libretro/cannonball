@@ -25,6 +25,7 @@ mpr-10378.16
 opr-10185.11
 opr-10186.47
 opr-10188.71
+opr-10188.71f
 opr-10189.70
 opr-10190.69
 opr-10191.68
@@ -163,8 +164,6 @@ local.properties
 *.vspscc
 .builds
 *.dotCover
-*.o
-*.a
 
 ## TODO: If you have NuGet Package Restore enabled, uncomment this
 #packages/
@@ -264,10 +263,15 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+old_version
+
 
 #############
 ## libretro
 #############
 
+*.o
+*.a
 *.so
 *.dll
+*.dylib

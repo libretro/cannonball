@@ -150,7 +150,7 @@ void OHud::draw_timer1(uint16_t time)
     if (!outrun.freeze_timer)
     {
         const uint16_t BASE_TILE = 0x8C80;
-        draw_timer2(time, 0x1100BE, BASE_TILE);
+        draw_timer2(time > 0x99 ? 0x99 : time, 0x1100BE, BASE_TILE);
 
         // Blank out the OFF text area
         video.write_text16(0x110C2, 0);
@@ -602,7 +602,7 @@ void OHud::blit_text2(uint32_t src_addr)
     uint32_t dst_addr = 0x110000 + roms.rom0.read16(&src_addr); // Text RAM destination address
 
     uint16_t pal = roms.rom0.read8(&src_addr); 
-    pal = 0x80A0 | ((pal << 9) | (pal >> 7) & 1);
+    pal = 0x80A0 | ((pal << 9) | ((pal >> 7) & 1));
     // same as ror 7 and extending to word
     uint16_t counter = roms.rom0.read8(&src_addr); // Number of tiles to blit
 
@@ -650,7 +650,7 @@ void OHud::draw_debug_info(uint32_t pos, uint16_t height_pat, uint8_t sprite_pat
 // Big Yellow Text. Always Centered. 
 void OHud::blit_text_big(const uint8_t Y, const char* text, bool do_notes)
 {
-    uint16_t length = strlen(text);
+    uint16_t length = (uint16_t) strlen(text);
 
     const uint16_t X = 20 - (length >> 1);
 
@@ -720,7 +720,7 @@ void OHud::blit_text_big(const uint8_t Y, const char* text, bool do_notes)
 void OHud::blit_text_new(uint16_t x, uint16_t y, const char* text, uint16_t pal)
 {
     uint32_t dst_addr = translate(x, y); 
-    uint16_t length = strlen(text);
+    uint16_t length = (uint16_t) strlen(text);
 
     for (uint16_t i = 0; i < length; i++)
     {
@@ -729,7 +729,7 @@ void OHud::blit_text_new(uint16_t x, uint16_t y, const char* text, uint16_t pal)
         // Convert lowercase characters to uppercase
         if (c >= 'a' && c <= 'z')
             c -= 0x20;
-        else if (c == '©')
+        else if (static_cast<unsigned char>(c) == 0xA9)
             c = 0x10;
         else if (c == '-')
             c = 0x2d;

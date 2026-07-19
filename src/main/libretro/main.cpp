@@ -11,6 +11,7 @@
 
 #include <file/file_path.h>
 #include <streams/file_stream.h>
+#include <retro_dirent.h>
 #include <file/file_path.h>
 #include <string/stdstring.h>
 
@@ -28,10 +29,10 @@
 #include "frontend/config.hpp"
 #include "frontend/menu.hpp"
 
-#include "cannonboard/interface.hpp"
 #include "engine/oinputs.hpp"
 #include "engine/ooutputs.hpp"
 #include "engine/omusic.hpp"
+#include "engine/ostats.hpp"
 
 #include "lr_options.hpp"
 
@@ -51,7 +52,6 @@ Audio cannonball::audio;
 #endif
 
 Menu* menu;
-Interface cannonboard;
 
 
 // Pause Engine
@@ -88,6 +88,10 @@ static void config_init(void)
 #endif
     config.video.hires      = 0; // Hi-Resolution Mode
     config.video.filtering  = 0; // Open GL Filtering Mode
+    config.video.shadow     = 0; // Original System 16 shadow intensity
+
+    // Must be set before set_fps() initializes the audio chips.
+    config.sound.rate       = 44100;
 
     config.set_fps(config.video.fps);
 
@@ -102,30 +106,9 @@ static void config_init(void)
     config.sound.advertise   = 1;
     config.sound.preview     = 1;
     config.sound.fix_samples = 1;
+    config.sound.music_timer = MUSIC_TIMER;
 
-#if 0
-    // Custom Music
-    for (int i = 0; i < 4; i++)
-    {
-        std::string xmltag = "sound.custom_music.track";
-        xmltag += Utils::to_string(i+1);  
 
-        config.sound.custom_music[i].enabled = pt_config.get(xmltag + ".<xmlattr>.enabled", 0);
-        config.sound.custom_music[i].title   = pt_config.get(xmltag + ".title", "TRACK " +Utils::to_string(i+1));
-        config.sound.custom_music[i].filename= pt_config.get(xmltag + ".filename", "track"+Utils::to_string(i+1)+".wav");
-    }
-#endif
-
-#ifdef CANNONBOARD
-    // ------------------------------------------------------------------------
-    // CannonBoard Settings
-    // ------------------------------------------------------------------------
-    cannonboard.enabled = 1;
-    cannonboard.port    = "COM6";
-    cannonboard.baud    = 57600;
-    cannonboard.debug   = 0;
-    cannonboard.cabinet = 0;
-#endif
 
     // ------------------------------------------------------------------------
     // Controls
@@ -190,7 +173,15 @@ static void config_init(void)
     config.engine.fix_bugs        = 1;
     config.engine.fix_timer       = 0;
     config.engine.layout_debug    = 0;
-    config.engine.new_attract     = 1;
+    config.engine.force_ai       = false;
+    config.engine.hiscore_delete = true;
+    config.engine.hiscore_timer  = HIGHSCORE_TIMER;
+    config.engine.new_attract    = 1;
+    config.engine.grippy_tyres   = false;
+    config.engine.offroad        = false;
+    config.engine.bumper         = false;
+    config.engine.turbo          = false;
+    config.engine.car_pal        = 0;
 
     // ------------------------------------------------------------------------
     // Time Trial Mode
@@ -266,6 +257,8 @@ static bool update_option_visibility(void)
 
       option_display.key = "cannonball_sound_fix_samples";
       environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
+      option_display.key = "cannonball_sound_custom_wav_volume";
+      environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
 
       sound_enable_prev = sound_enable;
       updated           = true;
@@ -314,10 +307,18 @@ void retro_set_environment(retro_environment_t cb)
    environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_UPDATE_DISPLAY_CALLBACK,
          &update_display_cb);
 
+   // File VFS remains compatible with frontends that only expose version 1.
    vfs_iface_info.required_interface_version = 1;
    vfs_iface_info.iface                      = NULL;
    if (environ_cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
       filestream_vfs_init(&vfs_iface_info);
+
+   // Directory VFS is optional. retro_dirent falls back to libretro-common's
+   // implementation when the frontend does not expose version 3.
+   vfs_iface_info.required_interface_version = DIRENT_REQUIRED_VFS_VERSION;
+   vfs_iface_info.iface                      = NULL;
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
+      dirent_vfs_init(&vfs_iface_info);
 }
 
 void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
@@ -453,6 +454,27 @@ static void update_variables(bool startup)
       }
    }
 
+   #ifdef COMPILE_SOUND_CODE
+   var.key = "cannonball_sound_custom_wav_volume";
+   var.value = NULL;
+
+   if (environ_cb(
+           RETRO_ENVIRONMENT_GET_VARIABLE,
+           &var) &&
+       var.value)
+   {
+       int volume = atoi(var.value);
+
+       if (volume < 0)
+           volume = 0;
+       else if (volume > 200)
+           volume = 200;
+
+       cannonball::audio.custom_wav_volume =
+           (uint16_t)volume;
+   }
+   #endif
+
    var.key = "cannonball_gear";
    var.value = NULL;
 
@@ -541,6 +563,53 @@ static void update_variables(bool startup)
          config.engine.force_ai = false;
       else
          config.engine.force_ai = true;
+   }
+
+   var.key = "cannonball_grippy_tyres";
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+      config.engine.grippy_tyres = strcmp(var.value, "ON") == 0;
+
+   var.key = "cannonball_offroad_tyres";
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+      config.engine.offroad = strcmp(var.value, "ON") == 0;
+
+   var.key = "cannonball_strong_bumper";
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+      config.engine.bumper = strcmp(var.value, "ON") == 0;
+
+   var.key = "cannonball_faster_car";
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+      config.engine.turbo = strcmp(var.value, "ON") == 0;
+
+   var.key = "cannonball_car_color";
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      int car_pal = 0;
+
+      if (strcmp(var.value, "BLUE") == 0)
+         car_pal = 1;
+      else if (strcmp(var.value, "YELLOW") == 0)
+         car_pal = 2;
+      else if (strcmp(var.value, "GREEN") == 0)
+         car_pal = 3;
+      else if (strcmp(var.value, "CYAN") == 0)
+         car_pal = 4;
+      else if (strcmp(var.value, "BLACK") == 0)
+         car_pal = 5;
+      else if (strcmp(var.value, "WHITE") == 0)
+         car_pal = 6;
+
+      config.engine.car_pal = car_pal;
    }
 
    /* All of the remaining options require a core
@@ -969,7 +1038,7 @@ bool retro_load_game(const struct retro_game_info *info)
    log_cb(RETRO_LOG_INFO, "Rom directory: %s\n", rom_path);
    retro_build_save_paths();
 
-   bool loaded = roms.load_revb_roms();
+   bool loaded = roms.load_revb_roms(false);
 
    if (!loaded)
    {
@@ -978,6 +1047,10 @@ bool retro_load_game(const struct retro_game_info *info)
    }
 
    config_init();
+   config.data.res_path = std::string(rom_path) + "res/";
+
+   config.load_custom_music(
+         config.data.res_path + "config.xml");
 
    update_variables(true);
 
@@ -986,7 +1059,7 @@ bool retro_load_game(const struct retro_game_info *info)
       roms.load_pcm_rom(true);
 
    // Load patched widescreen tilemaps
-   if (!omusic.load_widescreen_map())
+   if (!omusic.load_widescreen_map(std::string(rom_path) + "res/"))
    {
       if (log_cb)
          log_cb(RETRO_LOG_WARN, "[Cannonball]: Unable to load widescreen tilemaps.\n");
@@ -995,7 +1068,7 @@ bool retro_load_game(const struct retro_game_info *info)
    if (!video.init(&roms, &config.video))
       return false;
 
-   menu = new Menu(&cannonboard);
+   menu = new Menu();
 
 #ifdef COMPILE_SOUND_CODE
    audio.init();
@@ -1014,14 +1087,6 @@ bool retro_load_game(const struct retro_game_info *info)
             config.controls.min_force,
             config.controls.force_duration);
 
-#ifdef CANNONBOARD
-   // Initialize CannonBoard (For use in original cabinets)
-   if (config.cannonboard.enabled)
-   {
-      cannonboard.init(config.cannonboard.port, config.cannonboard.baud);
-      cannonboard.start();
-   }
-#endif
 
    // Populate menus
    menu->populate();
@@ -1102,6 +1167,60 @@ void retro_deinit(void)
 
 void retro_reset(void)
 {
+    if (log_cb)
+        log_cb(
+            RETRO_LOG_INFO,
+            "[Cannonball]: Reset requested.\n");
+
+    pause_engine = false;
+    frame = 0;
+    tick_frame = true;
+    fps_counter = 0;
+
+    forcefeedback::deactivate_rumble();
+
+#ifdef COMPILE_SOUND_CODE
+    audio.clear_wav();
+#endif
+
+    // A frontend may request Reset immediately after changing a Core
+    // Option, without running another frame. Refresh the live options
+    // before selecting the reset destination.
+    update_variables(false);
+
+    // Reset the active game session to its initial state.
+    //
+    // Time Trial stores its selected mode, course and an artificial
+    // credit before handing control from the frontend to the engine.
+    // These values must not survive a frontend Reset request.
+    outrun.cannonball_mode = Outrun::MODE_ORIGINAL;
+
+    outrun.ttrial.level            = 0;
+    outrun.ttrial.current_lap      = 0;
+    outrun.ttrial.best_lap_counter = 0;
+    outrun.ttrial.best_lap[0]      = 0;
+    outrun.ttrial.best_lap[1]      = 0;
+    outrun.ttrial.best_lap[2]      = 0;
+    outrun.ttrial.new_high_score   = false;
+    outrun.ttrial.overtakes        = 0;
+    outrun.ttrial.crashes          = 0;
+    outrun.ttrial.vehicle_cols     = 0;
+
+    ostats.credits = 0;
+
+    // Reproduce the initial state selected when the content is loaded:
+    // main menu when enabled, otherwise the normal game boot sequence.
+    state = config.menu.enabled
+        ? STATE_INIT_MENU
+        : STATE_INIT_GAME;
+
+    if (log_cb)
+        log_cb(
+            RETRO_LOG_INFO,
+            "[Cannonball]: Reset target: %s.\n",
+            config.menu.enabled
+                ? "main menu"
+                : "attract mode");
 }
 
 struct button_bind
@@ -1188,13 +1307,6 @@ void retro_run(void)
 
     frame++;
 
-    // Get CannonBoard Packet Data
-    Packet* packet = NULL;
-    
-#ifdef CANNONBOARD
-    if (config.cannonboard.enabled)
-       packet      = cannonboard.get_packet();
-#endif
 
     switch (config.fps)
     {
@@ -1220,7 +1332,7 @@ void retro_run(void)
 
     if (tick_frame)
     {
-        oinputs.tick(packet);           // Do Controls
+        oinputs.tick();           // Do Controls
         oinputs.do_gear();        // Digital Gear
     }
 
@@ -1237,7 +1349,7 @@ void retro_run(void)
 
             if (!pause_engine || input.has_pressed(Input::STEP))
             {
-                outrun.tick(packet, tick_frame);
+                outrun.tick(tick_frame);
                 if (tick_frame) input.frame_done();
 
                 #ifdef COMPILE_SOUND_CODE
@@ -1269,7 +1381,7 @@ void retro_run(void)
 
         case STATE_MENU:
         {
-            menu->tick(packet);
+            menu->tick();
             input.frame_done();
             #ifdef COMPILE_SOUND_CODE
             // Tick audio program code
@@ -1292,14 +1404,10 @@ void retro_run(void)
             return;
     }
 
-#ifdef CANNONBOARD
-    // Write CannonBoard Outputs
-    if (config.cannonboard.enabled)
-        cannonboard.write(outrun.outputs->dig_out, outrun.outputs->hw_motor_control);
-#endif
 
     // Draw Video
-    video.draw_frame();
+    video.prepare_frame();
+    video.render_frame();
 
     // Stop any haptic feedback effects if
     // duration timer has elapsed

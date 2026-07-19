@@ -104,40 +104,66 @@ void OCrash::clear_crash_state()
 
 void OCrash::tick()
 {
-    if (!outrun.tick_frame && 
+    if (!outrun.tick_frame &&
         oroad.get_view_mode() == ORoad::VIEW_INCAR &&
         crash_type != CRASH_FLIP)
+    {
         return;
+    }
 
     // Do Ferrari
     if (spr_ferrari->control & OSprites::ENABLE)
-        if (outrun.tick_frame) do_crash();
-        else osprites.do_spr_order_shadows(spr_ferrari);
+    {
+        if (outrun.tick_frame)
+            do_crash();
+        else
+            osprites.do_spr_order_shadows(spr_ferrari);
+    }
 
     // Do Car Shadow
     if (spr_shadow->control & OSprites::ENABLE)
-        if (outrun.tick_frame) do_shadow(spr_ferrari, spr_shadow);
-        else osprites.do_spr_order_shadows(spr_shadow);
+    {
+        if (outrun.tick_frame)
+            do_shadow(spr_ferrari, spr_shadow);
+        else
+            osprites.do_spr_order_shadows(spr_shadow);
+    }
 
     // Do Passenger 1
     if (spr_pass1->control & OSprites::ENABLE)
-        if (outrun.tick_frame) ((ocrash).*(function_pass1))(spr_pass1);
-        else osprites.do_spr_order_shadows(spr_pass1);
+    {
+        if (outrun.tick_frame)
+            ((ocrash).*(function_pass1))(spr_pass1);
+        else
+            osprites.do_spr_order_shadows(spr_pass1);
+    }
 
     // Do Passenger 1 Shadow
     if (spr_pass1s->control & OSprites::ENABLE)
-        if (outrun.tick_frame) do_shadow(spr_pass1, spr_pass1s);
-        else osprites.do_spr_order_shadows(spr_pass1s);
+    {
+        if (outrun.tick_frame)
+            do_shadow(spr_pass1, spr_pass1s);
+        else
+            osprites.do_spr_order_shadows(spr_pass1s);
+    }
 
     // Do Passenger 2
     if (spr_pass2->control & OSprites::ENABLE)
-        if (outrun.tick_frame) ((ocrash).*(function_pass2))(spr_pass2);
-        else osprites.do_spr_order_shadows(spr_pass2);
+    {
+        if (outrun.tick_frame)
+            ((ocrash).*(function_pass2))(spr_pass2);
+        else
+            osprites.do_spr_order_shadows(spr_pass2);
+    }
 
     // Do Passenger 2 Shadow
     if (spr_pass2s->control & OSprites::ENABLE)
-        if (outrun.tick_frame) do_shadow(spr_pass2, spr_pass2s);
-        else osprites.do_spr_order_shadows(spr_pass2s);
+    {
+        if (outrun.tick_frame)
+            do_shadow(spr_pass2, spr_pass2s);
+        else
+            osprites.do_spr_order_shadows(spr_pass2s);
+    }
 }
 
 // Source: 0x1162
@@ -377,7 +403,8 @@ void OCrash::do_collision()
     else
         spr_ferrari->control &= ~OSprites::HFLIP;
 
-    spr_ferrari->pal_src = roms.rom0p->read8(5 + property_table);
+    //spr_ferrari->pal_src = roms.rom0p->read8(5 + property_table);
+    spr_ferrari->pal_src = oferrari.ferrari_pal;
     spin_pass_frame = (int8_t) roms.rom0p->read8(6 + property_table);
 
     if (--spinflipcount2 > 0)
@@ -520,7 +547,8 @@ void OCrash::do_bump()
     else
         spr_ferrari->control &= ~OSprites::HFLIP;
     
-    spr_ferrari->pal_src = roms.rom0p->read8(frames + 5);
+    //spr_ferrari->pal_src = roms.rom0p->read8(frames + 5);
+    spr_ferrari->pal_src = oferrari.ferrari_pal;
     spin_pass_frame = (int8_t) roms.rom0p->read8(frames + 6);
 
     if (++lookup_index >= 0x10)
@@ -660,7 +688,11 @@ void OCrash::do_car_flip()
     else 
         spr_ferrari->control &= ~OSprites::HFLIP;
 
-    spr_ferrari->pal_src = roms.rom0p->read8(4 + frames);
+    // Palette Hack for recoloured cars. Original version was simply: spr_ferrari->pal_src = roms.rom0p->read8(4 + frames);
+    if (frame >= 7)
+        spr_ferrari->pal_src = oferrari.ferrari_pal;
+    else
+        spr_ferrari->pal_src = oferrari.ferrari_pal == OFerrari::PAL_RED ? roms.rom0p->read8(4 + frames) : oferrari.ferrari_pal + 4;
 
     if (--spinflipcount2 > 0)
     {
@@ -693,7 +725,6 @@ void OCrash::do_car_flip()
     {
         init_finger(frames);
     }
-
     done(spr_ferrari);
 }
 
@@ -747,7 +778,8 @@ void OCrash::trigger_smoke()
     else 
         spr_ferrari->control &= ~OSprites::HFLIP;
 
-    spr_ferrari->pal_src =     roms.rom0p->read8(5 + addr);
+    //spr_ferrari->pal_src =     roms.rom0p->read8(5 + addr);
+    spr_ferrari->pal_src = oferrari.ferrari_pal;
     spin_pass_frame = (int8_t) roms.rom0p->read8(6 + addr);
 
     // Slow Car
@@ -854,7 +886,7 @@ void OCrash::init_spin1()
     crash_spin_count = 2;
     spinflipcount2 = 2;
 
-    slide = ((spins + 1) << 2) + (car_inc > 0xFF) ? 0xFF >> 3 : car_inc >> 3;
+    slide = ((spins + 1) << 2) + ((car_inc > 0xFF ? 0xFF : car_inc) >> 3);
 
     if (skid_counter_bak < 0)
         addr = outrun.adr.sprite_crash_spin1;

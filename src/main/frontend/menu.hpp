@@ -12,28 +12,22 @@
 #include <string>
 #include <vector>
 
-class Interface;
-class CabDiag;
 class TTrial;
-struct Packet;
 
 class Menu
 {
 public:
-    Menu(Interface* cannonboard);
+    Menu();
     ~Menu(void);
 
     void populate();
     void init();
-    void tick(Packet* packet);
+    void tick();
 #ifdef __LIBRETRO__
     void refresh_menu();
 #endif
 
 private:
-    Interface* cannonboard;
-    CabDiag* cabdiag;
-
     // Menu state
     uint8_t state;
 
@@ -43,7 +37,6 @@ private:
         STATE_REDEFINE_KEYS,
         STATE_REDEFINE_JOY,
         STATE_TTRIAL,
-        STATE_DIAGNOSTICS,
     };
 
     TTrial* ttrial;
@@ -68,8 +61,6 @@ private:
     // Stores whether this is a textual menu (i.e. no options that can be chosen)
     bool is_text_menu;
 
-    // Used to control the horizon pan effect
-    uint16_t horizon_pos;
 
     std::vector<std::string>* menu_selected;
     std::vector<std::string> menu_main;
@@ -78,11 +69,12 @@ private:
     std::vector<std::string> menu_timetrial;
     std::vector<std::string> menu_about;
     std::vector<std::string> menu_settings;
-    std::vector<std::string> menu_cannonboard;
     std::vector<std::string> menu_video;
     std::vector<std::string> menu_sound;
     std::vector<std::string> menu_controls;
     std::vector<std::string> menu_engine;
+    std::vector<std::string> menu_enhancements;
+    std::vector<std::string> menu_handling;
     std::vector<std::string> menu_musictest;
 
     std::vector<std::string> text_redefine;

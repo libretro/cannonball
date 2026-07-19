@@ -12,8 +12,6 @@
 #include "engine/oinputs.hpp"
 #include "engine/ostats.hpp"
 
-#include "cannonboard/interface.hpp"
-
 OInputs oinputs;
 
 OInputs::OInputs(void)
@@ -44,57 +42,31 @@ void OInputs::init()
     delay1      = 0;
     delay2      = 0;
     delay3      = 0;
-    coin1       = false;
-    coin2       = false;
 }
 
-void OInputs::tick(Packet* packet)
+void OInputs::tick()
 {
-    // CannonBoard Input
-    if (packet != NULL)
+    // Digital Controls: Simulate Analog
+    if (!input.analog || !input.gamepad)
     {
-        input_steering = packet->ai2;
-        input_acc      = packet->ai0;
-        input_brake    = packet->ai3;
-            
-        if (config.controls.gear != config.controls.GEAR_AUTO)
-            gear       = (packet->di1 & 0x10) == 0;
-
-        // Coin Chutes
-        coin1 = (packet->di1 & 0x40) != 0;
-        coin2 = (packet->di1 & 0x80) != 0;
-
-        // Service
-        input.keys[Input::COIN]  = (packet->di1 & 0x04) != 0;
-        // Start
-        input.keys[Input::START] = (packet->di1 & 0x08) != 0;
+        digital_steering();
+        digital_pedals();
     }
-
-    // Standard PC Keyboard/Joypad/Wheel Input
+    // Analog Controls
     else
     {
-        // Digital Controls: Simulate Analog
-        if (!input.analog || !input.gamepad)
+        input_steering = input.a_wheel;
+
+        // Analog Pedals
+        if (input.analog == 1)
         {
-            digital_steering();
-            digital_pedals();
+            input_acc   = input.a_accel;
+            input_brake = input.a_brake;
         }
-        // Analog Controls
+        // Digital Pedals
         else
         {
-            input_steering = input.a_wheel;
-
-            // Analog Pedals
-            if (input.analog == 1)
-            {
-                input_acc      = input.a_accel;
-                input_brake    = input.a_brake;
-            }
-            // Digital Pedals
-            else
-            {
-                digital_pedals();
-            }
+            digital_pedals();
         }
     }
 }
@@ -174,9 +146,6 @@ void OInputs::digital_pedals()
 
 void OInputs::do_gear()
 {
-    if (config.cannonboard.enabled)
-        return;
-
     // ------------------------------------------------------------------------
     // GEAR SHIFT
     // ------------------------------------------------------------------------
@@ -293,26 +262,6 @@ uint8_t OInputs::do_credits()
             osoundint.queue_sound(sound::COIN_IN);
         }
         return 3;
-    }
-    else if (coin1)
-    {
-        coin1 = false;
-        if (!config.engine.freeplay && ostats.credits < 9)
-        {
-            ostats.credits++;
-            osoundint.queue_sound(sound::COIN_IN);
-        }
-        return 1;
-    }
-    else if (coin2)
-    {
-        coin2 = false;
-        if (!config.engine.freeplay && ostats.credits < 9)
-        {
-            ostats.credits++;
-            osoundint.queue_sound(sound::COIN_IN);
-        }
-        return 2;
     }
     return 0;
 }
