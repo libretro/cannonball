@@ -447,14 +447,14 @@ void Menu::tick_menu()
     /* Tick Controls */
     if (input.has_pressed(Input::DOWN) || oinputs.is_analog_r())
     {
-        osoundint.queue_sound(sound::BEEP1);
+        osoundint.queue_sound(SOUND_BEEP1);
 
         if (++cursor >= (int16_t) menu_selected->size())
             cursor = 0;
     }
     else if (input.has_pressed(Input::UP) || oinputs.is_analog_l())
     {
-        osoundint.queue_sound(sound::BEEP1);
+        osoundint.queue_sound(SOUND_BEEP1);
 
         if (--cursor < 0)
             cursor = menu_selected->size() - 1;
@@ -823,24 +823,24 @@ void Menu::tick_menu()
         else if (menu_selected == &menu_musictest)
         {
             if (SELECTED(ENTRY_MUSIC1))
-                osoundint.queue_sound(sound::MUSIC_MAGICAL);
+                osoundint.queue_sound(SOUND_MUSIC_MAGICAL);
             else if (SELECTED(ENTRY_MUSIC2))
-                osoundint.queue_sound(sound::MUSIC_BREEZE);
+                osoundint.queue_sound(SOUND_MUSIC_BREEZE);
             else if (SELECTED(ENTRY_MUSIC3))
-                osoundint.queue_sound(sound::MUSIC_SPLASH);
+                osoundint.queue_sound(SOUND_MUSIC_SPLASH);
             else if (SELECTED(ENTRY_MUSIC4))
-                osoundint.queue_sound(sound::MUSIC_LASTWAVE);
+                osoundint.queue_sound(SOUND_MUSIC_LASTWAVE);
 
             else if (SELECTED(ENTRY_BACK))
             {
-                osoundint.queue_sound(sound::FM_RESET);
+                osoundint.queue_sound(SOUND_FM_RESET);
                 set_menu(&menu_sound);
             }
         }
         else
             set_menu(&menu_main);
 
-        osoundint.queue_sound(sound::BEEP1);
+        osoundint.queue_sound(SOUND_BEEP1);
         refresh_menu();
     }
 }

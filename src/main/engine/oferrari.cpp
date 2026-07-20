@@ -138,7 +138,7 @@ void OFerrari::reset_car()
     rev_stop_flag        = 0;
     oinitengine.ingame_engine = false;
     oinitengine.ingame_counter = 0x1E; /* Set ingame counter (time until we hand control to user) */
-    slip_sound           = sound::STOP_SLIP;
+    slip_sound           = SOUND_STOP_SLIP;
     acc_adjust1          = 
     acc_adjust2          = 
     acc_adjust3          = 0;
@@ -1138,17 +1138,17 @@ void OFerrari::move()
         car_state = CAR_SMOKE; /* Set smoke from car wheels */
         if (oinitengine.car_increment >> 16)
         {
-            if (slip_sound == sound::STOP_SLIP)
-                osoundint.queue_sound(slip_sound = sound::INIT_SLIP);
+            if (slip_sound == SOUND_STOP_SLIP)
+                osoundint.queue_sound(slip_sound = SOUND_INIT_SLIP);
         }
         else
-            osoundint.queue_sound(slip_sound = sound::STOP_SLIP);
+            osoundint.queue_sound(slip_sound = SOUND_STOP_SLIP);
     }
     /* no_smoke: */
     else
     {
-        if (slip_sound != sound::STOP_SLIP)
-            osoundint.queue_sound(slip_sound = sound::STOP_SLIP);        
+        if (slip_sound != SOUND_STOP_SLIP)
+            osoundint.queue_sound(slip_sound = SOUND_STOP_SLIP);        
     }
     /* move_car */
     car_inc_old = oinitengine.car_increment >> 16;
@@ -1577,8 +1577,8 @@ void OFerrari::do_sound_score_slip()
         engine_pitch = rev_pitch2 + (rev_pitch2 >> 1);
     }
 
-    osoundint.engine_data[sound::ENGINE_PITCH_H] = engine_pitch >> 8;
-    osoundint.engine_data[sound::ENGINE_PITCH_L] = engine_pitch & 0xFF;
+    osoundint.engine_data[SOUND_ENGINE_PITCH_H] = engine_pitch >> 8;
+    osoundint.engine_data[SOUND_ENGINE_PITCH_L] = engine_pitch & 0xFF;
 
     /* Curved Road */
     if (oinitengine.road_type != OInitEngine::ROAD_STRAIGHT)
@@ -1624,7 +1624,7 @@ void OFerrari::do_sound_score_slip()
         if (ocrash.skid_counter)
         {
             is_slipping = -1;
-            osoundint.queue_sound(sound::INIT_SLIP);
+            osoundint.queue_sound(SOUND_INIT_SLIP);
         }
     }
     /* 0xBE94 */
@@ -1633,7 +1633,7 @@ void OFerrari::do_sound_score_slip()
         if (!ocrash.skid_counter)
         {
             is_slipping = 0;
-            osoundint.queue_sound(sound::STOP_SLIP);
+            osoundint.queue_sound(SOUND_STOP_SLIP);
         }
     }
     /* 0xBEAC */
@@ -1650,7 +1650,7 @@ void OFerrari::do_sound_score_slip()
             if (cornering)
             {
                 is_slipping = -1;
-                osoundint.queue_sound(sound::INIT_SLIP);
+                osoundint.queue_sound(SOUND_INIT_SLIP);
             }
         }
         /* 0xBEE4: Stop Cornering    */
@@ -1659,7 +1659,7 @@ void OFerrari::do_sound_score_slip()
             if (!cornering)
             {
                 is_slipping = 0;
-                osoundint.queue_sound(sound::STOP_SLIP);
+                osoundint.queue_sound(SOUND_STOP_SLIP);
             }
         }
     }
@@ -1670,13 +1670,13 @@ void OFerrari::do_sound_score_slip()
     {
         /* If previous wheels on-road & current wheels off-road - play safety zone sound */
         if (!wheel_state)
-            osoundint.queue_sound(sound::STOP_SAFETYZONE);
+            osoundint.queue_sound(SOUND_STOP_SAFETYZONE);
     }
     /* Stop Safety Sound */
     else
     {
         if (wheel_state)
-            osoundint.queue_sound(sound::INIT_SAFETYZONE);
+            osoundint.queue_sound(SOUND_INIT_SAFETYZONE);
     }
     sprite_wheel_state = wheel_state;
 }

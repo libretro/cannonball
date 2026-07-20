@@ -76,9 +76,9 @@ void OMusic::enable()
     blit_music_select();
     ohud.blit_text2(TEXT2_SELECT_MUSIC); /* Select Music By Steering */
   
-    osoundint.queue_sound(sound::RESET);
+    osoundint.queue_sound(SOUND_RESET);
     if (!config.sound.preview)
-        osoundint.queue_sound(sound::PCM_WAVE); /* Wave Noises */
+        osoundint.queue_sound(SOUND_PCM_WAVE); /* Wave Noises */
 
     /* Enable block of sprites */
     entry_start = OSprites::SPRITE_ENTRIES - 0x10;    
@@ -246,7 +246,7 @@ void OMusic::tick()
         if (music_selected != last_music_selected)
         {
             if (preview_counter == 0 && last_music_selected != -1)
-                osoundint.queue_sound(sound::FM_RESET);
+                osoundint.queue_sound(SOUND_FM_RESET);
 
             if (++preview_counter >= 10)
             {

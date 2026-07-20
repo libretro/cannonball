@@ -106,8 +106,8 @@ void OHiScore::tick()
             /* New High Score */
             if (score_pos != -1)
             {
-                osoundint.queue_sound(sound::PCM_WAVE);
-                osoundint.queue_sound(sound::MUSIC_LASTWAVE);
+                osoundint.queue_sound(SOUND_PCM_WAVE);
+                osoundint.queue_sound(SOUND_MUSIC_LASTWAVE);
                 insert_score();               
             }
             /* Not a High Score */

@@ -376,7 +376,7 @@ void OCrash::do_collision()
             {
                 slide = -slide;
                 oinitengine.car_x_pos -= slide;
-                osoundint.queue_sound(sound::CRASH2);
+                osoundint.queue_sound(SOUND_CRASH2);
             }
         }
         /* Road generator 2 */
@@ -386,7 +386,7 @@ void OCrash::do_collision()
             {
                 slide = -slide;
                 oinitengine.car_x_pos -= slide;
-                osoundint.queue_sound(sound::CRASH2);
+                osoundint.queue_sound(SOUND_CRASH2);
             }
         }
     }
@@ -457,7 +457,7 @@ void OCrash::do_collision()
     /* Last spin */
     if (--spinflipcount1 <= 0)
     {
-        osoundint.queue_sound(sound::STOP_SLIP);
+        osoundint.queue_sound(SOUND_STOP_SLIP);
         if (spin_control2)
         {
             spin_control2++;
@@ -579,7 +579,7 @@ void OCrash::do_car_flip()
             {
                 slide = -slide;
                 oinitengine.car_increment = ((car_inc16 >> 1) << 16) | (oinitengine.car_increment & 0xFFFF);
-                osoundint.queue_sound(sound::CRASH2);
+                osoundint.queue_sound(SOUND_CRASH2);
                 if (oinitengine.car_increment >> 16 > 0x14)
                 {
                     int16_t z = spr_ferrari->counter > 0x1FD ? 0x1FD : spr_ferrari->counter; /* d3 */
@@ -600,7 +600,7 @@ void OCrash::do_car_flip()
             {
                 slide = -slide;
                 oinitengine.car_increment = ((car_inc16 >> 1) << 16) | (oinitengine.car_increment & 0xFFFF);
-                osoundint.queue_sound(sound::CRASH2);
+                osoundint.queue_sound(SOUND_CRASH2);
                 if (oinitengine.car_increment >> 16 > 0x14)
                 {
                     int16_t z = spr_ferrari->counter > 0x1FD ? 0x1FD : spr_ferrari->counter; /* d3 */
@@ -663,7 +663,7 @@ void OCrash::do_car_flip()
     if (passenger_frame == 0)
     {
         slide >>= 1;
-        osoundint.queue_sound(sound::CRASH2);
+        osoundint.queue_sound(SOUND_CRASH2);
     }
 
     /* Set Z during lower frames */
@@ -876,7 +876,7 @@ void OCrash::pan_camera()
 /* Source: 0x1C7E */
 void OCrash::init_spin1()
 {
-    osoundint.queue_sound(sound::INIT_SLIP);
+    osoundint.queue_sound(SOUND_INIT_SLIP);
     uint16_t car_inc = oinitengine.car_increment >> 16;
     uint16_t spins = 1;
     if (car_inc > 0xB4)
@@ -905,7 +905,7 @@ void OCrash::init_spin1()
 /* Source: 0x1C10 */
 void OCrash::init_spin2()
 {
-    osoundint.queue_sound(sound::INIT_SLIP);
+    osoundint.queue_sound(SOUND_INIT_SLIP);
     uint16_t car_inc = oinitengine.car_increment >> 16;
     spinflipcount1 = 1;
     crash_spin_count = 2;
@@ -934,7 +934,7 @@ void OCrash::init_spin2()
 /* Source: 0x19EE */
 void OCrash::collide_slow()
 {
-    osoundint.queue_sound(sound::REBOUND);
+    osoundint.queue_sound(SOUND_REBOUND);
     
     /* Setup shift value for car bump, based on current speed, which ultimately determines how much car rises in air */
     uint16_t car_inc = oinitengine.car_increment >> 16;
@@ -974,7 +974,7 @@ void OCrash::collide_slow()
 /* Source: 0x1A98 */
 void OCrash::collide_med()
 {
-    osoundint.queue_sound(sound::INIT_SLIP);
+    osoundint.queue_sound(SOUND_INIT_SLIP);
     
     /* Set number of spins based on car speed */
     uint16_t car_inc = oinitengine.car_increment >> 16;    
@@ -1005,7 +1005,7 @@ void OCrash::collide_med()
 /* Source: 0x1B12 */
 void OCrash::collide_fast()
 {
-    osoundint.queue_sound(sound::CRASH1);
+    osoundint.queue_sound(SOUND_CRASH1);
 
     uint16_t car_inc = oinitengine.car_increment >> 16;
     if (car_inc > 0xFA)

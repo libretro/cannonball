@@ -221,8 +221,8 @@ void OStats::init_next_level()
         ohud.draw_lap_timer(0x110554, stage_times[cur_stage-1], config.engine.fix_bugs ? lap_ms[stage_times[cur_stage-1][2]] : ms_value);
 
         otraffic.set_max_traffic();
-        osoundint.queue_sound(sound::YM_CHECKPOINT);
-        osoundint.queue_sound(sound::VOICE_CHECKPOINT);
+        osoundint.queue_sound(SOUND_YM_CHECKPOINT);
+        osoundint.queue_sound(SOUND_VOICE_CHECKPOINT);
         
         /* Update Stage Number on HUD */
         ohud.draw_stage_number(0x110d76, cur_stage+1);

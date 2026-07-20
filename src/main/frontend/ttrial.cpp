@@ -66,7 +66,7 @@ int TTrial::tick()
             ohud.blit_text_big(1, "STEER TO SELECT TRACK");
             ohud.blit_text1(2, 25, TEXT1_LAPTIME1);
             ohud.blit_text1(2, 26, TEXT1_LAPTIME2);
-            osoundint.queue_sound(sound::PCM_WAVE);
+            osoundint.queue_sound(SOUND_PCM_WAVE);
             outrun.ttrial.laps    = config.ttrial.laps;
             outrun.custom_traffic = config.ttrial.traffic;
             state = TICK_COURSEMAP;

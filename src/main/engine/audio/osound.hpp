@@ -10,83 +10,78 @@
 #include "engine/audio/osoundadr.hpp"
 
 /* PCM Sample Indexes */
-namespace pcm_sample
+enum
 {
-    enum
-    {
-        CRASH1  = 0xD0, /* 0xD0 - Crash 1 */
-        GURGLE  = 0xD1, /* 0xD1 - Gurgle */
-        SLIP    = 0xD2, /* 0xD2 - Slip */
-        CRASH2  = 0xD3, /* 0xD3 - Crash 2 */
-        CRASH3  = 0xD4, /* 0xD4 - Crash 3 */
-        SKID    = 0xD5, /* 0xD5 - Skid */
-        REBOUND = 0xD6, /* 0xD6 - Rebound */
-        HORN    = 0xD7, /* 0xD7 - Horn */
-        TYRES   = 0xD8, /* 0xD8 - Tyre Squeal */
-        SAFETY  = 0xD9, /* 0xD9 - Safety Zone */
-        LOSKID  = 0xDA, /* 0xDA - Lofi skid (is this used) */
-        CHEERS  = 0xDB, /* 0xDB - Cheers */
-        VOICE1  = 0xDC, /* 0xDC - Voice 1, Checkpoint */
-        VOICE2  = 0xDD, /* 0xDD - Voice 2, Congratulations */
-        VOICE3  = 0xDE, /* 0xDE - Voice 3, Get Ready */
-        VOICE4  = 0xDF, /* 0xDF - Voice 4, You're doing great (unused, plays at wrong pitch) */
-        WAVE    = 0xE0, /* 0xE0 - Wave */
-        CRASH4  = 0xE1  /* 0xE1 - Crash 4 */
-    };
-}
+    PCM_SAMPLE_CRASH1  = 0xD0, /* 0xD0 - Crash 1 */
+    PCM_SAMPLE_GURGLE  = 0xD1, /* 0xD1 - Gurgle */
+    PCM_SAMPLE_SLIP    = 0xD2, /* 0xD2 - Slip */
+    PCM_SAMPLE_CRASH2  = 0xD3, /* 0xD3 - Crash 2 */
+    PCM_SAMPLE_CRASH3  = 0xD4, /* 0xD4 - Crash 3 */
+    PCM_SAMPLE_SKID    = 0xD5, /* 0xD5 - Skid */
+    PCM_SAMPLE_REBOUND = 0xD6, /* 0xD6 - Rebound */
+    PCM_SAMPLE_HORN    = 0xD7, /* 0xD7 - Horn */
+    PCM_SAMPLE_TYRES   = 0xD8, /* 0xD8 - Tyre Squeal */
+    PCM_SAMPLE_SAFETY  = 0xD9, /* 0xD9 - Safety Zone */
+    PCM_SAMPLE_LOSKID  = 0xDA, /* 0xDA - Lofi skid (is this used) */
+    PCM_SAMPLE_CHEERS  = 0xDB, /* 0xDB - Cheers */
+    PCM_SAMPLE_VOICE1  = 0xDC, /* 0xDC - Voice 1, Checkpoint */
+    PCM_SAMPLE_VOICE2  = 0xDD, /* 0xDD - Voice 2, Congratulations */
+    PCM_SAMPLE_VOICE3  = 0xDE, /* 0xDE - Voice 3, Get Ready */
+    PCM_SAMPLE_VOICE4  = 0xDF, /* 0xDF - Voice 4, You're doing great (unused, plays at wrong pitch) */
+    PCM_SAMPLE_WAVE    = 0xE0, /* 0xE0 - Wave */
+    PCM_SAMPLE_CRASH4  = 0xE1  /* 0xE1 - Crash 4 */
+};
+
 
 /* Internal Channel Offsets in RAM */
-namespace channel
-{
-    /* Channels 0-7: YM Channels */
-    const static uint16_t YM1 = 0x020; /* f820 */
-    const static uint16_t YM2 = 0x040;
-    const static uint16_t YM3 = 0x060;
-    const static uint16_t YM4 = 0x080;
-    const static uint16_t YM5 = 0x0A0;
-    const static uint16_t YM6 = 0x0C0;
-    const static uint16_t YM7 = 0x0E0;
-    const static uint16_t YM8 = 0x100; /* f900 */
+/* Channels 0-7: YM Channels */
+const static uint16_t CHANNEL_YM1 = 0x020; /* f820 */
+const static uint16_t CHANNEL_YM2 = 0x040;
+const static uint16_t CHANNEL_YM3 = 0x060;
+const static uint16_t CHANNEL_YM4 = 0x080;
+const static uint16_t CHANNEL_YM5 = 0x0A0;
+const static uint16_t CHANNEL_YM6 = 0x0C0;
+const static uint16_t CHANNEL_YM7 = 0x0E0;
+const static uint16_t CHANNEL_YM8 = 0x100; /* f900 */
 
-    /* Channels 8-13: PCM Drum Channels for music */
-    const static uint16_t PCM_DRUM1 = 0x120;
-    const static uint16_t PCM_DRUM2 = 0x140;
-    const static uint16_t PCM_DRUM3 = 0x160;
-    const static uint16_t PCM_DRUM4 = 0x180;
-    const static uint16_t PCM_DRUM5 = 0x1A0;
-    const static uint16_t PCM_DRUM6 = 0x1C0;
+/* Channels 8-13: PCM Drum Channels for music */
+const static uint16_t CHANNEL_PCM_DRUM1 = 0x120;
+const static uint16_t CHANNEL_PCM_DRUM2 = 0x140;
+const static uint16_t CHANNEL_PCM_DRUM3 = 0x160;
+const static uint16_t CHANNEL_PCM_DRUM4 = 0x180;
+const static uint16_t CHANNEL_PCM_DRUM5 = 0x1A0;
+const static uint16_t CHANNEL_PCM_DRUM6 = 0x1C0;
 
-    /* Channels 14-21: PCM Sound Effects */
-    const static uint16_t PCM_FX1 = 0x1E0; /* f9e0: Crowd, Cheers, Wave */
-    const static uint16_t PCM_FX2 = 0x200;
-    const static uint16_t PCM_FX3 = 0x220; /* fa20: Slip, Safety Zone */
-    const static uint16_t PCM_FX4 = 0x240;
-    const static uint16_t PCM_FX5 = 0x260; /* fa60: Crash 1, Rebound, Crash2 */
-    const static uint16_t PCM_FX6 = 0x280;
-    const static uint16_t PCM_FX7 = 0x2A0; /* faa0: Voices */
-    const static uint16_t PCM_FX8 = 0x2C0;
+/* Channels 14-21: PCM Sound Effects */
+const static uint16_t CHANNEL_PCM_FX1 = 0x1E0; /* f9e0: Crowd, Cheers, Wave */
+const static uint16_t CHANNEL_PCM_FX2 = 0x200;
+const static uint16_t CHANNEL_PCM_FX3 = 0x220; /* fa20: Slip, Safety Zone */
+const static uint16_t CHANNEL_PCM_FX4 = 0x240;
+const static uint16_t CHANNEL_PCM_FX5 = 0x260; /* fa60: Crash 1, Rebound, Crash2 */
+const static uint16_t CHANNEL_PCM_FX6 = 0x280;
+const static uint16_t CHANNEL_PCM_FX7 = 0x2A0; /* faa0: Voices */
+const static uint16_t CHANNEL_PCM_FX8 = 0x2C0;
 
-    /* Channel Mapping Info. Used to play sound effects and music at the same time.  */
-    const static uint16_t MAP1 = 0x2E0;
-    const static uint16_t MAP2 = 0x300;
-    const static uint16_t MAP3 = 0x320;
-    const static uint16_t MAP4 = 0x340;
-    const static uint16_t MAP5 = 0x360;
-    const static uint16_t MAP6 = 0x380;
-    const static uint16_t MAP7 = 0x3A0;
+/* Channel Mapping Info. Used to play sound effects and music at the same time.  */
+const static uint16_t CHANNEL_MAP1 = 0x2E0;
+const static uint16_t CHANNEL_MAP2 = 0x300;
+const static uint16_t CHANNEL_MAP3 = 0x320;
+const static uint16_t CHANNEL_MAP4 = 0x340;
+const static uint16_t CHANNEL_MAP5 = 0x360;
+const static uint16_t CHANNEL_MAP6 = 0x380;
+const static uint16_t CHANNEL_MAP7 = 0x3A0;
 
-    /* Channels 22-23: YM Sound Effects */
-    const static uint16_t YM_FX1 = 0x3C0; /* fbc0: Signal 1, Signal 2 */
-    const static uint16_t YM_FX2 = 0x3E0;
+/* Channels 22-23: YM Sound Effects */
+const static uint16_t CHANNEL_YM_FX1 = 0x3C0; /* fbc0: Signal 1, Signal 2 */
+const static uint16_t CHANNEL_YM_FX2 = 0x3E0;
 
-    /* Engine Commands in RAM */
-    const static int16_t ENGINE_CH1 = 0x400; /* 0xFC00: Engine Channel - Player's Car */
-    const static int16_t ENGINE_CH2 = 0x420; /* 0xFC20: Engine Channel - Traffic 1 */
-    const static int16_t ENGINE_CH3 = 0x440; /* 0xFC40: Engine Channel - Traffic 2 */
-    const static int16_t ENGINE_CH4 = 0x460; /* 0xFC60: Engine Channel - Traffic 3 */
-    const static int16_t ENGINE_CH5 = 0x480; /* 0xFC80: Engine Channel - Traffic 4 */
+/* Engine Commands in RAM */
+const static int16_t CHANNEL_ENGINE_CH1 = 0x400; /* 0xFC00: Engine Channel - Player's Car */
+const static int16_t CHANNEL_ENGINE_CH2 = 0x420; /* 0xFC20: Engine Channel - Traffic 1 */
+const static int16_t CHANNEL_ENGINE_CH3 = 0x440; /* 0xFC40: Engine Channel - Traffic 2 */
+const static int16_t CHANNEL_ENGINE_CH4 = 0x460; /* 0xFC60: Engine Channel - Traffic 3 */
+const static int16_t CHANNEL_ENGINE_CH5 = 0x480; /* 0xFC80: Engine Channel - Traffic 4 */
 
-}
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Internal Format of Sound Data in RAM before sending to hardware */
@@ -139,38 +134,36 @@ namespace channel
 /*+0x1C: [Word] Sequence Address #1 */
 /*+0x1E: [Word] Sequence Address #2 */
 
-namespace ch
+enum
 {
-    enum
-    {
-        FLAGS       = 0x00,
-        FM_FLAGS    = 0x01,
-        END_MARKER  = 0x02,
-        SEQ_POS     = 0x03,
-        SEQ_END     = 0x05,
-        SEQ_CMD     = 0x07,
-        NOTE_OFFSET = 0x09,
-        MEM_OFFSET  = 0x0A,
-        FM_PHASETBL = 0x0B,
-        FM_BLOCK    = 0x0C,
-        FM_MARKER   = 0x0D,
-        COMMAND     = 0x0E,
-        UNKNOWN     = 0x0F,
-        FM_PHASEOFF = 0x10,
-        VOL_L       = 0x11,
-        VOL_R       = 0x12,
-        PCM_ADR1L   = 0x13,
-        FM_NOTE     = 0x13,
-        PCM_ADR1H   = 0x14,
-        FM_PHASE_AMP= 0x14,
-        PCM_ADR2    = 0x15,
-        PCM_PITCH   = 0x16,
-        CTRL        = 0x17,
-        FM_LOOP     = 0x18,
-        SEQ_ADR1    = 0x1C,
-        SEQ_ADR2    = 0x1E
-    };
-}
+    CH_FLAGS       = 0x00,
+    CH_FM_FLAGS    = 0x01,
+    CH_END_MARKER  = 0x02,
+    CH_SEQ_POS     = 0x03,
+    CH_SEQ_END     = 0x05,
+    CH_SEQ_CMD     = 0x07,
+    CH_NOTE_OFFSET = 0x09,
+    CH_MEM_OFFSET  = 0x0A,
+    CH_FM_PHASETBL = 0x0B,
+    CH_FM_BLOCK    = 0x0C,
+    CH_FM_MARKER   = 0x0D,
+    CH_COMMAND     = 0x0E,
+    CH_UNKNOWN     = 0x0F,
+    CH_FM_PHASEOFF = 0x10,
+    CH_VOL_L       = 0x11,
+    CH_VOL_R       = 0x12,
+    CH_PCM_ADR1L   = 0x13,
+    CH_FM_NOTE     = 0x13,
+    CH_PCM_ADR1H   = 0x14,
+    CH_FM_PHASE_AMP= 0x14,
+    CH_PCM_ADR2    = 0x15,
+    CH_PCM_PITCH   = 0x16,
+    CH_CTRL        = 0x17,
+    CH_FM_LOOP     = 0x18,
+    CH_SEQ_ADR1    = 0x1C,
+    CH_SEQ_ADR2    = 0x1E
+};
+
 
 /* +0x00: [Byte] Engine Volume */
 /* +0x01: [Byte] Engine Volume (seems same as 0x00) */
@@ -190,51 +183,47 @@ namespace ch
 /* +0x07: [Byte] */
 /* +0x08: [Byte] 0 = Channel Muted, 1 = Channel Active */
 
-namespace ch_engines
+enum
 {
-    enum
-    {
-        VOL0    = 0x00,
-        VOL1    = 0x01,
-        FLAGS   = 0x02,
-        OFFSET  = 0x03,
-        LOOP    = 0x03,
-        PITCH_L = 0x04,
-        PITCH_H = 0x05,
-        VOL6    = 0x06,
-        ACTIVE  = 0x08
-    };
-}
+    CH_ENGINES_VOL0    = 0x00,
+    CH_ENGINES_VOL1    = 0x01,
+    CH_ENGINES_FLAGS   = 0x02,
+    CH_ENGINES_OFFSET  = 0x03,
+    CH_ENGINES_LOOP    = 0x03,
+    CH_ENGINES_PITCH_L = 0x04,
+    CH_ENGINES_PITCH_H = 0x05,
+    CH_ENGINES_VOL6    = 0x06,
+    CH_ENGINES_ACTIVE  = 0x08
+};
+
 
 /* MML Command Languge Defines */
-namespace mml
+enum
 {
-    enum
-    {
-        TEMPO            = 0x01, /* change tempo of track(only possible for non - FIXED_TEMPO tracks) */
-        SAMPLE_LEVEL	 = 0x02, /* set sample left / right volume */
-        SEAMLESS		 = 0x03, /* make use of unused command $83 for 'seamless' note transitions */
-        END_FM_TRACK	 = 0x04, /* end playback of this FM track(DO NOT USE ON PCM TRACKS) */
-        NOISE_ON		 = 0x05, /* set noise bit(only works on FM track 7) */
-        SET_TL		     = 0x06, /* only partially working(can't use bits 0 and 1) */
-        KEY_FRACTIONS	 = 0x07, /* little to no audible difference */
-        CALL		     = 0x08, /* call a subroutine */
-        RET			     = 0x09, /* return from a subroutine */
-        LOOP_FOREVER	 = 0x0a, /* self explanatory */
-        TRANSPOSE		 = 0x0b, /* transpose subsequent notes up or down */
-        LOOP		     = 0x0c, /* loop n number of times(allows nested loops via second parameter) */
-        PITCH_BEND_START = 0x0d, /* pitch bend start */
-        PITCH_BEND_END	 = 0x0e, /* pitch bend AND 'seamless' end */
-        LOAD_PATCH		 = 0x11, /* load new FM patch data into the sound chip registers */
-        NOISE_OFF		 = 0x12, /* clear noise bit(set by cmd $85) */
-        VOICE_PITCH		 = 0x13, /* set pitch of PCM voice like 'Checkpoint' or 'Get Ready' */
-        FIXED_TEMPO		 = 0x14, /* note duration is read directly from track rather than being computed */
-        LONG		     = 0x15, /* used for 'long' notes, restsand percussion samples */
-        RIGHT_CH_ONLY	 = 0x16, /* send FM output to right channel / speaker only */
-        LEFT_CH_ONLY	 = 0x17, /* send FM output to left channel / speaker only */
-        BOTH_CH		     = 0x18 /* send FM output to both channels / speakers */
-    };
-}
+    MML_TEMPO            = 0x01, /* change tempo of track(only possible for non - MML_FIXED_TEMPO tracks) */
+    MML_SAMPLE_LEVEL	 = 0x02, /* set sample left / right volume */
+    MML_SEAMLESS		 = 0x03, /* make use of unused command $83 for 'seamless' note transitions */
+    MML_END_FM_TRACK	 = 0x04, /* end playback of this FM track(DO NOT USE ON PCM TRACKS) */
+    MML_NOISE_ON		 = 0x05, /* set noise bit(only works on FM track 7) */
+    MML_SET_TL		     = 0x06, /* only partially working(can't use bits 0 and 1) */
+    MML_KEY_FRACTIONS	 = 0x07, /* little to no audible difference */
+    MML_CALL		     = 0x08, /* call a subroutine */
+    MML_RET			     = 0x09, /* return from a subroutine */
+    MML_LOOP_FOREVER	 = 0x0a, /* self explanatory */
+    MML_TRANSPOSE		 = 0x0b, /* transpose subsequent notes up or down */
+    MML_LOOP		     = 0x0c, /* loop n number of times(allows nested loops via second parameter) */
+    MML_PITCH_BEND_START = 0x0d, /* pitch bend start */
+    MML_PITCH_BEND_END	 = 0x0e, /* pitch bend AND 'seamless' end */
+    MML_LOAD_PATCH		 = 0x11, /* load new FM patch data into the sound chip registers */
+    MML_NOISE_OFF		 = 0x12, /* clear noise bit(set by cmd $85) */
+    MML_VOICE_PITCH		 = 0x13, /* set pitch of PCM voice like 'Checkpoint' or 'Get Ready' */
+    MML_FIXED_TEMPO		 = 0x14, /* note duration is read directly from track rather than being computed */
+    MML_LONG		     = 0x15, /* used for 'long' notes, restsand percussion samples */
+    MML_RIGHT_CH_ONLY	 = 0x16, /* send FM output to right channel / speaker only */
+    MML_LEFT_CH_ONLY	 = 0x17, /* send FM output to left channel / speaker only */
+    MML_BOTH_CH		     = 0x18 /* send FM output to both channels / speakers */
+};
+
 
 
 

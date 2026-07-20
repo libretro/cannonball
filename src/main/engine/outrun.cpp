@@ -296,7 +296,7 @@ void Outrun::main_switch()
             ostats.time_counter = 5;
             ostats.frame_counter = ostats.frame_reset;
             ohiscore.init();
-            osoundint.queue_sound(sound::FM_RESET);
+            osoundint.queue_sound(SOUND_FM_RESET);
             cannonball::audio.clear_wav();
             game_state = GS_BEST1;
 
@@ -319,7 +319,7 @@ void Outrun::main_switch()
             ostats.time_counter = 5;
             ostats.frame_counter = ostats.frame_reset;
             osoundint.queue_sound(0);
-            ologo.enable(sound::FM_RESET);
+            ologo.enable(SOUND_FM_RESET);
             game_state = GS_LOGO;
 
         case GS_LOGO:
@@ -372,9 +372,9 @@ void Outrun::main_switch()
             oroad.tick();
             oroad.tick();
             oroad.tick();
-            osoundint.queue_sound(sound::STOP_CHEERS);
-            osoundint.queue_sound(sound::VOICE_GETREADY);
-            osoundint.queue_sound(sound::REVS);             /* Moved from Z80 Code for extra flexibility */
+            osoundint.queue_sound(SOUND_STOP_CHEERS);
+            osoundint.queue_sound(SOUND_VOICE_GETREADY);
+            osoundint.queue_sound(SOUND_REVS);             /* Moved from Z80 Code for extra flexibility */
             omusic.play_music();
             
             if (!freeze_timer)
@@ -386,7 +386,7 @@ void Outrun::main_switch()
             ostats.credits--;                                   /* Update Credits */
             ohud.blit_text1(TEXT1_CLEAR_START);
             ohud.blit_text1(TEXT1_CLEAR_CREDITS);
-            osoundint.queue_sound(sound::INIT_CHEERS);
+            osoundint.queue_sound(SOUND_INIT_CHEERS);
             video.enabled = true;
             game_state = GS_START1;
             ohud.draw_main_hud();
@@ -397,7 +397,7 @@ void Outrun::main_switch()
         case GS_START2:
             if (--ostats.frame_counter < 0)
             {
-                osoundint.queue_sound(sound::SIGNAL1);
+                osoundint.queue_sound(SOUND_SIGNAL1);
                 ostats.frame_counter = ostats.frame_reset;
                 game_state++;
             }
@@ -411,8 +411,8 @@ void Outrun::main_switch()
                     ohud.clear_timetrial_text();
                 }
 
-                osoundint.queue_sound(sound::SIGNAL2);
-                osoundint.queue_sound(sound::STOP_CHEERS);
+                osoundint.queue_sound(SOUND_SIGNAL2);
+                osoundint.queue_sound(SOUND_STOP_CHEERS);
                 ostats.frame_counter = ostats.frame_reset;
                 game_state++;
             }
@@ -470,7 +470,7 @@ void Outrun::main_switch()
                 ohud.blit_text_new(9,  18, "CRASHES            - ");
                 ohud.blit_text_new(31, 18, Utils::to_string((int) ttrial.crashes).c_str(), OHud::GREEN);
             }
-            osoundint.queue_sound(sound::NEW_COMMAND);
+            osoundint.queue_sound(SOUND_NEW_COMMAND);
             game_state = GS_GAMEOVER;
 
         case GS_GAMEOVER:
@@ -530,8 +530,8 @@ void Outrun::main_switch()
             ostats.time_counter = config.engine.hiscore_timer;
             ostats.frame_counter = ostats.frame_reset;
             ohiscore.init();
-            osoundint.queue_sound(sound::NEW_COMMAND);
-            osoundint.queue_sound(sound::FM_RESET);
+            osoundint.queue_sound(SOUND_NEW_COMMAND);
+            osoundint.queue_sound(SOUND_FM_RESET);
             cannonball::audio.clear_wav();
             game_state = GS_BEST2;
             /* fall through */

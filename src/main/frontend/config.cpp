@@ -46,17 +46,17 @@ Config::Config(void)
 
     music_t magical;
     magical.type  = music_t::IS_YM_INT;
-    magical.cmd   = sound::MUSIC_MAGICAL;
+    magical.cmd   = SOUND_MUSIC_MAGICAL;
     magical.title = "MAGICAL SOUND SHOWER";
 
     music_t breeze;
     breeze.type  = music_t::IS_YM_INT;
-    breeze.cmd   = sound::MUSIC_BREEZE;
+    breeze.cmd   = SOUND_MUSIC_BREEZE;
     breeze.title = "PASSING BREEZE";
 
     music_t splash;
     splash.type  = music_t::IS_YM_INT;
-    splash.cmd   = sound::MUSIC_SPLASH;
+    splash.cmd   = SOUND_MUSIC_SPLASH;
     splash.title = "SPLASH WAVE";
 
     sound.music.push_back(magical);
@@ -173,7 +173,7 @@ void Config::load_custom_music(const std::string& filename)
             ? music_t::IS_WAV
             : music_t::IS_YM_EXT;
 
-        music.cmd = sound::MUSIC_CUSTOM;
+        music.cmd = SOUND_MUSIC_CUSTOM;
 
         sound.music.push_back(music);
         loaded_tracks++;

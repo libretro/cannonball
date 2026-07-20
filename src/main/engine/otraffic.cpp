@@ -428,7 +428,7 @@ void OTraffic::update_props(oentry* sprite)
     /* Overtake Traffic Object */
     if (z16 >= 0x200)
     {
-        osoundint.queue_sound(sound::RESET);
+        osoundint.queue_sound(SOUND_RESET);
         if (outrun.game_state == GS_INGAME)
         {
             /* Update score on overtake */
@@ -770,7 +770,7 @@ void OTraffic::check_collision(oentry* sprite)
                 if (traffic_speed < 0) traffic_speed = 0;
                 oinitengine.car_increment = (traffic_speed << 16) | (oinitengine.car_increment & 0xFFFF);
                 oferrari.car_inc_old = traffic_speed;
-                d0 = sound::REBOUND; /* rebound sound effect */
+                d0 = SOUND_REBOUND; /* rebound sound effect */
                 collision_traffic++; /* denote collision with traffic */
                 outrun.ttrial.vehicle_cols++;
             }
@@ -797,10 +797,10 @@ void OTraffic::check_collision(oentry* sprite)
 void OTraffic::traffic_sound()
 {
     /* Clear traffic data */
-    osoundint.engine_data[sound::TRAFFIC1] = 0;
-    osoundint.engine_data[sound::TRAFFIC2] = 0;
-    osoundint.engine_data[sound::TRAFFIC3] = 0;
-    osoundint.engine_data[sound::TRAFFIC4] = 0;
+    osoundint.engine_data[SOUND_TRAFFIC1] = 0;
+    osoundint.engine_data[SOUND_TRAFFIC2] = 0;
+    osoundint.engine_data[SOUND_TRAFFIC3] = 0;
+    osoundint.engine_data[SOUND_TRAFFIC4] = 0;
 
     if (outrun.game_state != GS_INGAME && outrun.game_state != GS_ATTRACT)
         return;
@@ -827,6 +827,6 @@ void OTraffic::traffic_sound()
         pan &= 7;
         /* Position into screen is used to set volume */
         uint8_t vol = (t->road_priority & 0x1F0) >> 1;
-        osoundint.engine_data[sound::TRAFFIC1 + i] = pan | vol;
+        osoundint.engine_data[SOUND_TRAFFIC1 + i] = pan | vol;
     }
 }

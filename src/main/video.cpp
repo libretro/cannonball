@@ -32,7 +32,7 @@ Video::Video(void)
     sprite_layer = new hwsprites();
     tile_layer   = new hwtiles();
 
-    set_shadow_intensity(shadow::ORIGINAL);
+    set_shadow_intensity(SHADOW_ORIGINAL);
     enabled      = false;
 }
 
@@ -120,7 +120,7 @@ int Video::set_video_mode(video_settings_t* settings)
     if (settings->scale < 1)
         settings->scale = 1;
 
-    set_shadow_intensity(settings->shadow == 0 ? shadow::ORIGINAL : shadow::MAME);
+    set_shadow_intensity(settings->shadow == 0 ? SHADOW_ORIGINAL : SHADOW_MAME);
 
     return 1;
 }

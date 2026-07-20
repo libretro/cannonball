@@ -127,7 +127,7 @@ void OBonus::decrement_bonus_secs()
 
     /* Play Signal 1 Sound In A Steady Fashion */
     if ((((bonus_counter - 1) ^ bonus_counter) & BIT_2) == 0)
-        osoundint.queue_sound(sound::SIGNAL1);
+        osoundint.queue_sound(SOUND_SIGNAL1);
 
     /* Increment Score by 100K points */
     ostats.update_score(0x100000);

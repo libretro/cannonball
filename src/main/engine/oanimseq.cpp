@@ -515,7 +515,7 @@ void OAnimSeq::anim_seq_outro_ferrari()
         }
         else
         {
-            osoundint.queue_sound(sound::VOICE_CONGRATS);
+            osoundint.queue_sound(SOUND_VOICE_CONGRATS);
             ferrari_stopped = true;
         }
     }
