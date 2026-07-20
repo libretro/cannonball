@@ -266,18 +266,18 @@ void OMusic::play_music(int index)
     switch (next_track->type)
     {
         case music_t::IS_YM_INT:
-            cannonball::audio.clear_wav();
+            cannonball_audio.clear_wav();
             osoundint.queue_sound(next_track->cmd);
             break;
 
         case music_t::IS_YM_EXT:
-            cannonball::audio.clear_wav();
+            cannonball_audio.clear_wav();
             roms.load_ym_data((config.data.res_path + next_track->filename).c_str());
             osoundint.queue_sound(next_track->cmd);
             break;
 
         case music_t::IS_WAV:
-            cannonball::audio.load_wav((config.data.res_path + next_track->filename).c_str());
+            cannonball_audio.load_wav((config.data.res_path + next_track->filename).c_str());
             break;
     }
 

@@ -167,7 +167,7 @@ void Outrun::tick(bool tick_frame)
 
     /* Draw FPS */
     if (config.video.fps_count)
-        ohud.draw_fps_counter(cannonball::fps_counter);
+        ohud.draw_fps_counter(cannonball_fps_counter);
 }
 
 /* Vertical Interrupt */
@@ -297,7 +297,7 @@ void Outrun::main_switch()
             ostats.frame_counter = ostats.frame_reset;
             ohiscore.init();
             osoundint.queue_sound(SOUND_FM_RESET);
-            cannonball::audio.clear_wav();
+            cannonball_audio.clear_wav();
             game_state = GS_BEST1;
 
         case GS_BEST1:
@@ -492,7 +492,7 @@ void Outrun::main_switch()
                     ohud.blit_text1(10, 20, TEXT1_CLEAR_START);
 
                 if (input.is_pressed(Input::START))
-                    cannonball::state = cannonball::STATE_INIT_MENU;
+                    cannonball_state = STATE_INIT_MENU;
             }
             break;
 
@@ -532,7 +532,7 @@ void Outrun::main_switch()
             ohiscore.init();
             osoundint.queue_sound(SOUND_NEW_COMMAND);
             osoundint.queue_sound(SOUND_FM_RESET);
-            cannonball::audio.clear_wav();
+            cannonball_audio.clear_wav();
             game_state = GS_BEST2;
             /* fall through */
 

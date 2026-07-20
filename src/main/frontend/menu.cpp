@@ -278,7 +278,7 @@ void Menu::init()
     /* Reset audio, so we can play tones */
     osoundint.has_booted = true;
     osoundint.init();
-    cannonball::audio.clear_wav();
+    cannonball_audio.clear_wav();
 
     frame = 0;
     message_counter = 0;
@@ -302,7 +302,7 @@ void Menu::tick()
 
                 if (ttrial_state == TTrial::INIT_GAME)
                 {
-                    cannonball::state = cannonball::STATE_INIT_GAME;
+                    cannonball_state = STATE_INIT_GAME;
                     osoundint.queue_clear();
                 }
                 else if (ttrial_state == TTrial::BACK_TO_MENU)
@@ -382,7 +382,7 @@ void Menu::tick_ui()
 
     /* Draw FPS */
     if (config.video.fps_count)
-        ohud.draw_fps_counter(cannonball::fps_counter);
+        ohud.draw_fps_counter(cannonball_fps_counter);
 
     oroad.tick();
 }
@@ -479,7 +479,7 @@ void Menu::tick_menu()
                 set_menu(&menu_about);
             else if (SELECTED(ENTRY_EXIT))
             {
-                cannonball::state = cannonball::STATE_QUIT;
+                cannonball_state = STATE_QUIT;
             }
         }
         else if (menu_selected == &menu_gamemodes)
@@ -633,9 +633,9 @@ void Menu::tick_menu()
             {
                 config.sound.enabled = !config.sound.enabled;
                 if (config.sound.enabled)
-                    cannonball::audio.start_audio();
+                    cannonball_audio.start_audio();
                 else
-                    cannonball::audio.stop_audio();              
+                    cannonball_audio.stop_audio();              
                 lr_options_set_frontend_variable(&config.sound.enabled);
             }
             else if (SELECTED(ENTRY_ADVERTISE))
@@ -1100,12 +1100,12 @@ bool Menu::check_jap_roms()
 void Menu::restart_video()
 {
     if (config.sound.enabled)
-        cannonball::audio.stop_audio();
+        cannonball_audio.stop_audio();
     video.disable();
     video.init(&roms, &config.video);
     osoundint.init();
     if (config.sound.enabled)
-        cannonball::audio.start_audio();
+        cannonball_audio.start_audio();
 }
 
 void Menu::start_game(int mode, int settings)
@@ -1194,7 +1194,7 @@ void Menu::start_game(int mode, int settings)
     if (check_jap_roms())
     {
         outrun.cannonball_mode = mode;
-        cannonball::state = cannonball::STATE_INIT_GAME;
+        cannonball_state = STATE_INIT_GAME;
         osoundint.queue_clear();
     }
 }

@@ -497,8 +497,8 @@ void Config::set_fps(int fps)
         tick_fps = 60;
 
     if (config.sound.enabled)
-        cannonball::audio.stop_audio();
+        cannonball_audio.stop_audio();
     osoundint.init();
     if (config.sound.enabled)
-        cannonball::audio.start_audio();
+        cannonball_audio.start_audio();
 }

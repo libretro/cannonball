@@ -39,14 +39,12 @@
 #include "ffeedback.hpp"
 
 /* Initialize Shared Variables */
-using namespace cannonball;
+int    cannonball_state       = STATE_BOOT;
+int    cannonball_frame       = 0;
+bool   cannonball_tick_frame  = true;
+int    cannonball_fps_counter = 0;
 
-int    cannonball::state       = STATE_BOOT;
-int    cannonball::frame       = 0;
-bool   cannonball::tick_frame  = true;
-int    cannonball::fps_counter = 0;
-
-Audio cannonball::audio;
+Audio cannonball_audio;
 
 Menu* menu;
 
@@ -439,9 +437,9 @@ static void update_variables(bool startup)
       {
          config.sound.enabled = newval;
          if (config.sound.enabled)
-            cannonball::audio.start_audio();
+            cannonball_audio.start_audio();
          else
-            cannonball::audio.stop_audio();
+            cannonball_audio.stop_audio();
       }
    }
 
@@ -460,7 +458,7 @@ static void update_variables(bool startup)
        else if (volume > 200)
            volume = 200;
 
-       cannonball::audio.custom_wav_volume =
+       cannonball_audio.custom_wav_volume =
            (uint16_t)volume;
    }
 
@@ -829,7 +827,7 @@ end:
    update_option_visibility();
 
    /* Update menu to reflect any option changes */
-   if (!startup && (state == STATE_MENU))
+   if (!startup && (cannonball_state == STATE_MENU))
       menu->refresh_menu();
 }
 
@@ -1059,8 +1057,8 @@ bool retro_load_game(const struct retro_game_info *info)
 
    menu = new Menu();
 
-   audio.init();
-   state = config.menu.enabled ? STATE_INIT_MENU : STATE_INIT_GAME;
+   cannonball_audio.init();
+   cannonball_state = config.menu.enabled ? STATE_INIT_MENU : STATE_INIT_GAME;
 
    /* Initialize controls */
    input.init(config.controls.pad_id,
@@ -1092,7 +1090,7 @@ bool retro_load_game_special(unsigned game_type,
 
 void retro_unload_game(void)
 {
-    audio.stop_audio();
+    cannonball_audio.stop_audio();
     input.close();
     forcefeedback_close();
     delete menu;
@@ -1158,13 +1156,13 @@ void retro_reset(void)
             "[Cannonball]: Reset requested.\n");
 
     pause_engine = false;
-    frame = 0;
-    tick_frame = true;
-    fps_counter = 0;
+    cannonball_frame = 0;
+    cannonball_tick_frame = true;
+    cannonball_fps_counter = 0;
 
     forcefeedback_deactivate_rumble();
 
-    audio.clear_wav();
+    cannonball_audio.clear_wav();
 
     /* A frontend may request Reset immediately after changing a Core */
     /* Option, without running another frame. Refresh the live options */
@@ -1193,7 +1191,7 @@ void retro_reset(void)
 
     /* Reproduce the initial state selected when the content is loaded: */
     /* main menu when enabled, otherwise the normal game boot sequence. */
-    state = config.menu.enabled
+    cannonball_state = config.menu.enabled
         ? STATE_INIT_MENU
         : STATE_INIT_GAME;
 
@@ -1288,7 +1286,7 @@ void retro_run(void)
     if (config.fps != libretro_fps_prev)
         update_timing();
 
-    frame++;
+    cannonball_frame++;
 
 
     switch (config.fps)
@@ -1296,53 +1294,53 @@ void retro_run(void)
         case 60:
             /* 60 fps
              * Non-standard: tick every second frame */
-            tick_frame = frame & 1;
+            cannonball_tick_frame = cannonball_frame & 1;
             break;
         case 120:
             /* 120 fps
              * Non-standard: tick every fourth frame */
-            tick_frame = (frame & 3) == 1;
+            cannonball_tick_frame = (cannonball_frame & 3) == 1;
             break;
         case 30:
         default:
             /* 30 fps
              * Standard rate: tick every frame */
-            tick_frame = true;
+            cannonball_tick_frame = true;
             break;
     }
 
     process_events();
 
-    if (tick_frame)
+    if (cannonball_tick_frame)
     {
         oinputs.tick();           /* Do Controls */
         oinputs.do_gear();        /* Digital Gear */
     }
 
-    switch (state)
+    switch (cannonball_state)
     {
         case STATE_GAME:
         {
-            if (tick_frame)
+            if (cannonball_tick_frame)
             {
                 if (input.has_pressed(Input::TIMER)) outrun.freeze_timer = !outrun.freeze_timer;
                 if (input.has_pressed(Input::PAUSE)) pause_engine = !pause_engine;
-                if (input.has_pressed(Input::MENU))  state = STATE_INIT_MENU;
+                if (input.has_pressed(Input::MENU))  cannonball_state = STATE_INIT_MENU;
             }
 
             if (!pause_engine || input.has_pressed(Input::STEP))
             {
-                outrun.tick(tick_frame);
-                if (tick_frame) input.frame_done();
+                outrun.tick(cannonball_tick_frame);
+                if (cannonball_tick_frame) input.frame_done();
 
                 /* Tick audio program code */
                 osoundint.tick();
                 /* Tick Audio */
-                audio.tick();
+                cannonball_audio.tick();
             }
             else
             {                
-                if (tick_frame) input.frame_done();
+                if (cannonball_tick_frame) input.frame_done();
             }
         }
         break;
@@ -1350,13 +1348,13 @@ void retro_run(void)
         case STATE_INIT_GAME:
             if (config.engine.jap && !roms.load_japanese_roms())
             {
-                state = STATE_QUIT;
+                cannonball_state = STATE_QUIT;
             }
             else
             {
                 pause_engine = false;
                 outrun.init();
-                state = STATE_GAME;
+                cannonball_state = STATE_GAME;
             }
             break;
 
@@ -1367,7 +1365,7 @@ void retro_run(void)
             /* Tick audio program code */
             osoundint.tick();
             /* Tick Audio */
-            audio.tick();
+            cannonball_audio.tick();
         }
         break;
 
@@ -1375,7 +1373,7 @@ void retro_run(void)
             oinputs.init();
             outrun.outputs->init();
             menu->init();
-            state = STATE_MENU;
+            cannonball_state = STATE_MENU;
             break;
 
         case STATE_QUIT:
