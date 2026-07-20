@@ -252,7 +252,7 @@ public:
 
 private:
     const static uint16_t PCM_RAM_SIZE  = 0x100;
-    const static uint16_t CHAN_RAM_SIZE = 0x800;
+    enum { CHAN_RAM_SIZE = 0x800 };
 
     /* Internal channel format */
     uint8_t chan_ram[CHAN_RAM_SIZE];

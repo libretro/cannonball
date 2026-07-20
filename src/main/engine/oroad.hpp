@@ -124,7 +124,7 @@ public:
 	/* 0x736: 0 = Base Horizon Value Not Set. 1 = Value Set. */
 	uint8_t horizon_set;
 
-    const static uint16_t ARRAY_LENGTH = 0x200;
+    enum { ARRAY_LENGTH = 0x200 };
 
 	/* 60800 - 60BFF: Road X-Positions [Before H-Scroll Is Applied] - Same Data For Both Roads */
 	int16_t road_x[ARRAY_LENGTH];

@@ -321,7 +321,7 @@ const static uint32_t PALETTE_EXPANSION[] =
     0x00000000, 0x0ffc0777, 0x08880999, 0x0aaa0bbb, 0x0ccc0ddd, 0x0fff0eee, 0x0ddd0ccc, 0x0aaa0000, /* Palette 285: White Ferrari. Flip */
 };
 
-const static int PAL_LOOKUP_LENGTH = (sizeof(PALETTE_EXPANSION) / sizeof(PALETTE_EXPANSION[0])) / 8;
+enum { PAL_LOOKUP_LENGTH = (sizeof(PALETTE_EXPANSION) / sizeof(PALETTE_EXPANSION[0])) / 8 };
 
 /*
    We can generate the 'flip palette' colours for the Ferrari from an existing car palette as follows:

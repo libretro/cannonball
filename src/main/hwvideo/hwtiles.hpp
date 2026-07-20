@@ -35,7 +35,7 @@ private:
     /* S16 Width, ignoring widescreen related scaling. */
     uint16_t s16_width_noscale;
 
-    static const int TILES_LENGTH = 0x10000;
+    enum { TILES_LENGTH = 0x10000 };
     uint32_t tiles[TILES_LENGTH];        /* Converted tiles */
     uint32_t tiles_backup[TILES_LENGTH]; /* Converted tiles (backup without patch) */
 

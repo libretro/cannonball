@@ -22,8 +22,8 @@ private:
     uint16_t x1, x2;
 
     /* 128 sprites, 16 bytes each (0x400) */
-    static const uint16_t SPRITE_RAM_SIZE = 128 * 8;
-    static const uint32_t SPRITES_LENGTH = 0x100000 >> 2;
+    enum { SPRITE_RAM_SIZE = 128 * 8 };
+    enum { SPRITES_LENGTH = 0x100000 >> 2 };
     static const uint16_t COLOR_BASE = 0x800;
 
     uint32_t sprites[SPRITES_LENGTH]; /* Converted sprites */

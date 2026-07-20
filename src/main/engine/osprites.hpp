@@ -40,13 +40,13 @@ public:
     /* We just leave the larger array in place when changing the settings.  */
     
     /* Total sprite entries in Jump Table (start at offset #3) */
-	const static uint8_t SPRITE_ENTRIES = 0x62;
+	enum { SPRITE_ENTRIES = 0x62 };
     
     /* This is initalized based on the config */
     uint8_t no_sprites;
 
     /* Total number of object entries, including SPRITE_ENTRIES, FERRARI, PASSENGERS, TRAFFIC etc. */
-    const static uint8_t JUMP_ENTRIES_TOTAL = SPRITE_ENTRIES + 24;
+    enum { JUMP_ENTRIES_TOTAL = SPRITE_ENTRIES + 24 };
 
     const static uint8_t SPRITE_FERRARI = SPRITE_ENTRIES + 1;
     const static uint8_t SPRITE_PASS1   = SPRITE_ENTRIES + 2;   /* Passengers */
@@ -166,7 +166,7 @@ private:
 	/* Word 4: Palette RAM Destination Offset */
 	/* */
 	/*etc. */
-	const static int PAL_ENTRIES = 0x100; /* hardware palette entries (before extra CannonBall palettes) */
+	enum { PAL_ENTRIES = 0x100 }; /* hardware palette entries (before extra CannonBall palettes) */
 	uint16_t pal_addresses[PAL_ENTRIES]; /* todo: rename to pal_mapping */
 
 	/* Palette Lookup Table (was 0x100, but extended to account for extra palettes in CannonBall) */

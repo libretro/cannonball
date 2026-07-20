@@ -24,7 +24,7 @@ private:
     uint16_t color_offset3;
     int32_t x_offset;
 
-    static const uint16_t ROAD_RAM_SIZE = 0x1000;
+    enum { ROAD_RAM_SIZE = 0x1000 };
     static const uint16_t rom_size = 0x8000;
 
     /* Decoded road graphics */

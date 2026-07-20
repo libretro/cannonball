@@ -65,7 +65,7 @@ private:
     /* Controls what type of sound we're going to process in the interrupt routine */
     uint8_t sound_counter;
 
-    static const uint8_t QUEUE_LENGTH = 0x1F;
+    enum { QUEUE_LENGTH = 0x1F };
     uint8_t queue[QUEUE_LENGTH + 1];
 
     /* Number of sounds queued */

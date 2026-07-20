@@ -24,7 +24,7 @@ class OHiScore
 {
 public:
     /* Number of score entries in table */
-    const static uint8_t NO_SCORES = 20;
+    enum { NO_SCORES = 20 };
     
     /* 20 Score Entries */
     score_entry scores[NO_SCORES];
@@ -95,7 +95,7 @@ private:
     };
 
     /* Number of minicar entries */
-    const static uint8_t NO_MINICARS = 7;
+    enum { NO_MINICARS = 7 };
 
     /* 20 Score Entries */
     minicar_entry minicars[NO_MINICARS];
