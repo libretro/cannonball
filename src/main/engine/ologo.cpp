@@ -32,10 +32,10 @@ void OLogo::enable(int16_t y)
     entry_start = OSprites::SPRITE_ENTRIES - 0x10;
 
     /* Enable block of sprites */
-    for (int i = entry_start; i < entry_start + 7; i++)
+    { int i; for (i = entry_start; i < entry_start + 7; i++)
     {
         osprites.jump_table[i].init(i);
-    }
+    } }
 
     palm_frames[0] = outrun.adr.sprite_logo_palm1;
     palm_frames[1] = outrun.adr.sprite_logo_palm2;
@@ -58,10 +58,10 @@ void OLogo::enable(int16_t y)
 void OLogo::disable()
 {
     /* Enable block of sprites */
-    for (int i = entry_start; i < entry_start + 7; i++)
+    { int i; for (i = entry_start; i < entry_start + 7; i++)
     {
         osprites.jump_table[i].control &= ~OSprites::ENABLE;
-    }
+    } }
 }
 
 void OLogo::tick()
@@ -278,6 +278,6 @@ void OLogo::sprite_logo_text()
 /* Blit Only: Used when frame skipping */
 void OLogo::blit()
 {
-    for (int i = 0; i < 7; i++)
-        osprites.do_spr_order_shadows(&osprites.jump_table[entry_start + i]);
+    { int i; for (i = 0; i < 7; i++)
+        osprites.do_spr_order_shadows(&osprites.jump_table[entry_start + i]); }
 }

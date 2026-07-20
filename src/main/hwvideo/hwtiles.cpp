@@ -78,8 +78,8 @@
 
 hwtiles::hwtiles(void)
 {
-    for (int i = 0; i < 2; i++)
-        tile_banks[i] = i;
+    { int i; for (i = 0; i < 2; i++)
+        tile_banks[i] = i; }
 
     set_x_clamp(CENTRE);
 }
@@ -94,7 +94,7 @@ void hwtiles::init(uint8_t* src_tiles, const bool hires)
 {
     if (src_tiles)
     {
-        for (int i = 0; i < TILES_LENGTH; i++)
+        { int i; for (i = 0; i < TILES_LENGTH; i++)
         {
             uint8_t p0 = src_tiles[i];
             uint8_t p1 = src_tiles[i + 0x10000];
@@ -102,14 +102,14 @@ void hwtiles::init(uint8_t* src_tiles, const bool hires)
 
             uint32_t val = 0;
 
-            for (int ii = 0; ii < 8; ii++) 
+            { int ii; for (ii = 0; ii < 8; ii++) 
             {
                 uint8_t bit = 7 - ii;
                 uint8_t pix = ((((p0 >> bit)) & 1) | (((p1 >> bit) << 1) & 2) | (((p2 >> bit) << 2) & 4));
                 val = (val << 4) | pix;
-            }
+            } }
             tiles[i] = val; /* Store converted value */
-        }
+        } }
         memcpy(tiles_backup, tiles, TILES_LENGTH * sizeof(uint32_t));
     }
     
@@ -132,7 +132,7 @@ void hwtiles::patch_tiles(RomLoader* patch)
 {
     memcpy(tiles_backup, tiles, TILES_LENGTH * sizeof(uint32_t));
 
-    for (uint32_t i = 0; i < patch->length;)
+    { uint32_t i; for (i = 0; i < patch->length;)
     {
         uint32_t tile_index = patch->read16(&i) << 3;
         tiles[tile_index++] = patch->read32(&i);
@@ -143,7 +143,7 @@ void hwtiles::patch_tiles(RomLoader* patch)
         tiles[tile_index++] = patch->read32(&i);
         tiles[tile_index++] = patch->read32(&i);
         tiles[tile_index++] = patch->read32(&i);
-    }
+    } }
 }
 
 void hwtiles::restore_tiles()
@@ -177,13 +177,13 @@ void hwtiles::set_x_clamp(const uint16_t props)
 
 void hwtiles::update_tile_values()
 {
-    for (int i = 0; i < 4; i++)
+    { int i; for (i = 0; i < 4; i++)
     {
         page[i] = ((text_ram[0xe80 + (i * 2) + 0] << 8) | text_ram[0xe80 + (i * 2) + 1]);
 
         scroll_x[i] = ((text_ram[0xe98 + (i * 2) + 0] << 8) | text_ram[0xe98 + (i * 2) + 1]);
         scroll_y[i] = ((text_ram[0xe90 + (i * 2) + 0] << 8) | text_ram[0xe90 + (i * 2) + 1]);
-    }
+    } }
 }
 
 /* A quick and dirty debug function to display the contents of tile memory. */
@@ -215,9 +215,9 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
     if ((yScroll & 0x8000) != 0)
         yScroll = (text_ram[0xf16 + (0x40 * page_index) + 0] << 8) | text_ram[0xf16 + (0x40 * page_index) + 1];
 
-    for (int my = 0; my < 64; my++) 
+    { int my; for (my = 0; my < 64; my++) 
     {
-        for (int mx = 0; mx < 128; mx++) 
+        { int mx; for (mx = 0; mx < 128; mx++) 
         {
             if (my < 32 && mx < 64)                    /* top left */
                 ActPage = (EffPage >> 0) & 0x0f;
@@ -272,8 +272,8 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
                 else if (x > -8 && x < s16_width_noscale && y > -8 && y < S16_HEIGHT)
 					(this->*render8x8_tile_mask_clip)(buf, Code, x, y, Colour, 3, 0, ColourOff);
             } /* end priority check */
-        }
-    } /* end for loop */
+        } }
+    } } /* end for loop */
 }
 
 void hwtiles::render_text_layer(uint16_t* buf, uint8_t priority_draw)
@@ -329,7 +329,7 @@ void hwtiles::render8x8_tile_mask_lores(
     uint32_t* pTileData = tiles + (nTileNumber << 3);
     buf += (StartY * config.s16_width) + StartX;
 
-    for (int y = 0; y < 8; y++) 
+    { int y; for (y = 0; y < 8; y++) 
     {
         uint32_t p0 = *pTileData;
 
@@ -355,7 +355,7 @@ void hwtiles::render8x8_tile_mask_lores(
         }
         buf += config.s16_width;
         pTileData++;
-    }
+    } }
 }
 
 void hwtiles::render8x8_tile_mask_clip_lores(
@@ -372,7 +372,7 @@ void hwtiles::render8x8_tile_mask_clip_lores(
     uint32_t* pTileData = tiles + (nTileNumber << 3);
     buf += (StartY * config.s16_width) + StartX;
 
-    for (int y = 0; y < 8; y++) 
+    { int y; for (y = 0; y < 8; y++) 
     {
         if ((StartY + y) >= 0 && (StartY + y) < S16_HEIGHT) 
         {
@@ -401,7 +401,7 @@ void hwtiles::render8x8_tile_mask_clip_lores(
         }
         buf += config.s16_width;
         pTileData++;
-    }
+    } }
 }
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -423,7 +423,7 @@ void hwtiles::render8x8_tile_mask_hires(
     uint32_t* pTileData = tiles + (nTileNumber << 3);
     buf += ((StartY << 1) * config.s16_width) + (StartX << 1);
 
-    for (int y = 0; y < 8; y++) 
+    { int y; for (y = 0; y < 8; y++) 
     {
         uint32_t p0 = *pTileData;
 
@@ -449,7 +449,7 @@ void hwtiles::render8x8_tile_mask_hires(
         }
         buf += (config.s16_width << 1);
         pTileData++;
-    }
+    } }
 }
 
 void hwtiles::render8x8_tile_mask_clip_hires(
@@ -466,7 +466,7 @@ void hwtiles::render8x8_tile_mask_clip_hires(
     uint32_t* pTileData = tiles + (nTileNumber << 3);
     buf += ((StartY << 1) * config.s16_width) + (StartX << 1);
 
-    for (int y = 0; y < 8; y++) 
+    { int y; for (y = 0; y < 8; y++) 
     {
         if ((StartY + y) >= 0 && (StartY + y) < S16_HEIGHT) 
         {
@@ -495,7 +495,7 @@ void hwtiles::render8x8_tile_mask_clip_hires(
         }
         buf += (config.s16_width << 1);
         pTileData++;
-    }
+    } }
 }
 
 /* Hires Mode: Set 4 pixels instead of one. */

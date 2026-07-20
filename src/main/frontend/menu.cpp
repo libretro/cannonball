@@ -394,7 +394,7 @@ void Menu::draw_menu_options()
     /* Find central column in screen.  */
     int8_t y = 13 + ((ROWS - 13) >> 1) - ((menu_selected->size() * 2) >> 1);
 
-    for (int i = 0; i < (int) menu_selected->size(); i++)
+    { int i; for (i = 0; i < (int) menu_selected->size(); i++)
     {
         std::string s = menu_selected->at(i);
 
@@ -412,7 +412,7 @@ void Menu::draw_menu_options()
                 video.write_text32(ohud.translate(x - 3, y, 0x110030), 0x20202020);
         }
         y += 2;
-    }
+    } }
 }
 
 /* Draw a single line of text */

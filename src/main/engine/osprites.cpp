@@ -38,21 +38,21 @@ void OSprites::init()
     no_sprites = config.engine.level_objects ? SPRITE_ENTRIES : 0x4F;
 
     /* Also handled by clear_palette_data() now */
-    for (uint16_t i = 0; i < PAL_LOOKUP_LENGTH; i++)
-        pal_lookup[i] = 0;
+    { uint16_t i; for (i = 0; i < PAL_LOOKUP_LENGTH; i++)
+        pal_lookup[i] = 0; }
 
-    for (uint16_t i = 0; i < 0x2000; i++)
+    { uint16_t i; for (i = 0; i < 0x2000; i++)
     {
         sprite_order[i] = 0;
         sprite_order2[i] = 0;
-    }
+    } }
 
     /* Reset hardware entries */
-    for (uint16_t i = 0; i < JUMP_ENTRIES_TOTAL; i++)
-        sprite_entries[i].init();
+    { uint16_t i; for (i = 0; i < JUMP_ENTRIES_TOTAL; i++)
+        sprite_entries[i].init(); }
 
-    for (uint8_t i = 0; i < SPRITE_ENTRIES; i++)
-        jump_table[i].init(i);
+    { uint8_t i; for (i = 0; i < SPRITE_ENTRIES; i++)
+        jump_table[i].init(i); }
 
     /* Ferrari + Passenger Sprites */
     jump_table[SPRITE_FERRARI].init(SPRITE_FERRARI);        /* Ferrari */
@@ -69,21 +69,21 @@ void OSprites::init()
     /* Traffic in Right Hand Lane At Start of Stage 1 */
     /* ------------------------------------------------------------------------ */
 
-    for (uint8_t i = SPRITE_TRAFF1; i <= SPRITE_TRAFF8; i++)
+    { uint8_t i; for (i = SPRITE_TRAFF1; i <= SPRITE_TRAFF8; i++)
     {
         jump_table[i].init(i);      
         jump_table[i].control |= SHADOW;
         jump_table[i].addr = outrun.adr.sprite_porsche; /* Initial offset of traffic sprites. Will be changed. */
-    }
+    } }
 
     /* ------------------------------------------------------------------------ */
     /* Crash Sprites */
     /* ------------------------------------------------------------------------ */
 
-    for (uint8_t i = SPRITE_CRASH; i <= SPRITE_CRASH_PASS2_S; i++)
+    { uint8_t i; for (i = SPRITE_CRASH; i <= SPRITE_CRASH_PASS2_S; i++)
     {
         jump_table[i].init(i);
-    }
+    } }
 
     jump_table[SPRITE_CRASH_PASS1].draw_props = oentry::BOTTOM;
     jump_table[SPRITE_CRASH_PASS2].draw_props = oentry::BOTTOM;
@@ -148,8 +148,8 @@ void OSprites::update_sprites()
 /* Source: 0x4A50 */
 void OSprites::disable_sprites()
 {
-    for (uint8_t i = 0; i < SPRITE_ENTRIES; i++)
-        jump_table[i].control &= ~OSprites::ENABLE;
+    { uint8_t i; for (i = 0; i < SPRITE_ENTRIES; i++)
+        jump_table[i].control &= ~OSprites::ENABLE; }
 }
 
 void OSprites::tick()
@@ -276,8 +276,8 @@ void OSprites::sprite_control()
 void OSprites::clear_palette_data()
 {
     spr_col_pal = 0;
-    for (int16_t i = 0; i < PAL_LOOKUP_LENGTH; i++)
-        pal_lookup[i] = 0;
+    { int16_t i; for (i = 0; i < PAL_LOOKUP_LENGTH; i++)
+        pal_lookup[i] = 0; }
 }
 
 
@@ -293,14 +293,14 @@ void OSprites::copy_palette_data()
     /* Return if no palette entries to copy */
     if (pal_copy_count <= 0) return;
 
-    for (int16_t i = 0; i < pal_copy_count * 2;)
+    { int16_t i; for (i = 0; i < pal_copy_count * 2;)
     {
         /* Palette Data Source Offset (aligned to start of 32 byte boundry, * 32) */
         uint32_t src_addr = pal_addresses[i++] << 3;
         uint32_t dst_addr = PAL_SPRITES + (pal_addresses[i++] << 5);
-        for (uint16_t j = 0; j < 8; j++)
-            video.write_pal32(&dst_addr, PALETTE_EXPANSION[src_addr++]);
-    }
+        { uint16_t j; for (j = 0; j < 8; j++)
+            video.write_pal32(&dst_addr, PALETTE_EXPANSION[src_addr++]); }
+    } }
     pal_copy_count = 0; /* All entries copied */
 }
 
@@ -477,14 +477,14 @@ void OSprites::sprite_copy()
     uint16_t cnt_shadow_copy = spr_cnt_shadow;
 
     /* next_sprite */
-    for (uint16_t i = 0; i < spr_cnt_main; i++)
+    { uint16_t i; for (i = 0; i < spr_cnt_main; i++)
     {
         uint16_t jump_index = sprite_order2[i];
         oentry *entry = &jump_table[jump_index];
         entry->dst_index = cnt_shadow_copy;
         cnt_shadow_copy++;
         do_sprite(entry);
-    }
+    } }
 
     finalise_sprites();
 }
@@ -525,7 +525,7 @@ void OSprites::blit_sprites()
 {
     uint32_t dst_addr = SPRITE_RAM;
 
-    for (uint16_t i = 0; i <= sprite_count; i++)
+    { uint16_t i; for (i = 0; i <= sprite_count; i++)
     {
         uint16_t* data = sprite_entries[i].data;
 
@@ -540,7 +540,7 @@ void OSprites::blit_sprites()
 
         /* Allign on correct boundary */
         dst_addr += 2;
-    }
+    } }
 }
 
 /* Convert Sprite From Internal Software Format To Hardware Format */

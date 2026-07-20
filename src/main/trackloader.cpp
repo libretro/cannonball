@@ -117,7 +117,7 @@ void TrackLoader::init_original_tracks(bool jap)
                                             0x18, 0x19, 0x1A, 0x1B, 
                                             0x20, 0x21, 0x22, 0x23, 0x24};
 
-    for (int i = 0; i < STAGES; i++)
+    { int i; for (i = 0; i < STAGES; i++)
     {
         const uint16_t STAGE_OFFSET = stage_data[STAGE_ORDER[i]] << 2;
 
@@ -128,7 +128,7 @@ void TrackLoader::init_original_tracks(bool jap)
         /* CPU 1 Data */
         const uint32_t PATH_ADR = roms.rom1p->read32(ROAD_DATA_LOOKUP + STAGE_OFFSET);
         levels[i].path = &roms.rom1p->rom[PATH_ADR];        
-    }
+    } }
 
     /* -------------------------------------------------------------------------------------------- */
     /* Setup End Sections & Split Stages */
@@ -138,12 +138,12 @@ void TrackLoader::init_original_tracks(bool jap)
     setup_section(level_split, roms.rom0p, outrun.adr.road_seg_split);
     level_split->path         = &roms.rom1p->rom[ROAD_DATA_SPLIT];
 
-    for (int i = 0; i < 5; i++)
+    { int i; for (i = 0; i < 5; i++)
     {
         const uint32_t STAGE_ADR = roms.rom0p->read32(outrun.adr.road_seg_end + (i << 2));
         setup_section(&levels_end[i], roms.rom0p, STAGE_ADR);
         levels_end[i].path  = &roms.rom1p->rom[ROAD_DATA_BONUS];
-    }
+    } }
 }
 
 void TrackLoader::init_layout_tracks(bool jap)
@@ -184,7 +184,7 @@ void TrackLoader::init_layout_tracks(bool jap)
     /* -------------------------------------------------------------------------------------------- */
     /* Iterate and setup 15 stages */
     /* -------------------------------------------------------------------------------------------- */
-    for (int i = 0; i < STAGES; i++)
+    { int i; for (i = 0; i < STAGES; i++)
     {
         /* CPU 0 Data */
         const uint32_t STAGE_ADR = layout->read32(LayOut::LEVELS + (i * sizeof(uint32_t)));
@@ -193,7 +193,7 @@ void TrackLoader::init_layout_tracks(bool jap)
         /* CPU 1 Data */
         const uint32_t PATH_ADR = layout->read32(LayOut::PATH);
         levels[i].path = &layout->rom[ PATH_ADR + ((ROAD_END_CPU1 * sizeof(uint32_t)) * i) ];
-    }
+    } }
 
     /* -------------------------------------------------------------------------------------------- */
     /* Setup End Sections & Split Stages */
@@ -205,12 +205,12 @@ void TrackLoader::init_layout_tracks(bool jap)
 
     /* End sections don't contain palette information. Shared path. */
     uint8_t* end_path = &layout->rom[ layout->read32(LayOut::END_PATH) ];
-    for (int i = 0; i < 5; i++)
+    { int i; for (i = 0; i < 5; i++)
     {
         const uint32_t STAGE_ADR = layout->read32(LayOut::END_LEVELS + (i * sizeof(uint32_t)));
         setup_section(&levels_end[i], layout, STAGE_ADR);
         levels_end[i].path = end_path;
-    }
+    } }
 }
 
 /* Setup a normal level */

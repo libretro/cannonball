@@ -149,12 +149,12 @@ void OMap::tick()
 /* Render sprites only. No Logic */
 void OMap::blit()
 {
-    for (uint8_t i = 0; i <= MAP_PIECES; i++)
+    { uint8_t i; for (i = 0; i <= MAP_PIECES; i++)
     {
         oentry* sprite = &osprites.jump_table[i];
         if (sprite->control & OSprites::ENABLE)
             osprites.do_spr_order_shadows(sprite);
-    }
+    } }
 }
 
 void OMap::draw_course_map()
@@ -192,11 +192,11 @@ void OMap::draw_course_map()
     move_mini_car   (sprite++);
 
     /* Draw Backdrop Map Pieces */
-    for (uint8_t i = 26; i <= MAP_PIECES; i++)
+    { uint8_t i; for (i = 26; i <= MAP_PIECES; i++)
     {
         if (sprite->control & OSprites::ENABLE)
             osprites.do_spr_order_shadows(sprite++);
-    }
+    } }
 }
 
 
@@ -227,7 +227,7 @@ void OMap::load_sprites()
 
     uint32_t adr = outrun.adr.sprite_coursemap;
 
-    for (uint8_t i = 0; i <= MAP_PIECES; i++)
+    { uint8_t i; for (i = 0; i <= MAP_PIECES; i++)
     {
         oentry* sprite     = &osprites.jump_table[i];
         sprite->id         = i+1;
@@ -245,18 +245,18 @@ void OMap::load_sprites()
         adr += 4; /* throw this address away */
 
         osprites.map_palette(sprite);
-    }
+    } }
 
     /* Wide-screen hack to extend sea to edge of screen. */
     if (config.s16_x_off != 0 || config.engine.fix_bugs)
     {
-        for (uint8_t i = 26; i <= 30; i++)
+        { uint8_t i; for (i = 26; i <= 30; i++)
         {
             oentry* sprite = &osprites.jump_table[i];
             sprite->addr   = osprites.jump_table[31].addr;
             sprite->x      -= 64;
             sprite->zoom   = 0x7F;
-        }
+        } }
     }
 
     /* Minicar initalization moved here */

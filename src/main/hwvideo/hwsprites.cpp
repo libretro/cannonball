@@ -68,7 +68,7 @@ void hwsprites::init(const uint8_t* src_sprites)
         /* Convert S16 tiles to a more useable format */
         const uint8_t *spr = src_sprites;
 
-        for (uint32_t i = 0; i < SPRITES_LENGTH; i++)
+        { uint32_t i; for (i = 0; i < SPRITES_LENGTH; i++)
         {
             uint8_t d3 = *spr++;
             uint8_t d2 = *spr++;
@@ -76,18 +76,18 @@ void hwsprites::init(const uint8_t* src_sprites)
             uint8_t d0 = *spr++;
 
             sprites[i] = (d0 << 24) | (d1 << 16) | (d2 << 8) | d3;
-        }
+        } }
     }
 }
 
 void hwsprites::reset()
 {
     /* Clear Sprite RAM buffers */
-    for (uint16_t i = 0; i < SPRITE_RAM_SIZE; i++)
+    { uint16_t i; for (i = 0; i < SPRITE_RAM_SIZE; i++)
     {
         ram[i] = 0;
         ramBuff[i] = 0;
-    }
+    } }
 }
 
 /* Clip areas of the screen in wide-screen mode */
@@ -134,12 +134,12 @@ void hwsprites::swap()
     uint16_t *dst = (uint16_t *)ramBuff;
 
     /* swap the halves of the road RAM */
-    for (uint16_t i = 0; i < SPRITE_RAM_SIZE; i++)
+    { uint16_t i; for (i = 0; i < SPRITE_RAM_SIZE; i++)
     {
         uint16_t temp = *src;
         *src++ = *dst;
         *dst++ = temp;
-    }
+    } }
 }
 
 #if PIXEL_ACCURACY

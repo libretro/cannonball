@@ -50,8 +50,8 @@ void SoundChip::set_volume(uint8_t v)
 
 void SoundChip::clear_buffer()
 {
-    for (uint32_t i = 0; i < buffer_size; i++)
-        buffer[i] = 0;
+    { uint32_t i; for (i = 0; i < buffer_size; i++)
+        buffer[i] = 0; }
 }
 
 void SoundChip::write_buffer(const uint8_t channel, uint32_t address, int16_t value)

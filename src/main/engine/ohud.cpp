@@ -262,7 +262,7 @@ void OHud::draw_score(uint32_t addr, const uint32_t score, uint8_t font)
 
     /* Draw blank digits until we find first digit */
     /* Then use zero for blank digits */
-    for (uint8_t i = 0; i < 7; i++)
+    { uint8_t i; for (i = 0; i < 7; i++)
     {
         if (!found && !digits[i])
             video.write_text16(&addr, BLANK);
@@ -271,7 +271,7 @@ void OHud::draw_score(uint32_t addr, const uint32_t score, uint8_t font)
             video.write_text16(&addr, digits[i] + BASE);
             found = true;
         }
-    }
+    } }
 
     video.write_text16(&addr, digits[7] + BASE); /* Always draw last digit */
     delete[] digits;
@@ -303,7 +303,7 @@ void OHud::draw_score_tile(uint32_t addr, const uint32_t score, uint8_t font)
 
     /* Draw blank digits until we find first digit */
     /* Then use zero for blank digits */
-    for (uint8_t i = 0; i < 7; i++)
+    { uint8_t i; for (i = 0; i < 7; i++)
     {
         if (!found && !digits[i])
             video.write_tile16(&addr, BLANK);
@@ -312,7 +312,7 @@ void OHud::draw_score_tile(uint32_t addr, const uint32_t score, uint8_t font)
             video.write_tile16(&addr, digits[i] + BASE);
             found = true;
         }
-    }
+    } }
 
     video.write_tile16(&addr, digits[7] + BASE); /* Always draw last digit */
     delete[] digits;
@@ -494,13 +494,13 @@ void OHud::draw_insert_coin()
                 if (outrun.tick_counter & BIT_4)
                 {                
                     /* Blit each tile */
-                    for (uint16_t i = 0; i < sizeof(PRESS_START); i++)
-                        video.write_text16(&dst_addr, (0x8700 | PRESS_START[i]));
+                    { uint16_t i; for (i = 0; i < sizeof(PRESS_START); i++)
+                        video.write_text16(&dst_addr, (0x8700 | PRESS_START[i])); }
                 }
                 else
                 {
-                    for (uint16_t i = 0; i < sizeof(PRESS_START); i++)
-                        video.write_text16(&dst_addr, (0x8700 | 0x20));
+                    { uint16_t i; for (i = 0; i < sizeof(PRESS_START); i++)
+                        video.write_text16(&dst_addr, (0x8700 | 0x20)); }
                 }
             }
             else
@@ -560,11 +560,11 @@ void OHud::blit_text1(uint32_t src_addr)
     uint16_t data = roms.rom0.read16(&src_addr);     /* Tile data to blit */
     
     /* Blit each tile */
-    for (uint16_t i = 0; i <= counter; i++)
+    { uint16_t i; for (i = 0; i <= counter; i++)
     {
         data = (data & 0xFF00) | roms.rom0.read8(&src_addr);
         video.write_text16(&dst_addr, data);
-    }
+    } }
 }
 
 void OHud::blit_text1(uint8_t x, uint8_t y, uint32_t src_addr)
@@ -575,11 +575,11 @@ void OHud::blit_text1(uint8_t x, uint8_t y, uint32_t src_addr)
     uint16_t data = roms.rom0.read16(&src_addr);     /* Tile data to blit */
 
     /* Blit each tile */
-    for (uint16_t i = 0; i <= counter; i++)
+    { uint16_t i; for (i = 0; i <= counter; i++)
     {
         data = (data & 0xFF00) | roms.rom0.read8(&src_addr);
         video.write_text16(&dst_addr, data);
-    }
+    } }
 }
 
 /* Blit Tiles to text ram layer (Double Row) */
@@ -607,7 +607,7 @@ void OHud::blit_text2(uint32_t src_addr)
     uint16_t counter = roms.rom0.read8(&src_addr); /* Number of tiles to blit */
 
     /* Blit each tile */
-    for (uint16_t i = 0; i <= counter; i++)
+    { uint16_t i; for (i = 0; i <= counter; i++)
     {
         uint16_t data = roms.rom0.read8(&src_addr); /* Tile data to blit */
         
@@ -627,7 +627,7 @@ void OHud::blit_text2(uint32_t src_addr)
             data++;
         }
         video.write_text16(0x7E + dst_addr, data); /* Write second row to text ram */
-    }
+    } }
 }
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -655,11 +655,11 @@ void OHud::blit_text_big(const uint8_t Y, const char* text, bool do_notes)
     const uint16_t X = 20 - (length >> 1);
 
     /* Clear complete row in text ram before blitting */
-    for (uint8_t x = 0; x < 40; x++)
+    { uint8_t x; for (x = 0; x < 40; x++)
     {
         video.write_text16(translate(x, Y, 0x110030) + 0x110000, 0); /* Write blank space to text ram */
         video.write_text16(translate(x, Y, 0x110030) + 0x11007E, 0); /* Write blank space to text ram */
-    }
+    } }
 
     /* Draw Notes */
     if (do_notes)
@@ -675,7 +675,7 @@ void OHud::blit_text_big(const uint8_t Y, const char* text, bool do_notes)
     uint32_t dst_addr = translate(X, Y, 0x110030) + 0x110000;
 
     /* Blit each tile */
-    for (uint16_t i = 0; i < length; i++)
+    { uint16_t i; for (i = 0; i < length; i++)
     {
         char c = *text++;
         /* Convert lowercase characters to uppercase */
@@ -707,7 +707,7 @@ void OHud::blit_text_big(const uint8_t Y, const char* text, bool do_notes)
             video.write_text16(&dst_addr,       c + pal);     /* Write first row to text ram */
             video.write_text16(0x7E + dst_addr, c + pal + 1); /* Write second row to text ram */
         }       
-    }
+    } }
 }
 
 /* Custom Routine To Blit Text Easily */
@@ -722,7 +722,7 @@ void OHud::blit_text_new(uint16_t x, uint16_t y, const char* text, uint16_t pal)
     uint32_t dst_addr = translate(x, y, 0x110030); 
     uint16_t length = (uint16_t) strlen(text);
 
-    for (uint16_t i = 0; i < length; i++)
+    { uint16_t i; for (i = 0; i < length; i++)
     {
         char c = *text++;
 
@@ -737,7 +737,7 @@ void OHud::blit_text_new(uint16_t x, uint16_t y, const char* text, uint16_t pal)
             c = 0x5b;
 
         video.write_text16(&dst_addr, (pal << 8) | c);
-    }
+    } }
 }
 
 /* Translate x, y column position to tilemap address */

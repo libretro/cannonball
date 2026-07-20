@@ -82,10 +82,10 @@ void OMusic::enable()
 
     /* Enable block of sprites */
     entry_start = OSprites::SPRITE_ENTRIES - 0x10;    
-    for (int i = entry_start; i < entry_start + 5; i++)
+    { int i; for (i = entry_start; i < entry_start + 5; i++)
     {
         osprites.jump_table[i].init(i);
-    }
+    } }
 
     setup_sprite1();
     setup_sprite2();
@@ -108,10 +108,10 @@ void OMusic::enable()
 void OMusic::disable()
 {
     /* Disable block of sprites */
-    for (int i = entry_start; i < entry_start + 5; i++)
+    { int i; for (i = entry_start; i < entry_start + 5; i++)
     {
         osprites.jump_table[i].control &= ~OSprites::ENABLE;
-    }
+    } }
 
     video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);
 
@@ -377,8 +377,8 @@ void OMusic::set_hand(short direction, oentry* fm, oentry* dial, oentry* hand)
 /* Blit Only: Used when frame skipping */
 void OMusic::blit()
 {
-    for (int i = 0; i < 5; i++)
-        osprites.do_spr_order_shadows(&osprites.jump_table[entry_start + i]);
+    { int i; for (i = 0; i < 5; i++)
+        osprites.do_spr_order_shadows(&osprites.jump_table[entry_start + i]); }
 }
 
 /* Blit Music Selection Tiles to text ram layer (Double Row) */
@@ -415,8 +415,8 @@ void OMusic::blit_music_select()
     uint32_t dst_addr = PAL_RAM_SKY;
 
     /* Write 32 Palette Longs to Palette RAM */
-    for (int i = 0; i < 32; i++)
-        video.write_pal32(&dst_addr, roms.rom0.read32(&src_addr));
+    { int i; for (i = 0; i < 32; i++)
+        video.write_pal32(&dst_addr, roms.rom0.read32(&src_addr)); }
 
     /* Set Tilemap Scroll */
     otiles.set_scroll(config.s16_x_off, 0);
@@ -432,13 +432,13 @@ void OMusic::blit_music_select()
         const uint16_t rows = tilemap->read16(&src_addr);
         const uint16_t cols = tilemap->read16(&src_addr);
 
-        for (int y = 0; y < rows; y++)
+        { int y; for (y = 0; y < rows; y++)
         {
             dst_addr = tilemap16;
-            for (int x = 0; x < cols; x++)
-                video.write_tile16(&dst_addr, tilemap->read16(&src_addr));
+            { int x; for (x = 0; x < cols; x++)
+                video.write_tile16(&dst_addr, tilemap->read16(&src_addr)); }
             tilemap16 += 0x80; /* next line of tiles */
-        }
+        } }
     }
     /* -------------------------------------------------------------------------------------------- */
     /* Blit to Tilemap 16: Original 4:3 Version.  */
@@ -448,10 +448,10 @@ void OMusic::blit_music_select()
         uint32_t tilemap16 = TILEMAP_RAM_16;
         src_addr = TILEMAP_MUSIC_SELECT;
 
-        for (int y = 0; y < 28; y++)
+        { int y; for (y = 0; y < 28; y++)
         {
             dst_addr = tilemap16;
-            for (int x = 0; x < 40;)
+            { int x; for (x = 0; x < 40;)
             {
                 /* get next tile */
                 uint32_t data = roms.rom0.read16(&src_addr);
@@ -467,15 +467,15 @@ void OMusic::blit_music_select()
                     uint16_t value = roms.rom0.read16(&src_addr); /* tile index to copy */
                     uint16_t count = roms.rom0.read16(&src_addr); /* number of times to copy value */
 
-                    for (uint16_t i = 0; i <= count; i++)
+                    { uint16_t i; for (i = 0; i <= count; i++)
                     {
                         video.write_tile16(&dst_addr, value);
                         x++;
-                    }
+                    } }
                 }
-            }
+            } }
             tilemap16 += 0x80; /* next line of tiles */
-        } /* end for */
+        } } /* end for */
 
         /* Fix Misplaced tile on music select screen (above steering wheel) */
         if (config.engine.fix_bugs)

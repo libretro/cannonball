@@ -155,8 +155,8 @@ void Video::prepare_frame()
     if (!enabled)
     {
         /* Fill with black pixels */
-        for (int i = 0; i < config.s16_width * config.s16_height; i++)
-            pixels[i] = 0;
+        { int i; for (i = 0; i < config.s16_width * config.s16_height; i++)
+            pixels[i] = 0; }
     }
     else
     {
@@ -178,11 +178,11 @@ void Video::render_frame()
 {
     uint16_t* output = pixels;
 
-    for (int i = 0;
+    { int i; for (i = 0;
          i < config.s16_width * config.s16_height;
          i++)
         output[i] = (uint16_t)
-            rgb[output[i] % (S16_PALETTE_ENTRIES * 3)];
+            rgb[output[i] % (S16_PALETTE_ENTRIES * 3)]; }
 
     video_cb(
         pixels,
@@ -198,8 +198,8 @@ void Video::render_frame()
 
 void Video::clear_text_ram()
 {
-    for (uint32_t i = 0; i <= 0xFFF; i++)
-        tile_layer->text_ram[i] = 0;
+    { uint32_t i; for (i = 0; i <= 0xFFF; i++)
+        tile_layer->text_ram[i] = 0; }
 }
 
 void Video::write_text8(uint32_t addr, const uint8_t data)
@@ -250,8 +250,8 @@ uint8_t Video::read_text8(uint32_t addr)
 
 void Video::clear_tile_ram()
 {
-    for (uint32_t i = 0; i <= 0xFFFF; i++)
-        tile_layer->tile_ram[i] = 0;
+    { uint32_t i; for (i = 0; i <= 0xFFFF; i++)
+        tile_layer->tile_ram[i] = 0; }
 }
 
 void Video::write_tile8(uint32_t addr, const uint8_t data)

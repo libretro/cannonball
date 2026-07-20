@@ -41,11 +41,11 @@ void OSoundInt::init()
     reset();
 
     /* Clear PCM Chip RAM */
-    for (uint16_t i = 0; i < PCM_RAM_SIZE; i++)
-        pcm_ram[i] = 0;
+    { uint16_t i; for (i = 0; i < PCM_RAM_SIZE; i++)
+        pcm_ram[i] = 0; }
 
-    for (uint8_t i = 0; i < 8; i++)
-        engine_data[i] = 0;
+    { uint8_t i; for (i = 0; i < 8; i++)
+        engine_data[i] = 0; }
 
     osound.init(ym, pcm_ram);
 }
@@ -70,11 +70,11 @@ void OSoundInt::tick()
     /* Ticks per frame will vary between 2 and 3 at 60fps. */
     const int max_ticks = (int) audio_ticks;
 
-    for (int i = 0; i < max_ticks; i++)
+    { int i; for (i = 0; i < max_ticks; i++)
     {
         play_queued_sound(); /* Process audio commands from main program code */
         osound.tick();       /* Tick Ported Z80 Audio Code */
-    }
+    } }
 
     audio_ticks -= max_ticks;
 }
@@ -96,7 +96,7 @@ void OSoundInt::play_queued_sound()
     }
 
     /* Process the lot in one go.  */
-    for (int counter = 0; counter < 8; counter++)
+    { int counter; for (counter = 0; counter < 8; counter++)
     {
         /* Process queued sound */
         if (counter == 0)
@@ -117,7 +117,7 @@ void OSoundInt::play_queued_sound()
         {
             osound.engine_data[counter] = engine_data[counter];
         }
-    }
+    } }
 }
 
 /* Queue a sound in service mode */

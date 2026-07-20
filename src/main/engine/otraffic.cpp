@@ -105,7 +105,7 @@ void OTraffic::tick()
     if (outrun.tick_frame) 
         spawn_traffic();
 
-    for (uint8_t i = OSprites::SPRITE_TRAFF1; i <= OSprites::SPRITE_TRAFF8; i++)
+    { uint8_t i; for (i = OSprites::SPRITE_TRAFF1; i <= OSprites::SPRITE_TRAFF8; i++)
     {
         oentry* sprite = &osprites.jump_table[i];
 
@@ -132,15 +132,15 @@ void OTraffic::tick()
 
         if (sprite->function_holder == TRAFFIC_TICK)
             tick_spawned_sprite(sprite);
-    }
+    } }
 }
 
 /* Disable Traffic Routines */
 /* Source: 0x4A78 */
 void OTraffic::disable_traffic()
 {
-    for (uint8_t i = OSprites::SPRITE_TRAFF1; i <= OSprites::SPRITE_TRAFF8; i++)
-        osprites.jump_table[i].control &= ~OSprites::ENABLE;
+    { uint8_t i; for (i = OSprites::SPRITE_TRAFF1; i <= OSprites::SPRITE_TRAFF8; i++)
+        osprites.jump_table[i].control &= ~OSprites::ENABLE; }
 }
 
 /* Master Function to determine when to spawn traffic */
@@ -182,7 +182,7 @@ void OTraffic::spawn_traffic()
         return;
 
     /* Spawn Traffic if possible in one of the eight slots */
-    for (uint8_t i = OSprites::SPRITE_TRAFF1; i <= OSprites::SPRITE_TRAFF8; i++)
+    { uint8_t i; for (i = OSprites::SPRITE_TRAFF1; i <= OSprites::SPRITE_TRAFF8; i++)
     {
         oentry* sprite = &osprites.jump_table[i];
         
@@ -191,7 +191,7 @@ void OTraffic::spawn_traffic()
             spawn_car(sprite);
             return;
         }
-    }
+    } }
 }
 
 /* Spawn individual vehicle. Called by master function. */
@@ -663,7 +663,7 @@ void OTraffic::traffic_logic()
     oentry* next = 0;
 
     /* Compare Current Traffic Entry With Previous One */
-    for (uint8_t index2 = index + 1; index2 < sprite_count; index2++)
+    { uint8_t index2; for (index2 = index + 1; index2 < sprite_count; index2++)
     {
         uint16_t src_index = osprites.sprite_entries[spr_index++].scratch;
         next = &osprites.jump_table[src_index];
@@ -714,7 +714,7 @@ void OTraffic::traffic_logic()
             next->traffic_near_speed = first->traffic_speed;
             first = next;
         }
-    }
+    } }
 
     calculate_avg_speed(spawned);
 }
@@ -817,7 +817,7 @@ void OTraffic::traffic_sound()
     int16_t sounds = traffic_count <= 4 ? traffic_count : 4;
 
     /* Loop through traffic objects that are on screen */
-    for (int16_t i = 0; i < sounds; i++)
+    { int16_t i; for (i = 0; i < sounds; i++)
     {
         oentry* t = traffic_adr[traffic_count - i - 1];
         /* Used to set panning of sound as car moves left and right in front of the player */
@@ -828,5 +828,5 @@ void OTraffic::traffic_sound()
         /* Position into screen is used to set volume */
         uint8_t vol = (t->road_priority & 0x1F0) >> 1;
         osoundint.engine_data[SOUND_TRAFFIC1 + i] = pan | vol;
-    }
+    } }
 }

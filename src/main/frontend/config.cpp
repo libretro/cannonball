@@ -113,7 +113,7 @@ void Config::load_custom_music(const std::string& filename)
 
     /* Scan track1, track2, track3... until the first entry */
     /* without an enabled attribute. */
-    for (int i = 0; ; i++)
+    { int i; for (i = 0; ; i++)
     {
         const std::string track_number =
             Utils::to_string(i + 1);
@@ -177,7 +177,7 @@ void Config::load_custom_music(const std::string& filename)
 
         sound.music.push_back(music);
         loaded_tracks++;
-    }
+    } }
 
     if (log_cb)
         log_cb(
@@ -227,7 +227,7 @@ void Config::load_scores(const std::string &filename)
         return;
 
     /* Game Scores */
-    for (int i = 0; i < ohiscore.NO_SCORES; i++)
+    { int i; for (i = 0; i < ohiscore.NO_SCORES; i++)
     {
         score_entry* e = &ohiscore.scores[i];
 
@@ -288,7 +288,7 @@ void Config::load_scores(const std::string &filename)
 
         if (e->initial3 == '.')
             e->initial3 = 0x20;
-    }
+    } }
 }
 
 
@@ -301,7 +301,7 @@ void Config::save_scores(const std::string &filename)
 
     append_xml_declaration(document);
 
-    for (int i = 0; i < ohiscore.NO_SCORES; i++)
+    { int i; for (i = 0; i < ohiscore.NO_SCORES; i++)
     {
         score_entry* e = &ohiscore.scores[i];
 
@@ -358,7 +358,7 @@ void Config::save_scores(const std::string &filename)
             .append_child("time")
             .text()
             .set(Utils::to_hex_string(e->time).c_str());
-    }
+    } }
 
     const bool saved =
         document.save_file(
@@ -383,8 +383,8 @@ void Config::load_tiletrial_scores()
     /* Counter value representing 1m 15s 0ms. */
     static const uint16_t COUNTER_1M_15 = 0x11D0;
 
-    for (int i = 0; i < 15; i++)
-        ttrial.best_times[i] = COUNTER_1M_15;
+    { int i; for (i = 0; i < 15; i++)
+        ttrial.best_times[i] = COUNTER_1M_15; }
 
     pugi::xml_document document;
 
@@ -401,7 +401,7 @@ void Config::load_tiletrial_scores()
     const pugi::xml_node time_trial =
         document.child("time_trial");
 
-    for (int i = 0; i < 15; i++)
+    { int i; for (i = 0; i < 15; i++)
     {
         const std::string score_name =
             "score" + Utils::to_string(i);
@@ -411,7 +411,7 @@ void Config::load_tiletrial_scores()
                 .child(score_name.c_str())
                 .text()
                 .as_uint(COUNTER_1M_15);
-    }
+    } }
 }
 
 
@@ -427,7 +427,7 @@ void Config::save_tiletrial_scores()
     pugi::xml_node time_trial =
         document.append_child("time_trial");
 
-    for (int i = 0; i < 15; i++)
+    { int i; for (i = 0; i < 15; i++)
     {
         const std::string score_name =
             "score" + Utils::to_string(i);
@@ -436,7 +436,7 @@ void Config::save_tiletrial_scores()
             .append_child(score_name.c_str())
             .text()
             .set(ttrial.best_times[i]);
-    }
+    } }
 
     const bool saved =
         document.save_file(

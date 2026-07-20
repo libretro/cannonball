@@ -58,7 +58,7 @@ void OLevelObjs::init_hiscore_sprites()
 void OLevelObjs::init_entries(uint32_t a4, const uint8_t start_index, const uint8_t no_entries)
 {
     /* next_sprite: */
-    for (uint8_t i = start_index; i <= no_entries; i++)
+    { uint8_t i; for (i = start_index; i <= no_entries; i++)
     {
         oentry *sprite = &osprites.jump_table[i];
 
@@ -113,7 +113,7 @@ void OLevelObjs::init_entries(uint32_t a4, const uint8_t start_index, const uint
             sprite->function_holder = 8; /* SpriteNoCollisionZ2; */
 
         osprites.map_palette(sprite);    
-    }
+    } }
 }
 
 /* Setup Sprites */
@@ -124,14 +124,14 @@ void OLevelObjs::init_entries(uint32_t a4, const uint8_t start_index, const uint
 void OLevelObjs::setup_sprites(uint32_t z)
 {
     /* Setup entries that have not yet been enabled */
-    for (uint8_t i = 0; i < osprites.no_sprites; i++)
+    { uint8_t i; for (i = 0; i < osprites.no_sprites; i++)
     {
         if ((osprites.jump_table[i].control & OSprites::ENABLE) == 0)
         {
             setup_sprite(&osprites.jump_table[i], z);
             return;
         }
-    }
+    } }
 }
 
 /* Setup Sprite from ROM format for use in game */
@@ -283,7 +283,7 @@ void OLevelObjs::setup_sprite_routine(oentry* sprite)
 
 void OLevelObjs::do_sprite_routine()
 {
-    for (uint8_t i = 0; i < osprites.no_sprites; i++)
+    { uint8_t i; for (i = 0; i < osprites.no_sprites; i++)
     {
         oentry* sprite = &osprites.jump_table[i];
 
@@ -373,7 +373,7 @@ void OLevelObjs::do_sprite_routine()
                     break;
             }
         }
-    }
+    } }
 }
 
 /* Source: 4048 */

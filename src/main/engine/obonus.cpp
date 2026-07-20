@@ -74,10 +74,10 @@ void OBonus::init_bonus_text()
     if (outrun.cannonball_mode == Outrun::MODE_ORIGINAL)
     {
         /* Add milliseconds remaining from previous stage times */
-        for (int i = 0; i < 5; i++)
+        { int i; for (i = 0; i < 5; i++)
         {
             total_time = outils::bcd_add(outils::DEC_TO_HEX[ostats.stage_times[i][2]], total_time);
-        }
+        } }
     }
 
     /* Mask on top digit of lap milliseconds */
@@ -109,8 +109,8 @@ void OBonus::init_bonus_text()
     uint32_t dst_addr = 0x11065A;
     int8_t count = roms.rom0.read8(&src_addr);
 
-    for (int8_t i = 0; i <= count; i++)
-        ohud.blit_large_digit(&dst_addr, (roms.rom0.read8(&src_addr) - 0x30) << 1);
+    { int8_t i; for (i = 0; i <= count; i++)
+        ohud.blit_large_digit(&dst_addr, (roms.rom0.read8(&src_addr) - 0x30) << 1); }
 
     blit_bonus_secs();
 }

@@ -51,8 +51,8 @@ void OHiScore::setup_pal_best()
     uint32_t src = PAL_BESTOR;
     uint32_t dst = 0x120F00;
 
-    for (int i = 0; i <= 0x1F; i++)
-        video.write_pal32(&dst, roms.rom0.read32(&src));
+    { int i; for (i = 0; i <= 0x1F; i++)
+        video.write_pal32(&dst, roms.rom0.read32(&src)); }
 }
 
 /* Setup road colour for Best Outrunners High Score Entry */
@@ -62,8 +62,8 @@ void OHiScore::setup_road_best()
 {
     uint32_t dst = 0x120800;
 
-    for (int i = 0; i <= 0x1F; i++)
-        video.write_pal32(&dst, 0);
+    { int i; for (i = 0; i <= 0x1F; i++)
+        video.write_pal32(&dst, 0); }
 }
 
 /* Initalize Default Score Table */
@@ -72,7 +72,7 @@ void OHiScore::init_def_scores()
 {
     uint32_t adr = DEFAULT_SCORES;
 
-    for (int i = 0; i < NO_SCORES; i++)
+    { int i; for (i = 0; i < NO_SCORES; i++)
     {
         /* Read default score */
         scores[i].score = roms.rom0.read32(&adr);
@@ -89,7 +89,7 @@ void OHiScore::init_def_scores()
         /* Read map tiles */
         scores[i].maptiles = roms.rom0.read32(&adr);
         /*scores[i].maptiles = 0xe5c8c2d1; // hack to populate map tiles for testing */
-    }
+    } }
 }
 
 /* Hi Score Processing Logic */
@@ -143,7 +143,7 @@ void OHiScore::tick()
 /* Source: D318 */
 void OHiScore::get_score_pos()
 {
-    for (int i = 0; i < NO_SCORES; i++)
+    { int i; for (i = 0; i < NO_SCORES; i++)
     {
         if (ostats.score > scores[i].score)
         {
@@ -151,7 +151,7 @@ void OHiScore::get_score_pos()
             set_display_pos();
             return;
         }
-    }
+    } }
 
     score_pos = -1; /* Not a new high-score */
 }
@@ -165,10 +165,10 @@ void OHiScore::get_score_pos()
 void OHiScore::insert_score()
 {
     /* Move entries down in memory */
-    for (int i = NO_SCORES - 1; i > score_pos; i--)
+    { int i; for (i = NO_SCORES - 1; i > score_pos; i--)
     {
         scores[i] = scores[i-1];
-    }
+    } }
 
     scores[score_pos].score    = ostats.score;
     scores[score_pos].initial1 = 0x20;
@@ -182,8 +182,8 @@ void OHiScore::insert_score()
 
         scores[score_pos].time = 0;
 
-        for (int i = 0; i < entries; i++)
-            scores[score_pos].time += ostats.stage_counters[i];
+        { int i; for (i = 0; i < entries; i++)
+            scores[score_pos].time += ostats.stage_counters[i]; }
     }
     else
     {
@@ -467,13 +467,13 @@ void OHiScore::display_scores()
 /* Source: 0xCED2 */
 void OHiScore::setup_minicars()
 {
-    for (int i = 0; i < NO_MINICARS; i++)
+    { int i; for (i = 0; i < NO_MINICARS; i++)
     {
         minicars[i].pos         = 0x100;
         minicars[i].dst_reached = 0;
         minicars[i].speed       = (outils::random() & 0x180) | 0xF0;
         minicars[i].base_speed  = (outils::random() & 0x7) | 0x01;
-    }
+    } }
 }
 
 /* Move minicars across screen on text ram layer */
@@ -487,7 +487,7 @@ void OHiScore::tick_minicars()
     uint32_t tiles_adr = TILES_MINICARS1;
 
     /* There are seven lines / entries to blit */
-    for (int i = 0; i < NO_MINICARS; i++)
+    { int i; for (i = 0; i < NO_MINICARS; i++)
     {
         minicar_entry* minicar = &minicars[i];
         
@@ -550,7 +550,7 @@ void OHiScore::tick_minicars()
 
         dst += 0x100; /* Advance to next row in text ram */
         tiles_adr += 0x0A; /* Advance to next block of minicar data */
-    }
+    } }
 }
 
 /* Setup palette and priority data for the copied tiles behind the minicar. */
@@ -589,8 +589,8 @@ void OHiScore::blit_score_table()
 {
     /* Clear tile table ready for High Score Display */
     uint32_t tile_addr = 0x10E000; /* Tile Table 15 */
-    for (int i = 0; i <= 0x3FF; i++)
-        video.write_tile32(&tile_addr, 0x200020);
+    { int i; for (i = 0; i <= 0x3FF; i++)
+        video.write_tile32(&tile_addr, 0x200020); }
 
     ohud.blit_text2(TEXT2_BEST_OR);   /* Print "BEST OUTRUNNERS" */
     ohud.blit_text1(TEXT1_SCORE_ETC); /* Print Score, Name, Route, Record */
@@ -613,7 +613,7 @@ void OHiScore::blit_digit()
     int16_t pos = score_display_pos + 1;
 
     /* Display numbers 1 to 7 */
-    for (int i = 0; i < 7; i++)
+    { int i; for (i = 0; i < 7; i++)
     {
         int32_t tile = (pos / 10) | ((pos % 10) << 16);
 
@@ -636,7 +636,7 @@ void OHiScore::blit_digit()
 
         dst += 0x100; /* Advance to next text row */
         pos++;
-    }
+    } }
 }
 
 /* Blit High Scores */
@@ -651,11 +651,11 @@ void OHiScore::blit_scores()
     int16_t pos = score_display_pos;
 
     /* Display scores 1 to 7 */
-    for (int i = 0; i < 7; i++)
+    { int i; for (i = 0; i < 7; i++)
     {
         ohud.draw_score_tile(dst, scores[pos++].score, 0);
         dst += 0x100; /* Advance to next text row */
-    }
+    } }
 }
 
 /* Blit Initials */
@@ -670,14 +670,14 @@ void OHiScore::blit_initials()
     int16_t pos = score_display_pos;
 
     /* Write 3 initials for entries 1 to 7 */
-    for (int i = 0; i < 7; i++)
+    { int i; for (i = 0; i < 7; i++)
     {
         video.write_tile8(dst + 1, scores[pos].initial1);
         video.write_tile8(dst + 3, scores[pos].initial2);
         video.write_tile8(dst + 5, scores[pos].initial3);
         pos++;
         dst += 0x100; /* Advance to next text row */
-    }
+    } }
 }
 
 /* Blit mini route map */
@@ -692,7 +692,7 @@ void OHiScore::blit_route_map()
     int16_t pos = score_display_pos;
 
     /* Write 7 map entries */
-    for (int i = 0; i < 7; i++)
+    { int i; for (i = 0; i < 7; i++)
     {
         uint32_t tiles = scores[pos++].maptiles;
 
@@ -703,7 +703,7 @@ void OHiScore::blit_route_map()
         video.write_tile8(dst + 0x03, tiles & 0xFF);
 
         dst += 0x100; /* Advance to next text row */
-    }
+    } }
 }
 
 /* Blit laptime */
@@ -718,7 +718,7 @@ void OHiScore::blit_lap_time()
     int16_t pos = score_display_pos;
 
     /* Write 7 lap entries */
-    for (int i = 0; i < 7; i++)
+    { int i; for (i = 0; i < 7; i++)
     {
         uint16_t time = scores[pos++].time;
 
@@ -742,7 +742,7 @@ void OHiScore::blit_lap_time()
         }
 
         dst += 0x100; /* Advance to next text row */
-    }
+    } }
 }
 
 /* Convert laptime to tile data and store in laptime array. */

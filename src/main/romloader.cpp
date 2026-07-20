@@ -213,8 +213,8 @@ int RomLoader::load_rom(const char* filename,
                (unsigned)(checksum));
     }
 
-    for (int i = 0; i < file_length; i++)
-        rom[(i * interleave) + offset] = buffer[(size_t)(i)];
+    { int i; for (i = 0; i < file_length; i++)
+        rom[(i * interleave) + offset] = buffer[(size_t)(i)]; }
 
     loaded = true;
     return 0;
@@ -325,8 +325,8 @@ int RomLoader::load_crc32(const char* debug,
         return 1;
     }
 
-    for (int i = 0; i < file_length; i++)
-        rom[(i * interleave) + offset] = buffer[(size_t)(i)];
+    { int i; for (i = 0; i < file_length; i++)
+        rom[(i * interleave) + offset] = buffer[(size_t)(i)]; }
 
     if (verbose && log_cb)
         log_cb(RETRO_LOG_INFO,

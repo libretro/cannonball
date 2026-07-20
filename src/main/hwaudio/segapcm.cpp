@@ -75,8 +75,8 @@ SegaPCM::SegaPCM(uint32_t clock, RomLoader* rom, uint8_t* ram, int32_t bank)
 
     bankmask = mask & (rom_mask >> bankshift);
 
-    for (int32_t i = 0; i < 0x100; i++)
-        ram[i] = 0xff;
+    { int32_t i; for (i = 0; i < 0x100; i++)
+        ram[i] = 0xff; }
 }
 
 SegaPCM::~SegaPCM()
@@ -96,7 +96,7 @@ void SegaPCM::stream_update()
     SoundChip::clear_buffer();
 
     /* loop over channels */
-    for (int ch = 0; ch < 16; ch++)
+    { int ch; for (ch = 0; ch < 16; ch++)
     {
         uint8_t *regs = ram + 8 * ch;
 
@@ -148,5 +148,5 @@ void SegaPCM::stream_update()
             regs[0x85] = addr >> 16;
             low[ch] = regs[0x86] & 1 ? 0 : addr;
         }
-    }
+    } }
 }

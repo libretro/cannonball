@@ -165,27 +165,27 @@ void HWRoad::init(const uint8_t* src_road, const bool hires)
 
 void HWRoad::decode_road(const uint8_t* src_road)
 {
-    for (int y = 0; y < 256 * 2; y++) 
+    { int y; for (y = 0; y < 256 * 2; y++) 
     {
         const int src = ((y & 0xff) * 0x40 + (y >> 8) * 0x8000) % rom_size; /* tempGfx */
         const int dst = y * 512; /* System16Roads */
 
         /* loop over columns */
-        for (int x = 0; x < 512; x++) 
+        { int x; for (x = 0; x < 512; x++) 
         {
             roads[dst + x] = (((src_road[src + (x / 8)] >> (~x & 7)) & 1) << 0) | (((src_road[src + (x / 8 + 0x4000)] >> (~x & 7)) & 1) << 1);
 
             /* pre-mark road data in the "stripe" area with a high bit */
             if (x >= 256 - 8 && x < 256 && roads[dst + x] == 3)
                 roads[dst + x] |= 4;
-        }
-    }
+        } }
+    } }
 
     /* set up a dummy road in the last entry */
-    for (int i = 0; i < 512; i++) 
+    { int i; for (i = 0; i < 512; i++) 
     {
         roads[256 * 2 * 512 + i] = 3;
-    }
+    } }
 }
 
 /* Writes go to RAM, but we read from the RAM Buffer. */
@@ -215,12 +215,12 @@ uint16_t HWRoad::read_road_control()
     uint32_t *dst = (uint32_t *)ramBuff;
 
     /* swap the halves of the road RAM */
-    for (uint16_t i = 0; i < ROAD_RAM_SIZE/4; i++)
+    { uint16_t i; for (i = 0; i < ROAD_RAM_SIZE/4; i++)
     {
         uint32_t temp = *src;
         *src++ = *dst;
         *dst++ = temp;
-    }
+    } }
 
     return 0xffff;
 }

@@ -107,7 +107,7 @@ uint32_t outils::bcd_add(uint32_t src, uint32_t dst)
     uint8_t carry = 0;
     uint32_t final = 0;
 
-    for (uint8_t i = 0; i < 4; i++)
+    { uint8_t i; for (i = 0; i < 4; i++)
     {
         int32_t res = (src & 0xF) + (dst & 0xF) + carry;
 
@@ -130,7 +130,7 @@ uint32_t outils::bcd_add(uint32_t src, uint32_t dst)
         dst >>= 8;
 
         final |= ((res & 0xFF) << (i * 8));
-    }
+    } }
 
     return final;
 }
@@ -141,7 +141,7 @@ uint32_t outils::bcd_sub(uint32_t src, uint32_t dst)
     uint8_t carry = 0;
     uint32_t final = 0;
 
-    for (uint8_t i = 0; i < 4; i++)
+    { uint8_t i; for (i = 0; i < 4; i++)
     {
         int32_t res = (dst & 0xF) - (src & 0xF) - carry;
 
@@ -164,7 +164,7 @@ uint32_t outils::bcd_sub(uint32_t src, uint32_t dst)
         dst >>= 8;
 
         final |= ((res & 0xFF) << (i * 8));
-    }
+    } }
 
     return final;
 }

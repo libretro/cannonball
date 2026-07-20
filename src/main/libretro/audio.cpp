@@ -81,12 +81,12 @@ void Audio::clear_buffers()
     int specified_delay_samps = (FREQ * SND_DELAY) / 1000;
     dsp_write_pos = (specified_delay_samps+SAMPLES) * bytes_per_sample;
 
-    for (int i = 0; i < dsp_buffer_bytes; i++)
-        dsp_buffer[i] = 0;
+    { int i; for (i = 0; i < dsp_buffer_bytes; i++)
+        dsp_buffer[i] = 0; }
 
     uint16_t buffer_size = (FREQ / config.fps) * CHANNELS;
-    for (int i = 0; i < buffer_size; i++)
-        mix_buffer[i] = 0;
+    { int i; for (i = 0; i < buffer_size; i++)
+        mix_buffer[i] = 0; }
 }
 
 void Audio::stop_audio()
@@ -131,7 +131,7 @@ void Audio::tick()
     const int samples_written =
         osoundint.pcm->buffer_size;
 
-    for (int i = 0; i < samples_written; i++)
+    { int i; for (i = 0; i < samples_written; i++)
     {
         const int32_t wav_sample =
             (int32_t)(
@@ -154,7 +154,7 @@ void Audio::tick()
 
         if (++wavfile.pos >= wavfile.length)
             wavfile.pos = 0;
-    }
+    } }
 
     uint8_t* mbuf8 =
         (uint8_t*)mix_buffer;
@@ -471,7 +471,7 @@ void Audio::load_wav(const char* filename)
         return;
     }
 
-    for (uint64_t output_frame = 0;
+    { uint64_t output_frame; for (output_frame = 0;
          output_frame < output_frames;
          output_frame++)
     {
@@ -507,7 +507,7 @@ void Audio::load_wav(const char* filename)
             (size_t)next_frame *
                 input_frame_bytes;
 
-        for (uint32_t channel = 0;
+        { uint32_t channel; for (channel = 0;
              channel < CHANNELS;
              channel++)
         {
@@ -541,8 +541,8 @@ void Audio::load_wav(const char* filename)
                 output_frame * CHANNELS +
                 channel] =
                     (int16_t)sample;
-        }
-    }
+        } }
+    } }
 
     free(file_buffer);
 

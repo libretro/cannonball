@@ -55,12 +55,12 @@ void OSound::init(YM2151* ym, uint8_t* pcm_ram)
     engine_counter= 0;
 
     /* Clear AM RAM 0xF800 - 0xFFFF */
-    for (uint16_t i = 0; i < CHAN_RAM_SIZE; i++)
-        chan_ram[i] = 0;
+    { uint16_t i; for (i = 0; i < CHAN_RAM_SIZE; i++)
+        chan_ram[i] = 0; }
 
     /* Enable all PCM channels by default */
-    for (int8_t i = 0; i < 16; i++)
-        pcm_ram[0x86 + (i * 8)] = 1; /* Channel Active */
+    { int8_t i; for (i = 0; i < 16; i++)
+        pcm_ram[0x86 + (i * 8)] = 1; } /* Channel Active */
 
     init_fm_chip();
 }
@@ -309,27 +309,27 @@ void OSound::new_command()
         uint16_t adr = YM_LEVEL_CMDS2;
 
         /* Send four level commands */
-        for (uint8_t i = 0; i < 4; i++)
+        { uint8_t i; for (i = 0; i < 4; i++)
         {
             uint8_t reg = roms.z80.read8(&adr);
             uint8_t val = roms.z80.read8(&adr);
             fm_write_reg(reg, val);
-        }
+        } }
     }
 
     /* Clear channel memory area used for internal format of PCM sound data */
-    for (int16_t i = CHANNEL_PCM_FX1; i < CHANNEL_YM_FX1; i++)
-        chan_ram[i] = 0;
+    { int16_t i; for (i = CHANNEL_PCM_FX1; i < CHANNEL_YM_FX1; i++)
+        chan_ram[i] = 0; }
 
     /* PCM Channel Enable */
     uint16_t pcm_enable = 0xF088 + 6;
 
     /* Disable 6 PCM Channels */
-    for (int16_t i = 0; i < 6; i++)
+    { int16_t i; for (i = 0; i < 6; i++)
     {
         pcm_w(pcm_enable, pcm_r(pcm_enable) | BIT_0); 
         pcm_enable += 0x10; /* Advance to next channel */
-    }
+    } }
 }
 
 /* Copy PCM Channel RAM contents to Channel RAM */
@@ -357,13 +357,13 @@ void OSound::check_fm_mapping()
     uint16_t chan_id = CHANNEL_MAP1;
 
     /* 8 Channels */
-    for (uint8_t c = 0; c < 8; c++)
+    { uint8_t c; for (c = 0; c < 8; c++)
     {
         /* Map back to corresponding music channel */
         if (chan_ram[chan_id] & BIT_7)    
             chan_ram[chan_id - 0x2C0] |= BIT_2;
         chan_id += CHAN_SIZE;
-    }
+    } }
 }
 
 /* Process and update all sound channels */
@@ -377,14 +377,14 @@ void OSound::process_channels()
     /* Channel to process */
     uint16_t chan_id = CHANNEL_YM1;
 
-    for (uint8_t c = 0; c < 30; c++)
+    { uint8_t c; for (c = 0; c < 30; c++)
     {
         /* If channel is enabled, process the channel */
         if (chan_ram[chan_id] & BIT_7)
             process_channel(chan_id);
 
         chan_id += CHAN_SIZE; /* Advance to next channel in memory */
-    }
+    } }
 }
 
 /* Update Individual Channel. */
@@ -832,23 +832,23 @@ void OSound::init_sound(uint8_t cmd, uint16_t src, uint16_t dst)
     uint8_t channels = roms.z80.read8(&src);
 
     /* next_channel */
-    for (uint8_t ch = 0; ch < channels; ch++)
+    { uint8_t ch; for (ch = 0; ch < channels; ch++)
     {
         /* Address of default channel setup data */
         uint16_t adr = roms.z80.read16(&src);
 
         /* Copy default setup code for block of sound (14 bytes) */
-        for (int i = 0; i < 0xE; i++)
-            chan_ram[dst++] = roms.z80.read8(&adr);
+        { int i; for (i = 0; i < 0xE; i++)
+            chan_ram[dst++] = roms.z80.read8(&adr); }
 
         /* Write command byte (at position 0xE) */
         chan_ram[dst++] = command_index;
 
         /* Write zero 17 times (essentially pad out the 0x20 byte entry) */
         /* This empty space is updated later */
-        for (int i = 0xF; i < CHAN_SIZE; i++)
-            chan_ram[dst++] = 0;
-    }
+        { int i; for (i = 0xF; i < CHAN_SIZE; i++)
+            chan_ram[dst++] = 0; }
+    } }
 }
 
 /* Source: 0xCC3 */
@@ -868,7 +868,7 @@ void OSound::process_pcm(uint8_t* chan)
         if (chan[CH_CTRL] & BIT_2)
         {
             /* get_chan_adr2: */
-            for (int i = 0; i < 6; i++)
+            { int i; for (i = 0; i < 6; i++)
             {
                 uint8_t channel_pair = pcm_r(adr + 6);
 
@@ -880,11 +880,11 @@ void OSound::process_pcm(uint8_t* chan)
                 }
                 /* d79 */
                 adr += CHAN_SIZE; /* Advance to next channel */
-            }
+            } }
             adr = BASE_ADR;
         }
         /* get_chan_adr3: */
-        for (int i = 0; i < 6; i++)
+        { int i; for (i = 0; i < 6; i++)
         {
             uint8_t channel_pair = pcm_r(adr + 6);
 
@@ -895,11 +895,11 @@ void OSound::process_pcm(uint8_t* chan)
             }
 
             adr += CHAN_SIZE; /* Advance to next channel */
-        }
+        } }
 
         adr = BASE_ADR;
         /* get_chan_adr4: */
-        for (int i = 0; i < 6; i++)
+        { int i; for (i = 0; i < 6; i++)
         {
             uint8_t channel_pair = pcm_r(adr + 6);
 
@@ -909,7 +909,7 @@ void OSound::process_pcm(uint8_t* chan)
                 return;
             }
             adr += CHAN_SIZE; /* Advance to next channel */
-        }
+        } }
 
         /* No need to restore positioning info from stack, as stored in 'pos' variable */
         calc_end_marker(chan);
@@ -1008,8 +1008,8 @@ void OSound::fm_dotimera()
 void OSound::fm_reset()
 {
     /* Clear YM & Drum Channels in RAM (0xF820 - 0xF9DF) */
-    for (uint16_t i = CHANNEL_YM1; i < CHANNEL_PCM_FX1; i++)
-        chan_ram[i] = 0;
+    { uint16_t i; for (i = CHANNEL_YM1; i < CHANNEL_PCM_FX1; i++)
+        chan_ram[i] = 0; }
 
     fm_write_block(0, YM_INIT_CMDS, 0);
 }
@@ -1076,20 +1076,20 @@ void OSound::fm_write_block(uint8_t ix0, uint16_t adr, uint8_t chan)
 void OSound::ym_set_levels()
 {
     /* Clear YM & Drum Channels in RAM (0xF820 - 0xF9DF) */
-    for (uint16_t i = CHANNEL_YM1; i < CHANNEL_PCM_FX1; i++)
-        chan_ram[i] = 0;
+    { uint16_t i; for (i = CHANNEL_YM1; i < CHANNEL_PCM_FX1; i++)
+        chan_ram[i] = 0; }
 
     /* FM Sound Effects: Write fewer levels */
     uint8_t entries = (chan_ram[CHANNEL_YM_FX1] & BIT_7) ? 28 : 32;
     uint16_t adr = YM_LEVEL_CMDS1;
 
     /* Write Level Info */
-    for (uint8_t i = 0; i < entries; i++)
+    { uint8_t i; for (i = 0; i < entries; i++)
     {
         uint8_t reg = roms.z80.read8(&adr);
         uint8_t val = roms.z80.read8(&adr);
         fm_write_reg(reg, val);
-    }
+    } }
 }
 
 const static uint16_t FM_DATA_TABLE[] =

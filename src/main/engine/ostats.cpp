@@ -54,13 +54,13 @@ void OStats::init(bool ttrial)
 
 void OStats::clear_stage_times()
 {
-    for (int i = 0; i < 15; i++)
+    { int i; for (i = 0; i < 15; i++)
     {
         stage_counters[i] = 0;
 
-        for (int j = 0; j < 3; j++)
-            stage_times[i][j] = 0;
-    }
+        { int j; for (j = 0; j < 3; j++)
+            stage_times[i][j] = 0; }
+    } }
 }
 
 void OStats::clear_route_info()

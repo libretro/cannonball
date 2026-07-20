@@ -95,16 +95,16 @@ void ORoad::init()
     pos_fine         = 0;
     horizon_base     = 0;
 
-    for (int i = 0; i < ARRAY_LENGTH; i++)
+    { int i; for (i = 0; i < ARRAY_LENGTH; i++)
     {
         road_x[i] = 0;
         road0_h[i] = 0;
         road1_h[i] = 0;
         road_unk[i] = 0;
-    }
+    } }
 
-     for (int i = 0; i < 0x1000; i++)
-         road_y[i] = 0;
+     { int i; for (i = 0; i < 0x1000; i++)
+         road_y[i] = 0; }
 
     road_pos_old = 0;
     road_data_offset = 0;
@@ -216,8 +216,8 @@ void ORoad::set_default_hscroll()
 {
     uint32_t adr = HW_HSCROLL_TABLE0;
 
-    for (uint16_t i = 0; i <= 0x1FF; i++)
-        hwroad.write32(&adr, 0x1000100);
+    { uint16_t i; for (i = 0; i <= 0x1FF; i++)
+        hwroad.write32(&adr, 0x1000100); }
 
     hwroad.read_road_control();
 }
@@ -238,8 +238,8 @@ void ORoad::clear_road_ram()
 {
     uint32_t adr = 0x80000; /* start of road ram */
 
-    for (uint8_t scanline = 0; scanline < S16_HEIGHT; scanline++)
-        hwroad.write16(&adr, scanline);
+    { uint8_t scanline; for (scanline = 0; scanline < S16_HEIGHT; scanline++)
+        hwroad.write16(&adr, scanline); }
 
     hwroad.read_road_control();
 }
@@ -348,12 +348,12 @@ void ORoad::setup_x_data(uint32_t addr)
     const int16_t curve_y_dist = (y << 14) / distance;
 
     /* Setup Default Straight Positions Of Road at 60800 - 608FF */
-    for (uint8_t i = 0; i < 0x80;)
+    { uint8_t i; for (i = 0; i < 0x80;)
     {
         /* Set marker to ignore current road position, and use last good value */
         road_x[i++] = 0x3210;
         road_x[i++] = 0x3210;
-    }
+    } }
 
     /* Now We Setup The Real Road Data at 60800 */
     int32_t curve_x_total = 0;
@@ -368,7 +368,7 @@ void ORoad::setup_x_data(uint32_t addr)
     /* Note this works its way from closest to the camera, further into the horizon */
     /* So the amount to offset x is going to increase over time */
     /* We sample 20 Road Positions to generate the road. */
-    for (uint8_t i = 0; i <= 0x20; i++)
+    { uint8_t i; for (i = 0; i <= 0x20; i++)
     {
         const int32_t x_next = trackloader.readPath(addr)     + trackloader.readPath(addr + 4); /* Length 1 */
         const int32_t y_next = trackloader.readPath(addr + 2) + trackloader.readPath(addr + 6); /* Length 2 */
@@ -387,17 +387,17 @@ void ORoad::setup_x_data(uint32_t addr)
         int32_t xinc = (curve_inc - curve_inc_old) / curve_steps;
         int16_t x = curve_inc_old;
 
-        for (int16_t pos = curve_start; pos <= curve_end; pos++)
+        { int16_t pos; for (pos = curve_start; pos <= curve_end; pos++)
         {
             x += xinc;              
             if (x < -0x3200 || x > 0x3200) return;
             road_x[scanline] = x;           
             if (--scanline < 0) return;
-        }
+        } }
 
         curve_inc_old = curve_inc;
         curve_start = curve_end;
-    }
+    } }
 }
 
 /* Interpolates road data into a smooth curve. */
@@ -540,7 +540,7 @@ void ORoad::do_road_offset(int16_t* dst_x, int16_t width, bool invert)
     if (car_offset != 0)
     {
         car_offset <<= 7;
-        for (uint16_t i = 0; i <= 0x1FF; i++)
+        { uint16_t i; for (i = 0; i <= 0x1FF; i++)
         {
             int16_t h_scroll = scanline_inc >> 16;
 
@@ -560,7 +560,7 @@ void ORoad::do_road_offset(int16_t* dst_x, int16_t width, bool invert)
             (*dst_x++) = h_scroll;
 
             scanline_inc += car_offset;
-        }
+        } }
         return;
     }
     /* ------------------------------ */
@@ -569,7 +569,7 @@ void ORoad::do_road_offset(int16_t* dst_x, int16_t width, bool invert)
 
     if (!invert)
     {
-        for (uint16_t i = 0; i <= 0x3F; i++)
+        { uint16_t i; for (i = 0; i <= 0x3F; i++)
         {
             (*dst_x++) = (*src_x++) >> 6;
             (*dst_x++) = (*src_x++) >> 6;
@@ -580,11 +580,11 @@ void ORoad::do_road_offset(int16_t* dst_x, int16_t width, bool invert)
             (*dst_x++) = (*src_x++) >> 6;
             (*dst_x++) = (*src_x++) >> 6;
             (*dst_x++) = (*src_x++) >> 6;
-        }
+        } }
     }
     else
     {
-        for (uint16_t i = 0; i <= 0x3F; i++)
+        { uint16_t i; for (i = 0; i <= 0x3F; i++)
         {
             (*dst_x++) = -(*src_x++) >> 6;
             (*dst_x++) = -(*src_x++) >> 6;
@@ -595,7 +595,7 @@ void ORoad::do_road_offset(int16_t* dst_x, int16_t width, bool invert)
             (*dst_x++) = -(*src_x++) >> 6;
             (*dst_x++) = -(*src_x++) >> 6;
             (*dst_x++) = -(*src_x++) >> 6;
-        }
+        } }
     }
 }
 
@@ -1090,11 +1090,11 @@ void ORoad::set_y_2044()
     /* ------------------------------------------------------------------------ */
     if (section_length >= 0)
     {
-        for (uint16_t i = 0; i <= section_length; i++)
+        { uint16_t i; for (i = 0; i <= section_length; i++)
         {
             total_height += change_per_entry; 
             road_y[--y_addr] = (total_height << 4) >> 16;
-        }        
+        } }        
     }
 
     /* ------------------------------------------------------------------------ */
@@ -1223,14 +1223,14 @@ void ORoad::set_y_horizon()
     uint32_t total_height = 0;
 
     /* write_next_y: */
-    for (uint16_t i = 0; i <= 0x1FF; i++) /* (1FF height positions) */
+    { uint16_t i; for (i = 0; i <= 0x1FF; i++) /* (1FF height positions) */
     {
         total_height += d2;
         uint32_t d0 = (total_height << 4) >> 16;
         road_y[--a0] = d0;
     }
 
-    road_unk[0] = 0;
+    road_unk[0] = 0; }
     
     /* If not at end of section return. Otherwise, setup new horizon y-value */
     if (height_start != 0x1FF) return;
@@ -1316,29 +1316,29 @@ void ORoad::set_horizon_y()
         d6--;
 
         /* loop 1: */
-        for (int16_t i = 0; i <= d6; i++)
+        { int16_t i; for (i = 0; i <= d6; i++)
         {
             road_y[a2++] = d5 >> 2;
             d5 -= d0;
-        }
+        } }
         /* loop 2: */
-        for (int16_t i = 0; i <= d6; i++)
+        { int16_t i; for (i = 0; i <= d6; i++)
         {
             road_y[a2++] = d5 >> 2;
             d5 -= d1;
-        }
+        } }
         /* loop 3: */
-        for (int16_t i = 0; i <= d6; i++)
+        { int16_t i; for (i = 0; i <= d6; i++)
         {
             road_y[a2++] = d5 >> 2;
             d5 -= d2;
-        }
+        } }
         /* loop 4: */
-        for (int16_t i = 0; i <= d6; i++)
+        { int16_t i; for (i = 0; i <= d6; i++)
         {
             road_y[a2++] = d5 >> 2;
             d5 -= d3;
-        }
+        } }
 
         road_int += 2; 
     } /* end loop */
@@ -1528,7 +1528,7 @@ void ORoad::blit_road(uint32_t a0)
     uint32_t a2 = 0x400 + road_p2;
 
     /* Write 0x1A0 bytes total Src: (0x260 - 0x400) Dst: 0x1C0 */
-    for (int16_t i = 0; i <= 13; i++)
+    { int16_t i; for (i = 0; i <= 13; i++)
     {
         a0 -= 2; hwroad.write16(a0, road_y[--a2]);
         a0 -= 2; hwroad.write16(a0, road_y[--a2]);
@@ -1547,7 +1547,7 @@ void ORoad::blit_road(uint32_t a0)
         a0 -= 2; hwroad.write16(a0, road_y[--a2]);
         a0 -= 2; hwroad.write16(a0, road_y[--a2]);
         a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-    }
+    } }
 }
 
 void ORoad::output_hscroll(int16_t* src, uint32_t dst)
@@ -1556,7 +1556,7 @@ void ORoad::output_hscroll(int16_t* src, uint32_t dst)
     uint32_t src_addr = 0;
 
     /* Copy 16 bytes */
-    for (int32_t i = 0; i <= 0x3F; i++)
+    { int32_t i; for (i = 0; i <= 0x3F; i++)
     {
         int16_t d0h = -src[src_addr++] + d6;
         int16_t d0l = -src[src_addr++] + d6;
@@ -1574,7 +1574,7 @@ void ORoad::output_hscroll(int16_t* src, uint32_t dst)
         hwroad.write16(&dst, d2l);
         hwroad.write16(&dst, d3h);
         hwroad.write16(&dst, d3l);
-    }
+    } }
 }
 
 /* Copy Background Colour To Road. */
@@ -1603,7 +1603,7 @@ void ORoad::copy_bg_color()
     uint32_t dst = HW_BGCOLOR;
 
     /* Copy 1K */
-    for (int i = 0; i < 32; i++)
+    { int i; for (i = 0; i < 32; i++)
     {
         hwroad.write32(&dst, roms.rom1p->read32(&src));
         hwroad.write32(&dst, roms.rom1p->read32(&src));
@@ -1613,5 +1613,5 @@ void ORoad::copy_bg_color()
         hwroad.write32(&dst, roms.rom1p->read32(&src));
         hwroad.write32(&dst, roms.rom1p->read32(&src));
         hwroad.write32(&dst, roms.rom1p->read32(&src));
-    }
+    } }
 }
