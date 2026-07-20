@@ -12,26 +12,20 @@
 
 #include <libretro.h>
 
-#include "main.hpp"
+#include "../main.hpp"
 #include "config.hpp"
-#include "globals.hpp"
-#ifdef __LIBRETRO__
-#include "lr_setup.hpp"
-#else
-#include "setup.hpp"
-#endif
+#include "../globals.hpp"
+#include "../setup.hpp"
 #include "../utils.hpp"
 
-#include "engine/ohiscore.hpp"
-#include "engine/audio/osoundint.hpp"
+#include "../engine/ohiscore.hpp"
+#include "../engine/audio/osoundint.hpp"
 
 extern retro_log_printf_t                 log_cb;
 
 #ifdef __PS3__
 #define remove std::remove
 #endif
-
-
 
 Config config;
 
@@ -501,11 +495,9 @@ void Config::set_fps(int fps)
     else
         tick_fps = 60;
 
-    #ifdef COMPILE_SOUND_CODE
     if (config.sound.enabled)
         cannonball::audio.stop_audio();
     osoundint.init();
     if (config.sound.enabled)
         cannonball::audio.start_audio();
-    #endif
 }

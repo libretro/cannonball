@@ -15,8 +15,6 @@
 
 #include "globals.hpp"
 
-#ifdef COMPILE_SOUND_CODE
-
 struct wav_t {
     uint8_t loaded;
     int16_t *data;
@@ -44,7 +42,7 @@ public:
     void clear_wav();
 
 private:
-    // Sample Rate. Can't be changed easily for now, due to lack of SDL resampling.
+    // Sample Rate. Can't be changed easily for now
     static const uint32_t FREQ = 44100;
 
     // Stereo. Could be changed, requires some recoding.
@@ -69,4 +67,3 @@ private:
     void pause_audio();
     void resume_audio();
 };
-#endif

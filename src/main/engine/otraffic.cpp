@@ -594,12 +594,8 @@ void OTraffic::set_max_traffic()
             5, 6, 7, 8, 8, // Very Hard Traffic
         };
 
-#ifdef __LIBRETRO__
         int dip_traffic = config.engine.disable_traffic ? 3 : config.engine.dip_traffic;
         uint8_t index = (dip_traffic * 5) + (oroad.stage_lookup_off / 8);
-#else
-        uint8_t index = (config.engine.dip_traffic * 5) + (oroad.stage_lookup_off / 8);
-#endif
         max_traffic = MAX_TRAFFIC[index];
     }
     else

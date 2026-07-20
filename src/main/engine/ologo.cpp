@@ -8,9 +8,10 @@
 ***************************************************************************/
 
 #include <stdint.h>
-#include "engine/osprites.hpp"
-#include "engine/outils.hpp"
-#include "engine/ologo.hpp"
+
+#include "osprites.hpp"
+#include "outils.hpp"
+#include "ologo.hpp"
 
 OLogo ologo;
 

@@ -27,12 +27,6 @@ extern retro_log_printf_t                 log_cb;
 
 extern retro_audio_sample_batch_t  audio_batch_cb;
 
-#ifdef COMPILE_SOUND_CODE
-
-/* ----------------------------------------------------------------------------
-   SDL Sound Implementation & Callback Function
-   ----------------------------------------------------------------------------*/
-
 // Note that these variables are accessed by two separate threads.
 uint8_t* dsp_buffer;
 static int dsp_buffer_bytes;
@@ -591,4 +585,3 @@ void Audio::clear_wav()
     wavfile.pos    = 0;
     wavfile.loaded = false;
 }
-#endif

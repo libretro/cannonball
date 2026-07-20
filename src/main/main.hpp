@@ -2,18 +2,14 @@
 
 #include "globals.hpp"
 
-#ifdef COMPILE_SOUND_CODE
 #include "libretro/audio.hpp"
-#endif
 
 namespace cannonball
 {
-#ifdef COMPILE_SOUND_CODE
     extern Audio audio;
-#endif
 
     // Frame counter
-	extern int frame;
+    extern int frame;
 
     // Tick Logic. Used when running at non-standard > 30 fps
     extern bool tick_frame;

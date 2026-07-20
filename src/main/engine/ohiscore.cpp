@@ -6,17 +6,13 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#ifdef __LIBRETRO__
-#include "lr_setup.hpp"
-#else
-#include "setup.hpp"
-#endif
+#include "../setup.hpp"
 #include "main.hpp"
-#include "engine/ohud.hpp"
-#include "engine/oinputs.hpp"
-#include "engine/ostats.hpp"
-#include "engine/outils.hpp"
-#include "engine/ohiscore.hpp"
+#include "ohud.hpp"
+#include "oinputs.hpp"
+#include "ostats.hpp"
+#include "outils.hpp"
+#include "ohiscore.hpp"
 
 OHiScore ohiscore;
 

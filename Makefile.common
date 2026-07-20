@@ -9,7 +9,6 @@ INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
 endif
 
 FLAGS += -D__LIBRETRO__
-FLAGS += -DCOMPILE_SOUND_CODE
 
 SOURCES_C :=
 

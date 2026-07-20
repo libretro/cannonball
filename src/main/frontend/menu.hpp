@@ -23,9 +23,7 @@ public:
     void populate();
     void init();
     void tick();
-#ifdef __LIBRETRO__
     void refresh_menu();
-#endif
 
 private:
     // Menu state
@@ -84,9 +82,6 @@ private:
     void draw_text(std::string);
     void tick_menu();
     void set_menu(std::vector<std::string>*);
-#ifndef __LIBRETRO__
-    void refresh_menu();
-#endif
     void set_menu_text(std::string s1, std::string s2);
     void redefine_keyboard();
     void redefine_joystick();

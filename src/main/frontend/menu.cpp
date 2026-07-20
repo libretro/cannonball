@@ -11,28 +11,22 @@
 
 #include "main.hpp"
 #include "menu.hpp"
-#ifdef __LIBRETRO__
-#include "lr_setup.hpp"
-#else
-#include "setup.hpp"
-#endif
+#include "../setup.hpp"
 #include "../utils.hpp"
 
-#include "engine/ohud.hpp"
-#include "engine/oinputs.hpp"
-#include "engine/osprites.hpp"
-#include "engine/ologo.hpp"
-#include "engine/opalette.hpp"
-#include "engine/otiles.hpp"
+#include "../engine/ohud.hpp"
+#include "../engine/oinputs.hpp"
+#include "../engine/osprites.hpp"
+#include "../engine/ologo.hpp"
+#include "../engine/opalette.hpp"
+#include "../engine/otiles.hpp"
 
-#include "frontend/ttrial.hpp"
+#include "../frontend/ttrial.hpp"
 
-#ifdef __LIBRETRO__
 #include "lr_options.hpp"
+
 extern void update_geometry();
 extern void update_timing(void);
-#endif
-
 
 // Logo Y Position
 const static int16_t LOGO_Y = -60;
@@ -166,9 +160,7 @@ void Menu::populate()
     menu_timetrial.push_back(ENTRY_BACK);
 
     menu_settings.push_back(ENTRY_VIDEO);
-    #ifdef COMPILE_SOUND_CODE
     menu_settings.push_back(ENTRY_SOUND);
-    #endif
     menu_settings.push_back(ENTRY_CONTROLS);
     menu_settings.push_back(ENTRY_ENGINE);
     menu_settings.push_back(ENTRY_SCORES);
@@ -514,9 +506,7 @@ void Menu::tick_menu()
             {
                 if (++config.cont_traffic > TTrial::MAX_TRAFFIC)
                     config.cont_traffic = 0;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.cont_traffic);
-#endif
             }
             else if (SELECTED(ENTRY_BACK))
                 set_menu(&menu_gamemodes);
@@ -535,17 +525,13 @@ void Menu::tick_menu()
             {
                 if (++config.ttrial.laps > TTrial::MAX_LAPS)
                     config.ttrial.laps = 1;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.ttrial.laps);
-#endif
             }
             else if (SELECTED(ENTRY_TRAFFIC))
             {
                 if (++config.ttrial.traffic > TTrial::MAX_TRAFFIC)
                     config.ttrial.traffic = 0;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.ttrial.traffic);
-#endif
             }
             else if (SELECTED(ENTRY_BACK))
                 set_menu(&menu_gamemodes);
@@ -592,10 +578,8 @@ void Menu::tick_menu()
             {
                 config.video.widescreen = !config.video.widescreen;
                 restart_video();
-#ifdef __LIBRETRO__
                 update_geometry();
                 lr_options::set_frontend_variable(&config.video.widescreen);
-#endif
             }
             else if (SELECTED(ENTRY_HIRES))
             {
@@ -612,10 +596,8 @@ void Menu::tick_menu()
 
                 restart_video();
                 video.sprite_layer->set_x_clip(false);
-#ifdef __LIBRETRO__
                 update_geometry();
                 lr_options::set_frontend_variable(&config.video.hires);
-#endif
             }
             else if (SELECTED(ENTRY_SCALE))
             {
@@ -632,19 +614,15 @@ void Menu::tick_menu()
             }
             else if (SELECTED(ENTRY_FPS))
             {
-#ifdef __LIBRETRO__
                 int fps_prev = config.fps;
-#endif
                 if (++config.video.fps > 3)
                 {
                     config.video.fps = 0;
                 }
                 config.set_fps(config.video.fps);
-#ifdef __LIBRETRO__
                 if (config.fps != fps_prev)
                     update_timing();
                 lr_options::set_frontend_variable(&config.video.fps);
-#endif
             }
             else if (SELECTED(ENTRY_BACK))
                 set_menu(&menu_settings);
@@ -654,34 +632,22 @@ void Menu::tick_menu()
             if (SELECTED(ENTRY_MUTE))
             {
                 config.sound.enabled = !config.sound.enabled;
-                #ifdef COMPILE_SOUND_CODE
                 if (config.sound.enabled)
                     cannonball::audio.start_audio();
                 else
                     cannonball::audio.stop_audio();              
-                #endif
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.sound.enabled);
-#endif
             }
             else if (SELECTED(ENTRY_ADVERTISE))
-#ifdef __LIBRETRO__
             {
                 config.sound.advertise = !config.sound.advertise;
                 lr_options::set_frontend_variable(&config.sound.advertise);
             }
-#else
-                config.sound.advertise = !config.sound.advertise;
-#endif
             else if (SELECTED(ENTRY_PREVIEWSND))
-#ifdef __LIBRETRO__
             {
                 config.sound.preview = !config.sound.preview;
                 lr_options::set_frontend_variable(&config.sound.preview);
             }
-#else
-                config.sound.preview = !config.sound.preview;
-#endif
             else if (SELECTED(ENTRY_FIXSAMPLES))
             {
                 int rom_type = !config.sound.fix_samples;
@@ -695,9 +661,7 @@ void Menu::tick_menu()
                 {
                     display_message(rom_type == 1 ? "CANT LOAD FIXED SAMPLES" : "CANT LOAD ORIGINAL SAMPLES");
                 }
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.sound.fix_samples);
-#endif
             }
             else if (SELECTED(ENTRY_MUSICTEST))
                 set_menu(&menu_musictest);
@@ -710,22 +674,14 @@ void Menu::tick_menu()
             {
                 if (++config.controls.gear > config.controls.GEAR_AUTO)
                     config.controls.gear = config.controls.GEAR_BUTTON;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.controls.gear);
-#endif
             }
             else if (SELECTED(ENTRY_ANALOG))
             {
-#ifdef __LIBRETRO__
                 if (++config.controls.analog >= 2)
-#else
-                if (++config.controls.analog == 3)
-#endif
                     config.controls.analog = 0;
                 input.analog = config.controls.analog;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.controls.analog);
-#endif
             }
             else if (SELECTED(ENTRY_REDEFKEY))
             {
@@ -745,17 +701,13 @@ void Menu::tick_menu()
             {
                 if (++config.controls.steer_speed > 9)
                     config.controls.steer_speed = 1;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.controls.steer_speed);
-#endif
             }
             else if (SELECTED(ENTRY_DPEDAL))
             {
                 if (++config.controls.pedal_speed > 9)
                     config.controls.pedal_speed = 1;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.controls.pedal_speed);
-#endif
             }
             else if (SELECTED(ENTRY_BACK))
                 set_menu(&menu_settings);
@@ -765,27 +717,20 @@ void Menu::tick_menu()
             if (SELECTED(ENTRY_TRACKS))
             {
                 config.engine.jap = !config.engine.jap;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.engine.jap);
-#endif
             }
             else if (SELECTED(ENTRY_FREEPLAY))
             {
                config.engine.freeplay = !config.engine.freeplay;
-#ifdef __LIBRETRO__
-                lr_options::set_frontend_variable(&config.engine.freeplay);
-#endif
+	       lr_options::set_frontend_variable(&config.engine.freeplay);
             }
             else if (SELECTED(ENTRY_FORCE_AI))
             {
                config.engine.force_ai = !config.engine.force_ai;
-#ifdef __LIBRETRO__
-                lr_options::set_frontend_variable(&config.engine.force_ai);
-#endif
+	       lr_options::set_frontend_variable(&config.engine.force_ai);
             }
             else if (SELECTED(ENTRY_TIME))
             {
-#ifdef __LIBRETRO__
                 if (config.engine.dip_time < 4)
                     config.engine.dip_time++;
                 else
@@ -797,24 +742,9 @@ void Menu::tick_menu()
                     config.engine.freeze_timer = 0;
 
                 lr_options::set_frontend_variable(&config.engine.dip_time);
-#else
-                if (config.engine.dip_time == 3)
-                {
-                    if (!config.engine.freeze_timer)
-                        config.engine.freeze_timer = 1;
-                    else
-                    {
-                        config.engine.dip_time = 0;
-                        config.engine.freeze_timer = 0;
-                    }
-                }
-                else
-                    config.engine.dip_time++;
-#endif
             }
             else if (SELECTED(ENTRY_TRAFFIC))
             {
-#ifdef __LIBRETRO__
                 if (config.engine.dip_traffic < 4)
                     config.engine.dip_traffic++;
                 else
@@ -826,20 +756,6 @@ void Menu::tick_menu()
                     config.engine.disable_traffic = 0;
 
                 lr_options::set_frontend_variable(&config.engine.dip_traffic);
-#else
-                if (config.engine.dip_traffic == 3)
-                {
-                    if (!config.engine.disable_traffic)
-                        config.engine.disable_traffic = 1;
-                    else
-                    {
-                        config.engine.dip_traffic = 0;
-                        config.engine.disable_traffic = 0;
-                    }
-                }
-                else
-                    config.engine.dip_traffic++;
-#endif
             }
             else if (SELECTED(ENTRY_SUB_ENHANCEMENTS))
                 set_menu(&menu_enhancements);
@@ -851,41 +767,25 @@ void Menu::tick_menu()
         else if (menu_selected == &menu_enhancements)
         {
             if (SELECTED(ENTRY_TIMER))
-#ifdef __LIBRETRO__
             {
                 config.engine.fix_timer = !config.engine.fix_timer;
                 lr_options::set_frontend_variable(&config.engine.fix_timer);
             }
-#else
-                config.engine.fix_timer = !config.engine.fix_timer;
-#endif
             else if (SELECTED(ENTRY_OBJECTS))
-#ifdef __LIBRETRO__
             {
                 config.engine.level_objects = !config.engine.level_objects;
                 lr_options::set_frontend_variable(&config.engine.level_objects);
             }
-#else
-                config.engine.level_objects = !config.engine.level_objects;
-#endif
             else if (SELECTED(ENTRY_PROTOTYPE))
-#ifdef __LIBRETRO__
             {
                 config.engine.prototype = !config.engine.prototype;
                 lr_options::set_frontend_variable(&config.engine.prototype);
             }
-#else
-                config.engine.prototype = !config.engine.prototype;
-#endif
             else if (SELECTED(ENTRY_ATTRACT))
-#ifdef __LIBRETRO__
             {
                 config.engine.new_attract ^= 1;
                 lr_options::set_frontend_variable(&config.engine.new_attract);
             }
-#else
-                config.engine.new_attract ^= 1;
-#endif
             else if (SELECTED(ENTRY_BACK))
                 set_menu(&menu_engine);
         }
@@ -894,38 +794,28 @@ void Menu::tick_menu()
             if (SELECTED(ENTRY_GRIP))
             {
                 config.engine.grippy_tyres = !config.engine.grippy_tyres;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.engine.grippy_tyres);
-#endif
             }
             else if (SELECTED(ENTRY_OFFROAD))
             {
                 config.engine.offroad = !config.engine.offroad;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.engine.offroad);
-#endif
             }
             else if (SELECTED(ENTRY_BUMPER))
             {
                 config.engine.bumper = !config.engine.bumper;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.engine.bumper);
-#endif
             }
             else if (SELECTED(ENTRY_TURBO))
             {
                 config.engine.turbo = !config.engine.turbo;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.engine.turbo);
-#endif
             }
             else if (SELECTED(ENTRY_COLOR))
             {
                 if (++config.engine.car_pal > 6)
                     config.engine.car_pal = 0;
-#ifdef __LIBRETRO__
                 lr_options::set_frontend_variable(&config.engine.car_pal);
-#endif
             }
             else if (SELECTED(ENTRY_BACK))
                 set_menu(&menu_engine);
@@ -1209,24 +1099,18 @@ bool Menu::check_jap_roms()
 // Reinitalize Video, and stop audio to avoid crackles
 void Menu::restart_video()
 {
-    #ifdef COMPILE_SOUND_CODE
     if (config.sound.enabled)
         cannonball::audio.stop_audio();
-    #endif
     video.disable();
     video.init(&roms, &config.video);
-    #ifdef COMPILE_SOUND_CODE
     osoundint.init();
     if (config.sound.enabled)
         cannonball::audio.start_audio();
-    #endif
 }
 
 void Menu::start_game(int mode, int settings)
 {
-#ifdef __LIBRETRO__
     int fps_prev = config.fps;
-#endif
 
     // Enhanced Settings
     if (settings == 1)
@@ -1252,7 +1136,6 @@ void Menu::start_game(int mode, int settings)
         config.sound.preview        = 1;
 
         restart_video();
-#ifdef __LIBRETRO__
         update_geometry();
         if (config.fps != fps_prev)
             update_timing();
@@ -1265,7 +1148,6 @@ void Menu::start_game(int mode, int settings)
         lr_options::set_frontend_variable(&config.engine.new_attract);
         lr_options::set_frontend_variable(&config.engine.fix_bugs);
         lr_options::set_frontend_variable(&config.sound.preview);
-#endif
     }
     // Original Settings
     else if (settings == 2)
@@ -1290,7 +1172,6 @@ void Menu::start_game(int mode, int settings)
         config.sound.preview        = 0;
 
         restart_video();
-#ifdef __LIBRETRO__
         update_geometry();
         if (config.fps != fps_prev)
             update_timing();
@@ -1303,7 +1184,6 @@ void Menu::start_game(int mode, int settings)
         lr_options::set_frontend_variable(&config.engine.new_attract);
         lr_options::set_frontend_variable(&config.engine.fix_bugs);
         lr_options::set_frontend_variable(&config.sound.preview);
-#endif
     }
     // Otherwise, use whatever is already setup...
     else

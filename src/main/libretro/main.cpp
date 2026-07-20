@@ -24,15 +24,14 @@
 #include "romloader.hpp"
 #include "trackloader.hpp"
 #include "main.hpp"
-#include "lr_setup.hpp"
-#include "engine/outrun.hpp"
-#include "frontend/config.hpp"
-#include "frontend/menu.hpp"
-
-#include "engine/oinputs.hpp"
-#include "engine/ooutputs.hpp"
-#include "engine/omusic.hpp"
-#include "engine/ostats.hpp"
+#include "../setup.hpp"
+#include "../engine/outrun.hpp"
+#include "../engine/oinputs.hpp"
+#include "../engine/ooutputs.hpp"
+#include "../engine/omusic.hpp"
+#include "../engine/ostats.hpp"
+#include "../frontend/config.hpp"
+#include "../frontend/menu.hpp"
 
 #include "lr_options.hpp"
 
@@ -47,9 +46,7 @@ int    cannonball::frame       = 0;
 bool   cannonball::tick_frame  = true;
 int    cannonball::fps_counter = 0;
 
-#ifdef COMPILE_SOUND_CODE
 Audio cannonball::audio;
-#endif
 
 Menu* menu;
 
@@ -98,11 +95,7 @@ static void config_init(void)
     // ------------------------------------------------------------------------
     // Sound Settings
     // ------------------------------------------------------------------------
-#ifdef COMPILE_SOUND_CODE
     config.sound.enabled     = 1;
-#else
-    config.sound.enabled     = 0;
-#endif
     config.sound.advertise   = 1;
     config.sound.preview     = 1;
     config.sound.fix_samples = 1;
@@ -445,16 +438,13 @@ static void update_variables(bool startup)
       if (newval != config.sound.enabled)
       {
          config.sound.enabled = newval;
-         #ifdef COMPILE_SOUND_CODE
          if (config.sound.enabled)
             cannonball::audio.start_audio();
          else
             cannonball::audio.stop_audio();
-         #endif
       }
    }
 
-   #ifdef COMPILE_SOUND_CODE
    var.key = "cannonball_sound_custom_wav_volume";
    var.value = NULL;
 
@@ -473,7 +463,6 @@ static void update_variables(bool startup)
        cannonball::audio.custom_wav_volume =
            (uint16_t)volume;
    }
-   #endif
 
    var.key = "cannonball_gear";
    var.value = NULL;
@@ -1070,9 +1059,7 @@ bool retro_load_game(const struct retro_game_info *info)
 
    menu = new Menu();
 
-#ifdef COMPILE_SOUND_CODE
    audio.init();
-#endif
    state = config.menu.enabled ? STATE_INIT_MENU : STATE_INIT_GAME;
 
    // Initialize controls
@@ -1105,9 +1092,7 @@ bool retro_load_game_special(unsigned game_type,
 
 void retro_unload_game(void)
 {
-#ifdef COMPILE_SOUND_CODE
     audio.stop_audio();
-#endif
     input.close();
     forcefeedback::close();
     delete menu;
@@ -1179,9 +1164,7 @@ void retro_reset(void)
 
     forcefeedback::deactivate_rumble();
 
-#ifdef COMPILE_SOUND_CODE
     audio.clear_wav();
-#endif
 
     // A frontend may request Reset immediately after changing a Core
     // Option, without running another frame. Refresh the live options
@@ -1352,12 +1335,10 @@ void retro_run(void)
                 outrun.tick(tick_frame);
                 if (tick_frame) input.frame_done();
 
-                #ifdef COMPILE_SOUND_CODE
                 // Tick audio program code
                 osoundint.tick();
                 // Tick Audio
                 audio.tick();
-                #endif
             }
             else
             {                
@@ -1383,12 +1364,10 @@ void retro_run(void)
         {
             menu->tick();
             input.frame_done();
-            #ifdef COMPILE_SOUND_CODE
             // Tick audio program code
             osoundint.tick();
             // Tick Audio
             audio.tick();
-            #endif
         }
         break;
 

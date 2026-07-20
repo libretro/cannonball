@@ -46,8 +46,6 @@ public:
     void set_shadow_intensity(float);
     void prepare_frame();
     void render_frame();
-    bool supports_window();
-    bool supports_vsync();
 
     void clear_text_ram();
     void write_text8(uint32_t, const uint8_t);
@@ -77,16 +75,11 @@ public:
     uint32_t read_pal32(uint32_t*);
 
 private:
-#ifdef __LIBRETRO__
     // Palette lookup used by the Libretro RGB565 output.
     uint32_t rgb[S16_PALETTE_ENTRIES * 3];
     uint32_t shadow_multi;
-#else
-    // SDL Renderer
-    RenderBase* renderer;
-#endif
     
-	uint8_t palette[S16_PALETTE_ENTRIES * 2]; // 2 Bytes Per Palette Entry
+    uint8_t palette[S16_PALETTE_ENTRIES * 2]; // 2 Bytes Per Palette Entry
     void refresh_palette(uint32_t);
 };
 

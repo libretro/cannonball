@@ -14,13 +14,13 @@
 
 #include "../trackloader.hpp"
 
-#include "engine/oanimseq.hpp"
-#include "engine/ocrash.hpp"
-#include "engine/oferrari.hpp"
-#include "engine/olevelobjs.hpp"
-#include "engine/osprites.hpp"
-#include "engine/otraffic.hpp"
-#include "engine/data/ozoom_lookup.hpp"
+#include "oanimseq.hpp"
+#include "ocrash.hpp"
+#include "oferrari.hpp"
+#include "olevelobjs.hpp"
+#include "osprites.hpp"
+#include "otraffic.hpp"
+#include "data/ozoom_lookup.hpp"
 
 OSprites osprites;
 
