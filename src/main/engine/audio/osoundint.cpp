@@ -40,7 +40,7 @@ void OSoundInt::init()
 
     reset();
 
-    // Clear PCM Chip RAM
+    /* Clear PCM Chip RAM */
     for (uint16_t i = 0; i < PCM_RAM_SIZE; i++)
         pcm_ram[i] = 0;
 
@@ -50,8 +50,8 @@ void OSoundInt::init()
     osound.init(ym, pcm_ram);
 }
 
-// Clear sound queue
-// Source: 0x5086
+/* Clear sound queue */
+/* Source: 0x5086 */
 void OSoundInt::reset()
 {
     sound_counter = 0;
@@ -64,28 +64,28 @@ void OSoundInt::reset()
 
 void OSoundInt::tick()
 {
-    // The audio code is updated 125 times per second
+    /* The audio code is updated 125 times per second */
     audio_ticks += (125.0 / config.fps);
 
-    // Ticks per frame will vary between 2 and 3 at 60fps.
+    /* Ticks per frame will vary between 2 and 3 at 60fps. */
     const int max_ticks = (int) audio_ticks;
 
     for (int i = 0; i < max_ticks; i++)
     {
-        play_queued_sound(); // Process audio commands from main program code
-        osound.tick();       // Tick Ported Z80 Audio Code
+        play_queued_sound(); /* Process audio commands from main program code */
+        osound.tick();       /* Tick Ported Z80 Audio Code */
     }
 
     audio_ticks -= max_ticks;
 }
 
-// ----------------------------------------------------------------------------
-// Sound Queuing Code
-// ----------------------------------------------------------------------------
+/* ---------------------------------------------------------------------------- */
+/* Sound Queuing Code */
+/* ---------------------------------------------------------------------------- */
 
-// Play Queued Sounds & Send Engine Noise Commands to Z80
-// Was called by horizontal interrupt routine
-// Source: 0x564E
+/* Play Queued Sounds & Send Engine Noise Commands to Z80 */
+/* Was called by horizontal interrupt routine */
+/* Source: 0x564E */
 void OSoundInt::play_queued_sound()
 {
     if (!has_booted)
@@ -95,10 +95,10 @@ void OSoundInt::play_queued_sound()
         return;
     }
 
-    // Process the lot in one go. 
+    /* Process the lot in one go.  */
     for (int counter = 0; counter < 8; counter++)
     {
-        // Process queued sound
+        /* Process queued sound */
         if (counter == 0)
         {
             if (sounds_queued != 0)
@@ -112,7 +112,7 @@ void OSoundInt::play_queued_sound()
                 osound.command_input = sound::RESET;
             }
         }
-        // Process player engine sounds and passing traffic
+        /* Process player engine sounds and passing traffic */
         else
         {
             osound.engine_data[counter] = engine_data[counter];
@@ -120,9 +120,9 @@ void OSoundInt::play_queued_sound()
     }
 }
 
-// Queue a sound in service mode
-// Used to trigger both sound effects and music
-// Source: 0x56C6
+/* Queue a sound in service mode */
+/* Used to trigger both sound effects and music */
+/* Source: 0x56C6 */
 void OSoundInt::queue_sound_service(uint8_t snd)
 {
     if (has_booted)
@@ -131,19 +131,19 @@ void OSoundInt::queue_sound_service(uint8_t snd)
         queue_clear();
 }
 
-// Queue a sound in-game
-// Note: This version has an additional check, so that certain sounds aren't played depending on game mode
-// Source: 0x56D4
+/* Queue a sound in-game */
+/* Note: This version has an additional check, so that certain sounds aren't played depending on game mode */
+/* Source: 0x56D4 */
 void OSoundInt::queue_sound(uint8_t snd)
 {
     if (has_booted)
     {
         if (outrun.game_state == GS_ATTRACT)
         {
-            // Return if we are not playing sound in attract mode
+            /* Return if we are not playing sound in attract mode */
             if (!config.sound.advertise && snd != sound::COIN_IN) return;
 
-            // Do not play music in attract mode, even if attract sound enabled
+            /* Do not play music in attract mode, even if attract sound enabled */
             if (snd == sound::MUSIC_BREEZE || snd == sound::MUSIC_MAGICAL ||
                 snd == sound::MUSIC_SPLASH || snd == sound::MUSIC_LASTWAVE)
                 return;
@@ -156,7 +156,7 @@ void OSoundInt::queue_sound(uint8_t snd)
 
 void OSoundInt::add_to_queue(uint8_t snd)
 {
-    // Add sound to the tail end of the queue
+    /* Add sound to the tail end of the queue */
     queue[sound_tail] = snd;
     sound_tail = (sound_tail + 1) & QUEUE_LENGTH;
     sounds_queued++;

@@ -18,37 +18,37 @@
 class oanimsprite
 {
 public:
-    // Base Sprite
+    /* Base Sprite */
     oentry* sprite;
 
-    //+0x06 [Byte] Sprite/Object Index Being Processed
-    //             1 = Car Door
-    //             2 = Ferrari Interior
-    //             3 = Car Shadow
-    //             4 = Man Sprite
-    //             5 = Man Shadow
-    //             6 = Female Sprite
-    //             7 = Female Shadow
-    //             8 = Trophy Person
-    //             9 = Trophy Shadow
-    //             A = After Effects (e.g. smoke cloud on genie animation)
+    /*+0x06 [Byte] Sprite/Object Index Being Processed */
+    /*             1 = Car Door */
+    /*             2 = Ferrari Interior */
+    /*             3 = Car Shadow */
+    /*             4 = Man Sprite */
+    /*             5 = Man Shadow */
+    /*             6 = Female Sprite */
+    /*             7 = Female Shadow */
+    /*             8 = Trophy Person */
+    /*             9 = Trophy Shadow */
+    /*             A = After Effects (e.g. smoke cloud on genie animation) */
 
-    //+0x1E [Long] Reference to the CURRENT block of animation data.
+    /*+0x1E [Long] Reference to the CURRENT block of animation data. */
     uint32_t anim_addr_curr;
 
-    //+0x22 [Long] Reference to the NEXT block of animation data.
+    /*+0x22 [Long] Reference to the NEXT block of animation data. */
     uint32_t anim_addr_next;
 
-    //+0x26 [Word] Animation Frame Number
+    /*+0x26 [Word] Animation Frame Number */
     int16_t anim_frame;
 
-    //+0x28 [Word] Frame Delay (Before increment to next frame)
+    /*+0x28 [Word] Frame Delay (Before increment to next frame) */
     uint8_t frame_delay;
 
-    //+0x2A [Word] Increment End Sequence Position When Set
+    /*+0x2A [Word] Increment End Sequence Position When Set */
     uint16_t anim_props;
 
-    //+0x2C [Word] Animation State
+    /*+0x2C [Word] Animation State */
     int16_t anim_state;
 
     void init(oentry* s)

@@ -85,9 +85,9 @@ void Outrun::init()
 void Outrun::boot()
 {
     game_state = config.engine.layout_debug ? GS_INIT_GAME : GS_INIT;
-    // Initialize default hi-score entries
+    /* Initialize default hi-score entries */
     ohiscore.init_def_scores();
-    // Load saved hi-score entries
+    /* Load saved hi-score entries */
     config.load_scores(
         cannonball_mode == Outrun::MODE_ORIGINAL
             ? FILENAME_SCORES
@@ -96,7 +96,7 @@ void Outrun::boot()
     init_jump_table();
     oinitengine.init(cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
     osoundint.init();
-    outils::reset_random_seed(); // Ensure we match the genuine boot up of the original game each time
+    outils::reset_random_seed(); /* Ensure we match the genuine boot up of the original game each time */
 }
 
 void Outrun::tick(bool tick_frame)
@@ -120,14 +120,14 @@ void Outrun::tick(bool tick_frame)
         }
     }
 
-    // Only tick the road cpu twice for every time we tick the main cpu
-    // The timing here isn't perfect, as normally the road CPU would run in parallel with the main CPU.
-    // We can potentially hack this by calling the road CPU twice.
-    // Most noticeable with clipping sprites on hills.
+    /* Only tick the road cpu twice for every time we tick the main cpu */
+    /* The timing here isn't perfect, as normally the road CPU would run in parallel with the main CPU. */
+    /* We can potentially hack this by calling the road CPU twice. */
+    /* Most noticeable with clipping sprites on hills. */
       
-    // 30 FPS 
-    // Updates Game Logic 1/2 frames
-    // Updates V-Blank 1/2 frames
+    /* 30 FPS  */
+    /* Updates Game Logic 1/2 frames */
+    /* Updates V-Blank 1/2 frames */
     if (config.fps == 30 && config.tick_fps == 30)
     {
         jump_table();
@@ -135,9 +135,9 @@ void Outrun::tick(bool tick_frame)
         vint();
         vint();
     }
-    // 30/60 FPS Hybrid. (This is the same as the original game)
-    // Updates Game Logic 1/2 frames
-    // Updates V-Blank 1/1 frames
+    /* 30/60 FPS Hybrid. (This is the same as the original game) */
+    /* Updates Game Logic 1/2 frames */
+    /* Updates V-Blank 1/1 frames */
     else if (config.fps == 60 && config.tick_fps == 30)
     {
         if (tick_frame)
@@ -147,9 +147,9 @@ void Outrun::tick(bool tick_frame)
         }
         vint();
     }
-    // 60 FPS. Smooth Mode. 
-    // Updates Game Logic 1/1 frames
-    // Updates V-Blank 1/1 frames
+    /* 60 FPS. Smooth Mode.  */
+    /* Updates Game Logic 1/1 frames */
+    /* Updates V-Blank 1/1 frames */
     else
     {
         jump_table();
@@ -157,7 +157,7 @@ void Outrun::tick(bool tick_frame)
         vint();
     }
 
-    // Moved out of vertical interrupt
+    /* Moved out of vertical interrupt */
     if (tick_frame)
     {
         uint8_t coin = oinputs.do_credits();
@@ -165,12 +165,12 @@ void Outrun::tick(bool tick_frame)
         outputs->coin_chute_out(&outputs->chute2, coin == 2);
     }
 
-    // Draw FPS
+    /* Draw FPS */
     if (config.video.fps_count)
         ohud.draw_fps_counter(cannonball::fps_counter);
 }
 
-// Vertical Interrupt
+/* Vertical Interrupt */
 void Outrun::vint()
 {
     otiles.write_tilemap_hw();
@@ -187,8 +187,8 @@ void Outrun::jump_table()
 {
     if (tick_frame && game_state != GS_CALIBRATE_MOTOR)
     {
-        main_switch();                  // Address #1 (0xB128) - Main Switch
-        oinputs.adjust_inputs();        // Address #2 (0x74D8) - Adjust Analogue Inputs
+        main_switch();                  /* Address #1 (0xB128) - Main Switch */
+        oinputs.adjust_inputs();        /* Address #2 (0x74D8) - Adjust Analogue Inputs */
     }
 
     switch (game_state)
@@ -197,16 +197,16 @@ void Outrun::jump_table()
         case GS_CALIBRATE_MOTOR:
             break;
  
-        // ----------------------------------------------------------------------------------------
-        // Couse Map Specific Code
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* Couse Map Specific Code */
+        /* ---------------------------------------------------------------------------------------- */
         case GS_MAP:
             omap.tick();
             break;
 
 
         case GS_MUSIC:
-            if (tick_frame) omusic.check_start(); // Check for start button
+            if (tick_frame) omusic.check_start(); /* Check for start button */
             osprites.tick();
             olevelobjs.do_sprite_routine();
 
@@ -216,9 +216,9 @@ void Outrun::jump_table()
             }
             break;
 
-        // ----------------------------------------------------------------------------------------
-        // Best OutRunners Entry (EditJumpTable3 Entries)
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* Best OutRunners Entry (EditJumpTable3 Entries) */
+        /* ---------------------------------------------------------------------------------------- */
         case GS_INIT_BEST2:
         case GS_BEST2:
             osprites.tick();
@@ -226,15 +226,15 @@ void Outrun::jump_table()
 
             if (!tick_frame)
             {
-                // Check for start button if credits are remaining and set state to Music Selection
+                /* Check for start button if credits are remaining and set state to Music Selection */
                 if (ostats.credits && input.is_pressed_clear(Input::START))
                     game_state = GS_INIT_MUSIC;
             }
             break;
 
-        // ----------------------------------------------------------------------------------------
-        // Core Game Engine Routines
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* Core Game Engine Routines */
+        /* ---------------------------------------------------------------------------------------- */
         case GS_LOGO:
             if (!tick_frame)
                 ologo.blit();
@@ -244,47 +244,47 @@ void Outrun::jump_table()
             if (tick_frame) check_freeplay_start();
         
         default:
-            if (tick_frame) osprites.tick();                // Address #3 Jump_SetupSprites
-            olevelobjs.do_sprite_routine();                 // replaces calling each sprite individually
+            if (tick_frame) osprites.tick();                /* Address #3 Jump_SetupSprites */
+            olevelobjs.do_sprite_routine();                 /* replaces calling each sprite individually */
             if (!config.engine.disable_traffic)
-                otraffic.tick();                            // Spawn & Tick Traffic
-            if (tick_frame) oinitengine.init_crash_bonus(); // Initalize crash sequence or bonus code
+                otraffic.tick();                            /* Spawn & Tick Traffic */
+            if (tick_frame) oinitengine.init_crash_bonus(); /* Initalize crash sequence or bonus code */
             oferrari.tick();
             if (oferrari.state != OFerrari::FERRARI_END_SEQ)
             {
                 oanimseq.flag_seq();
                 ocrash.tick();
-                osmoke.draw_ferrari_smoke(&osprites.jump_table[OSprites::SPRITE_SMOKE1]); // Do Left Hand Smoke
-                oferrari.draw_shadow();                                                   // (0xF1A2) - Draw Ferrari Shadow
-                osmoke.draw_ferrari_smoke(&osprites.jump_table[OSprites::SPRITE_SMOKE2]); // Do Right Hand Smoke
+                osmoke.draw_ferrari_smoke(&osprites.jump_table[OSprites::SPRITE_SMOKE1]); /* Do Left Hand Smoke */
+                oferrari.draw_shadow();                                                   /* (0xF1A2) - Draw Ferrari Shadow */
+                osmoke.draw_ferrari_smoke(&osprites.jump_table[OSprites::SPRITE_SMOKE2]); /* Do Right Hand Smoke */
             }
             else
             {
-                osmoke.draw_ferrari_smoke(&osprites.jump_table[OSprites::SPRITE_SMOKE1]); // Do Left Hand Smoke
-                osmoke.draw_ferrari_smoke(&osprites.jump_table[OSprites::SPRITE_SMOKE2]); // Do Right Hand Smoke
+                osmoke.draw_ferrari_smoke(&osprites.jump_table[OSprites::SPRITE_SMOKE1]); /* Do Left Hand Smoke */
+                osmoke.draw_ferrari_smoke(&osprites.jump_table[OSprites::SPRITE_SMOKE2]); /* Do Right Hand Smoke */
             }
             break;
     }
 
     osprites.sprite_copy();
 
-    // Libretro force feedback uses the current steering position.
+    /* Libretro force feedback uses the current steering position. */
     if (tick_frame && config.controls.haptic)
         outputs->tick(oinputs.input_steering);
 }
 
-// Source: 0xB15E
+/* Source: 0xB15E */
 void Outrun::main_switch()
 {
     switch (game_state)
     {
         case GS_INIT:  
             init_attract();
-            // fall through
+            /* fall through */
             
-        // ----------------------------------------------------------------------------------------
-        // Attract Mode
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* Attract Mode */
+        /* ---------------------------------------------------------------------------------------- */
         case GS_ATTRACT:
             tick_attract();
             break;
@@ -333,13 +333,13 @@ void Outrun::main_switch()
             else if (decrement_timers())
             {
                 ologo.disable();
-                game_state = GS_INIT; // Resume attract mode
+                game_state = GS_INIT; /* Resume attract mode */
             }
             break;
 
-        // ----------------------------------------------------------------------------------------
-        // Music Select Screen
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* Music Select Screen */
+        /* ---------------------------------------------------------------------------------------- */
 
         case GS_INIT_MUSIC:
             omusic.enable();
@@ -355,44 +355,44 @@ void Outrun::main_switch()
                 game_state = GS_INIT_GAME;
             }
             break;
-        // ----------------------------------------------------------------------------------------
-        // In-Game
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* In-Game */
+        /* ---------------------------------------------------------------------------------------- */
 
         case GS_INIT_GAME:
-            //ROM:0000B3E8                 move.w  #-1,(ingame_active1).l              ; Denote in-game engine is active
-            //ROM:0000B3F0                 clr.l   (prev_game_time).l                  ; Reset overall game time
-            //ROM:0000B3F6                 move.w  #-1,(ingame_active2).l
+            /*ROM:0000B3E8                 move.w  #-1,(ingame_active1).l              ; Denote in-game engine is active */
+            /*ROM:0000B3F0                 clr.l   (prev_game_time).l                  ; Reset overall game time */
+            /*ROM:0000B3F6                 move.w  #-1,(ingame_active2).l */
             video.clear_text_ram();
             oferrari.car_ctrl_active = true;
             init_jump_table();
             oinitengine.init(cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
-            // Timing Hack to ensure horizon is correct
-            // Note that the original code disables the screen, and waits for the second CPU's interrupt instead
+            /* Timing Hack to ensure horizon is correct */
+            /* Note that the original code disables the screen, and waits for the second CPU's interrupt instead */
             oroad.tick();
             oroad.tick();
             oroad.tick();
             osoundint.queue_sound(sound::STOP_CHEERS);
             osoundint.queue_sound(sound::VOICE_GETREADY);
-            osoundint.queue_sound(sound::REVS);             // Moved from Z80 Code for extra flexibility
+            osoundint.queue_sound(sound::REVS);             /* Moved from Z80 Code for extra flexibility */
             omusic.play_music();
             
             if (!freeze_timer)
-                ostats.time_counter = ostats.TIME[config.engine.dip_time * 40]; // Set time to begin level with
+                ostats.time_counter = ostats.TIME[config.engine.dip_time * 40]; /* Set time to begin level with */
             else
                 ostats.time_counter = 0x30;
 
             ostats.frame_counter = ostats.frame_reset + 50;
-            ostats.credits--;                                   // Update Credits
+            ostats.credits--;                                   /* Update Credits */
             ohud.blit_text1(TEXT1_CLEAR_START);
             ohud.blit_text1(TEXT1_CLEAR_CREDITS);
             osoundint.queue_sound(sound::INIT_CHEERS);
             video.enabled = true;
             game_state = GS_START1;
             ohud.draw_main_hud();
-            // fall through
+            /* fall through */
 
-        //  Start Game - Car Driving In
+        /*  Start Game - Car Driving In */
         case GS_START1:
         case GS_START2:
             if (--ostats.frame_counter < 0)
@@ -423,15 +423,15 @@ void Outrun::main_switch()
                 game_state = GS_INIT_GAMEOVER;
             break;
 
-        // ----------------------------------------------------------------------------------------
-        // Bonus Mode
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* Bonus Mode */
+        /* ---------------------------------------------------------------------------------------- */
         case GS_INIT_BONUS:
             ostats.frame_counter = ostats.frame_reset;
-            obonus.bonus_control = OBonus::BONUS_INIT;  // Initialize Bonus Mode Logic
-            oroad.road_load_end   |= BIT_0;             // Instruct CPU 1 to load end road section
-            ostats.game_completed |= BIT_0;             // Denote game completed
-            obonus.bonus_timer = 3600;                  // Safety Timer Added in Rev. A Roms
+            obonus.bonus_control = OBonus::BONUS_INIT;  /* Initialize Bonus Mode Logic */
+            oroad.road_load_end   |= BIT_0;             /* Instruct CPU 1 to load end road section */
+            ostats.game_completed |= BIT_0;             /* Denote game completed */
+            obonus.bonus_timer = 3600;                  /* Safety Timer Added in Rev. A Roms */
             game_state = GS_BONUS;
 
         case GS_BONUS:
@@ -442,13 +442,13 @@ void Outrun::main_switch()
             }
             break;
 
-        // ----------------------------------------------------------------------------------------
-        // Display Game Over Text
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* Display Game Over Text */
+        /* ---------------------------------------------------------------------------------------- */
         case GS_INIT_GAMEOVER:
             if (cannonball_mode != MODE_TTRIAL)
             {
-                oferrari.car_ctrl_active = false; // -1
+                oferrari.car_ctrl_active = false; /* -1 */
                 oinitengine.car_increment = 0;
                 oferrari.car_inc_old = 0;
                 ostats.time_counter = 3;
@@ -496,27 +496,27 @@ void Outrun::main_switch()
             }
             break;
 
-        // ----------------------------------------------------------------------------------------
-        // Display Course Map
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* Display Course Map */
+        /* ---------------------------------------------------------------------------------------- */
         case GS_INIT_MAP:
             omap.init();
             ohud.blit_text2(TEXT2_COURSEMAP);
             game_state = GS_MAP;
-            // fall through
+            /* fall through */
 
         case GS_MAP:
             break;
 
-        // ----------------------------------------------------------------------------------------
-        // Best OutRunners / Score Entry
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* Best OutRunners / Score Entry */
+        /* ---------------------------------------------------------------------------------------- */
         case GS_INIT_BEST2:
             oroad.set_view_mode(ORoad::VIEW_ORIGINAL, true);
-            // bsr.w   EndGame
+            /* bsr.w   EndGame */
             osprites.disable_sprites();
             otraffic.disable_traffic();
-            // bsr.w   EditJumpTable3
+            /* bsr.w   EditJumpTable3 */
             osprites.clear_palette_data();
             olevelobjs.init_hiscore_sprites();
             ocrash.coll_count1   = 0;
@@ -524,7 +524,7 @@ void Outrun::main_switch()
             ocrash.crash_counter = 0;
             ocrash.skid_counter  = 0;
             ocrash.spin_control1 = 0;
-            oferrari.car_ctrl_active = false; // -1
+            oferrari.car_ctrl_active = false; /* -1 */
             oinitengine.car_increment = 0;
             oferrari.car_inc_old = 0;
             ostats.time_counter = config.engine.hiscore_timer;
@@ -534,27 +534,27 @@ void Outrun::main_switch()
             osoundint.queue_sound(sound::FM_RESET);
             cannonball::audio.clear_wav();
             game_state = GS_BEST2;
-            // fall through
+            /* fall through */
 
         case GS_BEST2:
-            ohiscore.tick(); // Do High Score Logic
+            ohiscore.tick(); /* Do High Score Logic */
             ohud.draw_credits();
 
-            // If countdown has expired
+            /* If countdown has expired */
             if (decrement_timers())
             {
-                //ROM:0000B700                 bclr    #5,(ppi1_value).l                   ; Turn screen off (not activated until PPI written to)
-                oferrari.car_ctrl_active = true; // 0 : Allow road updates
+                /*ROM:0000B700                 bclr    #5,(ppi1_value).l                   ; Turn screen off (not activated until PPI written to) */
+                oferrari.car_ctrl_active = true; /* 0 : Allow road updates */
                 init_jump_table();
                 oinitengine.init(cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
-                //ROM:0000B716                 bclr    #0,(byte_260550).l
-                game_state = GS_REINIT;          // Reinit game to attract mode
+                /*ROM:0000B716                 bclr    #0,(byte_260550).l */
+                game_state = GS_REINIT;          /* Reinit game to attract mode */
             }
             break;
 
-        // ----------------------------------------------------------------------------------------
-        // Reinitialize Game After High Score Entry
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* Reinitialize Game After High Score Entry */
+        /* ---------------------------------------------------------------------------------------- */
         case GS_REINIT:
             video.clear_text_ram();
             game_state = GS_INIT;
@@ -564,9 +564,9 @@ void Outrun::main_switch()
     oinitengine.update_road();
     oinitengine.update_engine();
 
-    // --------------------------------------------------------------------------------------------
-    // Debugging Only
-    // --------------------------------------------------------------------------------------------
+    /* -------------------------------------------------------------------------------------------- */
+    /* Debugging Only */
+    /* -------------------------------------------------------------------------------------------- */
 #ifndef NDEBUG
     {
         if (oinitengine.rd_split_state != 0)
@@ -582,7 +582,7 @@ void Outrun::main_switch()
         else if (fork_chosen)
             fork_chosen = 0;
 
-        // Hack to allow user to choose road fork with left/right
+        /* Hack to allow user to choose road fork with left/right */
         if (fork_chosen == -1)
         {
             oroad.road_width_bak = oroad.road_width >> 16; 
@@ -599,38 +599,38 @@ void Outrun::main_switch()
 #endif
 }
 
-// Setup Jump Table. Move from ROM to RAM.
-//
-// Source Address: 0x7E1C
-// Input:          Sprite To Copy
-// Output:         None
-//
-// ROM Format [0xF000 - 0xF1F5]
-//
-// Word 1: Number of entries [7D]
-// Long 1: Address 1 (address of jump information)
-// ...
-// Long x: Address x
-//
-// Each address in the jump table is a pointer into ROM containing 0x1F words 
-// of info (so info is at 0x40 boundary in bytes)
-//
-// RAM Format[0x61800]
-//
-// 0x00 byte: If high byte set, take jump
-// 0x01 byte: Index number
-// 0x02 long: Address to jump to
+/* Setup Jump Table. Move from ROM to RAM. */
+/* */
+/* Source Address: 0x7E1C */
+/* Input:          Sprite To Copy */
+/* Output:         None */
+/* */
+/* ROM Format [0xF000 - 0xF1F5] */
+/* */
+/* Word 1: Number of entries [7D] */
+/* Long 1: Address 1 (address of jump information) */
+/* ... */
+/* Long x: Address x */
+/* */
+/* Each address in the jump table is a pointer into ROM containing 0x1F words  */
+/* of info (so info is at 0x40 boundary in bytes) */
+/* */
+/* RAM Format[0x61800] */
+/* */
+/* 0x00 byte: If high byte set, take jump */
+/* 0x01 byte: Index number */
+/* 0x02 long: Address to jump to */
 void Outrun::init_jump_table()
 {
-    // Reset value to restore car increment to during attract mode
+    /* Reset value to restore car increment to during attract mode */
     car_inc_bak = 0;
 
     osprites.init();
     if (cannonball_mode != MODE_TTRIAL) 
     {
-        otraffic.init_stage1_traffic();      // Hard coded traffic in right hand lane
+        otraffic.init_stage1_traffic();      /* Hard coded traffic in right hand lane */
         if (trackloader.display_start_line)
-            olevelobjs.init_startline_sprites(); // Hard coded start line sprites (not part of level data)
+            olevelobjs.init_startline_sprites(); /* Hard coded start line sprites (not part of level data) */
     }
     else if (trackloader.display_start_line)
         olevelobjs.init_timetrial_sprites();
@@ -648,22 +648,22 @@ void Outrun::init_jump_table()
     video.sprite_layer->set_x_clip(false);
 }
 
-// -------------------------------------------------------------------------------
-// Decrement Game Time
-// 
-// Decrements Frame Count, and Overall Time Counter
-//
-// Returns true if timer expired.
-// Source: 0xB736
-// -------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------- */
+/* Decrement Game Time */
+/*  */
+/* Decrements Frame Count, and Overall Time Counter */
+/* */
+/* Returns true if timer expired. */
+/* Source: 0xB736 */
+/* ------------------------------------------------------------------------------- */
 bool Outrun::decrement_timers()
 {
-    // Cheat
+    /* Cheat */
     if (freeze_timer && game_state == GS_INGAME)
         return false;
 
-    // Correct count-down timer running fast at 1/29th (3%)
-    // Fix timer counting extra second
+    /* Correct count-down timer running fast at 1/29th (3%) */
+    /* Fix timer counting extra second */
     if (config.engine.fix_timer)
     {
         if (--ostats.frame_counter > 0)
@@ -672,7 +672,7 @@ bool Outrun::decrement_timers()
         ostats.frame_counter = ostats.frame_reset;
         ostats.time_counter  = outils::bcd_sub(1, ostats.time_counter);
 
-        // We need to manually refresh the HUD here to display '0' seconds
+        /* We need to manually refresh the HUD here to display '0' seconds */
         if (ostats.time_counter == 0)
             ohud.draw_timer1(0);
 
@@ -689,9 +689,9 @@ bool Outrun::decrement_timers()
     }
 }
 
-// -------------------------------------------------------------------------------
-// Motor calibration
-// -------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------- */
+/* Motor calibration */
+/* ------------------------------------------------------------------------------- */
 
 void Outrun::init_motor_calibration()
 {
@@ -703,7 +703,7 @@ void Outrun::init_motor_calibration()
     video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);
     video.sprite_layer->set_x_clip(false);
 
-    otiles.fill_tilemap_color(0x4F60); // Fill Tilemap Light Blue
+    otiles.fill_tilemap_color(0x4F60); /* Fill Tilemap Light Blue */
 
     video.enabled        = true;
     osoundint.has_booted = true;
@@ -714,7 +714,7 @@ void Outrun::init_motor_calibration()
     game_state           = GS_CALIBRATE_MOTOR;
 
 
-    // Write Palette To RAM
+    /* Write Palette To RAM */
     uint32_t dst = 0x120000;
     const static uint32_t PAL_SERVICE[] = {0xFF, 0xFF00FF, 0xFF00FF, 0xFF0000};
     video.write_pal32(&dst, PAL_SERVICE[0]);
@@ -723,9 +723,9 @@ void Outrun::init_motor_calibration()
     video.write_pal32(&dst, PAL_SERVICE[3]);
 }
 
-// -------------------------------------------------------------------------------
-// Attract Mode Control
-// -------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------- */
+/* Attract Mode Control */
+/* ------------------------------------------------------------------------------- */
 
 void Outrun::init_attract()
 {
@@ -748,7 +748,7 @@ void Outrun::tick_attract()
     ohud.draw_copyright_text();
     ohud.draw_insert_coin();
 
-    // Enhanced Attract Mode (Switch Between Views)
+    /* Enhanced Attract Mode (Switch Between Views) */
     if (config.engine.new_attract)
     {
         if (++attract_counter > 240)
@@ -784,25 +784,25 @@ void Outrun::check_freeplay_start()
     }
 }
 
-// -------------------------------------------------------------------------------
-// Best OutRunners Initialization
-// -------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------- */
+/* Best OutRunners Initialization */
+/* ------------------------------------------------------------------------------- */
 
 void Outrun::init_best_outrunners()
 {
     video.enabled = false;
-    video.sprite_layer->set_x_clip(false); // Stop clipping in wide-screen mode.
-    otiles.fill_tilemap_color(0); // Fill Tilemap Black
+    video.sprite_layer->set_x_clip(false); /* Stop clipping in wide-screen mode. */
+    otiles.fill_tilemap_color(0); /* Fill Tilemap Black */
     osprites.disable_sprites();
     oroad.horizon_base = 0x154;
-    ohiscore.setup_pal_best();    // Setup Palettes
+    ohiscore.setup_pal_best();    /* Setup Palettes */
     ohiscore.setup_road_best();
     game_state = GS_INIT_BEST2;
 }
 
-// -------------------------------------------------------------------------------
-// Remap ROM addresses and select course.
-// -------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------- */
+/* Remap ROM addresses and select course. */
+/* ------------------------------------------------------------------------------- */
 
 void Outrun::select_course(bool jap, bool prototype)
 {
@@ -811,7 +811,7 @@ void Outrun::select_course(bool jap, bool prototype)
         roms.rom0p = &roms.j_rom0;
         roms.rom1p = &roms.j_rom1;
 
-        // Main CPU
+        /* Main CPU */
         adr.tiles_def_lookup      = TILES_DEF_LOOKUP_J;
         adr.tiles_table           = TILES_TABLE_J;
         adr.sprite_master_table   = SPRITE_MASTER_TABLE_J;
@@ -902,7 +902,7 @@ void Outrun::select_course(bool jap, bool prototype)
         adr.road_seg_end          = ROAD_SEG_TABLE_END_J;
         adr.road_seg_split        = ROAD_SEG_TABLE_SPLIT_J;
 
-        // Sub CPU
+        /* Sub CPU */
         adr.road_height_lookup    = ROAD_HEIGHT_LOOKUP_J;
     }
     else
@@ -910,7 +910,7 @@ void Outrun::select_course(bool jap, bool prototype)
         roms.rom0p = &roms.rom0;
         roms.rom1p = &roms.rom1;
 
-        // Main CPU
+        /* Main CPU */
         adr.tiles_def_lookup      = TILES_DEF_LOOKUP;
         adr.tiles_table           = TILES_TABLE;
         adr.sprite_master_table   = SPRITE_MASTER_TABLE;
@@ -1004,12 +1004,12 @@ void Outrun::select_course(bool jap, bool prototype)
         adr.road_seg_end          = ROAD_SEG_TABLE_END;
         adr.road_seg_split        = ROAD_SEG_TABLE_SPLIT;
 
-        // Sub CPU
+        /* Sub CPU */
         adr.road_height_lookup    = ROAD_HEIGHT_LOOKUP;
     }
 
     trackloader.init(jap);
 
-    // Use Prototype Coconut Beach Track
+    /* Use Prototype Coconut Beach Track */
     trackloader.stage_data[0] = prototype ? 0x3A : 0x3C;
 }

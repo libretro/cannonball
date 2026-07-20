@@ -48,7 +48,7 @@
 *
  *******************************************************************************************/
 
-// Enable for hardware pixel accuracy, where sprite shadowing delayed by 1 clock cycle (slower)
+/* Enable for hardware pixel accuracy, where sprite shadowing delayed by 1 clock cycle (slower) */
 #define PIXEL_ACCURACY 0
 
 hwsprites::hwsprites()
@@ -65,7 +65,7 @@ void hwsprites::init(const uint8_t* src_sprites)
 
     if (src_sprites)
     {
-        // Convert S16 tiles to a more useable format
+        /* Convert S16 tiles to a more useable format */
         const uint8_t *spr = src_sprites;
 
         for (uint32_t i = 0; i < SPRITES_LENGTH; i++)
@@ -82,7 +82,7 @@ void hwsprites::init(const uint8_t* src_sprites)
 
 void hwsprites::reset()
 {
-    // Clear Sprite RAM buffers
+    /* Clear Sprite RAM buffers */
     for (uint16_t i = 0; i < SPRITE_RAM_SIZE; i++)
     {
         ram[i] = 0;
@@ -90,10 +90,10 @@ void hwsprites::reset()
     }
 }
 
-// Clip areas of the screen in wide-screen mode
+/* Clip areas of the screen in wide-screen mode */
 void hwsprites::set_x_clip(bool on)
 {
-    // Clip to central 320 width window.
+    /* Clip to central 320 width window. */
     if (on)
     {
         x1 = config.s16_x_off;
@@ -105,7 +105,7 @@ void hwsprites::set_x_clip(bool on)
             x2 <<= 1;
         }
     }
-    // Allow full wide-screen.
+    /* Allow full wide-screen. */
     else
     {
         x1 = 0;
@@ -127,13 +127,13 @@ void hwsprites::write(const uint16_t adr, const uint16_t data)
     ram[adr >> 1] = data;
 }
 
-// Copy back buffer to main ram, ready for blit
+/* Copy back buffer to main ram, ready for blit */
 void hwsprites::swap()
 {
     uint16_t *src = (uint16_t *)ram;
     uint16_t *dst = (uint16_t *)ramBuff;
 
-    // swap the halves of the road RAM
+    /* swap the halves of the road RAM */
     for (uint16_t i = 0; i < SPRITE_RAM_SIZE; i++)
     {
         uint16_t temp = *src;
@@ -144,13 +144,13 @@ void hwsprites::swap()
 
 #if PIXEL_ACCURACY
 
-// Reproduces glowy edge around sprites on top of shadows as seen on Hardware.
-// Believed to be caused by shadowing being out by one clock cycle / pixel.
-//
-// 1/ Sprites Drawn on top of Shadow clears the shadow flags for its opaque pixels.
-// 2/ Either the flag clear or the sprite itself is offset by one pixel horizontally.
-//
-// Thanks to Alex B. for this implementation.
+/* Reproduces glowy edge around sprites on top of shadows as seen on Hardware. */
+/* Believed to be caused by shadowing being out by one clock cycle / pixel. */
+/* */
+/* 1/ Sprites Drawn on top of Shadow clears the shadow flags for its opaque pixels. */
+/* 2/ Either the flag clear or the sprite itself is offset by one pixel horizontally. */
+/* */
+/* Thanks to Alex B. for this implementation. */
 
 #define draw_pixel()                                                                                  \
 {                                                                                                     \
@@ -195,13 +195,13 @@ void hwsprites::render(const uint8_t priority)
 
     for (uint16_t data = 0; data < SPRITE_RAM_SIZE; data += 8) 
     {
-        // stop when we hit the end of sprite list
+        /* stop when we hit the end of sprite list */
         if ((ramBuff[data+0] & 0x8000) != 0) break;
 
         uint32_t sprpri  = 1 << ((ramBuff[data+3] >> 12) & 3);
         if (sprpri != priority) continue;
 
-        // if hidden, or top greater than/equal to bottom, or invalid bank, punt
+        /* if hidden, or top greater than/equal to bottom, or invalid bank, punt */
         int16_t hide    = (ramBuff[data+0] & 0x5000);
         int32_t height  = (ramBuff[data+5] >> 8) + 1;       
         if (hide != 0 || height == 0) continue;
@@ -210,7 +210,7 @@ void hwsprites::render(const uint8_t priority)
         int32_t top     = (ramBuff[data+0] & 0x1ff) - 0x100;
         uint32_t addr    = ramBuff[data+1];
         int32_t pitch  = ((ramBuff[data+2] >> 1) | ((ramBuff[data+4] & 0x1000) << 3)) >> 8;
-        int32_t xpos    =  ramBuff[data+6]; // moved from original structure to accomodate widescreen
+        int32_t xpos    =  ramBuff[data+6]; /* moved from original structure to accomodate widescreen */
         uint8_t shadow  = (ramBuff[data+3] >> 14) & 1;
         int32_t vzoom    = ramBuff[data+3] & 0x7ff;
         int32_t ydelta = ((ramBuff[data+4] & 0x8000) != 0) ? 1 : -1;
@@ -220,33 +220,33 @@ void hwsprites::render(const uint8_t priority)
         int32_t color   = COLOR_BASE + ((ramBuff[data+5] & 0x7f) << 4);
         int32_t x, y, ytarget, yacc = 0, pix;
             
-        // adjust X coordinate
-        // note: the threshhold below is a guess. If it is too high, rachero will draw garbage
-        // If it is too low, smgp won't draw the bottom part of the road
+        /* adjust X coordinate */
+        /* note: the threshhold below is a guess. If it is too high, rachero will draw garbage */
+        /* If it is too low, smgp won't draw the bottom part of the road */
         if (xpos < 0x80 && xdelta < 0)
             xpos += 0x200;
         xpos -= 0xbe;
 
-        // initialize the end address to the start address
+        /* initialize the end address to the start address */
         ramBuff[data+7] = addr;
 
-        // clamp to within the memory region size
+        /* clamp to within the memory region size */
         if (numbanks)
             bank %= numbanks;
 
         const uint32_t* spritedata = sprites + 0x10000 * bank;
 
-        // clamp to a maximum of 8x (not 100% confirmed)
+        /* clamp to a maximum of 8x (not 100% confirmed) */
         if (vzoom < 0x40) vzoom = 0x40;
         if (hzoom < 0x40) hzoom = 0x40;
 
-        // loop from top to bottom
+        /* loop from top to bottom */
         ytarget = top + ydelta * height;
 
-        // Adjust for widescreen mode
+        /* Adjust for widescreen mode */
         xpos += config.s16_x_off;
 
-        // Adjust for hi-res mode
+        /* Adjust for hi-res mode */
         if (config.video.hires)
         {
             xpos <<= 1;
@@ -258,23 +258,23 @@ void hwsprites::render(const uint8_t priority)
 
         for (y = top; y != ytarget; y += ydelta)
         {
-            // skip drawing if not within the cliprect
+            /* skip drawing if not within the cliprect */
             if (y >= 0 && y < config.s16_height)
             {
                 uint16_t* pPixel = &video.pixels[y * config.s16_width];
                 int32_t xacc = 0;
 
-                // non-flipped case
+                /* non-flipped case */
                 if (flip == 0)
                 {
-                    // start at the word before because we preincrement below
+                    /* start at the word before because we preincrement below */
                     ramBuff[data+7] = (addr - 1);
 
                     for (x = xpos; (xdelta > 0 && x < config.s16_width) || (xdelta < 0 && x >= 0); )
                     {
-                        uint32_t pixels = spritedata[++ramBuff[data+7]]; // Add to base sprite data the vzoom value
+                        uint32_t pixels = spritedata[++ramBuff[data+7]]; /* Add to base sprite data the vzoom value */
 
-                        // draw four pixels
+                        /* draw four pixels */
                         pix = (pixels >> 28) & 0xf; while (xacc < 0x200) { draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
                         pix = (pixels >> 24) & 0xf; while (xacc < 0x200) { draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
                         pix = (pixels >> 20) & 0xf; while (xacc < 0x200) { draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
@@ -284,22 +284,22 @@ void hwsprites::render(const uint8_t priority)
                         pix = (pixels >>  4) & 0xf; while (xacc < 0x200) { draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
                         pix = (pixels >>  0) & 0xf; while (xacc < 0x200) { draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
 
-                        // stop if the second-to-last pixel in the group was 0xf
+                        /* stop if the second-to-last pixel in the group was 0xf */
                         if ((pixels & 0x000000f0) == 0x000000f0)
                             break;
                     }
                 }
-                // flipped case
+                /* flipped case */
                 else
                 {
-                    // start at the word after because we predecrement below
+                    /* start at the word after because we predecrement below */
                     ramBuff[data+7] = (addr + 1);
 
                     for (x = xpos; (xdelta > 0 && x < config.s16_width) || (xdelta < 0 && x >= 0); )
                     {
                         uint32_t pixels = spritedata[--ramBuff[data+7]];
 
-                        // draw four pixels
+                        /* draw four pixels */
                         pix = (pixels >>  0) & 0xf; while (xacc < 0x200) { draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
                         pix = (pixels >>  4) & 0xf; while (xacc < 0x200) { draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
                         pix = (pixels >>  8) & 0xf; while (xacc < 0x200) { draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
@@ -309,13 +309,13 @@ void hwsprites::render(const uint8_t priority)
                         pix = (pixels >> 24) & 0xf; while (xacc < 0x200) { draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
                         pix = (pixels >> 28) & 0xf; while (xacc < 0x200) { draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
 
-                        // stop if the second-to-last pixel in the group was 0xf
+                        /* stop if the second-to-last pixel in the group was 0xf */
                         if ((pixels & 0x0f000000) == 0x0f000000)
                             break;
                     }
                 }
             }
-            // accumulate zoom factors; if we carry into the high bit, skip an extra row
+            /* accumulate zoom factors; if we carry into the high bit, skip an extra row */
             yacc += vzoom; 
             addr += pitch * (yacc >> 9);
             yacc &= 0x1ff;

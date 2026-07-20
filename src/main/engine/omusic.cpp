@@ -32,7 +32,7 @@ OMusic::~OMusic(void)
     if (tile_patch) delete tile_patch;
 }
 
-// Load Modified Widescreen version of tilemap
+/* Load Modified Widescreen version of tilemap */
 bool OMusic::load_widescreen_map(std::string path)
 {
     int status = 0;
@@ -52,16 +52,16 @@ bool OMusic::load_widescreen_map(std::string path)
     return status == 0;
 }
 
-// Initialize Music Selection Screen
-//
-// Source: 0xB342
+/* Initialize Music Selection Screen */
+/* */
+/* Source: 0xB342 */
 void OMusic::enable()
 {
     oferrari.car_ctrl_active = false;
     video.clear_text_ram();
     osprites.disable_sprites();
     otraffic.disable_traffic();
-    //edit jump table 3
+    /*edit jump table 3 */
     oinitengine.car_increment = 0;
     oferrari.car_inc_old      = 0;
     osprites.spr_cnt_main     = 0;
@@ -69,18 +69,18 @@ void OMusic::enable()
     oroad.road_ctrl           = ORoad::ROAD_BOTH_P0;
     oroad.horizon_base        = ORoad::HORIZON_OFF;
     last_music_selected       = -1;
-    preview_counter           = -20; // Delay before playing music
-    ostats.time_counter       = config.sound.music_timer; // Move 30 seconds to timer countdown (note on the original roms this is 15 seconds)
+    preview_counter           = -20; /* Delay before playing music */
+    ostats.time_counter       = config.sound.music_timer; /* Move 30 seconds to timer countdown (note on the original roms this is 15 seconds) */
     ostats.frame_counter      = ostats.frame_reset;  
      
     blit_music_select();
-    ohud.blit_text2(TEXT2_SELECT_MUSIC); // Select Music By Steering
+    ohud.blit_text2(TEXT2_SELECT_MUSIC); /* Select Music By Steering */
   
     osoundint.queue_sound(sound::RESET);
     if (!config.sound.preview)
-        osoundint.queue_sound(sound::PCM_WAVE); // Wave Noises
+        osoundint.queue_sound(sound::PCM_WAVE); /* Wave Noises */
 
-    // Enable block of sprites
+    /* Enable block of sprites */
     entry_start = OSprites::SPRITE_ENTRIES - 0x10;    
     for (int i = entry_start; i < entry_start + 5; i++)
     {
@@ -93,7 +93,7 @@ void OMusic::enable()
     setup_sprite4();
     setup_sprite5();
 
-    // Widescreen tiles need additional palette information copied over
+    /* Widescreen tiles need additional palette information copied over */
     if (tile_patch->loaded && config.s16_x_off > 0)
     {
         video.tile_layer->patch_tiles(tile_patch);
@@ -107,7 +107,7 @@ void OMusic::enable()
 
 void OMusic::disable()
 {
-    // Disable block of sprites
+    /* Disable block of sprites */
     for (int i = entry_start; i < entry_start + 5; i++)
     {
         osprites.jump_table[i].control &= ~OSprites::ENABLE;
@@ -115,18 +115,18 @@ void OMusic::disable()
 
     video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);
 
-    // Restore original palette for widescreen tiles.
+    /* Restore original palette for widescreen tiles. */
     if (config.s16_x_off > 0)
     {
         video.tile_layer->restore_tiles();
         otiles.setup_palette_tilemap();
     }
 
-    video.enabled = false; // Turn screen off
+    video.enabled = false; /* Turn screen off */
 }
 
-// Music Selection Screen: Setup Radio Sprite
-// Source: 0xCAF0
+/* Music Selection Screen: Setup Radio Sprite */
+/* Source: 0xCAF0 */
 void OMusic::setup_sprite1()
 {
     oentry *e = &osprites.jump_table[entry_start + 0];
@@ -140,8 +140,8 @@ void OMusic::setup_sprite1()
     osprites.map_palette(e);
 }
 
-// Music Selection Screen: Setup Equalizer Sprite
-// Source: 0xCB2A
+/* Music Selection Screen: Setup Equalizer Sprite */
+/* Source: 0xCB2A */
 void OMusic::setup_sprite2()
 {
     oentry *e = &osprites.jump_table[entry_start + 1];
@@ -155,8 +155,8 @@ void OMusic::setup_sprite2()
     osprites.map_palette(e);
 }
 
-// Music Selection Screen: Setup FM Radio Readout
-// Source: 0xCB64
+/* Music Selection Screen: Setup FM Radio Readout */
+/* Source: 0xCB64 */
 void OMusic::setup_sprite3()
 {
     oentry *e = &osprites.jump_table[entry_start + 2];
@@ -170,8 +170,8 @@ void OMusic::setup_sprite3()
     osprites.map_palette(e);
 }
 
-// Music Selection Screen: Setup FM Radio Dial
-// Source: 0xCB9E
+/* Music Selection Screen: Setup FM Radio Dial */
+/* Source: 0xCB9E */
 void OMusic::setup_sprite4()
 {
     oentry *e = &osprites.jump_table[entry_start + 3];
@@ -185,8 +185,8 @@ void OMusic::setup_sprite4()
     osprites.map_palette(e);
 }
 
-// Music Selection Screen: Setup Hand Sprite
-// Source: 0xCBD8
+/* Music Selection Screen: Setup Hand Sprite */
+/* Source: 0xCBD8 */
 void OMusic::setup_sprite5()
 {
     oentry *e = &osprites.jump_table[entry_start + 4];
@@ -200,9 +200,9 @@ void OMusic::setup_sprite5()
     osprites.map_palette(e);
 }
 
-// Check for start button during music selection screen
-//
-// Source: 0xB768
+/* Check for start button during music selection screen */
+/* */
+/* Source: 0xB768 */
 void OMusic::check_start()
 {
     if (ostats.credits && input.has_pressed(Input::START))
@@ -213,26 +213,26 @@ void OMusic::check_start()
     }
 }
 
-// Tick and Blit
+/* Tick and Blit */
 void OMusic::tick()
 {
-    // Radio Sprite
+    /* Radio Sprite */
     osprites.do_spr_order_shadows(&osprites.jump_table[entry_start + 0]);
 
-    // Animated EQ Sprite (Cycle the graphical equalizer on the radio)
+    /* Animated EQ Sprite (Cycle the graphical equalizer on the radio) */
     oentry *e = &osprites.jump_table[entry_start + 1];
-    e->reload++; // Increment palette entry
+    e->reload++; /* Increment palette entry */
     e->pal_src = roms.rom0.read8((e->reload & 0x3E) >> 1 | MUSIC_EQ_PAL);
     osprites.map_palette(e);
     osprites.do_spr_order_shadows(e);
 
-    // Draw appropriate FM station on radio, depending on steering setting
-    // Draw Dial on radio, depending on steering setting
+    /* Draw appropriate FM station on radio, depending on steering setting */
+    /* Draw Dial on radio, depending on steering setting */
     e = &osprites.jump_table[entry_start + 2];
     oentry *dial = &osprites.jump_table[entry_start + 3];
     oentry *hand = &osprites.jump_table[entry_start + 4];
 
-    // Determine Track Selection Logic
+    /* Determine Track Selection Logic */
     if (total_tracks < 3) tick_original(e, dial, hand);
     else tick_enhanced(e, dial, hand);
 
@@ -240,7 +240,7 @@ void OMusic::tick()
     osprites.do_spr_order_shadows(dial);
     osprites.do_spr_order_shadows(hand);;
 
-    // Enhancement: Preview Music On Sound Selection Screen
+    /* Enhancement: Preview Music On Sound Selection Screen */
     if (config.sound.preview)
     {
         if (music_selected != last_music_selected)
@@ -284,22 +284,22 @@ void OMusic::play_music(int index)
     last_music_selected = index;
 }
 
-// Cycle music in continuous mode
+/* Cycle music in continuous mode */
 void OMusic::cycle_music()
 {
     if (++music_selected > 2) music_selected = 0;
     play_music();
 }
 
-// Original Version of Music Selection Screen With 3 Tracks.
-// Wheel Left = Track 0, Wheel Centre = Track 1, Wheel Right = Track 2
+/* Original Version of Music Selection Screen With 3 Tracks. */
+/* Wheel Left = Track 0, Wheel Centre = Track 1, Wheel Right = Track 2 */
 void OMusic::tick_original(oentry* fm, oentry* dial, oentry* hand)
 {
-    // Note tiles to append to left side of text
+    /* Note tiles to append to left side of text */
     const uint32_t NOTE_TILES1 = 0x8A7A8A7B;
     const uint32_t NOTE_TILES2 = 0x8A7C8A7D;
 
-    // Steer Left
+    /* Steer Left */
     if (oinputs.steering_adjust + 0x80 <= 0x55)
     {
         set_hand(HAND_LEFT, fm, dial, hand);
@@ -308,7 +308,7 @@ void OMusic::tick_original(oentry* fm, oentry* dial, oentry* hand)
         video.write_text32(0x110640, NOTE_TILES2);
         music_selected = 0;
     }
-    // Centre
+    /* Centre */
     else if (oinputs.steering_adjust + 0x80 <= 0xAA)
     {
         set_hand(HAND_CENTRE, fm, dial, hand);
@@ -317,7 +317,7 @@ void OMusic::tick_original(oentry* fm, oentry* dial, oentry* hand)
         video.write_text32(0x110646, NOTE_TILES2);
         music_selected = 1;
     }
-    // Steer Right
+    /* Steer Right */
     else
     {
         set_hand(HAND_RIGHT, fm, dial, hand);
@@ -328,7 +328,7 @@ void OMusic::tick_original(oentry* fm, oentry* dial, oentry* hand)
     }
 }
 
-// Enhanced Version of music selection with infinite tracks.
+/* Enhanced Version of music selection with infinite tracks. */
 void OMusic::tick_enhanced(oentry* fm, oentry* dial, oentry* hand)
 {
     if (input.has_pressed(Input::LEFT) || oinputs.is_analog_l())
@@ -356,7 +356,7 @@ void OMusic::set_hand(short direction, oentry* fm, oentry* dial, oentry* hand)
         dial->addr = outrun.adr.sprite_dial_left;
         hand->addr = outrun.adr.sprite_hand_left;
     }
-    // Centre
+    /* Centre */
     else if (direction == HAND_CENTRE)
     {
         hand->x = 21;
@@ -364,7 +364,7 @@ void OMusic::set_hand(short direction, oentry* fm, oentry* dial, oentry* hand)
         dial->addr = outrun.adr.sprite_dial_centre;
         hand->addr = outrun.adr.sprite_hand_centre;
     }
-    // Steer Right
+    /* Steer Right */
     else if (direction == HAND_RIGHT)
     {
         hand->x = 21;
@@ -374,56 +374,56 @@ void OMusic::set_hand(short direction, oentry* fm, oentry* dial, oentry* hand)
     }
 }
 
-// Blit Only: Used when frame skipping
+/* Blit Only: Used when frame skipping */
 void OMusic::blit()
 {
     for (int i = 0; i < 5; i++)
         osprites.do_spr_order_shadows(&osprites.jump_table[entry_start + i]);
 }
 
-// Blit Music Selection Tiles to text ram layer (Double Row)
-// 
-// Source Address: 0xE0DC
-// Input:          Destination address into tile ram
-// Output:         None
-//
-// Tilemap data is stored in the ROM as a series of words.
-//
-// A basic compression format is used:
-//
-// 1/ If a word is not '0000', copy it directly to tileram
-// 2/ If a word is '0000' a long follows which details the compression.
-//    The upper word of the long is the value to copy.
-//    The lower word of the long is the number of times to copy that value.
-//
-// Tile structure:
-//
-// MSB          LSB
-// ---nnnnnnnnnnnnn Tile index (0-8191)
-// ---ccccccc------ Palette (0-127)
-// p--------------- Priority flag
-// -??------------- Unknown
+/* Blit Music Selection Tiles to text ram layer (Double Row) */
+/*  */
+/* Source Address: 0xE0DC */
+/* Input:          Destination address into tile ram */
+/* Output:         None */
+/* */
+/* Tilemap data is stored in the ROM as a series of words. */
+/* */
+/* A basic compression format is used: */
+/* */
+/* 1/ If a word is not '0000', copy it directly to tileram */
+/* 2/ If a word is '0000' a long follows which details the compression. */
+/*    The upper word of the long is the value to copy. */
+/*    The lower word of the long is the number of times to copy that value. */
+/* */
+/* Tile structure: */
+/* */
+/* MSB          LSB */
+/* ---nnnnnnnnnnnnn Tile index (0-8191) */
+/* ---ccccccc------ Palette (0-127) */
+/* p--------------- Priority flag */
+/* -??------------- Unknown */
 
 void OMusic::blit_music_select()
 {
     const uint32_t TILEMAP_RAM_16 = 0x10F030;
 
-    // Palette Ram: 1F Long Entries For Sky Shade On Horizon, For Colour Change Effect
+    /* Palette Ram: 1F Long Entries For Sky Shade On Horizon, For Colour Change Effect */
     const uint32_t PAL_RAM_SKY = 0x120F00;
 
     uint32_t src_addr = PAL_MUSIC_SELECT;
     uint32_t dst_addr = PAL_RAM_SKY;
 
-    // Write 32 Palette Longs to Palette RAM
+    /* Write 32 Palette Longs to Palette RAM */
     for (int i = 0; i < 32; i++)
         video.write_pal32(&dst_addr, roms.rom0.read32(&src_addr));
 
-    // Set Tilemap Scroll
+    /* Set Tilemap Scroll */
     otiles.set_scroll(config.s16_x_off);
     
-    // --------------------------------------------------------------------------------------------
-    // Blit to Tilemap 16: Widescreen Version. Uses Custom Tilemap. 
-    // --------------------------------------------------------------------------------------------
+    /* -------------------------------------------------------------------------------------------- */
+    /* Blit to Tilemap 16: Widescreen Version. Uses Custom Tilemap.  */
+    /* -------------------------------------------------------------------------------------------- */
     if (tilemap->loaded && config.s16_x_off > 0)
     {
         uint32_t tilemap16 = TILEMAP_RAM_16 - 20;
@@ -437,12 +437,12 @@ void OMusic::blit_music_select()
             dst_addr = tilemap16;
             for (int x = 0; x < cols; x++)
                 video.write_tile16(&dst_addr, tilemap->read16(&src_addr));
-            tilemap16 += 0x80; // next line of tiles
+            tilemap16 += 0x80; /* next line of tiles */
         }
     }
-    // --------------------------------------------------------------------------------------------
-    // Blit to Tilemap 16: Original 4:3 Version. 
-    // --------------------------------------------------------------------------------------------
+    /* -------------------------------------------------------------------------------------------- */
+    /* Blit to Tilemap 16: Original 4:3 Version.  */
+    /* -------------------------------------------------------------------------------------------- */
     else
     {
         uint32_t tilemap16 = TILEMAP_RAM_16;
@@ -453,19 +453,19 @@ void OMusic::blit_music_select()
             dst_addr = tilemap16;
             for (int x = 0; x < 40;)
             {
-                // get next tile
+                /* get next tile */
                 uint32_t data = roms.rom0.read16(&src_addr);
-                // No Compression: write tile directly to tile ram
+                /* No Compression: write tile directly to tile ram */
                 if (data != 0)
                 {
                     video.write_tile16(&dst_addr, data);    
                     x++;
                 }
-                // Compression
+                /* Compression */
                 else
                 {
-                    uint16_t value = roms.rom0.read16(&src_addr); // tile index to copy
-                    uint16_t count = roms.rom0.read16(&src_addr); // number of times to copy value
+                    uint16_t value = roms.rom0.read16(&src_addr); /* tile index to copy */
+                    uint16_t count = roms.rom0.read16(&src_addr); /* number of times to copy value */
 
                     for (uint16_t i = 0; i <= count; i++)
                     {
@@ -474,10 +474,10 @@ void OMusic::blit_music_select()
                     }
                 }
             }
-            tilemap16 += 0x80; // next line of tiles
-        } // end for
+            tilemap16 += 0x80; /* next line of tiles */
+        } /* end for */
 
-        // Fix Misplaced tile on music select screen (above steering wheel)
+        /* Fix Misplaced tile on music select screen (above steering wheel) */
         if (config.engine.fix_bugs)
             video.write_tile16(0x10F730, 0x0C80);
     } 

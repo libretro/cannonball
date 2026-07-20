@@ -95,12 +95,12 @@ void SegaPCM::stream_update()
 {
     SoundChip::clear_buffer();
 
-    // loop over channels
+    /* loop over channels */
     for (int ch = 0; ch < 16; ch++)
     {
         uint8_t *regs = ram + 8 * ch;
 
-        // only process active channels
+        /* only process active channels */
         if ((regs[0x86] & 1) == 0) 
         {             
             uint8_t *rom  = pcm_rom + ((regs[0x86] & bankmask) << bankshift);
@@ -111,12 +111,12 @@ void SegaPCM::stream_update()
 
             uint32_t i;
 
-            // loop over samples on this channel
+            /* loop over samples on this channel */
             for (i = 0; i < frame_size; i++) 
             {
                 int8_t v = 0;
 
-                // handle looping if we've hit the end
+                /* handle looping if we've hit the end */
                 if ((addr >> 16) == end) 
                 {
                     if ((regs[0x86] & 2) == 0) 
@@ -130,20 +130,20 @@ void SegaPCM::stream_update()
                     }
                 }
 
-                // fetch the sample
+                /* fetch the sample */
                 v = rom[(addr >> 8) & rgnmask] - 0x80;
 
-                // apply panning
+                /* apply panning */
                 write_buffer(LEFT,  i, read_buffer(LEFT,  i) + (v * regs[2]));
                 write_buffer(RIGHT, i, read_buffer(RIGHT, i) + (v * regs[3]));
 
-                // Advance.
-                // Cannonball Change: Output at a fixed 44,100Hz. 
+                /* Advance. */
+                /* Cannonball Change: Output at a fixed 44,100Hz.  */
                 double increment = ((double)regs[7]) * downsample;
                 addr = (addr + (int) increment) & 0xffffff;
             }
 
-            // store back the updated address and info
+            /* store back the updated address and info */
             regs[0x84] = addr >> 8;
             regs[0x85] = addr >> 16;
             low[ch] = regs[0x86] & 1 ? 0 : addr;

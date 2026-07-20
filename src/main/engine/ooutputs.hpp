@@ -20,37 +20,37 @@
 
 struct CoinChute
 {
-    // Coin Chute Counters
+    /* Coin Chute Counters */
     uint8_t counter[3];
-    // Output bit
+    /* Output bit */
     uint8_t output_bit;
 };
 
 class OOutputs
 {
 public:
-    const static int MODE_DISABLED = 0; // Disabled
-    const static int MODE_FFEEDBACK = 2; // Force Feedback for Wheels
-    const static int MODE_RUMBLE = 3; // Simple rumble for controllers
+    const static int MODE_DISABLED = 0; /* Disabled */
+    const static int MODE_FFEEDBACK = 2; /* Force Feedback for Wheels */
+    const static int MODE_RUMBLE = 3; /* Simple rumble for controllers */
 
-    // Hardware Motor Control:
-    // 0 = Switch off
-    // 5 = Left
-    // 8 = Centre
-    // B = Right
+    /* Hardware Motor Control: */
+    /* 0 = Switch off */
+    /* 5 = Left */
+    /* 8 = Centre */
+    /* B = Right */
     uint8_t hw_motor_control, hw_motor_control_old;
 
-    // Digital Outputs
+    /* Digital Outputs */
     enum
     {
-        D_EXT_MUTE   = 0x01, // bit 0 = External Amplifier Mute Control
-        D_BRAKE_LAMP = 0x02, // bit 1 = brake lamp
-        D_START_LAMP = 0x04, // bit 2 = start lamp
-        D_COIN1_SUCC = 0x08, // bit 3 = Coin successfully inserted - Chute 2
-        D_COIN2_SUCC = 0x10, // bit 4 = Coin successfully inserted - Chute 1
-        D_MOTOR      = 0x20, // bit 5 = steering wheel central vibration
-        D_UNUSED     = 0x40, // bit 6 = ?
-        D_SOUND      = 0x80 // bit 7 = sound enable
+        D_EXT_MUTE   = 0x01, /* bit 0 = External Amplifier Mute Control */
+        D_BRAKE_LAMP = 0x02, /* bit 1 = brake lamp */
+        D_START_LAMP = 0x04, /* bit 2 = start lamp */
+        D_COIN1_SUCC = 0x08, /* bit 3 = Coin successfully inserted - Chute 2 */
+        D_COIN2_SUCC = 0x10, /* bit 4 = Coin successfully inserted - Chute 1 */
+        D_MOTOR      = 0x20, /* bit 5 = steering wheel central vibration */
+        D_UNUSED     = 0x40, /* bit 6 = ? */
+        D_SOUND      = 0x80 /* bit 7 = sound enable */
     };
 
     CoinChute chute1, chute2;
@@ -82,7 +82,7 @@ private:
     const static uint16_t STATE_DONE   = 5;
     const static uint16_t STATE_EXIT   = 6;
 
-    // Calibration Counter
+    /* Calibration Counter */
     const static int COUNTER_RESET = 300;
 
     const static uint8_t MOTOR_OFF    = 0;
@@ -91,52 +91,52 @@ private:
     const static uint8_t MOTOR_LEFT   = 0xB;
     
 
-    // These are calculated during startup in the original game.
-    // Here we just hardcode them, as the motor init code isn't ported.
+    /* These are calculated during startup in the original game. */
+    /* Here we just hardcode them, as the motor init code isn't ported. */
     const static uint8_t CENTRE_POS    = 0x80;
     const static uint8_t LEFT_LIMIT    = 0xC1;
     const static uint8_t RIGHT_LIMIT   = 0x3C;
 
-    // Motor Limit Values. Calibrated during startup.
+    /* Motor Limit Values. Calibrated during startup. */
     int16_t limit_left;
     int16_t limit_right;
 
-    // Motor Centre Position. (We Fudge this for Force Feedback wheel mode.)
+    /* Motor Centre Position. (We Fudge this for Force Feedback wheel mode.) */
     int16_t motor_centre_pos;
 
-    // Difference between input_motor and input_motor_old
+    /* Difference between input_motor and input_motor_old */
     int16_t motor_x_change;
 
     uint16_t motor_state;
     bool motor_enabled;
 
-    // 0x11: Motor Control Value
+    /* 0x11: Motor Control Value */
     int8_t motor_control;
-    // 0x12: Movement (1 = Left, -1 = Right, 0 = None)
+    /* 0x12: Movement (1 = Left, -1 = Right, 0 = None) */
     int8_t motor_movement;
-    // 0x14: Is Motor Centered
+    /* 0x14: Is Motor Centered */
     bool is_centered;
-    // 0x16: Motor X Change Latch
+    /* 0x16: Motor X Change Latch */
     int16_t motor_change_latch;
-    // 0x18: Speed
+    /* 0x18: Speed */
     int16_t speed;
-    // 0x1A: Road Curve
+    /* 0x1A: Road Curve */
     int16_t curve;
-    // 0x1E: Increment counter to index motor table for off-road/crash
+    /* 0x1E: Increment counter to index motor table for off-road/crash */
     int16_t vibrate_counter;
-    // 0x20: Last Motor X_Change > 8. No need to adjust further.
+    /* 0x20: Last Motor X_Change > 8. No need to adjust further. */
     bool was_small_change;
-    // 0x22: Adjusted movement value based on steering 1
+    /* 0x22: Adjusted movement value based on steering 1 */
     int16_t movement_adjust1;
-    // 0x24: Adjusted movement value based on steering 2
+    /* 0x24: Adjusted movement value based on steering 2 */
     int16_t movement_adjust2;
-    // 0x26: Adjusted movement value based on steering 3
+    /* 0x26: Adjusted movement value based on steering 3 */
     int16_t movement_adjust3;
 
-    // Counter control for motor tests
+    /* Counter control for motor tests */
     int16_t counter;
 
-    // Columns for output
+    /* Columns for output */
     uint16_t col1, col2;
 
     void diag_left(int16_t input_motor, uint8_t hw_motor_limit);

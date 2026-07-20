@@ -25,10 +25,10 @@ struct wav_t {
 class Audio
 {
 public:
-    // Enable/Disable Sound
+    /* Enable/Disable Sound */
     bool sound_enabled;
 
-    // Playback volume of custom WAV music, in percent.
+    /* Playback volume of custom WAV music, in percent. */
     uint16_t custom_wav_volume;
 
     Audio();
@@ -42,23 +42,23 @@ public:
     void clear_wav();
 
 private:
-    // Sample Rate. Can't be changed easily for now
+    /* Sample Rate. Can't be changed easily for now */
     static const uint32_t FREQ = 44100;
 
-    // Stereo. Could be changed, requires some recoding.
+    /* Stereo. Could be changed, requires some recoding. */
     static const uint32_t CHANNELS = 2;
 
-    // 16-Bit Audio Output. Could be changed, requires some recoding.
+    /* 16-Bit Audio Output. Could be changed, requires some recoding. */
     static const uint32_t BITS = 16;
 
-    // Low value  = Responsiveness, chance of drop out.
-    // High value = Laggy, less chance of drop out.
+    /* Low value  = Responsiveness, chance of drop out. */
+    /* High value = Laggy, less chance of drop out. */
     static const uint32_t SAMPLES  = 1024;
 
-    // Latency (in ms) and thus target buffer size
+    /* Latency (in ms) and thus target buffer size */
     const static int SND_DELAY = 20;
 
-    // Buffer used to mix PCM and YM channels together
+    /* Buffer used to mix PCM and YM channels together */
     uint16_t* mix_buffer;
 
     wav_t wavfile;

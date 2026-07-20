@@ -2,36 +2,36 @@
 
 #include <stdint.h>
 
-// ------------------------------------------------------------------------------------------------
-// General useful stuff
-// ------------------------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------------------------ */
+/* General useful stuff */
+/* ------------------------------------------------------------------------------------------------ */
 
-// Internal Sega OutRun Screen Properties
+/* Internal Sega OutRun Screen Properties */
 const uint16_t S16_WIDTH      = 320;
 const uint16_t S16_HEIGHT     = 224;
 
-// Internal Widescreen Width
+/* Internal Widescreen Width */
 const uint16_t S16_WIDTH_WIDE = 398;
 
-// Palette Address in Memory
+/* Palette Address in Memory */
 const uint32_t S16_PALETTE_BASE    = 0x120000;
 
-// Number of Palette Entries
+/* Number of Palette Entries */
 const uint16_t S16_PALETTE_ENTRIES = 0x1000;
 
-// Number of stages
+/* Number of stages */
 const uint16_t STAGES = 15;
 
-// Hard Coded End Point of every level
+/* Hard Coded End Point of every level */
 const static uint16_t ROAD_END      = 0x79C;
 
-// End Point of level for CPU1, including horizon
+/* End Point of level for CPU1, including horizon */
 const static uint16_t ROAD_END_CPU1 = 0x904;
 
-// Default timer used for hi-score entry
+/* Default timer used for hi-score entry */
 const static uint8_t HIGHSCORE_TIMER = 0x30;
 
-// Default timer used for music selection (was 15 seconds on original/old romset)
+/* Default timer used for music selection (was 15 seconds on original/old romset) */
 const static uint8_t MUSIC_TIMER = 0x30;
 
 enum

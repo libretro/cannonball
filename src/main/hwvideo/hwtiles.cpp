@@ -1,4 +1,4 @@
-#include <cstring> // memcpy
+#include <cstring> /* memcpy */
 #include "globals.hpp"
 #include "romloader.hpp"
 #include "hwvideo/hwtiles.hpp"
@@ -89,7 +89,7 @@ hwtiles::~hwtiles(void)
 
 }
 
-// Convert S16 tiles to a more useable format
+/* Convert S16 tiles to a more useable format */
 void hwtiles::init(uint8_t* src_tiles, const bool hires)
 {
     if (src_tiles)
@@ -108,7 +108,7 @@ void hwtiles::init(uint8_t* src_tiles, const bool hires)
                 uint8_t pix = ((((p0 >> bit)) & 1) | (((p1 >> bit) << 1) & 2) | (((p2 >> bit) << 2) & 4));
                 val = (val << 4) | pix;
             }
-            tiles[i] = val; // Store converted value
+            tiles[i] = val; /* Store converted value */
         }
         memcpy(tiles_backup, tiles, TILES_LENGTH * sizeof(uint32_t));
     }
@@ -127,7 +127,7 @@ void hwtiles::init(uint8_t* src_tiles, const bool hires)
     }
 }
 
-// Patch Tileset with new data
+/* Patch Tileset with new data */
 void hwtiles::patch_tiles(RomLoader* patch)
 {
     memcpy(tiles_backup, tiles, TILES_LENGTH * sizeof(uint32_t));
@@ -151,14 +151,14 @@ void hwtiles::restore_tiles()
     memcpy(tiles, tiles_backup, TILES_LENGTH * sizeof(uint32_t));
 }
 
-// Set Tilemap X Clamp
-//
-// This is used for the widescreen mode, in order to clamp the tilemap to
-// a location of the screen. 
-//
-// In-Game we must clamp right to avoid page scrolling issues.
-//
-// The clamp will always be 192 for the non-widescreen mode.
+/* Set Tilemap X Clamp */
+/* */
+/* This is used for the widescreen mode, in order to clamp the tilemap to */
+/* a location of the screen.  */
+/* */
+/* In-Game we must clamp right to avoid page scrolling issues. */
+/* */
+/* The clamp will always be 192 for the non-widescreen mode. */
 void hwtiles::set_x_clamp(const uint16_t props)
 {
     if (props == LEFT)
@@ -186,7 +186,7 @@ void hwtiles::update_tile_values()
     }
 }
 
-// A quick and dirty debug function to display the contents of tile memory.
+/* A quick and dirty debug function to display the contents of tile memory. */
 void hwtiles::render_all_tiles(uint16_t* buf)
 {
     uint32_t Code = 0, Colour = 5, x, y;
@@ -209,7 +209,7 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
     uint16_t xScroll = scroll_x[page_index];
     uint16_t yScroll = scroll_y[page_index];
 
-    // Need to support this at each row/column
+    /* Need to support this at each row/column */
     if ((xScroll & 0x8000) != 0)
         xScroll = (text_ram[0xf80 + (0x40 * page_index) + 0] << 8) | text_ram[0xf80 + (0x40 * page_index) + 1];
     if ((yScroll & 0x8000) != 0)
@@ -219,13 +219,13 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
     {
         for (int mx = 0; mx < 128; mx++) 
         {
-            if (my < 32 && mx < 64)                    // top left
+            if (my < 32 && mx < 64)                    /* top left */
                 ActPage = (EffPage >> 0) & 0x0f;
-            if (my < 32 && mx >= 64)                   // top right
+            if (my < 32 && mx >= 64)                   /* top right */
                 ActPage = (EffPage >> 4) & 0x0f;
-            if (my >= 32 && mx < 64)                   // bottom left
+            if (my >= 32 && mx < 64)                   /* bottom left */
                 ActPage = (EffPage >> 8) & 0x0f;
-            if (my >= 32 && mx >= 64)                  // bottom right page
+            if (my >= 32 && mx >= 64)                  /* bottom right page */
                 ActPage = (EffPage >> 12) & 0x0f;
 
             uint32_t TileIndex = 64 * 32 * 2 * ActPage + ((2 * 64 * my) & 0xfff) + ((2 * mx) & 0x7f);
@@ -247,8 +247,8 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
                 x = 8 * mx;
                 y = 8 * my;
 
-                // We take into account the internal screen resolution here
-                // to account for widescreen mode.
+                /* We take into account the internal screen resolution here */
+                /* to account for widescreen mode. */
                 x -= (x_clamp - xScroll) & 0x3ff;
 
                 if (x < -x_clamp)
@@ -271,9 +271,9 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
                     (this->*render8x8_tile_mask)(buf, Code, x, y, Colour, 3, 0, ColourOff);
                 else if (x > -8 && x < s16_width_noscale && y > -8 && y < S16_HEIGHT)
 					(this->*render8x8_tile_mask_clip)(buf, Code, x, y, Colour, 3, 0, ColourOff);
-            } // end priority check
+            } /* end priority check */
         }
-    } // end for loop
+    } /* end for loop */
 }
 
 void hwtiles::render_text_layer(uint16_t* buf, uint8_t priority_draw)
@@ -302,8 +302,8 @@ void hwtiles::render_text_layer(uint16_t* buf, uint8_t priority_draw)
 
                     x -= 192;
 
-                    // We also adjust the text layer for wide-screen below. But don't allow painting in the 
-                    // wide-screen areas to avoid graphical glitches.
+                    /* We also adjust the text layer for wide-screen below. But don't allow painting in the  */
+                    /* wide-screen areas to avoid graphical glitches. */
                     if (x > 7 && x < (s16_width_noscale - 8) && y > 7 && y <= (S16_HEIGHT - 8))
                         (this->*render8x8_tile_mask)(buf, Code, x + config.s16_x_off, y, Colour, 3, 0, TILEMAP_COLOUR_OFFSET);
                     else if (x > -8 && x < s16_width_noscale && y >= 0 && y < S16_HEIGHT) 
@@ -404,11 +404,11 @@ void hwtiles::render8x8_tile_mask_clip_lores(
     }
 }
 
-// ------------------------------------------------------------------------------------------------
-// Additional routines for Hi-Res Mode.
-// Note that the tilemaps are displayed at the same resolution, we just want everything to be
-// proportional.
-// ------------------------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------------------------ */
+/* Additional routines for Hi-Res Mode. */
+/* Note that the tilemaps are displayed at the same resolution, we just want everything to be */
+/* proportional. */
+/* ------------------------------------------------------------------------------------------------ */
 void hwtiles::render8x8_tile_mask_hires(
     uint16_t *buf,
     uint16_t nTileNumber, 
@@ -498,7 +498,7 @@ void hwtiles::render8x8_tile_mask_clip_hires(
     }
 }
 
-// Hires Mode: Set 4 pixels instead of one.
+/* Hires Mode: Set 4 pixels instead of one. */
 void hwtiles::set_pixel_x4(uint16_t *buf, uint32_t data)
 {
     buf[0] = buf[1] = buf[0  + config.s16_width] = buf[1 + config.s16_width] = data;

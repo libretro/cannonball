@@ -19,7 +19,7 @@ class OHud
 {
 public:
 
-    // Colours for default text palette
+    /* Colours for default text palette */
     enum 
     {
         GREY  = 0x84,
@@ -27,7 +27,7 @@ public:
         GREEN = 0x92
     } colors;
 
-    // Base for digits, for fast digit drawing
+    /* Base for digits, for fast digit drawing */
     const static uint16_t DIGIT_BASE = 0x30;
 
     OHud(void);

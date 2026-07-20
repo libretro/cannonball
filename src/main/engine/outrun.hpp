@@ -17,61 +17,61 @@
 
 #include "frontend/config.hpp"
 
-// Main include for Ported OutRun Code
+/* Main include for Ported OutRun Code */
 #include "oaddresses.hpp"
 #include "osprites.hpp"
 #include "oroad.hpp"
 #include "oinitengine.hpp"
 #include "audio/osoundint.hpp"
 
-// Globals
+/* Globals */
 enum 
 {
-	GS_INIT = 0,				// Initalize Game
-	GS_ATTRACT = 1,				// Attract Mode
-	GS_INIT_BEST1 = 2,			// Load Best Outrunners
-	GS_BEST1 = 3,				// Best Outrunners (Attract Mode)
-	GS_INIT_LOGO = 4,			// Load Outrun Logo
-	GS_LOGO = 5,				// Outrun Logo (Attract Mode)
-	GS_INIT_MUSIC = 6,			// Load Music Selection Screen
-	GS_MUSIC = 7,				// Music Selection Screen
-	GS_INIT_GAME = 8,			// Loading In-Game
-	GS_START1 = 9,				// Start Game, Car Driving In
-	GS_START2 = 10,				// Start Game, Countdown
-	GS_START3 = 11,				// Start Game, Countdown 2
-	GS_INGAME = 12,				// Start Game, User in control
-	GS_INIT_BONUS = 13,			// Load Bonus Points
-	GS_BONUS = 14,				// Display Bonus Points
-	GS_INIT_GAMEOVER = 15,	    // Load Game Over
-	GS_GAMEOVER = 16,           // Game Over Text
-	GS_INIT_MAP = 17,			// Load Course Map
-	GS_MAP = 18,				// Course Map
-	GS_INIT_BEST2 = 19,			// Load Best Outrunners
-	GS_BEST2 = 20,			    // Best Outrunners
-	GS_REINIT = 21,				// Reinitalize Game (after outrunners screen)
-    GS_CALIBRATE_MOTOR = 100   // Calibrate Motors
+	GS_INIT = 0,				/* Initalize Game */
+	GS_ATTRACT = 1,				/* Attract Mode */
+	GS_INIT_BEST1 = 2,			/* Load Best Outrunners */
+	GS_BEST1 = 3,				/* Best Outrunners (Attract Mode) */
+	GS_INIT_LOGO = 4,			/* Load Outrun Logo */
+	GS_LOGO = 5,				/* Outrun Logo (Attract Mode) */
+	GS_INIT_MUSIC = 6,			/* Load Music Selection Screen */
+	GS_MUSIC = 7,				/* Music Selection Screen */
+	GS_INIT_GAME = 8,			/* Loading In-Game */
+	GS_START1 = 9,				/* Start Game, Car Driving In */
+	GS_START2 = 10,				/* Start Game, Countdown */
+	GS_START3 = 11,				/* Start Game, Countdown 2 */
+	GS_INGAME = 12,				/* Start Game, User in control */
+	GS_INIT_BONUS = 13,			/* Load Bonus Points */
+	GS_BONUS = 14,				/* Display Bonus Points */
+	GS_INIT_GAMEOVER = 15,	    /* Load Game Over */
+	GS_GAMEOVER = 16,           /* Game Over Text */
+	GS_INIT_MAP = 17,			/* Load Course Map */
+	GS_MAP = 18,				/* Course Map */
+	GS_INIT_BEST2 = 19,			/* Load Best Outrunners */
+	GS_BEST2 = 20,			    /* Best Outrunners */
+	GS_REINIT = 21,				/* Reinitalize Game (after outrunners screen) */
+    GS_CALIBRATE_MOTOR = 100   /* Calibrate Motors */
 };
 
 struct time_trial_t
 {
-    bool enabled;             // Time Trial Mode Enabled
-    uint8_t  level;           // Time Trial Level
-    uint8_t  traffic;         // Max Traffic Level
-    uint8_t  laps;            // Total laps (maximum of 5 laps total allowed)
-    uint8_t  current_lap;     // Which lap are we currently on
-    uint16_t overtakes;       // Number of overtakes
-    uint16_t vehicle_cols;    // Number of vehicle collisions
-    uint16_t crashes;         // Number of crashes
-    uint8_t  laptimes[5][3];  // Stored lap times
-    int16_t  best_lap_counter;// Counter representing best laptime
-    uint8_t  best_lap[3];     // Stored best lap time
-    bool new_high_score;      // Has player achieved a new high score?
+    bool enabled;             /* Time Trial Mode Enabled */
+    uint8_t  level;           /* Time Trial Level */
+    uint8_t  traffic;         /* Max Traffic Level */
+    uint8_t  laps;            /* Total laps (maximum of 5 laps total allowed) */
+    uint8_t  current_lap;     /* Which lap are we currently on */
+    uint16_t overtakes;       /* Number of overtakes */
+    uint16_t vehicle_cols;    /* Number of vehicle collisions */
+    uint16_t crashes;         /* Number of crashes */
+    uint8_t  laptimes[5][3];  /* Stored lap times */
+    int16_t  best_lap_counter;/* Counter representing best laptime */
+    uint8_t  best_lap[3];     /* Stored best lap time */
+    bool new_high_score;      /* Has player achieved a new high score? */
 };
 
-// Addresses (Used to swap between original and Japanese roms)
+/* Addresses (Used to swap between original and Japanese roms) */
 struct adr_t
 {
-    // CPU 0
+    /* CPU 0 */
     uint32_t tiles_def_lookup;
     uint32_t tiles_table;
 
@@ -170,7 +170,7 @@ struct adr_t
     uint32_t road_seg_end;
     uint32_t road_seg_split;
     
-    // CPU 1
+    /* CPU 1 */
     uint32_t road_height_lookup;
 };
 
@@ -183,32 +183,32 @@ public:
 
     bool freeze_timer;
 
-    // CannonBall Game Mode
+    /* CannonBall Game Mode */
     uint8_t cannonball_mode;
 
-    const static uint8_t MODE_ORIGINAL = 0; // Original OutRun Mode
-    const static uint8_t MODE_TTRIAL   = 1; // Enhanced Time Trial Mode
-    const static uint8_t MODE_CONT     = 2; // Enhanced Continuous Mode
+    const static uint8_t MODE_ORIGINAL = 0; /* Original OutRun Mode */
+    const static uint8_t MODE_TTRIAL   = 1; /* Enhanced Time Trial Mode */
+    const static uint8_t MODE_CONT     = 2; /* Enhanced Continuous Mode */
 
-    // Max traffic level for custom modes 
+    /* Max traffic level for custom modes  */
     uint8_t custom_traffic;
 
-    // Time trial data
+    /* Time trial data */
     time_trial_t ttrial;
 
-    // Service Mode Toggle: Not implemented yet.
+    /* Service Mode Toggle: Not implemented yet. */
     bool service_mode;
 
-    // Tick Logic. Used when running at non-standard > 30 fps
+    /* Tick Logic. Used when running at non-standard > 30 fps */
     bool tick_frame;
 
-    // Tick Counter (always syncd to 30 fps to flash text and other stuff)
+    /* Tick Counter (always syncd to 30 fps to flash text and other stuff) */
     uint32_t tick_counter;
 
-    // Main game state
+    /* Main game state */
     int8_t game_state;
 
-    // Address structures
+    /* Address structures */
     adr_t adr;
 
 	Outrun();
@@ -225,10 +225,10 @@ private:
     uint8_t attract_view;
     int16_t attract_counter;
 
-    // Car Increment Backup for attract mode
+    /* Car Increment Backup for attract mode */
     uint32_t car_inc_bak;
 
-    // Debug to denote when fork has been chosen
+    /* Debug to denote when fork has been chosen */
     int8_t fork_chosen;
 
 	void jump_table();

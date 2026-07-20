@@ -39,7 +39,7 @@ void SoundChip::init(uint8_t channels, int32_t sample_freq, int32_t fps)
     initalized = true;
 }
 
-// Set soundchip volume (0 = Off, 10 = Loudest)
+/* Set soundchip volume (0 = Off, 10 = Loudest) */
 void SoundChip::set_volume(uint8_t v)
 {
     if (v > 10) 
@@ -56,7 +56,7 @@ void SoundChip::clear_buffer()
 
 void SoundChip::write_buffer(const uint8_t channel, uint32_t address, int16_t value)
 {
-    //buffer[channel + (address * channels)] = (int16_t) (value * volume); // Unused for now
+    /*buffer[channel + (address * channels)] = (int16_t) (value * volume); // Unused for now */
     buffer[channel + (address * channels)] = value;
 }
 

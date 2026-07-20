@@ -17,14 +17,14 @@
 #include "engine/ostats.hpp"
 #include "engine/otiles.hpp"
 
-// Track Selection: Ferrari Position Per Track
-// This is a link to a sprite object that represents part of the course map.
+/* Track Selection: Ferrari Position Per Track */
+/* This is a link to a sprite object that represents part of the course map. */
 static const uint8_t FERRARI_POS[] = 
 {
     1,5,3,11,9,7,19,17,15,13,24,23,22,21,20
 };
 
-// Map Stage Number to Internal Lookup 
+/* Map Stage Number to Internal Lookup  */
 static const uint8_t STAGE_LOOKUP[] = 
 {
     0x00,
@@ -54,7 +54,7 @@ int TTrial::tick()
     switch (state)
     {
         case INIT_COURSEMAP:
-            outrun.select_course(config.engine.jap != 0, config.engine.prototype != 0); // Need to setup correct course map graphics.
+            outrun.select_course(config.engine.jap != 0, config.engine.prototype != 0); /* Need to setup correct course map graphics. */
             config.load_tiletrial_scores();
             ostats.init(true);
             osprites.init();

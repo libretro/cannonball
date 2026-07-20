@@ -25,18 +25,18 @@ public:
 
     int8_t crash_input;
 
-    // Acceleration Input
+    /* Acceleration Input */
     int16_t input_acc;
 
-    // Steering Input
+    /* Steering Input */
     int16_t input_steering;
 
-    // Processed / Adjusted Values
+    /* Processed / Adjusted Values */
     int16_t steering_adjust;
     int16_t acc_adjust;
     int16_t brake_adjust;
     
-    // True = High Gear. False = Low Gear.
+    /* True = High Gear. False = Low Gear. */
     bool gear;
 
     OInputs(void);
@@ -53,38 +53,38 @@ public:
     bool is_analog_select();
 
 private:
-    // ------------------------------------------------------------------------
-    // Variables for port
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Variables for port */
+    /* ------------------------------------------------------------------------ */
 
-    // Amount to adjust steering per tick. (0x3 is a good test value)
+    /* Amount to adjust steering per tick. (0x3 is a good test value) */
     uint8_t steering_inc;
 
-    // Amount to adjust acceleration per tick. (0x10 is a good test value)
+    /* Amount to adjust acceleration per tick. (0x10 is a good test value) */
     uint8_t acc_inc;
 
-    // Amount to adjust brake per tick. (0x10 is a good test value)
+    /* Amount to adjust brake per tick. (0x10 is a good test value) */
     uint8_t brake_inc;
 
     static const int DELAY_RESET = 40;
     int delay1, delay2, delay3;
 
-    // ------------------------------------------------------------------------
-    // Variables from original code
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Variables from original code */
+    /* ------------------------------------------------------------------------ */
 
     const static uint8_t STEERING_MIN = 0x48;
     const static uint8_t STEERING_MAX = 0xB8;
     const static uint8_t STEERING_CENTRE = 0x80;
     
-    // Current steering value
+    /* Current steering value */
     int16_t steering_old;
     int16_t steering_change;
 
     const static uint8_t PEDAL_MIN = 0x30;
     const static uint8_t PEDAL_MAX = 0x90;
 
-    // Brake Input
+    /* Brake Input */
     int16_t input_brake;
 
     void digital_steering();

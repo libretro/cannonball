@@ -31,7 +31,7 @@ void OLogo::enable(int16_t y)
 
     entry_start = OSprites::SPRITE_ENTRIES - 0x10;
 
-    // Enable block of sprites
+    /* Enable block of sprites */
     for (int i = entry_start; i < entry_start + 7; i++)
     {
         osprites.jump_table[i].init(i);
@@ -57,7 +57,7 @@ void OLogo::enable(int16_t y)
 
 void OLogo::disable()
 {
-    // Enable block of sprites
+    /* Enable block of sprites */
     for (int i = entry_start; i < entry_start + 7; i++)
     {
         osprites.jump_table[i].control &= ~OSprites::ENABLE;
@@ -75,7 +75,7 @@ void OLogo::tick()
     sprite_logo_text();
 }
 
-// Animated Background Oval Sprite.
+/* Animated Background Oval Sprite. */
 void OLogo::setup_sprite1()
 {
     oentry *e = &osprites.jump_table[entry_start + 0];
@@ -89,7 +89,7 @@ void OLogo::setup_sprite1()
     osprites.map_palette(e);
 }
 
-// Sprite Car Graphic
+/* Sprite Car Graphic */
 void OLogo::setup_sprite2()
 {
     oentry *e = &osprites.jump_table[entry_start + 1];
@@ -103,7 +103,7 @@ void OLogo::setup_sprite2()
     osprites.map_palette(e);
 }
 
-// Sprite Flying Bird #1
+/* Sprite Flying Bird #1 */
 void OLogo::setup_sprite3()
 {
     oentry *e = &osprites.jump_table[entry_start + 2];
@@ -118,7 +118,7 @@ void OLogo::setup_sprite3()
     osprites.map_palette(e);
 }
 
-// Sprite Flying Bird #2
+/* Sprite Flying Bird #2 */
 void OLogo::setup_sprite4()
 {
     oentry *e = &osprites.jump_table[entry_start + 3];
@@ -133,7 +133,7 @@ void OLogo::setup_sprite4()
     osprites.map_palette(e);
 }
 
-// Sprite Road Base Section
+/* Sprite Road Base Section */
 void OLogo::setup_sprite5()
 {
     oentry *e = &osprites.jump_table[entry_start + 4];
@@ -147,7 +147,7 @@ void OLogo::setup_sprite5()
     osprites.map_palette(e);
 }
 
-// Palm Tree
+/* Palm Tree */
 void OLogo::setup_sprite6()
 {
     oentry *e = &osprites.jump_table[entry_start + 5];
@@ -161,7 +161,7 @@ void OLogo::setup_sprite6()
     osprites.map_palette(e);
 }
 
-// OutRun logo text
+/* OutRun logo text */
 void OLogo::setup_sprite7()
 {
     oentry *e = &osprites.jump_table[entry_start + 6];
@@ -176,7 +176,7 @@ void OLogo::setup_sprite7()
     osprites.map_palette(e);
 }
 
-// Draw Background of OutRun logo in attract mode
+/* Draw Background of OutRun logo in attract mode */
 void OLogo::sprite_logo_bg()
 {
     oentry *e = &osprites.jump_table[entry_start + 0];
@@ -185,7 +185,7 @@ void OLogo::sprite_logo_bg()
     uint16_t d1 = d0 - 1;
     d1 ^= d0;
 
-    // Map new palette
+    /* Map new palette */
     if (d1 & BIT_3)
     {
         e->pal_src = bg_pal[outils::random() & 7];
@@ -198,7 +198,7 @@ void OLogo::sprite_logo_bg()
 void OLogo::sprite_logo_car()
 {
     oentry *e = &osprites.jump_table[entry_start + 1];
-    // Flicker background palette of car
+    /* Flicker background palette of car */
     e->reload++;
     e->pal_src = ((e->reload & 2) >> 1) ? 0x8A : 0x6E;
     osprites.map_palette(e);
@@ -210,21 +210,21 @@ void OLogo::sprite_logo_bird1()
     oentry *e = &osprites.jump_table[entry_start + 2];
     e->counter++;
 
-    // Set Bird X Value
+    /* Set Bird X Value */
     uint16_t index = (e->counter << 1) & 0xFF;
-    int8_t bird_x = roms.rom0.read8(DATA_MOVEMENT + index); // Note we sign the value here
+    int8_t bird_x = roms.rom0.read8(DATA_MOVEMENT + index); /* Note we sign the value here */
     int8_t zoom = bird_x >> 3;
     e->x = (bird_x >> 3) + 8;
 
-    // Set Zoom Lookup
+    /* Set Zoom Lookup */
     e->zoom = zoom + 0x70;
 
-    // Set Bird Y Value
+    /* Set Bird Y Value */
     index = (index << 1) & 0xFF;
-    int8_t bird_y = roms.rom0.read8(DATA_MOVEMENT + index); // Note we sign the value here
+    int8_t bird_y = roms.rom0.read8(DATA_MOVEMENT + index); /* Note we sign the value here */
     e->y = (bird_y >> 5) + 0x4E - y_off;
 
-    // Set Frame
+    /* Set Frame */
     e->reload++;
     uint16_t frame = (e->reload & 4) >> 2;
     e->addr = frame ? outrun.adr.sprite_logo_bird2 : outrun.adr.sprite_logo_bird1;
@@ -236,21 +236,21 @@ void OLogo::sprite_logo_bird2()
     oentry *e = &osprites.jump_table[entry_start + 3];
     e->counter++;
 
-    // Set Bird X Value
+    /* Set Bird X Value */
     uint16_t index = (e->counter << 1) & 0xFF;
-    int8_t bird_x = roms.rom0.read8(DATA_MOVEMENT + index); // Note we sign the value here
+    int8_t bird_x = roms.rom0.read8(DATA_MOVEMENT + index); /* Note we sign the value here */
     int8_t zoom = bird_x >> 3;
-    e->x = (bird_x >> 3) - 2; // Different from sprite_logo_bird1
+    e->x = (bird_x >> 3) - 2; /* Different from sprite_logo_bird1 */
 
-    // Set Zoom Lookup
+    /* Set Zoom Lookup */
     e->zoom = zoom + 0x70;
 
-    // Set Bird Y Value
+    /* Set Bird Y Value */
     index = (index << 1) & 0xFF;
-    int8_t bird_y = roms.rom0.read8(DATA_MOVEMENT + index); // Note we sign the value here
-    e->y = (bird_y >> 5) + 0x52 - y_off; // Different from sprite_logo_bird1
+    int8_t bird_y = roms.rom0.read8(DATA_MOVEMENT + index); /* Note we sign the value here */
+    e->y = (bird_y >> 5) + 0x52 - y_off; /* Different from sprite_logo_bird1 */
 
-    // Set Frame
+    /* Set Frame */
     e->reload++;
     uint16_t frame = (e->reload & 4) >> 2;
     e->addr = frame ? outrun.adr.sprite_logo_bird2 : outrun.adr.sprite_logo_bird1;
@@ -265,7 +265,7 @@ void OLogo::sprite_logo_road()
 void OLogo::sprite_logo_palm()
 {
     oentry *e = &osprites.jump_table[entry_start + 5]; 
-    e->reload++; // Increment frame number
+    e->reload++; /* Increment frame number */
     e->addr = palm_frames[(e->reload & 0xE) >> 1];
     osprites.do_spr_order_shadows(e);
 }
@@ -275,7 +275,7 @@ void OLogo::sprite_logo_text()
     osprites.do_spr_order_shadows(&osprites.jump_table[entry_start + 6]); 
 }
 
-// Blit Only: Used when frame skipping
+/* Blit Only: Used when frame skipping */
 void OLogo::blit()
 {
     for (int i = 0; i < 7; i++)

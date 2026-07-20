@@ -20,8 +20,8 @@
 
 namespace shadow
 {
-    const static float ORIGINAL = 0.63f; // Hardware Intensity (63%)
-    const static float MAME = 0.78f;     // Mame Intensity (78%)
+    const static float ORIGINAL = 0.63f; /* Hardware Intensity (63%) */
+    const static float MAME = 0.78f;     /* Mame Intensity (78%) */
 }
 
 class hwsprites;
@@ -75,11 +75,11 @@ public:
     uint32_t read_pal32(uint32_t*);
 
 private:
-    // Palette lookup used by the Libretro RGB565 output.
+    /* Palette lookup used by the Libretro RGB565 output. */
     uint32_t rgb[S16_PALETTE_ENTRIES * 3];
     uint32_t shadow_multi;
     
-    uint8_t palette[S16_PALETTE_ENTRIES * 2]; // 2 Bytes Per Palette Entry
+    uint8_t palette[S16_PALETTE_ENTRIES * 2]; /* 2 Bytes Per Palette Entry */
     void refresh_palette(uint32_t);
 };
 

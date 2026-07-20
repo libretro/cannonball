@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 #include <cmath>
-#include <cstring>  // For memset on GCC
+#include <cstring>  /* For memset on GCC */
 
 #include "hwaudio/ym2151.hpp"
 
@@ -519,7 +519,7 @@ void YM2151::init_chip_tables()
         Hz = 1000;
 #if 0
         /* Hz is close, but not perfect */
-        //Hz = scaler * 3.4375 * pow (2, (i + 4 * 64 ) / 768.0 );
+        /*Hz = scaler * 3.4375 * pow (2, (i + 4 * 64 ) / 768.0 ); */
         /* calculate phase increment */
         phaseinc = (Hz*SIN_LEN) / (double)sampfreq;
 #endif
@@ -605,24 +605,24 @@ void YM2151::init_chip_tables()
     for (i=0; i<1024; i++)
     {
         /* ASG 980324: changed to compute both tim_A_tab and timer_A_time */
-        //pom= attotime::from_hz(clock) * (64 * (1024 - i));
+        /*pom= attotime::from_hz(clock) * (64 * (1024 - i)); */
         pom= ( 64.0  *  (1024.0-i) / (double)clock );
         #ifdef USE_MAME_TIMERS
             timer_A_time[i] = pom;
         #else
-            //tim_A_tab[i] = pom.as_double() * (double)sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
+            /*tim_A_tab[i] = pom.as_double() * (double)sampfreq * mult;  / * number of samples that timer period takes (fixed point) * / */
             tim_A_tab[i] = (int)(pom * (double)sampfreq * mult); 
         #endif
     }
     for (i=0; i<256; i++)
     {
         /* ASG 980324: changed to compute both tim_B_tab and timer_B_time */
-        //pom= attotime::from_hz(clock) * (1024 * (256 - i));
+        /*pom= attotime::from_hz(clock) * (1024 * (256 - i)); */
         pom= ( 1024.0 * (256.0-i)  / (double)clock );
         #ifdef USE_MAME_TIMERS
             timer_B_time[i] = pom;
         #else
-            //tim_B_tab[i] = pom.as_double() * (double)sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
+            /*tim_B_tab[i] = pom.as_double() * (double)sampfreq * mult;  / * number of samples that timer period takes (fixed point) * / */
             tim_B_tab[i] = (int)(pom * (double)sampfreq * mult); 
         #endif
     }
@@ -1008,7 +1008,7 @@ void YM2151::write_reg(int r, int v)
 #else
                 int oldstate = status & 3;
                 status &= ~1;
-                //if ((oldstate==1) && (irqhandler)) (*irqhandler)(device, 0);
+                /*if ((oldstate==1) && (irqhandler)) (*irqhandler)(device, 0); */
 #endif
             }
 
@@ -1020,7 +1020,7 @@ void YM2151::write_reg(int r, int v)
 #else
                 int oldstate = status & 3;
                 status &= ~2;
-                //if ((oldstate==2) && (irqhandler)) (*irqhandler)(device, 0);
+                /*if ((oldstate==2) && (irqhandler)) (*irqhandler)(device, 0); */
 #endif
             }
 
@@ -1098,11 +1098,11 @@ void YM2151::write_reg(int r, int v)
         case 0x1b:    /* CT2, CT1, LFO waveform */
             ct = v >> 6;
             lfo_wsel = v & 3;
-            //if (porthandler) (*porthandler)(device, 0 , ct );
+            /*if (porthandler) (*porthandler)(device, 0 , ct ); */
             break;
 
         default:
-            //logerror("YM2151 Write %02x to undocumented register #%02x\n",v,r);
+            /*logerror("YM2151 Write %02x to undocumented register #%02x\n",v,r); */
             break;
         }
         break;
@@ -2017,7 +2017,7 @@ void YM2151::stream_update()
             {
                 int oldstate = status & 3;
                 status |= 2;
-                //if ((!oldstate) && (irqhandler)) (*irqhandler)(device, 1);
+                /*if ((!oldstate) && (irqhandler)) (*irqhandler)(device, 1); */
                 if (oldstate==0) irq = true;
             }
         }
@@ -2087,7 +2087,7 @@ void YM2151::stream_update()
                 {
                     int oldstate = status & 3;
                     status |= 1;
-                    //if ((!oldstate) && (irqhandler)) (*irqhandler)(device, 1);
+                    /*if ((!oldstate) && (irqhandler)) (*irqhandler)(device, 1); */
                     if (oldstate==0) irq = true;
                 }
                 if (irq_enable & 0x80)

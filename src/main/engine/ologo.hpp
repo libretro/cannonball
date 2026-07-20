@@ -20,15 +20,15 @@ public:
     void blit();
 
 private:
-	// Palm Tree Frame Addresses
+	/* Palm Tree Frame Addresses */
     uint32_t palm_frames[8];
 
-	// Background Palette Entries
+	/* Background Palette Entries */
 	static const uint8_t bg_pal[];
 	
     uint8_t entry_start;
 
-    // Y Offset To Draw Logo At
+    /* Y Offset To Draw Logo At */
     int16_t y_off;
 	
 	void setup_sprite1();

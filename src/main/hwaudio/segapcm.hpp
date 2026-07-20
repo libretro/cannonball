@@ -32,7 +32,7 @@ public:
     void stream_update();
 
 private:
-    // PCM Chip Emulation
+    /* PCM Chip Emulation */
     uint8_t* ram;
     uint8_t* low;
     uint8_t* pcm_rom;

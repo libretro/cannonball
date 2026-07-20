@@ -16,31 +16,31 @@
 
 #include "globals.hpp"
 
-// Road Generator Palette Representation
+/* Road Generator Palette Representation */
 struct RoadPalette
 {
-    uint32_t stripe_centre;   // Centre Stripe Colour
-    uint32_t stripe;          // Stripe Colour
-    uint32_t side;            // Side Colour
-    uint32_t road;            // Main Road Colour
+    uint32_t stripe_centre;   /* Centre Stripe Colour */
+    uint32_t stripe;          /* Stripe Colour */
+    uint32_t side;            /* Side Colour */
+    uint32_t road;            /* Main Road Colour */
 };
 
-// OutRun Level Representation
+/* OutRun Level Representation */
 struct Level
 {
-    uint8_t* path;            // CPU 1 Path Data
-    uint8_t* curve;           // Track Curve Information (Derived From Path)
-    uint8_t* width_height;    // Track Width & Height Lookups
-    uint8_t* scenery;         // Track Scenery Lookups
+    uint8_t* path;            /* CPU 1 Path Data */
+    uint8_t* curve;           /* Track Curve Information (Derived From Path) */
+    uint8_t* width_height;    /* Track Width & Height Lookups */
+    uint8_t* scenery;         /* Track Scenery Lookups */
 
-    uint16_t pal_sky;         // Index into Sky Palettes
-    uint16_t pal_gnd;         // Index into Ground Palettes
+    uint16_t pal_sky;         /* Index into Sky Palettes */
+    uint16_t pal_gnd;         /* Index into Ground Palettes */
 
-    RoadPalette palr1;        // Road 1 Generator Palette
-    RoadPalette palr2;        // Road 2 Generator Palette
+    RoadPalette palr1;        /* Road 1 Generator Palette */
+    RoadPalette palr2;        /* Road 2 Generator Palette */
 };
 
-// LayOut Binary Header Format
+/* LayOut Binary Header Format */
 struct LayOut
 {
     static const uint32_t EXPECTED_VERSION = 1;
@@ -64,7 +64,7 @@ class TrackLoader
 {
 
 public:
-    // Reference to stage mapping/ordering table
+    /* Reference to stage mapping/ordering table */
     uint8_t* stage_data;
 
     Level* current_level;
@@ -72,14 +72,14 @@ public:
     const static int MODE_ORIGINAL = 0;
     const static int MODE_LAYOUT   = 1;
 
-    // Display start line on Stage 1
+    /* Display start line on Stage 1 */
     uint8_t display_start_line;
 
     uint32_t curve_offset;
     uint32_t wh_offset;
     uint32_t scenery_offset;
 
-    // Shared Structures
+    /* Shared Structures */
     uint8_t* pal_sky_data;
     uint8_t* pal_gnd_data;
     uint8_t* heightmap_data;
@@ -160,11 +160,11 @@ private:
 
     int mode;
 
-    Level* levels;         // Normal Stages 
-    Level* level_split;    // Split Section
-    Level* levels_end;     // End Section
+    Level* levels;         /* Normal Stages  */
+    Level* level_split;    /* Split Section */
+    Level* levels_end;     /* End Section */
 
-    uint8_t* current_path; // CPU 1 Road Path
+    uint8_t* current_path; /* CPU 1 Road Path */
     
     void setup_level(Level* l, RomLoader* data, const int STAGE_ADR);
     void setup_section(Level* l, RomLoader* data, const int STAGE_ADR);

@@ -17,20 +17,20 @@
 class OTraffic
 {
 public:
-    // AI: Set to denote enemy traffic is close to car.
+    /* AI: Set to denote enemy traffic is close to car. */
     uint8_t ai_traffic;
 
-    // Set to denote we should go to LHS of road on bonus
+    /* Set to denote we should go to LHS of road on bonus */
     uint8_t bonus_lhs;
 
-    // Logic for traffic based on road split
+    /* Logic for traffic based on road split */
     int8_t traffic_split;
 
-    // Denotes Collision With Other Traffic
-    //
-    // 0 = No Collision
-    // 1 = Init Collision Sequence
-    // 2 = Collision Sequence In Progress
+    /* Denotes Collision With Other Traffic */
+    /* */
+    /* 0 = No Collision */
+    /* 1 = Init Collision Sequence */
+    /* 2 = Collision Sequence In Progress */
     uint16_t collision_traffic;
 
     uint16_t collision_mask;
@@ -46,45 +46,45 @@ public:
     void traffic_sound();
 
 private:
-	// -------------------------------------------------------------------------
-	// Function Holders
-	// -------------------------------------------------------------------------
+	/* ------------------------------------------------------------------------- */
+	/* Function Holders */
+	/* ------------------------------------------------------------------------- */
     enum
     {
-        TRAFFIC_INIT = 0x10,       // Initalize Traffic Object
-        TRAFFIC_ENTRY = 0x11,      // First 0x80 Positions Of Road
-        TRAFFIC_TICK = 0x12        // Tick Normally
+        TRAFFIC_INIT = 0x10,       /* Initalize Traffic Object */
+        TRAFFIC_ENTRY = 0x11,      /* First 0x80 Positions Of Road */
+        TRAFFIC_TICK = 0x12        /* Tick Normally */
     };
 
-    // Onscreen traffic objects
+    /* Onscreen traffic objects */
     oentry* traffic_adr[9];
 
-    // Maximum number of on-screen enemies
+    /* Maximum number of on-screen enemies */
     uint8_t max_traffic;
 
-    // Total speed of all traffic combined
+    /* Total speed of all traffic combined */
     int16_t traffic_speed_total;
 
-    // Average speed of traffic. Used to control wheel frames of traffic sprites.
+    /* Average speed of traffic. Used to control wheel frames of traffic sprites. */
     int16_t traffic_speed_avg;
 
-    // Traffic Palette Cycle. This alternates between 0 and 1.
-    // Essentially changes the palette, so that the wheels on the traffic appear to be in motion.
+    /* Traffic Palette Cycle. This alternates between 0 and 1. */
+    /* Essentially changes the palette, so that the wheels on the traffic appear to be in motion. */
     uint8_t traffic_pal_cycle;
 
-    // Number of traffic spawned
+    /* Number of traffic spawned */
     int16_t traffic_count;
 
-    // +1E [Word] Spawn Tick Counter. Used as a somewhat unrandom way of spawning cars.
+    /* +1E [Word] Spawn Tick Counter. Used as a somewhat unrandom way of spawning cars. */
     int16_t spawn_counter;
 
-    // +20 [Word] Left Hand / Right Hand Spawn Control. Controls where next car should spawn.
+    /* +20 [Word] Left Hand / Right Hand Spawn Control. Controls where next car should spawn. */
     int16_t spawn_location;
 
-    // +22 [Word] Wheel Animation Reset Value
+    /* +22 [Word] Wheel Animation Reset Value */
     int16_t wheel_reset;
 
-    // +24 [Word] Wheel Animation Counter
+    /* +24 [Word] Wheel Animation Counter */
     int16_t wheel_counter;
 
     void spawn_car(oentry* sprite);

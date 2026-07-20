@@ -46,39 +46,39 @@ void OInputs::init()
 
 void OInputs::tick()
 {
-    // Digital Controls: Simulate Analog
+    /* Digital Controls: Simulate Analog */
     if (!input.analog || !input.gamepad)
     {
         digital_steering();
         digital_pedals();
     }
-    // Analog Controls
+    /* Analog Controls */
     else
     {
         input_steering = input.a_wheel;
 
-        // Analog Pedals
+        /* Analog Pedals */
         if (input.analog == 1)
         {
             input_acc   = input.a_accel;
             input_brake = input.a_brake;
         }
-        // Digital Pedals
+        /* Digital Pedals */
         else
         {
             digital_pedals();
         }
     }
 }
-// DIGITAL CONTROLS: Digital Simulation of analog steering
+/* DIGITAL CONTROLS: Digital Simulation of analog steering */
 void OInputs::digital_steering()
 {
-    // ------------------------------------------------------------------------
-    // STEERING
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* STEERING */
+    /* ------------------------------------------------------------------------ */
     if (input.is_pressed(Input::LEFT))
     {
-        // Recentre wheel immediately if facing other way
+        /* Recentre wheel immediately if facing other way */
         if (input_steering > STEERING_CENTRE) input_steering = STEERING_CENTRE;
 
         input_steering -= steering_inc;
@@ -86,13 +86,13 @@ void OInputs::digital_steering()
     }
     else if (input.is_pressed(Input::RIGHT))
     {
-        // Recentre wheel immediately if facing other way
+        /* Recentre wheel immediately if facing other way */
         if (input_steering < STEERING_CENTRE) input_steering = STEERING_CENTRE;
 
         input_steering += steering_inc;
         if (input_steering > STEERING_MAX) input_steering = STEERING_MAX;
     }
-    // Return steering to centre if nothing pressed
+    /* Return steering to centre if nothing pressed */
     else
     {
         if (input_steering < STEERING_CENTRE)
@@ -110,12 +110,12 @@ void OInputs::digital_steering()
     }
 }
 
-// DIGITAL CONTROLS: Digital Simulation of analog pedals
+/* DIGITAL CONTROLS: Digital Simulation of analog pedals */
 void OInputs::digital_pedals()
 {
-    // ------------------------------------------------------------------------
-    // ACCELERATION
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* ACCELERATION */
+    /* ------------------------------------------------------------------------ */
 
     if (input.is_pressed(Input::ACCEL))
     {
@@ -128,9 +128,9 @@ void OInputs::digital_pedals()
         if (input_acc < 0) input_acc = 0;
     }
 
-    // ------------------------------------------------------------------------
-    // BRAKE
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* BRAKE */
+    /* ------------------------------------------------------------------------ */
 
     if (input.is_pressed(Input::BRAKE))
     {
@@ -146,21 +146,21 @@ void OInputs::digital_pedals()
 
 void OInputs::do_gear()
 {
-    // ------------------------------------------------------------------------
-    // GEAR SHIFT
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* GEAR SHIFT */
+    /* ------------------------------------------------------------------------ */
 
-    // Automatic Gears: Don't do anything
+    /* Automatic Gears: Don't do anything */
     if (config.controls.gear == config.controls.GEAR_AUTO)
         return;
 
     else
     {
-        // Manual: Cabinet Shifter
+        /* Manual: Cabinet Shifter */
         if (config.controls.gear == config.controls.GEAR_PRESS)
             gear = !(input.is_pressed(Input::GEAR1) || input.is_pressed(Input::GEAR2));
 
-        // Manual: Two Separate Buttons for gears
+        /* Manual: Two Separate Buttons for gears */
         else if (config.controls.gear == config.controls.GEAR_SEPARATE)
         {
             if (input.has_pressed(Input::GEAR1))
@@ -169,7 +169,7 @@ void OInputs::do_gear()
                 gear = true;
         }
 
-        // Manual: Keyboard/Digital Button
+        /* Manual: Keyboard/Digital Button */
         else
         {
             if (input.has_pressed(Input::GEAR1) || input.has_pressed(Input::GEAR2))
@@ -178,16 +178,16 @@ void OInputs::do_gear()
     }
 }
 
-// Adjust Analogue Inputs
-//
-// Read, Adjust & Write Analogue Inputs
-// In the original, these values are set during a H-Blank routine
-//
-// Source: 74E2
+/* Adjust Analogue Inputs */
+/* */
+/* Read, Adjust & Write Analogue Inputs */
+/* In the original, these values are set during a H-Blank routine */
+/* */
+/* Source: 74E2 */
 
 void OInputs::adjust_inputs()
 {
-    // Cap Steering Value
+    /* Cap Steering Value */
     if (input_steering < STEERING_MIN) input_steering = STEERING_MIN;
     else if (input_steering > STEERING_MAX) input_steering = STEERING_MAX;
 
@@ -201,19 +201,19 @@ void OInputs::adjust_inputs()
     }
     else
     {
-        // no_crash1:
+        /* no_crash1: */
         int16_t d0 = input_steering - steering_old;
         steering_old = input_steering;
         steering_change += d0;
         d0 = steering_change < 0 ? -steering_change : steering_change;
 
-        // Note the below line "if (d0 > 2)" causes a bug in the original game
-        // whereby if you hold the wheel to the left whilst stationary, then accelerate the car will veer left even
-        // when the wheel has been centered
+        /* Note the below line "if (d0 > 2)" causes a bug in the original game */
+        /* whereby if you hold the wheel to the left whilst stationary, then accelerate the car will veer left even */
+        /* when the wheel has been centered */
         if (config.engine.fix_bugs || d0 > 2)
         {
             steering_change = 0;
-            // Convert input steering value to internal value
+            /* Convert input steering value to internal value */
             d0 = ((input_steering - 0x80) * 0x100) / 0x70;
             if (d0 > 0x7F) d0 = 0x7F;
             else if (d0 < -0x7F) d0 = -0x7F;
@@ -221,28 +221,28 @@ void OInputs::adjust_inputs()
         }
     }
 
-    // Cap & Adjust Acceleration Value
+    /* Cap & Adjust Acceleration Value */
     int16_t acc = input_acc;
     if (acc > PEDAL_MAX) acc = PEDAL_MAX;
     else if (acc < PEDAL_MIN) acc = PEDAL_MIN;
     acc_adjust = ((acc - 0x30) * 0x100) / 0x61;
 
-    // Cap & Adjust Brake Value
+    /* Cap & Adjust Brake Value */
     int16_t brake = input_brake;
     if (brake > PEDAL_MAX) brake = PEDAL_MAX;
     else if (brake < PEDAL_MIN) brake = PEDAL_MIN;
     brake_adjust = ((brake - 0x30) * 0x100) / 0x61;
 }
 
-// Simplified version of do credits routine. 
-// I have not ported the coin chute handling code, or dip switch routines.
-//
-// Returns: 0 (No Coin Inserted)
-//          1 (Coin Chute 1 Used)
-//          2 (Coin Chute 2 Used)
-//          3 (Key Pressed / Service Button)
-//
-// Source: 0x6DE0
+/* Simplified version of do credits routine.  */
+/* I have not ported the coin chute handling code, or dip switch routines. */
+/* */
+/* Returns: 0 (No Coin Inserted) */
+/*          1 (Coin Chute 1 Used) */
+/*          2 (Coin Chute 2 Used) */
+/*          3 (Key Pressed / Service Button) */
+/* */
+/* Source: 0x6DE0 */
 uint8_t OInputs::do_credits()
 {
     if (input.has_pressed(Input::COIN))
@@ -250,7 +250,7 @@ uint8_t OInputs::do_credits()
         if (!config.engine.freeplay && ostats.credits < 9)
         {
             ostats.credits++;
-            // todo: Increment credits total for bookkeeping
+            /* todo: Increment credits total for bookkeeping */
             osoundint.queue_sound(sound::COIN_IN);
         }
         return 3;
@@ -258,9 +258,9 @@ uint8_t OInputs::do_credits()
     return 0;
 }
 
-// ------------------------------------------------------------------------------------------------
-// Menu Selection Controls
-// ------------------------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------------------------ */
+/* Menu Selection Controls */
+/* ------------------------------------------------------------------------------------------------ */
 
 bool OInputs::is_analog_l()
 {

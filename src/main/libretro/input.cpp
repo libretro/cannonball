@@ -7,7 +7,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include <cstdlib> // abs
+#include <cstdlib> /* abs */
 #include <string.h>
 #include "input.hpp"
 
@@ -39,19 +39,19 @@ void Input::close()
 {
 }
 
-// Detect whether a key press change has occurred
+/* Detect whether a key press change has occurred */
 bool Input::has_pressed(presses p)
 {
     return keys[p] && !keys_old[p];
 }
 
-// Detect whether key is still pressed
+/* Detect whether key is still pressed */
 bool Input::is_pressed(presses p)
 {
     return keys[p];
 }
 
-// Detect whether pressed and clear the press
+/* Detect whether pressed and clear the press */
 bool Input::is_pressed_clear(presses p)
 {
     bool pressed = keys[p];
@@ -59,7 +59,7 @@ bool Input::is_pressed_clear(presses p)
     return pressed;
 }
 
-// Denote that a frame has been done by copying key presses into previous array
+/* Denote that a frame has been done by copying key presses into previous array */
 void Input::frame_done()
 {
     memcpy(&keys_old, &keys, sizeof(keys));
@@ -67,7 +67,7 @@ void Input::frame_done()
 
 void Input::handle_key(const int key, const bool is_pressed)
 {
-    // Redefinable Key Input
+    /* Redefinable Key Input */
     if (key == key_config[0])
         keys[UP] = is_pressed;
 
@@ -108,23 +108,23 @@ void Input::handle_key(const int key, const bool is_pressed)
 
 void Input::handle_joy_axis(int wheel_axis, int accel_axis, int brake_axis)
 {
-   // Analog Controls
+   /* Analog Controls */
 
-   // Steering
-   // OutRun requires values between 0x48 and 0xb8.
+   /* Steering */
+   /* OutRun requires values between 0x48 and 0xb8. */
    int percentage_adjust = ((wheel_zone) << 8) / 100;         
    int adjustedw = wheel_axis + ((wheel_axis * percentage_adjust) >> 8);
 
-   // Make 0 hard left, and 0x80 centre value.
+   /* Make 0 hard left, and 0x80 centre value. */
    adjustedw = ((adjustedw + (1 << 15)) >> 9);
-   adjustedw += 0x40; // Centre
+   adjustedw += 0x40; /* Centre */
 
    if (adjustedw < 0x40)
        adjustedw = 0x40;
    else if (adjustedw > 0xC0)
        adjustedw = 0xC0;
 
-   // Remove Dead Zone
+   /* Remove Dead Zone */
    if (wheel_dead)
    {
        if (std::abs(CENTRE - adjustedw) <= wheel_dead)
@@ -132,14 +132,14 @@ void Input::handle_joy_axis(int wheel_axis, int accel_axis, int brake_axis)
    }
    a_wheel = adjustedw;
 
-   // Accelerator [Single Axis]
-   // Scale input to be in the range of 0 to 0x7F
+   /* Accelerator [Single Axis] */
+   /* Scale input to be in the range of 0 to 0x7F */
    int adjusteda = accel_axis/256;          
    adjusteda += (adjusteda >> 2);
    a_accel = adjusteda;
 
-   // Brake [Single Axis]
-   // Scale input to be in the range of 0 to 0x7F
+   /* Brake [Single Axis] */
+   /* Scale input to be in the range of 0 to 0x7F */
    int adjustedb = 0x7F - ((-brake_axis + (1 << 15)) >> 9);
    adjustedb += (adjustedb >> 2);
    a_brake = adjustedb;

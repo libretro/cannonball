@@ -10,28 +10,28 @@
 
 #include "engine/osprite.hpp"
 
-//  Out Run/X-Board-style sprites
-//
-//      Offs  Bits               Usage
-//       +0   e------- --------  Signify end of sprite list
-//       +0   -h-h---- --------  Hide this sprite if either bit is set
-//       +0   ----bbb- --------  Sprite bank
-//       +0   -------t tttttttt  Top scanline of sprite + 256
-//       +2   oooooooo oooooooo  Offset within selected sprite bank
-//       +4   ppppppp- --------  Signed 7-bit pitch value between scanlines
-//       +4   -------x xxxxxxxx  X position of sprite (position $BE is screen position 0)
-//       +6   -s------ --------  Enable shadows
-//       +6   --pp---- --------  Sprite priority, relative to tilemaps
-//       +6   ------vv vvvvvvvv  Vertical zoom factor (0x200 = full size, 0x100 = half size, 0x300 = 2x size)
-//       +8   y------- --------  Render from top-to-bottom (1) or bottom-to-top (0) on screen
-//       +8   -f------ --------  Horizontal flip: read the data backwards if set
-//       +8   --x----- --------  Render from left-to-right (1) or right-to-left (0) on screen
-//       +8   ------hh hhhhhhhh  Horizontal zoom factor (0x200 = full size, 0x100 = half size, 0x300 = 2x size)
-//       +E   dddddddd dddddddd  Scratch space for current address
-//
-//    Out Run only:
-//       +A   hhhhhhhh --------  Height in scanlines - 1
-//       +A   -------- -ccccccc  Sprite color palette
+/*  Out Run/X-Board-style sprites */
+/* */
+/*      Offs  Bits               Usage */
+/*       +0   e------- --------  Signify end of sprite list */
+/*       +0   -h-h---- --------  Hide this sprite if either bit is set */
+/*       +0   ----bbb- --------  Sprite bank */
+/*       +0   -------t tttttttt  Top scanline of sprite + 256 */
+/*       +2   oooooooo oooooooo  Offset within selected sprite bank */
+/*       +4   ppppppp- --------  Signed 7-bit pitch value between scanlines */
+/*       +4   -------x xxxxxxxx  X position of sprite (position $BE is screen position 0) */
+/*       +6   -s------ --------  Enable shadows */
+/*       +6   --pp---- --------  Sprite priority, relative to tilemaps */
+/*       +6   ------vv vvvvvvvv  Vertical zoom factor (0x200 = full size, 0x100 = half size, 0x300 = 2x size) */
+/*       +8   y------- --------  Render from top-to-bottom (1) or bottom-to-top (0) on screen */
+/*       +8   -f------ --------  Horizontal flip: read the data backwards if set */
+/*       +8   --x----- --------  Render from left-to-right (1) or right-to-left (0) on screen */
+/*       +8   ------hh hhhhhhhh  Horizontal zoom factor (0x200 = full size, 0x100 = half size, 0x300 = 2x size) */
+/*       +E   dddddddd dddddddd  Scratch space for current address */
+/* */
+/*    Out Run only: */
+/*       +A   hhhhhhhh --------  Height in scanlines - 1 */
+/*       +A   -------- -ccccccc  Sprite color palette */
 
 osprite::osprite(void)
 {
@@ -54,8 +54,8 @@ void osprite::init()
     scratch = 0;
 }
 
-// X is now stored separately (not in the original data structure)
-// This is to support wide-screen mode
+/* X is now stored separately (not in the original data structure) */
+/* This is to support wide-screen mode */
 uint16_t osprite::get_x()
 {
     return data[0x6];
@@ -63,7 +63,7 @@ uint16_t osprite::get_x()
 
 uint16_t osprite::get_y()
 {
-    return data[0x0]; // returning y uses whole value
+    return data[0x0]; /* returning y uses whole value */
 }
 
 void osprite::set_x(uint16_t x)
@@ -83,7 +83,7 @@ void osprite::inc_x(uint16_t v)
 
 void osprite::set_y(uint16_t y)
 {
-    data[0x0] = y; // setting y wipes entire value
+    data[0x0] = y; /* setting y wipes entire value */
 }
 
 void osprite::set_vzoom(uint16_t z)
@@ -140,5 +140,5 @@ void osprite::set_bank(uint8_t bank)
 void osprite::hide(void)
 {
     data[0x0] |= 0x4000;
-    data[0x0] &= ~0x8000; // denote sprite list not ended
+    data[0x0] &= ~0x8000; /* denote sprite list not ended */
 }

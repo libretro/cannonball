@@ -18,25 +18,25 @@
 class OSoundInt
 {
 public:
-    // SoundChip: Sega Custom Sample Generator
+    /* SoundChip: Sega Custom Sample Generator */
     SegaPCM* pcm;
 
-    // SoundChip: Yamaha YM2151
+    /* SoundChip: Yamaha YM2151 */
     YM2151*  ym;
 
     const static uint16_t PCM_RAM_SIZE = 0x100;
 
-    // Note whether the game has booted
+    /* Note whether the game has booted */
     bool has_booted;
 
-    // [+0] Unused
-    // [+1] Engine pitch high
-    // [+2] Engine pitch low
-    // [+3] Engine pitch vol
-    // [+4] Traffic data #1 
-    // [+5] Traffic data #2 
-    // [+6] Traffic data #3 
-    // [+7] Traffic data #4
+    /* [+0] Unused */
+    /* [+1] Engine pitch high */
+    /* [+2] Engine pitch low */
+    /* [+3] Engine pitch vol */
+    /* [+4] Traffic data #1  */
+    /* [+5] Traffic data #2  */
+    /* [+6] Traffic data #3  */
+    /* [+7] Traffic data #4 */
     uint8_t engine_data[8];
 
     OSoundInt();
@@ -52,26 +52,26 @@ public:
     void queue_clear();
 
 private:
-    // 4 MHz
+    /* 4 MHz */
     static const uint32_t SOUND_CLOCK = 4000000;
 
-    // Fractionally counts number of times audio code must be called
-    // We call the audio code 125 times per frame from a timing perspective.
+    /* Fractionally counts number of times audio code must be called */
+    /* We call the audio code 125 times per frame from a timing perspective. */
     double audio_ticks;
 
-    // Reference to 0xFF bytes of PCM Chip RAM
+    /* Reference to 0xFF bytes of PCM Chip RAM */
     uint8_t* pcm_ram;
 
-    // Controls what type of sound we're going to process in the interrupt routine
+    /* Controls what type of sound we're going to process in the interrupt routine */
     uint8_t sound_counter;
 
     static const uint8_t QUEUE_LENGTH = 0x1F;
     uint8_t queue[QUEUE_LENGTH + 1];
 
-    // Number of sounds queued
+    /* Number of sounds queued */
     uint8_t sounds_queued;
 
-    // Positions in the queue
+    /* Positions in the queue */
     uint8_t sound_head, sound_tail;
 
     void add_to_queue(uint8_t snd);

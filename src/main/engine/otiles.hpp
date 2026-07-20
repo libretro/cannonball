@@ -15,17 +15,17 @@
 
 #include "outrun.hpp"
 
-// Forward definition of video for cyclic dependency
+/* Forward definition of video for cyclic dependency */
 class video;
 
 class OTiles
 {
 public:       
-    // + 0x21: Tilemap Control
-	// 0 = Clear Tile Table 1 & Init Default Tilemap (Stage 1)
-	// 1 = Scroll Tilemap
-	// 2 = Init Tilemap
-	// 3 = New Tilemap Initialized - Scroll both tilemaps during tilesplit
+    /* + 0x21: Tilemap Control */
+	/* 0 = Clear Tile Table 1 & Init Default Tilemap (Stage 1) */
+	/* 1 = Scroll Tilemap */
+	/* 2 = Init Tilemap */
+	/* 3 = New Tilemap Initialized - Scroll both tilemaps during tilesplit */
 	uint8_t tilemap_ctrl;
 	enum { TILEMAP_CLEAR, TILEMAP_SCROLL, TILEMAP_INIT, TILEMAP_SPLIT };
 
@@ -45,21 +45,21 @@ public:
     void set_scroll(int16_t h_scroll = 0, int16_t v_scroll = 0);
 
 private:	
-    // Page to use for tilemap. Alternates between 0 and 1 dependent on stage number
-    // to handle switch between tilemaps at stage end.
+    /* Page to use for tilemap. Alternates between 0 and 1 dependent on stage number */
+    /* to handle switch between tilemaps at stage end. */
     int8_t page;
 
-    // Enhancement: Used for continuous mode
+    /* Enhancement: Used for continuous mode */
     int16_t vswap_state;
     enum {VSWAP_OFF, VSWAP_SCROLL_OFF, VSWAP_SCROLL_ON};
 
     int16_t vswap_off;
 
-    // -----------------------------------------------------------------------
-    // TILEMAP VARIABLES 
-    // -----------------------------------------------------------------------
+    /* ----------------------------------------------------------------------- */
+    /* TILEMAP VARIABLES  */
+    /* ----------------------------------------------------------------------- */
 
-    // Scroll values to write to foreground & background tilemaps
+    /* Scroll values to write to foreground & background tilemaps */
 	int16_t fg_h_scroll;
 	int16_t bg_h_scroll;
 	int16_t fg_v_scroll;
@@ -68,35 +68,35 @@ private:
 	uint16_t fg_psel;
 	uint16_t bg_psel;
 
-	// + 0xC Current master tilemap scroll values
+	/* + 0xC Current master tilemap scroll values */
 	int16_t tilemap_v_scr;
 	int32_t tilemap_h_scr;
 
-	// BG & FG Tilemap Height in Tiles
+	/* BG & FG Tilemap Height in Tiles */
 	uint16_t fg_v_tiles;
 	uint16_t bg_v_tiles;
 
-	// + 0x16 Tilemap v-scroll offset. Generally static.
+	/* + 0x16 Tilemap v-scroll offset. Generally static. */
 	int16_t tilemap_v_off;
 
-	// FG & BG Tilemap ROM Address [long]
+	/* FG & BG Tilemap ROM Address [long] */
 	uint32_t fg_addr;
 	uint32_t bg_addr;
 	
-    // + 0x20: Toggle between loading palette and loading tiles
+    /* + 0x20: Toggle between loading palette and loading tiles */
     uint8_t tilemap_setup;
     enum { SETUP_TILES, SETUP_PAL };
 
-    // + 0x22: Clear Old Name Tables
+    /* + 0x22: Clear Old Name Tables */
     bool clear_name_tables;
 
-    // + 0x23: Set when road is splitting (used by UpdateFGPage and UpdateBGPage)
+    /* + 0x23: Set when road is splitting (used by UpdateFGPage and UpdateBGPage) */
     bool page_split;
 
-    // + 0x24: H-Scroll Lookup Table
+    /* + 0x24: H-Scroll Lookup Table */
     uint16_t h_scroll_lookup;
 
-    // -----------------------------------------------------------------------
+    /* ----------------------------------------------------------------------- */
     
     void clear_tile_info();
     void init_tilemap(int16_t stage_id = 0);

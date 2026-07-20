@@ -12,7 +12,7 @@
 class Roms
 {
 public:
-    // Western ROMs
+    /* Western ROMs */
     RomLoader rom0;
     RomLoader rom1;
     RomLoader tiles;
@@ -21,11 +21,11 @@ public:
     RomLoader z80;
     RomLoader pcm;
 
-    // Japanese ROMs
+    /* Japanese ROMs */
     RomLoader j_rom0;
     RomLoader j_rom1;
 
-    // Paged Roms (Swap between Jap and Western)
+    /* Paged Roms (Swap between Jap and Western) */
     RomLoader* rom0p;
     RomLoader* rom1p;
 

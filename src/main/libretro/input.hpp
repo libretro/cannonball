@@ -38,19 +38,19 @@ public:
     bool keys[15];
     bool keys_old[15];
 
-    // Has gamepad been found?
+    /* Has gamepad been found? */
     bool gamepad;
 
-    // Use analog controls
+    /* Use analog controls */
     int analog;
 
-    // Latch last key press for redefines
+    /* Latch last key press for redefines */
     int key_press;
 
-    // Latch last joystick button press for redefines
+    /* Latch last joystick button press for redefines */
     int16_t joy_button;
 
-    // Analog Controls
+    /* Analog Controls */
     int a_wheel;
     int a_accel;
     int a_brake;
@@ -73,10 +73,10 @@ public:
 private:
     static const int CENTRE = 0x80;
 
-    // Digital Dead Zone
+    /* Digital Dead Zone */
     static const int DIGITAL_DEAD = 3200;
 
-    // Configurations for keyboard and joypad
+    /* Configurations for keyboard and joypad */
     int* pad_config;
     int* key_config;
     int* axis;

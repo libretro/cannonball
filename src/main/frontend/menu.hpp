@@ -26,7 +26,7 @@ public:
     void refresh_menu();
 
 private:
-    // Menu state
+    /* Menu state */
     uint8_t state;
 
     enum
@@ -39,24 +39,24 @@ private:
 
     TTrial* ttrial;
 
-    // Redefine keys/joystick substate
+    /* Redefine keys/joystick substate */
     uint8_t redef_state;
 
     uint32_t frame;
 
-    // Counter for showing messages
+    /* Counter for showing messages */
     int32_t message_counter;
 
-    // Number of seconds to show message for
+    /* Number of seconds to show message for */
     const static int32_t MESSAGE_TIME = 5;
 
-    // Message text
+    /* Message text */
     std::string msg;
 
-    // Cursor
+    /* Cursor */
     int16_t cursor;
 
-    // Stores whether this is a textual menu (i.e. no options that can be chosen)
+    /* Stores whether this is a textual menu (i.e. no options that can be chosen) */
     bool is_text_menu;
 
 

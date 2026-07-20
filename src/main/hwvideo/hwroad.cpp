@@ -1,4 +1,4 @@
-#include <cstring> // memcpy
+#include <cstring> /* memcpy */
 #include "hwvideo/hwroad.hpp"
 #include "globals.hpp"
 #include "frontend/config.hpp"
@@ -116,7 +116,7 @@ HWRoad::~HWRoad()
 {
 }
 
-// Convert road to a more useable format
+/* Convert road to a more useable format */
 void HWRoad::init(const uint8_t* src_road, const bool hires)
 {
     road_control = 0;
@@ -167,28 +167,28 @@ void HWRoad::decode_road(const uint8_t* src_road)
 {
     for (int y = 0; y < 256 * 2; y++) 
     {
-        const int src = ((y & 0xff) * 0x40 + (y >> 8) * 0x8000) % rom_size; // tempGfx
-        const int dst = y * 512; // System16Roads
+        const int src = ((y & 0xff) * 0x40 + (y >> 8) * 0x8000) % rom_size; /* tempGfx */
+        const int dst = y * 512; /* System16Roads */
 
-        // loop over columns
+        /* loop over columns */
         for (int x = 0; x < 512; x++) 
         {
             roads[dst + x] = (((src_road[src + (x / 8)] >> (~x & 7)) & 1) << 0) | (((src_road[src + (x / 8 + 0x4000)] >> (~x & 7)) & 1) << 1);
 
-            // pre-mark road data in the "stripe" area with a high bit
+            /* pre-mark road data in the "stripe" area with a high bit */
             if (x >= 256 - 8 && x < 256 && roads[dst + x] == 3)
                 roads[dst + x] |= 4;
         }
     }
 
-    // set up a dummy road in the last entry
+    /* set up a dummy road in the last entry */
     for (int i = 0; i < 512; i++) 
     {
         roads[256 * 2 * 512 + i] = 3;
     }
 }
 
-// Writes go to RAM, but we read from the RAM Buffer.
+/* Writes go to RAM, but we read from the RAM Buffer. */
 void HWRoad::write16(uint32_t adr, const uint16_t data)
 {
     ram[(adr >> 1) & 0x7FF] = data;
@@ -214,7 +214,7 @@ uint16_t HWRoad::read_road_control()
     uint32_t *src = (uint32_t *)ram;
     uint32_t *dst = (uint32_t *)ramBuff;
 
-    // swap the halves of the road RAM
+    /* swap the halves of the road RAM */
     for (uint16_t i = 0; i < ROAD_RAM_SIZE/4; i++)
     {
         uint32_t temp = *src;
@@ -230,11 +230,11 @@ void HWRoad::write_road_control(const uint8_t road_control)
     this->road_control = road_control;
 }
 
-// ------------------------------------------------------------------------------------------------
-// Road Rendering: Lores Version
-// ------------------------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------------------------ */
+/* Road Rendering: Lores Version */
+/* ------------------------------------------------------------------------------------------------ */
 
-// Background: Look for solid fill scanlines
+/* Background: Look for solid fill scanlines */
 void HWRoad::render_background_lores(uint16_t* pixels)
 {
     int x, y;
@@ -247,7 +247,7 @@ void HWRoad::render_background_lores(uint16_t* pixels)
 
         int color = -1;
 
-        // based on the info->control, we can figure out which sky to draw
+        /* based on the info->control, we can figure out which sky to draw */
         switch (road_control & 3) 
         {
             case 0:
@@ -275,7 +275,7 @@ void HWRoad::render_background_lores(uint16_t* pixels)
                 break;
         }
 
-        // fill the scanline with color
+        /* fill the scanline with color */
         if (color != -1) 
         {
             uint16_t* pPixel = pixels + (y * config.s16_width);
@@ -287,7 +287,7 @@ void HWRoad::render_background_lores(uint16_t* pixels)
     }
 }
 
-// Foreground: Render From ROM
+/* Foreground: Render From ROM */
 void HWRoad::render_foreground_lores(uint16_t* pixels)
 {
     int x, y;
@@ -306,7 +306,7 @@ void HWRoad::render_foreground_lores(uint16_t* pixels)
         const uint32_t data0 = roadram[0x000 + y];
         const uint32_t data1 = roadram[0x100 + y];
 
-        // if both roads are low priority, skip
+        /* if both roads are low priority, skip */
         if (((data0 & 0x800) != 0) && ((data1 & 0x800) != 0))
             continue;
 
@@ -315,19 +315,19 @@ void HWRoad::render_foreground_lores(uint16_t* pixels)
         int32_t control = road_control & 3;
 
         uint8_t *src0, *src1;
-        int32_t bgcolor; // 8 bits
+        int32_t bgcolor; /* 8 bits */
 
-        // get road 0 data
+        /* get road 0 data */
         src0   = ((data0 & 0x800) != 0) ? roads + 256 * 2 * 512 : (roads + (0x000 + ((data0 >> 1) & 0xff)) * 512);
         hpos0  = roadram[0x200 + (((road_control & 4) != 0) ? y : (data0 & 0x1ff))] & 0xfff;
         color0 = roadram[0x600 + (((road_control & 4) != 0) ? y : (data0 & 0x1ff))];
 
-        // get road 1 data
+        /* get road 1 data */
         src1   = ((data1 & 0x800) != 0) ? roads + 256 * 2 * 512 : (roads + (0x100 + ((data1 >> 1) & 0xff)) * 512);
         hpos1  = roadram[0x400 + (((road_control & 4) != 0) ? (0x100 + y) : (data1 & 0x1ff))] & 0xfff;
         color1 = roadram[0x600 + (((road_control & 4) != 0) ? (0x100 + y) : (data1 & 0x1ff))];
 
-        // determine the 5 colors for road 0
+        /* determine the 5 colors for road 0 */
         color_table[0x00] = color_offset1 ^ 0x00 ^ ((color0 >> 0) & 1);
         color_table[0x01] = color_offset1 ^ 0x02 ^ ((color0 >> 1) & 1);
         color_table[0x02] = color_offset1 ^ 0x04 ^ ((color0 >> 2) & 1);
@@ -335,7 +335,7 @@ void HWRoad::render_foreground_lores(uint16_t* pixels)
         color_table[0x03] = ((data0 & 0x200) != 0) ? color_table[0x00] : (color_offset2 ^ 0x00 ^ bgcolor);
         color_table[0x07] = color_offset1 ^ 0x06 ^ ((color0 >> 3) & 1);
 
-        // determine the 5 colors for road 1
+        /* determine the 5 colors for road 1 */
         color_table[0x10] = color_offset1 ^ 0x08 ^ ((color1 >> 4) & 1);
         color_table[0x11] = color_offset1 ^ 0x0a ^ ((color1 >> 5) & 1);
         color_table[0x12] = color_offset1 ^ 0x0c ^ ((color1 >> 6) & 1);
@@ -343,10 +343,10 @@ void HWRoad::render_foreground_lores(uint16_t* pixels)
         color_table[0x13] = ((data1 & 0x200) != 0) ? color_table[0x10] : (color_offset2 ^ 0x10 ^ bgcolor);
         color_table[0x17] = color_offset1 ^ 0x0e ^ ((color1 >> 7) & 1);
 
-        // Shift road dependent on whether we are in widescreen mode or not
+        /* Shift road dependent on whether we are in widescreen mode or not */
         uint16_t s16_x = 0x5f8 + config.s16_x_off;
 
-        // draw the road
+        /* draw the road */
         switch (control) 
         {
             case 0:
@@ -406,13 +406,13 @@ void HWRoad::render_foreground_lores(uint16_t* pixels)
                     hpos1 = (hpos1 + 1) & 0xfff;
                 }
                 break;
-            } // end switch
-    } // end for
+            } /* end switch */
+    } /* end for */
 }
 
-// ------------------------------------------------------------------------------------------------
-// High Resolution (Double Resolution) Road Rendering
-// ------------------------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------------------------ */
+/* High Resolution (Double Resolution) Road Rendering */
+/* ------------------------------------------------------------------------------------------------ */
 void HWRoad::render_background_hires(uint16_t* pixels)
 {
     int x, y;
@@ -425,7 +425,7 @@ void HWRoad::render_background_hires(uint16_t* pixels)
 
         int color = -1;
 
-        // based on the info->control, we can figure out which sky to draw
+        /* based on the info->control, we can figure out which sky to draw */
         switch (road_control & 3) 
         {
             case 0:
@@ -453,7 +453,7 @@ void HWRoad::render_background_hires(uint16_t* pixels)
                 break;
         }
 
-        // fill the scanline with color
+        /* fill the scanline with color */
         if (color != -1) 
         {
             uint16_t* pPixel = pixels + (y * config.s16_width);
@@ -463,15 +463,15 @@ void HWRoad::render_background_hires(uint16_t* pixels)
                 *(pPixel)++ = color;
         }
 
-        // Hi-Res Mode: Copy extra line of background
+        /* Hi-Res Mode: Copy extra line of background */
         memcpy(pixels + ((y+1) * config.s16_width), pixels + (y * config.s16_width), sizeof(uint16_t) * config.s16_width);
     }
 }
 
-// ------------------------------------------------------------------------------------------------
-// Render Road Foreground - High Resolution Version
-// Interpolates previous scanline with next.
-// ------------------------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------------------------ */
+/* Render Road Foreground - High Resolution Version */
+/* Interpolates previous scanline with next. */
+/* ------------------------------------------------------------------------------------------------ */
 void HWRoad::render_foreground_hires(uint16_t* pixels)
 {
     int x, y, yy;
@@ -479,7 +479,7 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
     
     uint16_t color_table[32];
     int32_t color0, color1;
-    int32_t bgcolor; // 8 bits
+    int32_t bgcolor; /* 8 bits */
 
     for (y = 0; y < config.s16_height; y++) 
     {
@@ -494,7 +494,7 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
         uint32_t data0 = roadram[0x000 + yy];
         uint32_t data1 = roadram[0x100 + yy];
 
-        // if both roads are low priority, skip
+        /* if both roads are low priority, skip */
         if (((data0 & 0x800) != 0) && ((data1 & 0x800) != 0))
         {
             y++; 
@@ -503,15 +503,15 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
 
         uint8_t *src0 = NULL, *src1 = NULL;
 
-        // get road 0 data
+        /* get road 0 data */
         int32_t hpos0  = roadram[0x200 + (((road_control & 4) != 0) ? yy : (data0 & 0x1ff))] & 0xfff;
 
-        // get road 1 data       
+        /* get road 1 data        */
         int32_t hpos1  = roadram[0x400 + (((road_control & 4) != 0) ? (0x100 + yy) : (data1 & 0x1ff))] & 0xfff;
         
-        // ----------------------------------------------------------------------------------------
-        // Interpolate Scanlines when in hi-resolution mode.
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* Interpolate Scanlines when in hi-resolution mode. */
+        /* ---------------------------------------------------------------------------------------- */
         if (y & 1 && yy < S16_HEIGHT - 1)
         {
             uint32_t data0_next = roadram[0x000 + yy + 1];
@@ -520,7 +520,7 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
             int32_t  hpos0_next = roadram[0x200 + (((road_control & 4) != 0) ? yy + 1 : (data0_next & 0x1ff))] & 0xfff;
             int32_t  hpos1_next = roadram[0x400 + (((road_control & 4) != 0) ? yy + 1 : (data1_next & 0x1ff))] & 0xfff;
 
-            // Interpolate road 1 position
+            /* Interpolate road 1 position */
             if (((data0 & 0x800) == 0) && (data0_next & 0x800) == 0)
             {
                 data0      = (data0      >> 1) & 0xFF;
@@ -529,7 +529,7 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
                 src0 = (roads + (0x000 + diff) * 512);
                 hpos0 = (hpos0 + ((hpos0_next - hpos0) >> 1)) & 0xFFF;
             }
-            // Interpolate road 2 source position
+            /* Interpolate road 2 source position */
             if (((data1 & 0x800) == 0) && (data1_next & 0x800) == 0)
             {
                 data1      = (data1      >> 1) & 0xFF;
@@ -539,15 +539,15 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
                 hpos1 = (hpos1 + ((hpos1_next - hpos1) >> 1)) & 0xFFF;
             }     
         }
-        // ----------------------------------------------------------------------------------------
-        // Recalculate for non-interpolated scanlines
-        // ----------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------------------------- */
+        /* Recalculate for non-interpolated scanlines */
+        /* ---------------------------------------------------------------------------------------- */
         else
         {            
             color0 = roadram[0x600 + (((road_control & 4) != 0) ? yy :           (data0 & 0x1ff))];
             color1 = roadram[0x600 + (((road_control & 4) != 0) ? (0x100 + yy) : (data1 & 0x1ff))];
         
-            // determine the 5 colors for road 0
+            /* determine the 5 colors for road 0 */
             color_table[0x00] = color_offset1 ^ 0x00 ^ ((color0 >> 0) & 1);
             color_table[0x01] = color_offset1 ^ 0x02 ^ ((color0 >> 1) & 1);
             color_table[0x02] = color_offset1 ^ 0x04 ^ ((color0 >> 2) & 1);
@@ -555,7 +555,7 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
             color_table[0x03] = ((data0 & 0x200) != 0) ? color_table[0x00] : (color_offset2 ^ 0x00 ^ bgcolor);
             color_table[0x07] = color_offset1 ^ 0x06 ^ ((color0 >> 3) & 1);
 
-            // determine the 5 colors for road 1
+            /* determine the 5 colors for road 1 */
             color_table[0x10] = color_offset1 ^ 0x08 ^ ((color1 >> 4) & 1);
             color_table[0x11] = color_offset1 ^ 0x0a ^ ((color1 >> 5) & 1);
             color_table[0x12] = color_offset1 ^ 0x0c ^ ((color1 >> 6) & 1);
@@ -569,11 +569,11 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
         if (src1 == NULL)
             src1 = ((data1 & 0x800) != 0) ? roads + 256 * 2 * 512 : (roads + (0x100 + ((data1 >> 1) & 0xff)) * 512);
 
-        // Shift road dependent on whether we are in widescreen mode or not
+        /* Shift road dependent on whether we are in widescreen mode or not */
         uint16_t s16_x = 0x5f8 + config.s16_x_off;
         uint16_t* const pPixel = pixels + (y * config.s16_width);
 
-        // draw the road
+        /* draw the road */
         switch (road_control & 3)
         {
             case 0:
@@ -641,7 +641,7 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
                         hpos1 = (hpos1 + 1) & 0xfff;
                 }
                 break;
-            } // end switch
-    } // end for
+            } /* end switch */
+    } /* end for */
 }
 

@@ -85,21 +85,21 @@ struct sound_settings_t
 struct controls_settings_t
 {
     const static int GEAR_BUTTON   = 0;
-    const static int GEAR_PRESS    = 1; // For cabinets
-    const static int GEAR_SEPARATE = 2; // Separate button presses
+    const static int GEAR_PRESS    = 1; /* For cabinets */
+    const static int GEAR_SEPARATE = 2; /* Separate button presses */
     const static int GEAR_AUTO     = 3;
 
     int gear;
-    int steer_speed;   // Steering Digital Speed
-    int pedal_speed;   // Pedal Digital Speed
-    int padconfig[8];  // Joypad Button Config
-    int keyconfig[12]; // Keyboard Button Config
-    int pad_id;        // Use the N'th joystick on the system.
-    int analog;        // Use analog controls
-    int axis[3];       // Analog Axis
-    int asettings[3];  // Analog Settings
+    int steer_speed;   /* Steering Digital Speed */
+    int pedal_speed;   /* Pedal Digital Speed */
+    int padconfig[8];  /* Joypad Button Config */
+    int keyconfig[12]; /* Keyboard Button Config */
+    int pad_id;        /* Use the N'th joystick on the system. */
+    int analog;        /* Use analog controls */
+    int axis[3];       /* Analog Axis */
+    int asettings[3];  /* Analog Settings */
 
-    int haptic;        // Force Feedback Enabled
+    int haptic;        /* Force Feedback Enabled */
     int max_force;
     int min_force;
     int force_duration;
@@ -143,19 +143,19 @@ public:
     engine_settings_t      engine;
     ttrial_settings_t      ttrial;
 
-    // Internal screen width and height
+    /* Internal screen width and height */
     uint16_t s16_width, s16_height;
 
-    // Internal screen x offset
+    /* Internal screen x offset */
     uint16_t s16_x_off;
 
-    // 30 or 60 fps
+    /* 30 or 60 fps */
     int fps;
 
-    // Original game ticks sprites at 30fps but background scroll at 60fps
+    /* Original game ticks sprites at 30fps but background scroll at 60fps */
     int tick_fps;
 
-    // Continuous Mode: Traffic Setting
+    /* Continuous Mode: Traffic Setting */
     int cont_traffic;
 
     Config(void);

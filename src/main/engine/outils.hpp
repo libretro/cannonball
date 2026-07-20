@@ -27,7 +27,7 @@ public:
     static uint32_t bcd_add(uint32_t, uint32_t);
     static uint32_t bcd_sub(uint32_t, uint32_t);
 
-    // Inline functions
+    /* Inline functions */
     inline static void move16(uint32_t src, uint32_t& dst)
     {
         dst = (dst & 0xFFFF0000) + (src & 0xFFFF);

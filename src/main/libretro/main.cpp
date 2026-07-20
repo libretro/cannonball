@@ -35,10 +35,10 @@
 
 #include "lr_options.hpp"
 
-// Haptic Support.
+/* Haptic Support. */
 #include "ffeedback.hpp"
 
-// Initialize Shared Variables
+/* Initialize Shared Variables */
 using namespace cannonball;
 
 int    cannonball::state       = STATE_BOOT;
@@ -51,50 +51,50 @@ Audio cannonball::audio;
 Menu* menu;
 
 
-// Pause Engine
+/* Pause Engine */
 bool pause_engine;
 
 static bool libretro_supports_bitmasks = false;
 
 static void config_init(void)
 {
-    // ------------------------------------------------------------------------
-    // Menu Settings
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Menu Settings */
+    /* ------------------------------------------------------------------------ */
 
     config.menu.enabled           = 1;
     config.menu.road_scroll_speed = 50;
 
-    // ------------------------------------------------------------------------
-    // Video Settings
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Video Settings */
+    /* ------------------------------------------------------------------------ */
 
-    config.video.mode       = 0; // Video Mode: Default is Windowed
-    config.video.scale      = 1; // Video Scale: Default is 2x
-    config.video.scanlines  = 0; // Scanlines
+    config.video.mode       = 0; /* Video Mode: Default is Windowed */
+    config.video.scale      = 1; /* Video Scale: Default is 2x */
+    config.video.scanlines  = 0; /* Scanlines */
 #ifdef LOW_FPS
-    config.video.fps        = 0; // Default is 30 fps
+    config.video.fps        = 0; /* Default is 30 fps */
 #else
-    config.video.fps        = 2; // Default is 60 fps
+    config.video.fps        = 2; /* Default is 60 fps */
 #endif
-    config.video.fps_count  = 0; // FPS Counter
+    config.video.fps_count  = 0; /* FPS Counter */
 #ifdef DINGUX
-    config.video.widescreen = 0; // Enable Widescreen Mode
+    config.video.widescreen = 0; /* Enable Widescreen Mode */
 #else
-    config.video.widescreen = 1; // Enable Widescreen Mode
+    config.video.widescreen = 1; /* Enable Widescreen Mode */
 #endif
-    config.video.hires      = 0; // Hi-Resolution Mode
-    config.video.filtering  = 0; // Open GL Filtering Mode
-    config.video.shadow     = 0; // Original System 16 shadow intensity
+    config.video.hires      = 0; /* Hi-Resolution Mode */
+    config.video.filtering  = 0; /* Open GL Filtering Mode */
+    config.video.shadow     = 0; /* Original System 16 shadow intensity */
 
-    // Must be set before set_fps() initializes the audio chips.
+    /* Must be set before set_fps() initializes the audio chips. */
     config.sound.rate       = 44100;
 
     config.set_fps(config.video.fps);
 
-    // ------------------------------------------------------------------------
-    // Sound Settings
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Sound Settings */
+    /* ------------------------------------------------------------------------ */
     config.sound.enabled     = 1;
     config.sound.advertise   = 1;
     config.sound.preview     = 1;
@@ -103,9 +103,9 @@ static void config_init(void)
 
 
 
-    // ------------------------------------------------------------------------
-    // Controls
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Controls */
+    /* ------------------------------------------------------------------------ */
     config.controls.gear          = 0;
     config.controls.steer_speed   = 3;
     config.controls.pedal_speed   = 4;
@@ -143,9 +143,9 @@ static void config_init(void)
     config.controls.min_force     = 0x1999;
     config.controls.force_duration= 500;
 
-    // ------------------------------------------------------------------------
-    // Engine Settings
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Engine Settings */
+    /* ------------------------------------------------------------------------ */
 
     config.engine.dip_time      = 0;
     config.engine.dip_traffic   = 1;
@@ -159,7 +159,7 @@ static void config_init(void)
     config.engine.jap           = 0; /* japanese tracks */
     config.engine.prototype     = 0;
 
-    // Additional Level Objects
+    /* Additional Level Objects */
     config.engine.level_objects   = 1;
     config.engine.randomgen       = 1;
     config.engine.fix_bugs_backup = 
@@ -176,9 +176,9 @@ static void config_init(void)
     config.engine.turbo          = false;
     config.engine.car_pal        = 0;
 
-    // ------------------------------------------------------------------------
-    // Time Trial Mode
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Time Trial Mode */
+    /* ------------------------------------------------------------------------ */
 
     config.ttrial.laps    = 3;
     config.ttrial.traffic = 3;
@@ -187,7 +187,7 @@ static void config_init(void)
 }
 
 
-//  libretro.cpp
+/*  libretro.cpp */
 
 retro_log_printf_t                 log_cb;
 retro_video_refresh_t              video_cb;
@@ -300,14 +300,14 @@ void retro_set_environment(retro_environment_t cb)
    environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_UPDATE_DISPLAY_CALLBACK,
          &update_display_cb);
 
-   // File VFS remains compatible with frontends that only expose version 1.
+   /* File VFS remains compatible with frontends that only expose version 1. */
    vfs_iface_info.required_interface_version = 1;
    vfs_iface_info.iface                      = NULL;
    if (environ_cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
       filestream_vfs_init(&vfs_iface_info);
 
-   // Directory VFS is optional. retro_dirent falls back to libretro-common's
-   // implementation when the frontend does not expose version 3.
+   /* Directory VFS is optional. retro_dirent falls back to libretro-common's */
+   /* implementation when the frontend does not expose version 3. */
    vfs_iface_info.required_interface_version = DIRENT_REQUIRED_VFS_VERSION;
    vfs_iface_info.iface                      = NULL;
    if (environ_cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
@@ -1043,11 +1043,11 @@ bool retro_load_game(const struct retro_game_info *info)
 
    update_variables(true);
 
-   // Load fixed PCM ROM based on config
+   /* Load fixed PCM ROM based on config */
    if (config.sound.fix_samples)
       roms.load_pcm_rom(true);
 
-   // Load patched widescreen tilemaps
+   /* Load patched widescreen tilemaps */
    if (!omusic.load_widescreen_map(std::string(rom_path) + "res/"))
    {
       if (log_cb)
@@ -1062,7 +1062,7 @@ bool retro_load_game(const struct retro_game_info *info)
    audio.init();
    state = config.menu.enabled ? STATE_INIT_MENU : STATE_INIT_GAME;
 
-   // Initialize controls
+   /* Initialize controls */
    input.init(config.controls.pad_id,
          config.controls.keyconfig, config.controls.padconfig, 
          config.controls.analog,    config.controls.axis, config.controls.asettings);
@@ -1075,7 +1075,7 @@ bool retro_load_game(const struct retro_game_info *info)
             config.controls.force_duration);
 
 
-   // Populate menus
+   /* Populate menus */
    menu->populate();
 
    return true;
@@ -1166,16 +1166,16 @@ void retro_reset(void)
 
     audio.clear_wav();
 
-    // A frontend may request Reset immediately after changing a Core
-    // Option, without running another frame. Refresh the live options
-    // before selecting the reset destination.
+    /* A frontend may request Reset immediately after changing a Core */
+    /* Option, without running another frame. Refresh the live options */
+    /* before selecting the reset destination. */
     update_variables(false);
 
-    // Reset the active game session to its initial state.
-    //
-    // Time Trial stores its selected mode, course and an artificial
-    // credit before handing control from the frontend to the engine.
-    // These values must not survive a frontend Reset request.
+    /* Reset the active game session to its initial state. */
+    /* */
+    /* Time Trial stores its selected mode, course and an artificial */
+    /* credit before handing control from the frontend to the engine. */
+    /* These values must not survive a frontend Reset request. */
     outrun.cannonball_mode = Outrun::MODE_ORIGINAL;
 
     outrun.ttrial.level            = 0;
@@ -1191,8 +1191,8 @@ void retro_reset(void)
 
     ostats.credits = 0;
 
-    // Reproduce the initial state selected when the content is loaded:
-    // main menu when enabled, otherwise the normal game boot sequence.
+    /* Reproduce the initial state selected when the content is loaded: */
+    /* main menu when enabled, otherwise the normal game boot sequence. */
     state = config.menu.enabled
         ? STATE_INIT_MENU
         : STATE_INIT_GAME;
@@ -1315,8 +1315,8 @@ void retro_run(void)
 
     if (tick_frame)
     {
-        oinputs.tick();           // Do Controls
-        oinputs.do_gear();        // Digital Gear
+        oinputs.tick();           /* Do Controls */
+        oinputs.do_gear();        /* Digital Gear */
     }
 
     switch (state)
@@ -1335,9 +1335,9 @@ void retro_run(void)
                 outrun.tick(tick_frame);
                 if (tick_frame) input.frame_done();
 
-                // Tick audio program code
+                /* Tick audio program code */
                 osoundint.tick();
-                // Tick Audio
+                /* Tick Audio */
                 audio.tick();
             }
             else
@@ -1364,9 +1364,9 @@ void retro_run(void)
         {
             menu->tick();
             input.frame_done();
-            // Tick audio program code
+            /* Tick audio program code */
             osoundint.tick();
-            // Tick Audio
+            /* Tick Audio */
             audio.tick();
         }
         break;
@@ -1384,11 +1384,11 @@ void retro_run(void)
     }
 
 
-    // Draw Video
+    /* Draw Video */
     video.prepare_frame();
     video.render_frame();
 
-    // Stop any haptic feedback effects if
-    // duration timer has elapsed
+    /* Stop any haptic feedback effects if */
+    /* duration timer has elapsed */
     forcefeedback::update_rumble_interface();
 }

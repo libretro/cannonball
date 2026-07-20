@@ -9,27 +9,27 @@
 
 #include <stdint.h>
 
-// Format is: vzoom & hzoom, width/height lookup, sprite size to use, unused
-// (0x200 = full size, 0x100 = half size, 0x300 = 2x size)
+/* Format is: vzoom & hzoom, width/height lookup, sprite size to use, unused */
+/* (0x200 = full size, 0x100 = half size, 0x300 = 2x size) */
 
-// Example sizes:
-// Cactus 5 (largest): 94 pixels
-// Cactus 4          : 46 pixels
-// Cactus 3          : 23 pixels
-// Cactus 2          : 12 pixels
-// Cactus 1          :  4 pixels
+/* Example sizes: */
+/* Cactus 5 (largest): 94 pixels */
+/* Cactus 4          : 46 pixels */
+/* Cactus 3          : 23 pixels */
+/* Cactus 2          : 12 pixels */
+/* Cactus 1          :  4 pixels */
 
-const static uint16_t SIZE5 = 0x0028; // Smallest Sprite
+const static uint16_t SIZE5 = 0x0028; /* Smallest Sprite */
 const static uint16_t SIZE4 = 0x001E;
-const static uint16_t SIZE3 = 0x0014; // Medium Sprite
+const static uint16_t SIZE3 = 0x0014; /* Medium Sprite */
 const static uint16_t SIZE2 = 0x000A;
-const static uint16_t SIZE1 = 0x0000; // Largest Sprite
+const static uint16_t SIZE1 = 0x0000; /* Largest Sprite */
 
 const static uint16_t UNUSED = 0x0000;
 
 const static uint16_t ZOOM_LOOKUP[] =
 {
-    // Smallest Sprite In Set
+    /* Smallest Sprite In Set */
     0x03F0, 0x0000, SIZE5, UNUSED,
     0x03F0, 0x0000, SIZE5, UNUSED,
     0x03F0, 0x0000, SIZE5, UNUSED,
@@ -101,10 +101,10 @@ const static uint16_t ZOOM_LOOKUP[] =
     0x03F0, 0x0000, SIZE1, UNUSED,
     0x03E0, 0x0100, SIZE1, UNUSED,
     0x03D2, 0x0200, SIZE1, UNUSED,
-    // 0x032C, 0x0300, SIZE1, UNUSED,
-    // 0x03B5, 0x0400, SIZE1, UNUSED,
-    0x03C2, 0x0300, SIZE1, UNUSED, // Replaced value
-    0x03B6, 0x0400, SIZE1, UNUSED, // Replaced value
+    /* 0x032C, 0x0300, SIZE1, UNUSED, */
+    /* 0x03B5, 0x0400, SIZE1, UNUSED, */
+    0x03C2, 0x0300, SIZE1, UNUSED, /* Replaced value */
+    0x03B6, 0x0400, SIZE1, UNUSED, /* Replaced value */
     0x03A8, 0x0500, SIZE1, UNUSED,
     0x039B, 0x0600, SIZE1, UNUSED,
     0x038E, 0x0700, SIZE1, UNUSED,

@@ -29,26 +29,26 @@ public:
     void cycle_music();
 
 private:
-    // Modified Widescreen version of the Music Select Tilemap
+    /* Modified Widescreen version of the Music Select Tilemap */
     RomLoader* tilemap;
-    // Additional Widescreen tiles
+    /* Additional Widescreen tiles */
     RomLoader* tile_patch;
 
-    // Next track to play
+    /* Next track to play */
     music_t* next_track;
 
-    // Music Track Selected By Player
+    /* Music Track Selected By Player */
     uint8_t music_selected;
 
-    // Total tracks to include in music select (> 3 means user has added extra ones)
+    /* Total tracks to include in music select (> 3 means user has added extra ones) */
     int total_tracks;
 
-    // Enahcned: Current Cursor Position
+    /* Enahcned: Current Cursor Position */
     int cursor_pos;
 
     uint16_t entry_start;
 
-    // Used to preview music track
+    /* Used to preview music track */
     int16_t last_music_selected;
     int8_t preview_counter;
 

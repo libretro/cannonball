@@ -32,7 +32,7 @@ Config config;
 
 Config::Config(void)
 {
-    // Safe defaults required before Config::set_fps() initializes audio.
+    /* Safe defaults required before Config::set_fps() initializes audio. */
     sound.rate        = 44100;
     sound.music_timer = MUSIC_TIMER;
     video.shadow      = 0;
@@ -76,8 +76,8 @@ void Config::init()
 
 void Config::load_custom_music(const std::string& filename)
 {
-    // Remove custom tracks added by any previous content load,
-    // while retaining the three original arcade tracks.
+    /* Remove custom tracks added by any previous content load, */
+    /* while retaining the three original arcade tracks. */
     const size_t original_track_count = 3;
 
     if (sound.music.size() > original_track_count)
@@ -111,8 +111,8 @@ void Config::load_custom_music(const std::string& filename)
 
     unsigned loaded_tracks = 0;
 
-    // Scan track1, track2, track3... until the first entry
-    // without an enabled attribute.
+    /* Scan track1, track2, track3... until the first entry */
+    /* without an enabled attribute. */
     for (int i = 0; ; i++)
     {
         const std::string track_number =
@@ -226,7 +226,7 @@ void Config::load_scores(const std::string &filename)
     if (!result)
         return;
 
-    // Game Scores
+    /* Game Scores */
     for (int i = 0; i < ohiscore.NO_SCORES; i++)
     {
         score_entry* e = &ohiscore.scores[i];
@@ -380,7 +380,7 @@ void Config::load_tiletrial_scores()
     const std::string xml_filename =
         get_xml_filename(FILENAME_TTRIAL, engine.jap);
 
-    // Counter value representing 1m 15s 0ms.
+    /* Counter value representing 1m 15s 0ms. */
     static const uint16_t COUNTER_1M_15 = 0x11D0;
 
     for (int i = 0; i < 15; i++)
@@ -454,13 +454,13 @@ void Config::save_tiletrial_scores()
 
 bool Config::clear_scores()
 {
-    // Init Default Hiscores
+    /* Init Default Hiscores */
     ohiscore.init_def_scores();
 
     bool files_removed = false;
 
-    // Remove XML files if they exist
-    // remove() returns 0 on success
+    /* Remove XML files if they exist */
+    /* remove() returns 0 on success */
     if (!remove(std::string(FILENAME_SCORES).append(".xml").c_str()))
         files_removed = true;
     if (!remove(std::string(FILENAME_SCORES).append("_jap.xml").c_str()))
@@ -480,7 +480,7 @@ bool Config::clear_scores()
 void Config::set_fps(int fps)
 {
     video.fps = fps;
-    // Set core FPS to 30fps, 60fps or 120fps
+    /* Set core FPS to 30fps, 60fps or 120fps */
     if (video.fps == 0)
         this->fps = 30;
     else if (video.fps == 3)
@@ -488,7 +488,7 @@ void Config::set_fps(int fps)
     else
         this->fps = 60;
     
-    // Original game ticks sprites at 30fps but background scroll at 60fps
+    /* Original game ticks sprites at 30fps but background scroll at 60fps */
     if (video.fps == 3)
         tick_fps = 120;
     else if (video.fps < 2)

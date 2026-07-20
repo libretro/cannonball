@@ -33,13 +33,13 @@ OFerrari oferrari;
 
 static const uint16_t FERRARI_PALETTES[] =
 {
-    OFerrari::PAL_RED,      // Red
-    OFerrari::PAL_BLUE,     // Blue
-    OFerrari::PAL_YELLOW,   // Yellow
-    OFerrari::PAL_GREEN,    // Green
-    OFerrari::PAL_CYAN,     // Cyan
-    OFerrari::PAL_BLACK,  // Black
-    OFerrari::PAL_WHITE,  // White
+    OFerrari::PAL_RED,      /* Red */
+    OFerrari::PAL_BLUE,     /* Blue */
+    OFerrari::PAL_YELLOW,   /* Yellow */
+    OFerrari::PAL_GREEN,    /* Green */
+    OFerrari::PAL_CYAN,     /* Cyan */
+    OFerrari::PAL_BLACK,  /* Black */
+    OFerrari::PAL_WHITE,  /* White */
 };
 
 OFerrari::OFerrari(void)
@@ -112,7 +112,7 @@ void OFerrari::init(oentry *f, oentry *p1, oentry *p2, oentry *s)
     cornering_old     = 0;
     car_ctrl_active   = true;
 
-    // Change high gear torque value to enable faster speeds
+    /* Change high gear torque value to enable faster speeds */
     torque_lookup[0x1F] = config.engine.turbo ? 0x558 : 0x66C;
 
     int size = sizeof(FERRARI_PALETTES)/sizeof(FERRARI_PALETTES[0]);
@@ -121,11 +121,11 @@ void OFerrari::init(oentry *f, oentry *p1, oentry *p2, oentry *s)
     ferrari_pal = FERRARI_PALETTES[config.engine.car_pal];
 }
 
-// Reset all values relating to car speed, revs etc.
-// Source: 0x61F2
+/* Reset all values relating to car speed, revs etc. */
+/* Source: 0x61F2 */
 void OFerrari::reset_car()
 {
-    rev_shift            = 1;  // Set normal rev shift value
+    rev_shift            = 1;  /* Set normal rev shift value */
     ocrash.spin_control2 = 0;
     revs                 = 0;
     oinitengine.car_increment = 0;
@@ -137,7 +137,7 @@ void OFerrari::reset_car()
     torque_index         = 0x1F;
     rev_stop_flag        = 0;
     oinitengine.ingame_engine = false;
-    oinitengine.ingame_counter = 0x1E; // Set ingame counter (time until we hand control to user)
+    oinitengine.ingame_counter = 0x1E; /* Set ingame counter (time until we hand control to user) */
     slip_sound           = sound::STOP_SLIP;
     acc_adjust1          = 
     acc_adjust2          = 
@@ -147,7 +147,7 @@ void OFerrari::reset_car()
     brake_adjust3        = 0;
     auto_brake           = false;
     counter              = 0;
-    is_slipping          = 0;    // Denote not slipping/skidding
+    is_slipping          = 0;    /* Denote not slipping/skidding */
 }
 
 void OFerrari::tick()
@@ -197,21 +197,21 @@ void OFerrari::tick()
             }
             break;
 
-        // Ferrari End Sequence Logic
+        /* Ferrari End Sequence Logic */
         case FERRARI_END_SEQ:
             oanimseq.tick_end_seq();
             break;
     }
 }
 
-// Initalize Ferrari Start Sequence
-//
-// Source: 6036
-//
-// Note the remainder of this block is handled in oanimseq.ferrari_seq
+/* Initalize Ferrari Start Sequence */
+/* */
+/* Source: 6036 */
+/* */
+/* Note the remainder of this block is handled in oanimseq.ferrari_seq */
 void OFerrari::init_ingame()
 {
-    // turn_off:
+    /* turn_off: */
     car_state = CAR_NORMAL;
     state = FERRARI_LOGIC;
     spr_ferrari->reload = 0;
@@ -223,36 +223,36 @@ void OFerrari::init_ingame()
     sprite_car_x_bak = 0;
     sprite_wheel_state = 0;
 
-    // Passengers
-    // move.l  #SetPassengerSprite,$42(a5)
+    /* Passengers */
+    /* move.l  #SetPassengerSprite,$42(a5) */
     spr_pass1->reload = 0;
     spr_pass1->counter = 0;
     spr_pass1->xw1 = 0;
-    // move.l  #SetPassengerSprite,$82(a5)
+    /* move.l  #SetPassengerSprite,$82(a5) */
     spr_pass2->reload = 0;
     spr_pass2->counter = 0;
     spr_pass2->xw1 = 0;
 }
 
-// Source: 9C84
+/* Source: 9C84 */
 void OFerrari::logic()
 {
     switch (obonus.bonus_control)
     {
-        // Not Bonus Mode
+        /* Not Bonus Mode */
         case OBonus::BONUS_DISABLE:
             ferrari_normal();
             break;
 
         case OBonus::BONUS_INIT:
-            rev_shift = 2;          // Set Double Rev Shift Value
+            rev_shift = 2;          /* Set Double Rev Shift Value */
             obonus.bonus_control = OBonus::BONUS_TICK;
 
         case OBonus::BONUS_TICK:
             oattractai.check_road_bonus();
             oattractai.set_steering_bonus();
 
-            // Accelerate Car
+            /* Accelerate Car */
             if (oinitengine.rd_split_state == 0 || (oroad.road_pos >> 16) <= 0x163)
             {
                 oinputs.acc_adjust = 0xFF;
@@ -260,11 +260,11 @@ void OFerrari::logic()
                 setup_ferrari_bonus_sprite();
                 return;
             }
-            else // init_end_anim
+            else /* init_end_anim */
             {
                 rev_shift = 1;
                 obonus.bonus_control = OBonus::BONUS_SEQ0;
-                // note fall through!
+                /* note fall through! */
             }
             
         case OBonus::BONUS_SEQ0:
@@ -274,7 +274,7 @@ void OFerrari::logic()
                 return;
             }
             obonus.bonus_control = OBonus::BONUS_SEQ1;
-            // fall through
+            /* fall through */
             
         case OBonus::BONUS_SEQ1:
             if ((oroad.road_pos >> 16) < 0x18F)
@@ -300,7 +300,7 @@ void OFerrari::logic()
             }
             else
             {
-                oferrari.car_ctrl_active = false; // -1
+                oferrari.car_ctrl_active = false; /* -1 */
                 oinitengine.car_increment = 0;
                 obonus.bonus_control = OBonus::BONUS_END;
             }
@@ -313,9 +313,9 @@ void OFerrari::logic()
     }
 }
 
-// Ferrari - Normal Game Logic (Non-Bonus Mode Code)
-//
-// Source: 0x9CB4
+/* Ferrari - Normal Game Logic (Non-Bonus Mode Code) */
+/* */
+/* Source: 0x9CB4 */
 void OFerrari::ferrari_normal()
 {
     if (config.engine.force_ai && outrun.game_state == GS_INGAME)
@@ -327,7 +327,7 @@ void OFerrari::ferrari_normal()
 
     switch (outrun.game_state)
     {    
-        // Attract Mode: Process AI Code and fall through
+        /* Attract Mode: Process AI Code and fall through */
         case GS_INIT:
         case GS_ATTRACT:
             if (config.engine.new_attract)
@@ -363,14 +363,14 @@ void OFerrari::ferrari_normal()
     }
 }
 
-// Setup Ferrari Sprite Object
-//
-// Source: 0x9D30
+/* Setup Ferrari Sprite Object */
+/* */
+/* Source: 0x9D30 */
 void OFerrari::setup_ferrari_sprite()
 {
-    spr_ferrari->y = 221; // Set Default Ferrari Y
+    spr_ferrari->y = 221; /* Set Default Ferrari Y */
     
-    // Test Collision With Other Sprite Object
+    /* Test Collision With Other Sprite Object */
     if (olevelobjs.collision_sprite)
     {
         if (ocrash.coll_count1 == ocrash.coll_count2)
@@ -381,32 +381,32 @@ void OFerrari::setup_ferrari_sprite()
         }
     }
 
-    // Setup Default Ferrari Properties
+    /* Setup Default Ferrari Properties */
     spr_ferrari->x = 0;
     spr_ferrari->zoom = 0x7F;
-    spr_ferrari->draw_props = oentry::BOTTOM    ; // Anchor Bottom
+    spr_ferrari->draw_props = oentry::BOTTOM    ; /* Anchor Bottom */
     spr_ferrari->shadow = 3;
     spr_ferrari->width = 0;
     spr_ferrari->priority = spr_ferrari->road_priority = 0x1FD;
 
-    // Set Ferrari H-Flip Based On Steering & Speed
+    /* Set Ferrari H-Flip Based On Steering & Speed */
     int16_t d4 = oinputs.steering_adjust;
 
-    // If steering close to centre clear d4 to ignore h-flip of Ferrari
+    /* If steering close to centre clear d4 to ignore h-flip of Ferrari */
     if (d4 >= -8 && d4 <= 7)
         d4 = 0;
-    // If speed too slow clear d4 to ignore h-flip of Ferrari
+    /* If speed too slow clear d4 to ignore h-flip of Ferrari */
     if (oinitengine.car_increment >> 16 < 0x14)
         d4 = 0;
 
-    // cont2:
-    d4 >>= 2; // increase change of being close to zero and no h-flip occurring
+    /* cont2: */
+    d4 >>= 2; /* increase change of being close to zero and no h-flip occurring */
     
     int16_t x_off = 0;
 
-    // ------------------------------------------------------------------------
-    // Not Skidding
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Not Skidding */
+    /* ------------------------------------------------------------------------ */
     if (!ocrash.skid_counter)
     {
         if (d4 >= 0)
@@ -414,34 +414,34 @@ void OFerrari::setup_ferrari_sprite()
         else
             spr_ferrari->control |= OSprites::HFLIP;
 
-        // 0x9E4E not_skidding:
+        /* 0x9E4E not_skidding: */
 
-        // Calculate change in road y, so we can determine incline frame for ferrari
+        /* Calculate change in road y, so we can determine incline frame for ferrari */
         int16_t y = oroad.road_y[oroad.road_p0 + (0x3D0 / 2)] - oroad.road_y[oroad.road_p0 + (0x3E0 / 2)];
 
-        // Converts y difference to a frame value (this is for when on an incline)
+        /* Converts y difference to a frame value (this is for when on an incline) */
         int16_t incline_frame_offset = 0;
         if (y >= 0x12) incline_frame_offset += 8;
         if (y >= 0x13) incline_frame_offset += 8;
 
-        // Get abs version of ferrari turn
+        /* Get abs version of ferrari turn */
         int16_t turn_frame_offset = 0;
         int16_t d2 = d4;
         if (d2 < 0) d2 = -d2;
         if (d2 >= 0x12) turn_frame_offset += 0x18;
         if (d2 >= 0x1E) turn_frame_offset += 0x18;
 
-        // Set Ferrari Sprite Properties
+        /* Set Ferrari Sprite Properties */
         uint32_t offset = outrun.adr.sprite_ferrari_frames + turn_frame_offset + incline_frame_offset;
-        spr_ferrari->addr = roms.rom0p->read32(offset);     // Set Ferrari Frame Address
-        sprite_pass_y = roms.rom0p->read16(offset + 4); // Set Passenger Y Offset
-        x_off = roms.rom0p->read16(offset + 6); // Set Ferrari Sprite X Offset
+        spr_ferrari->addr = roms.rom0p->read32(offset);     /* Set Ferrari Frame Address */
+        sprite_pass_y = roms.rom0p->read16(offset + 4); /* Set Passenger Y Offset */
+        x_off = roms.rom0p->read16(offset + 6); /* Set Ferrari Sprite X Offset */
 
         if (d4 < 0) x_off = -x_off;
     }
-    // ------------------------------------------------------------------------
-    // Skidding
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Skidding */
+    /* ------------------------------------------------------------------------ */
     else
     {
         int16_t skid_counter = ocrash.skid_counter;
@@ -449,7 +449,7 @@ void OFerrari::setup_ferrari_sprite()
         if (skid_counter < 0)
         {
             spr_ferrari->control |= OSprites::HFLIP;
-            skid_counter = -skid_counter; // Needs to be positive
+            skid_counter = -skid_counter; /* Needs to be positive */
         }
         else
             spr_ferrari->control &= ~OSprites::HFLIP;
@@ -460,7 +460,7 @@ void OFerrari::setup_ferrari_sprite()
         if (skid_counter >= 6)  frame += 8;
         if (skid_counter >= 12) frame += 8;
 
-        // Calculate incline
+        /* Calculate incline */
         int16_t y = oroad.road_y[oroad.road_p0 + (0x3D0 / 2)] - oroad.road_y[oroad.road_p0 + (0x3E0 / 2)];
 
         int16_t incline_frame_offset = 0;
@@ -468,10 +468,10 @@ void OFerrari::setup_ferrari_sprite()
         if (y >= 0x13) incline_frame_offset += 0x20;
 
         uint32_t offset = outrun.adr.sprite_skid_frames + frame + incline_frame_offset;
-        spr_ferrari->addr = roms.rom0p->read32(offset); // Set Ferrari Frame Address
-        sprite_pass_y = roms.rom0p->read16(offset + 4); // Set Passenger Y Offset
-        x_off = roms.rom0p->read16(offset + 6);         // Set Ferrari Sprite X Offset
-        wheel_traction = TRACTION_OFF;                  // Both wheels have lost traction
+        spr_ferrari->addr = roms.rom0p->read32(offset); /* Set Ferrari Frame Address */
+        sprite_pass_y = roms.rom0p->read16(offset + 4); /* Set Passenger Y Offset */
+        x_off = roms.rom0p->read16(offset + 6);         /* Set Ferrari Sprite X Offset */
+        wheel_traction = TRACTION_OFF;                  /* Both wheels have lost traction */
 
         if (ocrash.skid_counter >= 0) x_off = -x_off;
     }
@@ -483,14 +483,14 @@ void OFerrari::setup_ferrari_sprite()
     draw_sprite(spr_ferrari);
 }
 
-// Bonus Mode: Setup Ferrari Sprite Details
-//
-// Source: 0xA212
+/* Bonus Mode: Setup Ferrari Sprite Details */
+/* */
+/* Source: 0xA212 */
 void OFerrari::setup_ferrari_bonus_sprite()
 {
-    // Setup Default Ferrari Properties
+    /* Setup Default Ferrari Properties */
     spr_ferrari->y = 221;
-    //spr_ferrari->x = 0; not really needed as set below
+    /*spr_ferrari->x = 0; not really needed as set below */
     spr_ferrari->priority = spr_ferrari->road_priority = 0x1FD;
 
     if (oinputs.steering_adjust > 0)
@@ -498,18 +498,18 @@ void OFerrari::setup_ferrari_bonus_sprite()
     else
         spr_ferrari->control |= OSprites::HFLIP;
 
-    // Get abs version of ferrari turn
+    /* Get abs version of ferrari turn */
     int16_t turn_frame_offset = 0;
     int16_t d2 = oinputs.steering_adjust >> 2;
     if (d2 < 0) d2 = -d2;
     if (d2 >= 0x4) turn_frame_offset += 0x18;
     if (d2 >= 0x8) turn_frame_offset += 0x18;
 
-    // Set Ferrari Sprite Properties
-    uint32_t offset   = outrun.adr.sprite_ferrari_frames + turn_frame_offset + 8; // 8 denotes the 'level' frames, no slope.
-    spr_ferrari->addr = roms.rom0p->read32(offset);     // Set Ferrari Frame Address
-    sprite_pass_y     = roms.rom0p->read16(offset + 4); // Set Passenger Y Offset
-    int16_t x_off     = roms.rom0p->read16(offset + 6); // Set Ferrari Sprite X Offset
+    /* Set Ferrari Sprite Properties */
+    uint32_t offset   = outrun.adr.sprite_ferrari_frames + turn_frame_offset + 8; /* 8 denotes the 'level' frames, no slope. */
+    spr_ferrari->addr = roms.rom0p->read32(offset);     /* Set Ferrari Frame Address */
+    sprite_pass_y     = roms.rom0p->read16(offset + 4); /* Set Passenger Y Offset */
+    int16_t x_off     = roms.rom0p->read16(offset + 6); /* Set Ferrari Sprite X Offset */
 
     if (oinputs.steering_adjust < 0) x_off = -x_off;
     spr_ferrari->x = x_off;
@@ -518,54 +518,54 @@ void OFerrari::setup_ferrari_bonus_sprite()
     draw_sprite(spr_ferrari);
 }
 
-// Source: 0xA1CE
+/* Source: 0xA1CE */
 void OFerrari::init_end_seq()
 {
-    // AI for remainder
+    /* AI for remainder */
     oattractai.check_road_bonus();
     oattractai.set_steering_bonus();
-    // Brake Car!
+    /* Brake Car! */
     oinputs.acc_adjust = 0;
     oinputs.brake_adjust = 0xFF;
     do_end_seq();
 }
 
-// Drive Ferrari to the side during end sequence
-//
-// Source: 0xA298
+/* Drive Ferrari to the side during end sequence */
+/* */
+/* Source: 0xA298 */
 void OFerrari::do_end_seq()
 {
     spr_ferrari->y = 221;
     spr_ferrari->priority = spr_ferrari->road_priority = 0x1FD;
 
-    // Set Ferrari Frame
-    // +0 [Long]: Address of frame
-    // +4 [Byte]: Passenger Offset (always 0!)
-    // +5 [Byte]: Ferrari X Change
-    // +6 [Byte]: Sprite Colour Palette
-    // +7 [Byte]: H-Flip
+    /* Set Ferrari Frame */
+    /* +0 [Long]: Address of frame */
+    /* +4 [Byte]: Passenger Offset (always 0!) */
+    /* +5 [Byte]: Ferrari X Change */
+    /* +6 [Byte]: Sprite Colour Palette */
+    /* +7 [Byte]: H-Flip */
 
     uint32_t addr = outrun.adr.anim_ferrari_frames + ((obonus.bonus_control - 0xC) << 1);
 
     spr_ferrari->addr    = roms.rom0p->read32(addr);
-    sprite_pass_y        = roms.rom0p->read8(4 + addr);  // Set Passenger Y Offset
+    sprite_pass_y        = roms.rom0p->read8(4 + addr);  /* Set Passenger Y Offset */
     spr_ferrari->x       = roms.rom0p->read8(5 + addr);
-    spr_ferrari->pal_src = ferrari_pal;//  roms.rom0p->read8(6 + addr);
-    spr_ferrari->control = roms.rom0p->read8(7 + addr) | (spr_ferrari->control & 0xFE); // HFlip
+    spr_ferrari->pal_src = ferrari_pal;/*  roms.rom0p->read8(6 + addr); */
+    spr_ferrari->control = roms.rom0p->read8(7 + addr) | (spr_ferrari->control & 0xFE); /* HFlip */
 
     osprites.map_palette(spr_ferrari);
     osprites.do_spr_order_shadows(spr_ferrari);
 }
 
-// - Update Car Palette To Adjust Brake Lamp
-// - Also Control Speed at which wheels spin through palette adjustment
-//
-// Source: 0x9F7C
+/* - Update Car Palette To Adjust Brake Lamp */
+/* - Also Control Speed at which wheels spin through palette adjustment */
+/* */
+/* Source: 0x9F7C */
 void OFerrari::set_ferrari_palette()
 {
     uint8_t pal;
 
-    // Denote palette for brake light
+    /* Denote palette for brake light */
     if (oinputs.brake_adjust >= OInputs::BRAKE_THRESHOLD1)
     {
         outrun.outputs->set_digital(OOutputs::D_BRAKE_LAMP);
@@ -577,14 +577,14 @@ void OFerrari::set_ferrari_palette()
         pal = 0;
     }
 
-    // Car Moving
+    /* Car Moving */
     if (oinitengine.car_increment >> 16 != 0)
     {
         int16_t car_increment = 5 - (oinitengine.car_increment >> 21);
         if (car_increment < 0) car_increment = 0;
         wheel_frame_reset = car_increment;
 
-        // Increment wheel palette offset (to move wheels)
+        /* Increment wheel palette offset (to move wheels) */
         if (wheel_counter <= 0)
         {
             wheel_counter = wheel_frame_reset;
@@ -596,24 +596,24 @@ void OFerrari::set_ferrari_palette()
     spr_ferrari->pal_src = pal + ferrari_pal + (wheel_pal & 1);
 }
 
-// Set Ferrari X Position
-//
-// - Reads steering value
-// - Converts to a practical change in x position
-// - There are a number of special cases, as you will see by looking at the code
-//
-// In use:
-//
-// d0 = Amount to adjust car x position by
-//
-// Source: 0xC1B2
+/* Set Ferrari X Position */
+/* */
+/* - Reads steering value */
+/* - Converts to a practical change in x position */
+/* - There are a number of special cases, as you will see by looking at the code */
+/* */
+/* In use: */
+/* */
+/* d0 = Amount to adjust car x position by */
+/* */
+/* Source: 0xC1B2 */
 
 void OFerrari::set_ferrari_x()
 {
     int16_t steering = oinputs.steering_adjust;
 
-    // Hack to reduce the amount you can steer left and right at the start of Stage 1
-    // The amount you can steer increases as you approach road position 0x7F
+    /* Hack to reduce the amount you can steer left and right at the start of Stage 1 */
+    /* The amount you can steer increases as you approach road position 0x7F */
     if (ostats.cur_stage == 0 && oinitengine.rd_split_state == 0 && (oroad.road_pos >> 16) <= 0x7F)
     {
         steering = (steering * (oroad.road_pos >> 16)) >> 7;
@@ -625,15 +625,15 @@ void OFerrari::set_ferrari_x()
     steering_old += steering;
     steering = steering_old;
 
-    // This block of code reduces the amount the player
-    // can steer left and right, when below a particular speed
+    /* This block of code reduces the amount the player */
+    /* can steer left and right, when below a particular speed */
     if (wheel_state == OFerrari::WHEELS_ON && (oinitengine.car_increment >> 16) <= 0x7F)
     {
         steering = (steering * (oinitengine.car_increment >> 16)) >> 7;
     }
 
-    // Check Road Curve And Adjust X Value Accordingly
-    // This effectively makes it harder to steer into sharp corners
+    /* Check Road Curve And Adjust X Value Accordingly */
+    /* This effectively makes it harder to steer into sharp corners */
     int16_t road_curve = oinitengine.road_curve;
     if (road_curve)
     {
@@ -656,16 +656,16 @@ void OFerrari::set_ferrari_x()
     steering += steering2;
     steering = -steering;
 
-    // Return if car is not moving
+    /* Return if car is not moving */
     if (outrun.game_state == GS_INGAME && oinitengine.car_increment >> 16 == 0)
     {
-        // Hack so car is centered if we want to bypass countdown sequence
+        /* Hack so car is centered if we want to bypass countdown sequence */
         int16_t road_width_change = (oroad.road_width >> 16) - road_width_old;
         road_width_old = (oroad.road_width >> 16);
         if (oinitengine.car_x_pos < 0)
             road_width_change = -road_width_change;
         oinitengine.car_x_pos += road_width_change;
-        // End of Hack
+        /* End of Hack */
         return;
     }
     
@@ -678,22 +678,22 @@ void OFerrari::set_ferrari_x()
     oinitengine.car_x_pos += road_width_change;
 }
 
-// Ensure car does not stray too far from sides of road
-// There are three parts to this function:
-// a. Normal Road
-// b. Road Split
-// c. Dual Lanes
-//
-// Source: 0xC2B0
+/* Ensure car does not stray too far from sides of road */
+/* There are three parts to this function: */
+/* a. Normal Road */
+/* b. Road Split */
+/* c. Dual Lanes */
+/* */
+/* Source: 0xC2B0 */
 void OFerrari::set_ferrari_bounds()
 {
-    // d0 = road_width
-    // d2 = car_x_pos
+    /* d0 = road_width */
+    /* d2 = car_x_pos */
 
     int16_t road_width16 = oroad.road_width >> 16;
     int16_t d1 = 0;
 
-    // Road Split Both Lanes
+    /* Road Split Both Lanes */
     if (oinitengine.rd_split_state == 4)
     {
         if (oinitengine.car_x_pos < 0)
@@ -701,14 +701,14 @@ void OFerrari::set_ferrari_bounds()
         d1 = road_width16 + 0x140;
         road_width16 -= 0x140;
     }
-    // One Lane
+    /* One Lane */
     else if (road_width16 <= 0xFF)
     {
         road_width16 += OFFROAD_BOUNDS;
         d1 = road_width16;
         road_width16 = -road_width16;
     }
-    // Two Lanes - road_two_lanes:
+    /* Two Lanes - road_two_lanes: */
     else
     {
         if (oinitengine.car_x_pos < 0)
@@ -717,7 +717,7 @@ void OFerrari::set_ferrari_bounds()
         road_width16 -= OFFROAD_BOUNDS;
     }
 
-    // Set Bounds
+    /* Set Bounds */
     if (oinitengine.car_x_pos < road_width16)
         oinitengine.car_x_pos = road_width16;
     else if (oinitengine.car_x_pos > d1)
@@ -727,9 +727,9 @@ void OFerrari::set_ferrari_bounds()
     oroad.road_width_bak = oroad.road_width >> 16; 
 }
 
-// Check Car Is Still On Road
-//
-// Source: 0xBFDC
+/* Check Car Is Still On Road */
+/* */
+/* Source: 0xBFDC */
 void OFerrari::check_wheels()
 {
     wheel_state = WHEELS_ON;
@@ -738,14 +738,14 @@ void OFerrari::check_wheels()
 
     switch (oroad.road_ctrl)
     {
-        case ORoad::ROAD_OFF:         // Both Roads Off
+        case ORoad::ROAD_OFF:         /* Both Roads Off */
             return;
 
-        // Single Road
-        case ORoad::ROAD_R0:          // Road 0
-        case ORoad::ROAD_R1:          // Road 1
-        case ORoad::ROAD_R0_SPLIT:    // Road 0 (Road Split.)
-        case ORoad::ROAD_R1_SPLIT:    // Road 1 (Road Split. Invert Road 1)
+        /* Single Road */
+        case ORoad::ROAD_R0:          /* Road 0 */
+        case ORoad::ROAD_R1:          /* Road 1 */
+        case ORoad::ROAD_R0_SPLIT:    /* Road 0 (Road Split.) */
+        case ORoad::ROAD_R1_SPLIT:    /* Road 1 (Road Split. Invert Road 1) */
         {
             int16_t x = oinitengine.car_x_pos;
             
@@ -771,11 +771,11 @@ void OFerrari::check_wheels()
         }
         break;
         
-        // Both Roads
-        case ORoad::ROAD_BOTH_P0:     // Both Roads (Road 0 Priority) [DEFAULT]
-        case ORoad::ROAD_BOTH_P1:     // Both Roads (Road 1 Priority) 
-        case ORoad::ROAD_BOTH_P0_INV: // Both Roads (Road 0 Priority) (Road Split. Invert Road 1)
-        case ORoad::ROAD_BOTH_P1_INV: // Both Roads (Road 1 Priority) (Road Split. Invert Road 1)
+        /* Both Roads */
+        case ORoad::ROAD_BOTH_P0:     /* Both Roads (Road 0 Priority) [DEFAULT] */
+        case ORoad::ROAD_BOTH_P1:     /* Both Roads (Road 1 Priority)  */
+        case ORoad::ROAD_BOTH_P0_INV: /* Both Roads (Road 0 Priority) (Road Split. Invert Road 1) */
+        case ORoad::ROAD_BOTH_P1_INV: /* Both Roads (Road 1 Priority) (Road Split. Invert Road 1) */
         {
             int16_t x = oinitengine.car_x_pos;
 
@@ -817,16 +817,16 @@ void OFerrari::set_wheels(uint8_t new_state)
     wheel_traction = (new_state == WHEELS_OFF) ? 2 : 1;
 }
 
-// Adjusts the x-position of the car based on the curve.
-// This effectively stops the user driving through the courses in a straight line.
-// (sticks the car to the track).
-//
-// Source: 0xBF6E
+/* Adjusts the x-position of the car based on the curve. */
+/* This effectively stops the user driving through the courses in a straight line. */
+/* (sticks the car to the track). */
+/* */
+/* Source: 0xBF6E */
 void OFerrari::set_curve_adjust()
 {
     int16_t x_diff = oroad.road_x[170] - oroad.road_x[511];
 
-    // Invert x diff when taking roadsplit
+    /* Invert x diff when taking roadsplit */
     if (oinitengine.rd_split_state && oinitengine.car_x_pos < 0)
         x_diff = -x_diff;
 
@@ -841,9 +841,9 @@ void OFerrari::set_curve_adjust()
     }
 }
 
-// Draw Shadow below Ferrari
-//
-// Source: 0xA7BC
+/* Draw Shadow below Ferrari */
+/* */
+/* Source: 0xA7BC */
 void OFerrari::draw_shadow()
 {
     if (spr_shadow->control & OSprites::ENABLE)
@@ -865,41 +865,41 @@ void OFerrari::draw_shadow()
     }
 }
 
-// Set Passenger Sprite X/Y Position.
-//
-// Routine is used separately for both male and female passengers.
-//
-// In use:
-// a1 = Passenger XY offset table
-// a5 = Passenger 1 / Passenger 2 Sprite
-// a6 = Car Sprite
-//
-// Memory locations:
-// 62F00 = Car
-// 62F40 = Passenger 1 (Man)
-// 62F80 = Passenger 2 (Girl)
-//
-// Source: A568
+/* Set Passenger Sprite X/Y Position. */
+/* */
+/* Routine is used separately for both male and female passengers. */
+/* */
+/* In use: */
+/* a1 = Passenger XY offset table */
+/* a5 = Passenger 1 / Passenger 2 Sprite */
+/* a6 = Car Sprite */
+/* */
+/* Memory locations: */
+/* 62F00 = Car */
+/* 62F40 = Passenger 1 (Man) */
+/* 62F80 = Passenger 2 (Girl) */
+/* */
+/* Source: A568 */
 void OFerrari::set_passenger_sprite(oentry* sprite)
 {
     sprite->road_priority = spr_ferrari->road_priority;
     sprite->priority = spr_ferrari->priority + 1;
     uint16_t frame = sprite_pass_y << 3;
 
-    // Is this a bug in the original? Note that by negating HFLIP check the passengers
-    // shift right a few pixels on acceleration.
+    /* Is this a bug in the original? Note that by negating HFLIP check the passengers */
+    /* shift right a few pixels on acceleration. */
     if ((oinitengine.car_increment >> 16 >= 0x14) && !(spr_ferrari->control & OSprites::HFLIP))
         frame += 4;
 
-    // --------------------------------------------------------------------------------------------
-    // Set Palette
-    // --------------------------------------------------------------------------------------------
+    /* -------------------------------------------------------------------------------------------- */
+    /* Set Palette */
+    /* -------------------------------------------------------------------------------------------- */
     uint8_t pal = 0;
 
-    // Test for car collision frame
+    /* Test for car collision frame */
     if (sprite_pass_y == 9)
     {
-        // Set Brown/Blonde Palette depending on whether man or woman
+        /* Set Brown/Blonde Palette depending on whether man or woman */
         if (sprite == spr_pass1) pal = 0xA;
         else pal = 0x8;
     }
@@ -909,9 +909,9 @@ void OFerrari::set_passenger_sprite(oentry* sprite)
         else pal = 0x2E;
     }
 
-    // --------------------------------------------------------------------------------------------
-    // Set X/Y Position
-    // --------------------------------------------------------------------------------------------
+    /* -------------------------------------------------------------------------------------------- */
+    /* Set X/Y Position */
+    /* -------------------------------------------------------------------------------------------- */
 
     sprite->pal_src = pal;
     uint32_t offset_table = ((sprite == spr_pass1) ? PASS1_OFFSET : PASS2_OFFSET) + frame;
@@ -927,22 +927,22 @@ void OFerrari::set_passenger_sprite(oentry* sprite)
     draw_sprite(sprite);
 }
 
-// Set Passenger Sprite Frame
-//
-// - Set the appropriate male/female frame
-// - Uses the car's speed to set the hair frame
-// - Also handles skid case
-//
-// Source: 0xA632
+/* Set Passenger Sprite Frame */
+/* */
+/* - Set the appropriate male/female frame */
+/* - Uses the car's speed to set the hair frame */
+/* - Also handles skid case */
+/* */
+/* Source: 0xA632 */
 
 void OFerrari::set_passenger_frame(oentry* sprite)
 {
     uint32_t addr = outrun.adr.sprite_pass_frames;
-    if (sprite == spr_pass2) addr += 4; // Female frames
+    if (sprite == spr_pass2) addr += 4; /* Female frames */
     uint16_t inc = oinitengine.car_increment >> 16;
 
-    // Car is moving
-    // Use adjusted increment/speed of car as reload value for sprite counter (to ultimately set hair frame)
+    /* Car is moving */
+    /* Use adjusted increment/speed of car as reload value for sprite counter (to ultimately set hair frame) */
     if (inc != 0)
     {
         if (inc > 0xFF) inc = 0xFF;
@@ -953,7 +953,7 @@ void OFerrari::set_passenger_frame(oentry* sprite)
         if (sprite->counter <= 0)
         {
             sprite->counter = sprite->reload;
-            sprite->xw1++; // Reuse this as a personal tick counter to flick between hair frames
+            sprite->xw1++; /* Reuse this as a personal tick counter to flick between hair frames */
         }
         else
             sprite->counter--;
@@ -961,16 +961,16 @@ void OFerrari::set_passenger_frame(oentry* sprite)
         inc = (sprite->xw1 & 1) << 3;
     }
 
-    // Check Skid
+    /* Check Skid */
     if (sprite->pass_props >= 9)
     {
-        // skid left
+        /* skid left */
         if (ocrash.skid_counter > 0)
         {
             sprite->addr = (sprite == spr_pass1) ? 
                 outrun.adr.sprite_pass1_skidl : outrun.adr.sprite_pass2_skidl;
         }
-        // skid right
+        /* skid right */
         else
         {
             sprite->addr = (sprite == spr_pass1) ? 
@@ -981,35 +981,35 @@ void OFerrari::set_passenger_frame(oentry* sprite)
         sprite->addr = roms.rom0p->read32(addr + inc);
 }
 
-// ------------------------------------------------------------------------------------------------
-//                                       CAR HANDLING ROUTINES
-// ------------------------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------------------------ */
+/*                                       CAR HANDLING ROUTINES */
+/* ------------------------------------------------------------------------------------------------ */
 
-// Main routine handling car speed, revs, torque
-//
-// Source: 0x6288
+/* Main routine handling car speed, revs, torque */
+/* */
+/* Source: 0x6288 */
 void OFerrari::move()
 {
     if (car_ctrl_active)
     {      
-        // Auto braking if necessary
+        /* Auto braking if necessary */
         if (outrun.game_state != GS_ATTRACT && auto_brake)
             oinputs.acc_adjust = 0;   
 
-        // Set Gear For Demo Mode
+        /* Set Gear For Demo Mode */
         if (config.engine.force_ai || 
             outrun.game_state == GS_ATTRACT || outrun.game_state == GS_BONUS || 
             config.controls.gear == config.controls.GEAR_AUTO)
         {
-            // demo_mode_gear
+            /* demo_mode_gear */
             oinputs.gear = (oinitengine.car_increment >> 16 > 0xA0);
         }
 
         gfx_smoke = 0;
 
-        // --------------------------------------------------------------------
-        // CRASH CODE - Slow Car
-        // --------------------------------------------------------------------
+        /* -------------------------------------------------------------------- */
+        /* CRASH CODE - Slow Car */
+        /* -------------------------------------------------------------------- */
         if (ocrash.crash_counter && ocrash.spin_control1 <= 0)
         {
             oinitengine.car_increment = (oinitengine.car_increment & 0xFFFF) | ((((oinitengine.car_increment >> 16) * 31) >> 5) << 16);
@@ -1019,24 +1019,24 @@ void OFerrari::move()
             gear_smoke = 0;
             torque = 0x1000;
         }
-        // --------------------------------------------------------------------
-        // NO CRASH
-        // --------------------------------------------------------------------
+        /* -------------------------------------------------------------------- */
+        /* NO CRASH */
+        /* -------------------------------------------------------------------- */
         else
         {    
-            if (car_state >= 0) car_state = CAR_NORMAL; // No crash - Clear smoke from wheels
+            if (car_state >= 0) car_state = CAR_NORMAL; /* No crash - Clear smoke from wheels */
 
-            // check_time_expired:
-            // 631E: Clear acceleration value if time out
+            /* check_time_expired: */
+            /* 631E: Clear acceleration value if time out */
             if ((ostats.time_counter & 0xFF) == 0)
                 oinputs.acc_adjust = 0;
         
-            // --------------------------------------------------------------------
-            // Do Car Acceleration / Revs / Torque
-            // Note: Torque gets set based on gear car is in
-            // --------------------------------------------------------------------
+            /* -------------------------------------------------------------------- */
+            /* Do Car Acceleration / Revs / Torque */
+            /* Note: Torque gets set based on gear car is in */
+            /* -------------------------------------------------------------------- */
         
-            // do_acceleration:
+            /* do_acceleration: */
             car_acc_brake();
 
             int32_t d2 = revs / torque;
@@ -1053,22 +1053,22 @@ void OFerrari::move()
                     do_gear_torque(d1);
             }
 
-            // set_torque:
+            /* set_torque: */
             int16_t new_torque = torque_lookup[torque_index];
             torque = new_torque;
-            d2 = (int32_t) (d2 & 0xFFFF) * new_torque; // unsigned multiply
+            d2 = (int32_t) (d2 & 0xFFFF) * new_torque; /* unsigned multiply */
             int32_t accel_copy = accel_value << 16;
             int32_t rev_adjust_new = 0;
 
             if (gear_counter != 0)
                 rev_adjust_new = tick_gear_change(d2 >> 16);
 
-            // Compare Accelerator To Proposed New Speed
-            //
-            // d0 = Desired Accelerator Value [accel_copy]
-            // d1 = Torque Value [new_torque]
-            // d2 = Proposed New Rev Value [d2]
-            // d4 = Rev Adjustment (due to braking / off road etc / revs being higher than desired) [rev_adjust]
+            /* Compare Accelerator To Proposed New Speed */
+            /* */
+            /* d0 = Desired Accelerator Value [accel_copy] */
+            /* d1 = Torque Value [new_torque] */
+            /* d2 = Proposed New Rev Value [d2] */
+            /* d4 = Rev Adjustment (due to braking / off road etc / revs being higher than desired) [rev_adjust] */
             else if (d2 != accel_copy)
             {
                 if (accel_copy >= d2)
@@ -1077,30 +1077,30 @@ void OFerrari::move()
                     rev_adjust_new = get_speed_dec_value(new_torque);
             }
 
-            // test_smoke:
+            /* test_smoke: */
             if (gear_smoke)
-                rev_adjust_new = tick_smoke(); // Note this also changes the speed [stored in d4]
+                rev_adjust_new = tick_smoke(); /* Note this also changes the speed [stored in d4] */
 
-            // cont2:
-            set_brake_subtract();               // Calculate brake value to subtract from revs
-            finalise_revs(d2, rev_adjust_new);  // Subtract calculated value from revs
-            convert_revs_speed(new_torque, d2); // d2 is converted from revs to speed
+            /* cont2: */
+            set_brake_subtract();               /* Calculate brake value to subtract from revs */
+            finalise_revs(d2, rev_adjust_new);  /* Subtract calculated value from revs */
+            convert_revs_speed(new_torque, d2); /* d2 is converted from revs to speed */
 
-            // Ingame Control Not Active. Clear Car Speed
+            /* Ingame Control Not Active. Clear Car Speed */
             if (!oinitengine.ingame_engine)
             {
                 oinitengine.car_increment = 0;
                 car_inc_old = 0;
             }
-            // Set New Car Speed to car_increment
+            /* Set New Car Speed to car_increment */
             else if (outrun.game_state != GS_BONUS)
             {
-                int16_t diff = car_inc_old - (d2 >> 16); // Old Speed - New Speed
+                int16_t diff = car_inc_old - (d2 >> 16); /* Old Speed - New Speed */
 
-                // Car is moving
+                /* Car is moving */
                 if (diff != 0)
                 {
-                    // Car Speeding Up (New Speed is faster)
+                    /* Car Speeding Up (New Speed is faster) */
                     if (diff < 0)
                     {
                         diff = -diff;
@@ -1110,7 +1110,7 @@ void OFerrari::move()
                         if (diff > 2)
                             d2 = (car_inc_old + adjust) << 16;                      
                     }
-                    // Car Slowing Down
+                    /* Car Slowing Down */
                     else if (diff > 0)
                     {
                         uint8_t adjust = 2;
@@ -1124,18 +1124,18 @@ void OFerrari::move()
             }
             else
                 oinitengine.car_increment = d2;
-        } // end crash if/else block
+        } /* end crash if/else block */
         
-        // move_car_rev:
+        /* move_car_rev: */
         update_road_pos();
         ohud.draw_rev_counter();
-    } // end car_ctrl_active
+    } /* end car_ctrl_active */
 
-    // Check whether we want to play slip sound
-    // check_slip
+    /* Check whether we want to play slip sound */
+    /* check_slip */
     if (gfx_smoke)
     {
-        car_state = CAR_SMOKE; // Set smoke from car wheels
+        car_state = CAR_SMOKE; /* Set smoke from car wheels */
         if (oinitengine.car_increment >> 16)
         {
             if (slip_sound == sound::STOP_SLIP)
@@ -1144,17 +1144,17 @@ void OFerrari::move()
         else
             osoundint.queue_sound(slip_sound = sound::STOP_SLIP);
     }
-    // no_smoke:
+    /* no_smoke: */
     else
     {
         if (slip_sound != sound::STOP_SLIP)
             osoundint.queue_sound(slip_sound = sound::STOP_SLIP);        
     }
-    // move_car
+    /* move_car */
     car_inc_old = oinitengine.car_increment >> 16;
     counter++;
     
-    // During Countdown: Clear Car Speed
+    /* During Countdown: Clear Car Speed */
     if (outrun.game_state == GS_START1 || outrun.game_state == GS_START2 || outrun.game_state == GS_START3)
     {
         oinitengine.car_increment = 0;
@@ -1163,14 +1163,14 @@ void OFerrari::move()
     
 }
 
-// Handle revs/torque when in-game engine disabled
-//
-// Source: 0x6694
+/* Handle revs/torque when in-game engine disabled */
+/* */
+/* Source: 0x6694 */
 void OFerrari::tick_engine_disabled(int32_t &d2)
 {
     torque_index = 0;
     
-    // Crash taking place - do counter and set game engine when expired
+    /* Crash taking place - do counter and set game engine when expired */
     if (ocrash.coll_count1)
     {
         olevelobjs.spray_counter = 0;
@@ -1180,12 +1180,12 @@ void OFerrari::tick_engine_disabled(int32_t &d2)
     else if (outrun.game_state != GS_ATTRACT && outrun.game_state != GS_INGAME) 
         return;
 
-    // Switch back to in-game engine mode
+    /* Switch back to in-game engine mode */
     oinitengine.ingame_engine = true;
 
     torque = 0x1000;
 
-    // Use top word of revs for lookup
+    /* Use top word of revs for lookup */
     int16_t lookup = (revs >> 16);
     if (lookup > 0xFF) lookup = 0xFF;
 
@@ -1196,24 +1196,24 @@ void OFerrari::tick_engine_disabled(int32_t &d2)
     acc_post_stop = acc;
     revs_post_stop = lookup;
 
-    // Clear bottom word of d2 and swap
+    /* Clear bottom word of d2 and swap */
     d2 = d2 << 16;
 
-    //lookup -= 0x10;
-    //if (lookup < 0) lookup = 0;
+    /*lookup -= 0x10; */
+    /*if (lookup < 0) lookup = 0; */
     rev_stop_flag = 14;
 }
 
-// - Convert the already processed accleration inputs into a meaningful value for both ACC and BRAKE
-// - Adjust acceleration based on number of wheels on road
-// - Adjust acceleration if car skidding or spinning
-//
-// Source: 0x6524
+/* - Convert the already processed accleration inputs into a meaningful value for both ACC and BRAKE */
+/* - Adjust acceleration based on number of wheels on road */
+/* - Adjust acceleration if car skidding or spinning */
+/* */
+/* Source: 0x6524 */
 void OFerrari::car_acc_brake()
 {
-    // ------------------------------------------------------------------------
-    // Acceleration
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Acceleration */
+    /* ------------------------------------------------------------------------ */
     int16_t acc1 = oinputs.acc_adjust;
     int16_t acc2 = oinputs.acc_adjust;
 
@@ -1230,13 +1230,13 @@ void OFerrari::car_acc_brake()
         if (acc2 < 8)
             acc1 = accel_value_bak;
     }
-    // test_skid_spin:
+    /* test_skid_spin: */
 
-    // Clear acceleration on skid
+    /* Clear acceleration on skid */
     if (ocrash.spin_control1 > 0 || ocrash.skid_counter)
         acc1 = 0;
 
-    // Adjust speed when offroad
+    /* Adjust speed when offroad */
     else if (wheel_state != WHEELS_ON)
     {
         if (!config.engine.offroad)
@@ -1246,19 +1246,19 @@ void OFerrari::car_acc_brake()
             else
                 acc1 = (acc1 * 6) / 10;
 
-            // If only one wheel off road, increase acceleration by a bit more than if both wheels off-road
+            /* If only one wheel off road, increase acceleration by a bit more than if both wheels off-road */
             if (wheel_state != WHEELS_OFF)
                 acc1 = (acc1 << 1) + (acc1 >> 1);
         }
     }
 
-    // finalise_acc_value:
+    /* finalise_acc_value: */
     accel_value = acc1;
     accel_value_bak = acc1;
 
-    // ------------------------------------------------------------------------
-    // Brake
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Brake */
+    /* ------------------------------------------------------------------------ */
     int16_t brake1 = oinputs.brake_adjust;
     int16_t brake2 = oinputs.brake_adjust;
     brake1 += brake_adjust1 + brake_adjust2 + brake_adjust3;
@@ -1268,16 +1268,16 @@ void OFerrari::car_acc_brake()
     brake_adjust1 = brake2;
     brake_value = brake1;
 
-    // ------------------------------------------------------------------------
-    // Gears
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Gears */
+    /* ------------------------------------------------------------------------ */
     gear_bak = gear_value;
     gear_value = oinputs.gear;
 }
 
-// Do Gear Changes & Torque Index Settings
-//
-// Source: 0x6948
+/* Do Gear Changes & Torque Index Settings */
+/* */
+/* Source: 0x6948 */
 void OFerrari::do_gear_torque(int16_t &d1)
 {
     if (oinitengine.ingame_engine)
@@ -1289,13 +1289,13 @@ void OFerrari::do_gear_torque(int16_t &d1)
             do_gear_low(d1);
     }
     torque_index = (uint8_t) d1;
-    // Backup gear value for next iteration (so we can tell when gear has recently changed)
+    /* Backup gear value for next iteration (so we can tell when gear has recently changed) */
     gear_bak = gear_value;
 }
 
 void OFerrari::do_gear_low(int16_t &d1)
 {
-    // Recent Shift from high to low
+    /* Recent Shift from high to low */
     if (gear_bak)
     {
         gear_value = false;
@@ -1303,11 +1303,11 @@ void OFerrari::do_gear_low(int16_t &d1)
         return;
     }
 
-    // Low Gear - Show Smoke When Accelerating From Standstill
+    /* Low Gear - Show Smoke When Accelerating From Standstill */
     if (oinitengine.car_increment >> 16 < 0x50 && accel_value - 0xE0 >= 0)
         gfx_smoke++;
 
-    // Adjust Torque Index
+    /* Adjust Torque Index */
     if (d1 == 0x10) return;
     else if (d1 < 0x10)
     {
@@ -1321,7 +1321,7 @@ void OFerrari::do_gear_low(int16_t &d1)
 
 void OFerrari::do_gear_high(int16_t &d1)
 {
-    // Change from Low Gear to High Gear
+    /* Change from Low Gear to High Gear */
     if (!gear_bak)
     {
         gear_value = true;
@@ -1329,18 +1329,18 @@ void OFerrari::do_gear_high(int16_t &d1)
         return;
     }
 
-    // Increment torque until it reaches 0x1F
+    /* Increment torque until it reaches 0x1F */
     if (d1 == 0x1f) return;
     d1++;
 }
 
-// Source: 0x6752
+/* Source: 0x6752 */
 int32_t OFerrari::tick_gear_change(int16_t rem)
 {
     gear_counter--;
     rev_adjust = rev_adjust - (rev_adjust >> 4);
 
-    // Setup smoke when gear counter hits zero
+    /* Setup smoke when gear counter hits zero */
     if (gear_counter == 0)
     {
         rem -= 0xE0;
@@ -1353,26 +1353,26 @@ int32_t OFerrari::tick_gear_change(int16_t rem)
     return rev_adjust;
 }
 
-// Set value to increment speed by, when revs lower than acceleration
-//
-// Inputs:
-//
-// d1 = Torque Value [new_torque]
-// d2 = Proposed new increment value [new_rev]
-//
-// Outputs: d4 [Rev Adjustment]
-//
-// Source: 679C
+/* Set value to increment speed by, when revs lower than acceleration */
+/* */
+/* Inputs: */
+/* */
+/* d1 = Torque Value [new_torque] */
+/* d2 = Proposed new increment value [new_rev] */
+/* */
+/* Outputs: d4 [Rev Adjustment] */
+/* */
+/* Source: 679C */
 
 int32_t OFerrari::get_speed_inc_value(uint16_t new_torque, uint32_t new_rev)
 {
-    // Use Top Word Of Revs For Table Lookup. Cap At 0xFF Max
+    /* Use Top Word Of Revs For Table Lookup. Cap At 0xFF Max */
     uint16_t lookup = (new_rev >> 16);
     if (lookup > 0xFF) lookup = 0xFF;
 
-    uint32_t rev_adjust = rev_inc_lookup[lookup]; // d4
+    uint32_t rev_adjust = rev_inc_lookup[lookup]; /* d4 */
 
-    // Double adjustment if car moving slowly
+    /* Double adjustment if car moving slowly */
     if (oinitengine.car_increment >> 16 <= 0x14)
         rev_adjust <<= 1;
 
@@ -1382,15 +1382,15 @@ int32_t OFerrari::get_speed_inc_value(uint16_t new_torque, uint32_t new_rev)
     return rev_adjust << rev_shift;
 }
 
-// Set value to decrement speed by, when revs higher than acceleration
-//
-// Inputs:
-//
-// d1 = Torque Value [new_torque]
-//
-// Outputs: d4 [Rev Adjustment]
-//
-// Source: 67E4
+/* Set value to decrement speed by, when revs higher than acceleration */
+/* */
+/* Inputs: */
+/* */
+/* d1 = Torque Value [new_torque] */
+/* */
+/* Outputs: d4 [Rev Adjustment] */
+/* */
+/* Source: 67E4 */
 int32_t OFerrari::get_speed_dec_value(uint16_t new_torque)
 {
     int32_t new_rev = -((0x440 * new_torque) >> 4);
@@ -1398,16 +1398,16 @@ int32_t OFerrari::get_speed_dec_value(uint16_t new_torque)
     return new_rev << 2;
 }
 
-// - Reads Brake Value
-// - Translates Into A Value To Subtract From Car Speed
-// - Also handles setting smoke on wheels during brake/skid
-// Source: 0x6A10
+/* - Reads Brake Value */
+/* - Translates Into A Value To Subtract From Car Speed */
+/* - Also handles setting smoke on wheels during brake/skid */
+/* Source: 0x6A10 */
 void OFerrari::set_brake_subtract()
 {
     int32_t d6 = 0;
-    const int32_t DEC = -0x8800; // Base value to subtract from acceleration burst
+    const int32_t DEC = -0x8800; /* Base value to subtract from acceleration burst */
     
-    // Not skidding or spinning
+    /* Not skidding or spinning */
     if (ocrash.skid_counter == 0 && ocrash.spin_control1 == 0)
     {
         if (brake_value < OInputs::BRAKE_THRESHOLD1)
@@ -1431,7 +1431,7 @@ void OFerrari::set_brake_subtract()
             return;
         }
     }
-    // check_smoke
+    /* check_smoke */
     if (oinitengine.car_increment >> 16 > 0x28)
         gfx_smoke++;
 
@@ -1439,18 +1439,18 @@ void OFerrari::set_brake_subtract()
 }
 
 
-// - Finalise rev value, taking adjustments into account
-//
-// Inputs:
-//
-// d2 = Current Revs
-// d4 = Rev Adjustment
-//
-// Outputs:
-//
-// d2 = New rev value
-//
-// Source: 0x67FC
+/* - Finalise rev value, taking adjustments into account */
+/* */
+/* Inputs: */
+/* */
+/* d2 = Current Revs */
+/* d4 = Rev Adjustment */
+/* */
+/* Outputs: */
+/* */
+/* d2 = New rev value */
+/* */
+/* Source: 0x67FC */
 
 void OFerrari::finalise_revs(int32_t &d2, int32_t rev_adjust_new)
 {
@@ -1463,13 +1463,13 @@ void OFerrari::finalise_revs(int32_t &d2, int32_t rev_adjust_new)
     else if (d2 < 0) d2 = 0;
 }
 
-// Convert revs to final speed value
-// Set correct pitch for sound fx
-//
-// Note - main problem seems to be that the revs fed to this routine are wrong in the first place on restart
-// rev_stop_flag, revs_post_stop, accel_value and acc_post_stop seem ok?
-//
-// Source: 0x6838
+/* Convert revs to final speed value */
+/* Set correct pitch for sound fx */
+/* */
+/* Note - main problem seems to be that the revs fed to this routine are wrong in the first place on restart */
+/* rev_stop_flag, revs_post_stop, accel_value and acc_post_stop seem ok? */
+/* */
+/* Source: 0x6838 */
 void OFerrari::convert_revs_speed(int32_t new_torque, int32_t &d2)
 {
     revs = d2;
@@ -1478,7 +1478,7 @@ void OFerrari::convert_revs_speed(int32_t new_torque, int32_t &d2)
 
     int16_t revs_top = d3 >> 16;
     
-    // Check whether we're switching back to ingame engine (after disabling user control of car)
+    /* Check whether we're switching back to ingame engine (after disabling user control of car) */
     if (rev_stop_flag)
     {
         if (revs_top >= revs_post_stop)
@@ -1490,7 +1490,7 @@ void OFerrari::convert_revs_speed(int32_t new_torque, int32_t &d2)
             if (accel_value < acc_post_stop)
                 revs_post_stop -= rev_stop_flag;
 
-            // cont1:
+            /* cont1: */
             int16_t d5 = revs_post_stop >> 1;
             int16_t d4 = rev_stop_flag;
             if (revs_top >= d5)
@@ -1500,17 +1500,17 @@ void OFerrari::convert_revs_speed(int32_t new_torque, int32_t &d2)
                 if (revs_top >= d5)
                     d4 >>= 1;
             }
-            // 689c
+            /* 689c */
             revs_post_stop -= d4;
             if (revs_post_stop < 0x1F) revs_post_stop = 0x1F;
             revs_top = revs_post_stop;
         }
     }
 
-    // setup_pitch_fx:
+    /* setup_pitch_fx: */
     rev_pitch1 = (revs_top * 0x1A90) >> 8;
 
-    // Setup New Car Increment Speed
+    /* Setup New Car Increment Speed */
     d2 = ((d2 >> 16) * 0x1A90) >> 8;
     d2 = (d2 << 16) >> 4;
     
@@ -1521,19 +1521,19 @@ void OFerrari::convert_revs_speed(int32_t new_torque, int32_t &d2)
 
     const int max_speed = !config.engine.turbo ? MAX_SPEED : (int) (MAX_SPEED * 1.2f);
     d2 = (d2 / new_torque) * 0x480;
-    //std::cout << std::hex << "d2: " << (int)d2 << " new_torque: " << new_torque << " torque index: " << std::hex << (int) torque_index << std::endl;
+    /*std::cout << std::hex << "d2: " << (int)d2 << " new_torque: " << new_torque << " torque index: " << std::hex << (int) torque_index << std::endl; */
     if (d2 < 0) d2 = 0;
     else if (d2 > max_speed) d2 = max_speed;
 }
 
-// Update road_pos, taking road_curve into account
-//
-// Source: 0x6ABA
+/* Update road_pos, taking road_curve into account */
+/* */
+/* Source: 0x6ABA */
 void OFerrari::update_road_pos()
 {
     uint32_t car_inc = CAR_BASE_INC;
 
-    // Bendy Roads
+    /* Bendy Roads */
     if (oinitengine.road_type > OInitEngine::ROAD_STRAIGHT)
     {
         int32_t x = oinitengine.car_x_pos;
@@ -1551,27 +1551,27 @@ void OFerrari::update_road_pos()
     oroad.road_pos += car_inc;
 }
 
-// Decrement Smoke Counter
-// Source: 0x666A
+/* Decrement Smoke Counter */
+/* Source: 0x666A */
 int32_t OFerrari::tick_smoke()
 {
     gear_smoke--;
     int32_t r = rev_adjust - (rev_adjust >> 4);
-    if (gear_smoke >= 8) gfx_smoke++; // Trigger smoke
+    if (gear_smoke >= 8) gfx_smoke++; /* Trigger smoke */
     return r;
 }
 
-// Calculate car score and sound. Strange combination, but there you go!
-//
-// Source: 0xBD78
+/* Calculate car score and sound. Strange combination, but there you go! */
+/* */
+/* Source: 0xBD78 */
 void OFerrari::do_sound_score_slip()
 {
-    // ------------------------------------------------------------------------
-    // ENGINE PITCH SOUND
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* ENGINE PITCH SOUND */
+    /* ------------------------------------------------------------------------ */
     uint16_t engine_pitch = 0;
 
-    // Do Engine Rev
+    /* Do Engine Rev */
     if (outrun.game_state >= GS_START1 && outrun.game_state <= GS_INGAME)
     {
         engine_pitch = rev_pitch2 + (rev_pitch2 >> 1);
@@ -1580,22 +1580,22 @@ void OFerrari::do_sound_score_slip()
     osoundint.engine_data[sound::ENGINE_PITCH_H] = engine_pitch >> 8;
     osoundint.engine_data[sound::ENGINE_PITCH_L] = engine_pitch & 0xFF;
 
-    // Curved Road
+    /* Curved Road */
     if (oinitengine.road_type != OInitEngine::ROAD_STRAIGHT)
     {
         int16_t steering = oinputs.steering_adjust;
         if (steering < 0) steering = -steering;
 
-        // Hard turn
+        /* Hard turn */
         if (steering >= 0x70)
         {
-            // Move Left
+            /* Move Left */
             if (oinitengine.car_x_pos > oinitengine.car_x_old)
                 cornering = (oinitengine.road_type == OInitEngine::ROAD_LEFT) ? 0 : -1;
-            // Straight
+            /* Straight */
             else if (oinitengine.car_x_pos == oinitengine.car_x_old)
                 cornering = 0;
-            // Move Right
+            /* Move Right */
             else
                 cornering = (oinitengine.road_type == OInitEngine::ROAD_RIGHT) ? 0 : -1;
         }
@@ -1605,20 +1605,20 @@ void OFerrari::do_sound_score_slip()
     else
         cornering = 0;
 
-    // update_score:
+    /* update_score: */
     car_x_diff = oinitengine.car_x_pos - oinitengine.car_x_old;
     oinitengine.car_x_old = oinitengine.car_x_pos;
 
     if (outrun.game_state == GS_ATTRACT) 
         return;
 
-    // Wheels onroad - Convert Speed To Score
+    /* Wheels onroad - Convert Speed To Score */
     if (wheel_state == WHEELS_ON) 
     {
         ostats.convert_speed_score(oinitengine.car_increment >> 16);
     }
 
-    // 0xBE6E
+    /* 0xBE6E */
     if (!sprite_slip_copy)
     {
         if (ocrash.skid_counter)
@@ -1627,7 +1627,7 @@ void OFerrari::do_sound_score_slip()
             osoundint.queue_sound(sound::INIT_SLIP);
         }
     }
-    // 0xBE94
+    /* 0xBE94 */
     else
     {
         if (!ocrash.skid_counter)
@@ -1636,15 +1636,15 @@ void OFerrari::do_sound_score_slip()
             osoundint.queue_sound(sound::STOP_SLIP);
         }
     }
-    // 0xBEAC
+    /* 0xBEAC */
     sprite_slip_copy = ocrash.skid_counter;
 
-    // ------------------------------------------------------------------------
-    // Switch to cornering. Play Slip Sound. Init Smoke
-    // ------------------------------------------------------------------------
+    /* ------------------------------------------------------------------------ */
+    /* Switch to cornering. Play Slip Sound. Init Smoke */
+    /* ------------------------------------------------------------------------ */
     if (!ocrash.skid_counter)
     {
-        // 0xBEBE: Initalize Slip
+        /* 0xBEBE: Initalize Slip */
         if (!cornering_old)
         {
             if (cornering)
@@ -1653,7 +1653,7 @@ void OFerrari::do_sound_score_slip()
                 osoundint.queue_sound(sound::INIT_SLIP);
             }
         }
-        // 0xBEE4: Stop Cornering   
+        /* 0xBEE4: Stop Cornering    */
         else
         {
             if (!cornering)
@@ -1663,16 +1663,16 @@ void OFerrari::do_sound_score_slip()
             }
         }
     }
-    // check_wheels:
+    /* check_wheels: */
     cornering_old = cornering;
 
     if (sprite_wheel_state)
     {
-        // If previous wheels on-road & current wheels off-road - play safety zone sound
+        /* If previous wheels on-road & current wheels off-road - play safety zone sound */
         if (!wheel_state)
             osoundint.queue_sound(sound::STOP_SAFETYZONE);
     }
-    // Stop Safety Sound
+    /* Stop Safety Sound */
     else
     {
         if (wheel_state)
@@ -1681,22 +1681,22 @@ void OFerrari::do_sound_score_slip()
     sprite_wheel_state = wheel_state;
 }
 
-// Shake Ferrari by altering XY Position when wheels are off-road
-//
-// Source: 0x9FEE
+/* Shake Ferrari by altering XY Position when wheels are off-road */
+/* */
+/* Source: 0x9FEE */
 void OFerrari::shake()
 {
     if (outrun.game_state != GS_INGAME && outrun.game_state != GS_ATTRACT) return;
 
-    if (wheel_traction == TRACTION_ON) return; // Return if both wheels have traction
+    if (wheel_traction == TRACTION_ON) return; /* Return if both wheels have traction */
 
     int8_t traction = wheel_traction - 1;
     int16_t rnd = outils::random();
     spr_ferrari->counter++;
 
-    uint16_t car_inc = oinitengine.car_increment >> 16; // [d5]
+    uint16_t car_inc = oinitengine.car_increment >> 16; /* [d5] */
     
-    if (car_inc <= 0xA) return; // Do not shake car at low speeds
+    if (car_inc <= 0xA) return; /* Do not shake car at low speeds */
 
     if (car_inc <= (0x3C >> traction))
     {
@@ -1717,12 +1717,12 @@ void OFerrari::shake()
     if (!(spr_ferrari->counter & BIT_1))
         rnd = -rnd;
 
-    spr_ferrari->x += rnd; // Increment Ferrari X by 1 or -1
+    spr_ferrari->x += rnd; /* Increment Ferrari X by 1 or -1 */
 }
 
-// Perform Skid (After Car Has Collided With Another Vehicle)
-//
-// Source: 0xBFB4
+/* Perform Skid (After Car Has Collided With Another Vehicle) */
+/* */
+/* Source: 0xBFB4 */
 void OFerrari::do_skid()
 {
     if (!ocrash.skid_counter) return;
@@ -1748,8 +1748,8 @@ void OFerrari::draw_sprite(oentry* sprite)
     }
 }
 
-// Rev Lookup Table. 255 Values.
-// Used to provide rev adjustment. Note that values tail off at higher speeds.
+/* Rev Lookup Table. 255 Values. */
+/* Used to provide rev adjustment. Note that values tail off at higher speeds. */
 const uint8_t OFerrari::rev_inc_lookup[] = 
 {
     0x14, 0x14, 0x14, 0x14, 0x15, 0x15, 0x15, 0x15, 0x16, 0x16, 0x16, 0x16, 0x17, 0x17, 0x17, 0x17, 
@@ -1773,9 +1773,9 @@ const uint8_t OFerrari::rev_inc_lookup[] =
 
 uint16_t OFerrari::torque_lookup[] =
 {
-    0x2600, // Offset 0x00 - Start line                                                           
-    0x243C, // ..
-    0x2278, // values only used when pulling away from start line
+    0x2600, /* Offset 0x00 - Start line                                                            */
+    0x243C, /* .. */
+    0x2278, /* values only used when pulling away from start line */
     0x20B4,
     0x1EF0,
     0x1D2C,
@@ -1789,12 +1789,12 @@ uint16_t OFerrari::torque_lookup[] =
     0xF0C,
     0xD48,
     0xB84,
-    0x9BB, // Offset 0x10 - Low Gear
-    0x983, // ..
-    0x94B, // .. in between these values
-    0x913, // .. is the lookup as we shift between
-    0x8DB, // .. the two gears
-    0x8A3, // ..
+    0x9BB, /* Offset 0x10 - Low Gear */
+    0x983, /* .. */
+    0x94B, /* .. in between these values */
+    0x913, /* .. is the lookup as we shift between */
+    0x8DB, /* .. the two gears */
+    0x8A3, /* .. */
     0x86B,
     0x833,
     0x7FB,
@@ -1804,5 +1804,5 @@ uint16_t OFerrari::torque_lookup[] =
     0x717,
     0x6DE,
     0x6A5,
-    0x66C, // Offset 0x1F - High Gear
+    0x66C, /* Offset 0x1F - High Gear */
 };

@@ -27,10 +27,10 @@ private:
     static const uint16_t ROAD_RAM_SIZE = 0x1000;
     static const uint16_t rom_size = 0x8000;
 
-    // Decoded road graphics
+    /* Decoded road graphics */
     uint8_t roads[0x40200];
 
-    // Two halves of RAM
+    /* Two halves of RAM */
     uint16_t ram[ROAD_RAM_SIZE / 2];
     uint16_t ramBuff[ROAD_RAM_SIZE / 2];
 

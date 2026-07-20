@@ -20,7 +20,7 @@
 
 OMap omap;
 
-// Position of Ferrari in Jump Table
+/* Position of Ferrari in Jump Table */
 const uint8_t SPRITE_FERRARI = 25;
 
 OMap::OMap(void)
@@ -34,7 +34,7 @@ OMap::~OMap(void)
 
 void OMap::init()
 {
-    oferrari.car_ctrl_active = false; // -1
+    oferrari.car_ctrl_active = false; /* -1 */
     video.clear_text_ram();
     osprites.disable_sprites();
     otraffic.disable_traffic();
@@ -45,23 +45,23 @@ void OMap::init()
     osprites.spr_cnt_shadow   = 0;
     oroad.road_ctrl           = ORoad::ROAD_BOTH_P0;
     oroad.horizon_base        = ORoad::HORIZON_OFF;
-    otiles.fill_tilemap_color(0xABD); //  Paint pinkish colour on tilemap 16
+    otiles.fill_tilemap_color(0xABD); /*  Paint pinkish colour on tilemap 16 */
     init_sprites = true;
 }
 
-// Process route through levels
-// Process end position on final level
-// Source: 0x345E
+/* Process route through levels */
+/* Process end position on final level */
+/* Source: 0x345E */
 void OMap::tick()
 {
-    // 60 FPS Code to simply render sprites
+    /* 60 FPS Code to simply render sprites */
     if (!outrun.tick_frame)
     {
         blit();
         return;
     }
 
-    // Initialize Course Map Sprites if necessary
+    /* Initialize Course Map Sprites if necessary */
     if (init_sprites)
     {
         load_sprites();
@@ -71,9 +71,9 @@ void OMap::tick()
 
     switch (map_state)
     {
-        // Initialise Route Info
+        /* Initialise Route Info */
         case MAP_INIT:
-            video.sprite_layer->set_x_clip(false); // Don't clip the area in wide-screen mode
+            video.sprite_layer->set_x_clip(false); /* Don't clip the area in wide-screen mode */
             map_route  = roms.rom0.read8(MAP_ROUTE_LOOKUP + ostats.routes[1]);
             map_pos    = 0;
             map_stage1 = 0;
@@ -87,12 +87,12 @@ void OMap::tick()
                 break;
             }
 
-        // Do Route [Note map is displayed from this point on]
+        /* Do Route [Note map is displayed from this point on] */
         case MAP_ROUTE:
             if (++map_pos > 0x1B)
             {
                 if (--map_stage2 <= 0)
-                {   //map_end_route
+                {   /*map_end_route */
                     map_pos = 0;
                     map_stage1++;
                     uint16_t route_info = ostats.routes[1 + map_stage1];
@@ -117,27 +117,27 @@ void OMap::tick()
             }
             break;
         
-        // Do Final Segment Of Route [Car still moving]
+        /* Do Final Segment Of Route [Car still moving] */
         case MAP_ROUTE_FINAL:
             do_route_final();
             break;
 
-        // Route Concluded       
+        /* Route Concluded        */
         case MAP_ROUTE_DONE:
             end_route();
             break;
         
-        // Init Delay Counter For Map Display
+        /* Init Delay Counter For Map Display */
         case MAP_INIT_DELAY:
             init_map_delay();
             break;
 
-        // Display Map
+        /* Display Map */
         case MAP_DISPLAY:
             map_display();
             break;
 
-        // Clear Course Map        
+        /* Clear Course Map         */
         case MAP_CLEAR:
             outrun.init_best_outrunners();
             return;
@@ -146,7 +146,7 @@ void OMap::tick()
     draw_course_map();
 }
 
-// Render sprites only. No Logic
+/* Render sprites only. No Logic */
 void OMap::blit()
 {
     for (uint8_t i = 0; i <= MAP_PIECES; i++)
@@ -161,7 +161,7 @@ void OMap::draw_course_map()
 {
     oentry* sprite = osprites.jump_table;
 
-    // Draw Road Components
+    /* Draw Road Components */
     draw_vert_bottom(sprite++);
     draw_vert_top   (sprite++);
     draw_vert_bottom(sprite++);
@@ -188,10 +188,10 @@ void OMap::draw_course_map()
     draw_horiz_end  (sprite++);
     draw_horiz_end  (sprite++);
 
-    // Draw Mini Car
+    /* Draw Mini Car */
     move_mini_car   (sprite++);
 
-    // Draw Backdrop Map Pieces
+    /* Draw Backdrop Map Pieces */
     for (uint8_t i = 26; i <= MAP_PIECES; i++)
     {
         if (sprite->control & OSprites::ENABLE)
@@ -207,14 +207,14 @@ void OMap::position_ferrari(uint8_t index)
     osprites.jump_table[SPRITE_FERRARI].y = segment->y;
 }
 
-// Initalize Course Map Sprites
-// 
-// Notes: Index 26 is start of water that needs to be changed for widescreen
-// 
-// Source: 0x33F4
+/* Initalize Course Map Sprites */
+/*  */
+/* Notes: Index 26 is start of water that needs to be changed for widescreen */
+/*  */
+/* Source: 0x33F4 */
 void OMap::load_sprites()
 {
-    // hacks
+    /* hacks */
     /*ostats.cur_stage = 4;
     ostats.routes[0] = 4;
     ostats.routes[1] = 0x08;
@@ -223,7 +223,7 @@ void OMap::load_sprites()
     ostats.routes[4] = 0x38;
     oinitengine.rd_split_state = 0x16;
     oroad.road_pos = 0x192 << 16;*/
-    // end hacks
+    /* end hacks */
 
     uint32_t adr = outrun.adr.sprite_coursemap;
 
@@ -242,12 +242,12 @@ void OMap::load_sprites()
         sprite->addr       = roms.rom0p->read32(&adr);
         sprite->counter    = 0;  
         
-        adr += 4; // throw this address away
+        adr += 4; /* throw this address away */
 
         osprites.map_palette(sprite);
     }
 
-    // Wide-screen hack to extend sea to edge of screen.
+    /* Wide-screen hack to extend sea to edge of screen. */
     if (config.s16_x_off != 0 || config.engine.fix_bugs)
     {
         for (uint8_t i = 26; i <= 30; i++)
@@ -259,14 +259,14 @@ void OMap::load_sprites()
         }
     }
 
-    // Minicar initalization moved here
+    /* Minicar initalization moved here */
     minicar_enable = 0;
     osprites.jump_table[SPRITE_FERRARI].x = -0x80;
     osprites.jump_table[SPRITE_FERRARI].y = 0x78;
     map_state = MAP_INIT;
 }
 
-// Source: 0x355A
+/* Source: 0x355A */
 void OMap::do_route_final()
 {
     int16_t pos = oroad.road_pos >> 16;
@@ -280,14 +280,14 @@ void OMap::do_route_final()
     end_route();
 }
 
-// Source: 0x3584
+/* Source: 0x3584 */
 void OMap::end_route()
 {
     map_pos++;
 
     if (map_pos_final < map_pos)
     {
-        // 359C
+        /* 359C */
         map_pos = map_pos_final;
         minicar_enable = 1;
         map_state = MAP_INIT_DELAY;
@@ -295,7 +295,7 @@ void OMap::end_route()
     }
 }
 
-// Source: 0x35B6
+/* Source: 0x35B6 */
 void OMap::init_map_delay()
 {
     map_route = 0;
@@ -304,10 +304,10 @@ void OMap::init_map_delay()
     map_display();
 }
 
-// Source: 0x35CC
+/* Source: 0x35CC */
 void OMap::map_display()
 {
-    // Init Best OutRunners
+    /* Init Best OutRunners */
     if (--map_delay <= 0)
     {
         map_state = MAP_CLEAR;
@@ -315,35 +315,35 @@ void OMap::map_display()
     }
 }
 
-// ------------------------------------------------------------------------------------------------
-// Colour sprite based road as car moves over it on mini-map
-// ------------------------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------------------------ */
+/* Colour sprite based road as car moves over it on mini-map */
+/* ------------------------------------------------------------------------------------------------ */
 
-// Source: 0x3740
+/* Source: 0x3740 */
 void OMap::draw_vert_top(oentry* sprite)
 {
     if (sprite->control & OSprites::ENABLE)
         draw_piece(sprite, outrun.adr.sprite_coursemap_top);
 }
 
-// Source: 0x3736
+/* Source: 0x3736 */
 void OMap::draw_vert_bottom(oentry* sprite)
 {
     if (sprite->control & OSprites::ENABLE)
         draw_piece(sprite, outrun.adr.sprite_coursemap_bot);
 }
 
-// Source: 0x372C
+/* Source: 0x372C */
 void OMap::draw_horiz_end(oentry* sprite)
 {
     if (sprite->control & OSprites::ENABLE)
         draw_piece(sprite, outrun.adr.sprite_coursemap_end);
 }
 
-// Source: 0x3746
+/* Source: 0x3746 */
 void OMap::draw_piece(oentry* sprite, uint32_t adr)
 {
-    // Update palette of background piece, to highlight route as minicar passes over it
+    /* Update palette of background piece, to highlight route as minicar passes over it */
     if (map_route == sprite->id)
     {
         sprite->priority = 0x102;
@@ -359,18 +359,18 @@ void OMap::draw_piece(oentry* sprite, uint32_t adr)
     osprites.do_spr_order_shadows(sprite);
 }
 
-// Move mini car sprite on Course Map Screen
-// Source: 0x3696
+/* Move mini car sprite on Course Map Screen */
+/* Source: 0x3696 */
 void OMap::move_mini_car(oentry* sprite)
 {
-    // Move Mini Car
+    /* Move Mini Car */
     if (!minicar_enable)
     {
-        // Remember that the minimap is angled, so we still need to adjust both the x and y positions
+        /* Remember that the minimap is angled, so we still need to adjust both the x and y positions */
         uint32_t movement_table = (map_route & 1) ? MAP_MOVEMENT_RIGHT : MAP_MOVEMENT_LEFT;
         
         int16_t pos = (map_stage1 < 4) ? map_pos : map_pos >> 1;
-        pos <<= 1; // do not try to merge with previous line
+        pos <<= 1; /* do not try to merge with previous line */
 
         sprite->x += roms.rom0.read16(movement_table + pos);
         int16_t y_change = roms.rom0.read16(movement_table + pos + 0x40);

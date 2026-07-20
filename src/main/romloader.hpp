@@ -26,9 +26,9 @@ public:
 
     void init(uint32_t length);
 
-    // Retains the upstream call interface used by Roms. The Libretro
-    // implementation identifies ROMs by CRC32 first, then falls back to the
-    // canonical filename for compatibility with existing frontend setups.
+    /* Retains the upstream call interface used by Roms. The Libretro */
+    /* implementation identifies ROMs by CRC32 first, then falls back to the */
+    /* canonical filename for compatibility with existing frontend setups. */
     int (RomLoader::*load)(const char*, const int, const int,
                            const uint32_t, const uint8_t, const bool);
 

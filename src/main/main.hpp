@@ -8,16 +8,16 @@ namespace cannonball
 {
     extern Audio audio;
 
-    // Frame counter
+    /* Frame counter */
     extern int frame;
 
-    // Tick Logic. Used when running at non-standard > 30 fps
+    /* Tick Logic. Used when running at non-standard > 30 fps */
     extern bool tick_frame;
 
-    // FPS Counter
+    /* FPS Counter */
     extern int fps_counter;
 
-    // Engine Master State
+    /* Engine Master State */
     extern int state;
     
     enum

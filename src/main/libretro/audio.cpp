@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <streams/file_stream.h>
 #include "audio.hpp"
-#include "frontend/config.hpp" // fps
+#include "frontend/config.hpp" /* fps */
 #include "engine/audio/osoundint.hpp"
 #include <libretro.h>
 
@@ -27,12 +27,12 @@ extern retro_log_printf_t                 log_cb;
 
 extern retro_audio_sample_batch_t  audio_batch_cb;
 
-// Note that these variables are accessed by two separate threads.
+/* Note that these variables are accessed by two separate threads. */
 uint8_t* dsp_buffer;
 static int dsp_buffer_bytes;
 static int dsp_write_pos;
 static int dsp_read_pos;
-static int bytes_per_sample; // Number of bytes per sample entry (usually 4 bytes if stereo and 16-bit sound)
+static int bytes_per_sample; /* Number of bytes per sample entry (usually 4 bytes if stereo and 16-bit sound) */
 
 Audio::Audio()
 {
@@ -56,17 +56,17 @@ void Audio::start_audio()
     {
         bytes_per_sample = CHANNELS * (BITS / 8);
 
-        // Start Audio
+        /* Start Audio */
         sound_enabled = true;
 
-        // how many fragments in the dsp buffer
+        /* how many fragments in the dsp buffer */
         const int DSP_BUFFER_FRAGS = 5;
         int specified_delay_samps = (FREQ * SND_DELAY) / 1000;
         int dsp_buffer_samps = SAMPLES * DSP_BUFFER_FRAGS + specified_delay_samps;
         dsp_buffer_bytes = CHANNELS * dsp_buffer_samps * (BITS / 8);
         dsp_buffer = new uint8_t[dsp_buffer_bytes];
 
-        // Create Buffer For Mixing
+        /* Create Buffer For Mixing */
         uint16_t buffer_size = (FREQ / config.fps) * CHANNELS;
         mix_buffer = new uint16_t[buffer_size];
 
@@ -110,7 +110,7 @@ void Audio::resume_audio()
         clear_buffers();
 }
 
-// Called every frame to update the audio
+/* Called every frame to update the audio */
 void Audio::tick()
 {
     static const unsigned SND_RATE = 44100;
@@ -211,7 +211,7 @@ void Audio::tick()
         audio_frames);
 }
 
-// Empty Wav Buffer
+/* Empty Wav Buffer */
 static int16_t EMPTY_BUFFER[] = {0, 0, 0, 0};
 
 static uint16_t wav_read_le16(const uint8_t* data)

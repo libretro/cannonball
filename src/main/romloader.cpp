@@ -134,9 +134,9 @@ int RomLoader::load_auto(const char* filename,
                          const uint8_t interleave,
                          const bool verbose)
 {
-    // Prefer content identification, matching the modern upstream loader.
-    // The canonical filename remains a compatibility fallback for frontends
-    // where directory enumeration is unavailable or for legacy ROM sets.
+    /* Prefer content identification, matching the modern upstream loader. */
+    /* The canonical filename remains a compatibility fallback for frontends */
+    /* where directory enumeration is unavailable or for legacy ROM sets. */
     if (load_crc32(filename, offset, file_length, expected_crc,
                    interleave, false) == 0)
     {
@@ -202,8 +202,8 @@ int RomLoader::load_rom(const char* filename,
 
     const uint32_t checksum = encoding_crc32(0, &buffer[0], buffer.size());
 
-    // Match the existing Libretro core: report checksum mismatches, but keep
-    // loading the named ROM instead of rejecting a set that previously worked.
+    /* Match the existing Libretro core: report checksum mismatches, but keep */
+    /* loading the named ROM instead of rejecting a set that previously worked. */
     if (expected_crc != checksum && verbose && log_cb)
     {
         log_cb(RETRO_LOG_WARN,
@@ -227,9 +227,9 @@ int RomLoader::create_map()
     crc_map.clear();
     mapped_path = path;
 
-    // Mark the map as initialized even if directory enumeration fails, so a
-    // frontend without directory VFS support does not trigger a full rescan
-    // for every ROM before falling back to canonical filenames.
+    /* Mark the map as initialized even if directory enumeration fails, so a */
+    /* frontend without directory VFS support does not trigger a full rescan */
+    /* for every ROM before falling back to canonical filenames. */
     map_created = true;
 
     RDIR* directory = retro_opendir(path.c_str());

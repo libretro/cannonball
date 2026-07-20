@@ -48,11 +48,11 @@ int Video::init(Roms* roms, video_settings_t* settings)
     if (!set_video_mode(settings))
         return 0;
 
-    // Internal pixel array. The size of this is always constant
+    /* Internal pixel array. The size of this is always constant */
     if (pixels) delete[] pixels;
     pixels = new uint16_t[config.s16_width * config.s16_height];
 
-    // Convert S16 tiles to a more useable format
+    /* Convert S16 tiles to a more useable format */
     tile_layer->init(roms->tiles.rom, config.video.hires != 0);
     
     clear_tile_ram();
@@ -63,7 +63,7 @@ int Video::init(Roms* roms, video_settings_t* settings)
         roms->tiles.rom = NULL;
     }
 
-    // Convert S16 sprites
+    /* Convert S16 sprites */
     sprite_layer->init(roms->sprites.rom);
     if (roms->sprites.rom)
     {
@@ -71,7 +71,7 @@ int Video::init(Roms* roms, video_settings_t* settings)
         roms->sprites.rom = NULL;
     }
 
-    // Convert S16 Road Stuff
+    /* Convert S16 Road Stuff */
     hwroad.init(roms->road.rom, config.video.hires != 0);
     if (roms->road.rom)
     {
@@ -88,9 +88,9 @@ void Video::disable()
     enabled = false;
 }
 
-// ------------------------------------------------------------------------------------------------
-// Configure video settings from config file
-// ------------------------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------------------------ */
+/* Configure video settings from config file */
+/* ------------------------------------------------------------------------------------------------ */
 
 int Video::set_video_mode(video_settings_t* settings)
 {
@@ -107,7 +107,7 @@ int Video::set_video_mode(video_settings_t* settings)
 
     config.s16_height = S16_HEIGHT;
 
-    // Internal video buffer is doubled in hi-res mode.
+    /* Internal video buffer is doubled in hi-res mode. */
     if (settings->hires)
     {
         config.s16_width  <<= 1;
@@ -125,22 +125,22 @@ int Video::set_video_mode(video_settings_t* settings)
     return 1;
 }
 
-// --------------------------------------------------------------------------------------------
-// Shadow Colours.
-// 63% Intensity is the correct value derived from hardware as follows:
-//
-// 1/ Shadows are just an extra 220 ohm resistor that goes to ground when enabled.
-// 2/ This is in parallel with the resistor-"DAC" (3.9k, 2k, 1k, 0.5k, 0.25k),
-//    and otherwise left floating.
-//
-// Static calculation example:
-//
-// const float rDAC   = 1.f / (1.f/3900.f + 1.f/2000.f + 1.f/1000.f + 1.f/500.f + 1.f/250.f);
-// const float rShade = 220.f;
-// const float shadeAttenuation = rShade / (rShade + rDAC); // 0.63f
-//
-// (MAME uses an incorrect value which is closer to 78% Intensity)
-// --------------------------------------------------------------------------------------------
+/* -------------------------------------------------------------------------------------------- */
+/* Shadow Colours. */
+/* 63% Intensity is the correct value derived from hardware as follows: */
+/* */
+/* 1/ Shadows are just an extra 220 ohm resistor that goes to ground when enabled. */
+/* 2/ This is in parallel with the resistor-"DAC" (3.9k, 2k, 1k, 0.5k, 0.25k), */
+/*    and otherwise left floating. */
+/* */
+/* Static calculation example: */
+/* */
+/* const float rDAC   = 1.f / (1.f/3900.f + 1.f/2000.f + 1.f/1000.f + 1.f/500.f + 1.f/250.f); */
+/* const float rShade = 220.f; */
+/* const float shadeAttenuation = rShade / (rShade + rDAC); // 0.63f */
+/* */
+/* (MAME uses an incorrect value which is closer to 78% Intensity) */
+/* -------------------------------------------------------------------------------------------- */
 
 void Video::set_shadow_intensity(float f)
 {
@@ -154,18 +154,18 @@ void Video::prepare_frame()
 
     if (!enabled)
     {
-        // Fill with black pixels
+        /* Fill with black pixels */
         for (int i = 0; i < config.s16_width * config.s16_height; i++)
             pixels[i] = 0;
     }
     else
     {
-        // OutRun Hardware Video Emulation
+        /* OutRun Hardware Video Emulation */
         tile_layer->update_tile_values();
 
         (hwroad.*hwroad.render_background)(pixels);
-        tile_layer->render_tile_layer(pixels, 1, 0);      // background layer
-        tile_layer->render_tile_layer(pixels, 0, 0);      // foreground layer
+        tile_layer->render_tile_layer(pixels, 1, 0);      /* background layer */
+        tile_layer->render_tile_layer(pixels, 0, 0);      /* foreground layer */
 
         if (!config.engine.fix_bugs || oroad.horizon_base != ORoad::HORIZON_OFF)
             (hwroad.*hwroad.render_foreground)(pixels);
@@ -192,9 +192,9 @@ void Video::render_frame()
     );
 }
 
-// ---------------------------------------------------------------------------
-// Text Handling Code
-// ---------------------------------------------------------------------------
+/* --------------------------------------------------------------------------- */
+/* Text Handling Code */
+/* --------------------------------------------------------------------------- */
 
 void Video::clear_text_ram()
 {
@@ -244,9 +244,9 @@ uint8_t Video::read_text8(uint32_t addr)
     return tile_layer->text_ram[addr & 0xFFF];
 }
 
-// ---------------------------------------------------------------------------
-// Tile Handling Code
-// ---------------------------------------------------------------------------
+/* --------------------------------------------------------------------------- */
+/* Tile Handling Code */
+/* --------------------------------------------------------------------------- */
 
 void Video::clear_tile_ram()
 {
@@ -297,9 +297,9 @@ uint8_t Video::read_tile8(uint32_t addr)
 }
 
 
-// ---------------------------------------------------------------------------
-// Sprite Handling Code
-// ---------------------------------------------------------------------------
+/* --------------------------------------------------------------------------- */
+/* Sprite Handling Code */
+/* --------------------------------------------------------------------------- */
 
 void Video::write_sprite16(uint32_t* addr, const uint16_t data)
 {
@@ -307,9 +307,9 @@ void Video::write_sprite16(uint32_t* addr, const uint16_t data)
     *addr += 2;
 }
 
-// ---------------------------------------------------------------------------
-// Palette Handling Code
-// ---------------------------------------------------------------------------
+/* --------------------------------------------------------------------------- */
+/* Palette Handling Code */
+/* --------------------------------------------------------------------------- */
 
 void Video::write_pal8(uint32_t* palAddr, const uint8_t data)
 {
@@ -379,20 +379,20 @@ uint32_t Video::read_pal32(uint32_t* palAddr)
     return (palette[adr] << 24) | (palette[adr+1] << 16) | (palette[adr+2] << 8) | palette[adr+3];
 }
 
-// Convert internal System 16 RRRR GGGG BBBB format palette to renderer output format
+/* Convert internal System 16 RRRR GGGG BBBB format palette to renderer output format */
 void Video::refresh_palette(uint32_t palAddr)
 {
     palAddr &= ~1;
     uint32_t a = (palette[palAddr] << 8) | palette[palAddr + 1];
-    uint32_t r = (a & 0x000f) << 1; // r rrr0
-    uint32_t g = (a & 0x00f0) >> 3; // g ggg0
-    uint32_t b = (a & 0x0f00) >> 7; // b bbb0
+    uint32_t r = (a & 0x000f) << 1; /* r rrr0 */
+    uint32_t g = (a & 0x00f0) >> 3; /* g ggg0 */
+    uint32_t b = (a & 0x0f00) >> 7; /* b bbb0 */
     if ((a & 0x1000) != 0)
-        r |= 1; // r rrrr
+        r |= 1; /* r rrrr */
     if ((a & 0x2000) != 0)
-        g |= 1; // g gggg
+        g |= 1; /* g gggg */
     if ((a & 0x4000) != 0)
-        b |= 1; // b bbbb
+        b |= 1; /* b bbbb */
 
     palAddr >>= 1;
 
@@ -405,8 +405,8 @@ void Video::refresh_palette(uint32_t palAddr)
     rgb[palAddr + S16_PALETTE_ENTRIES] =
         CURRENT_RGB();
 
-    // Conserva il comportamento del core precedente
-    // qualora venga usato il terzo banco della palette.
+    /* Conserva il comportamento del core precedente */
+    /* qualora venga usato il terzo banco della palette. */
     rgb[palAddr + (S16_PALETTE_ENTRIES * 2)] =
         CURRENT_RGB();
 }

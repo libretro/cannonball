@@ -15,13 +15,13 @@ class SoundChip
 public:
     bool initalized;
 
-    // Sample Frequency in use
+    /* Sample Frequency in use */
     uint32_t sample_freq;
 
-    // How many channels to support (mono/stereo)
+    /* How many channels to support (mono/stereo) */
     uint8_t channels;
 
-    // Size of the buffer (including channel info)
+    /* Size of the buffer (including channel info) */
     uint32_t buffer_size;
 
     SoundChip();
@@ -29,7 +29,7 @@ public:
 
     void init(uint8_t, int32_t, int32_t);
 
-    // Pure virtual function. Denotes virtual class.
+    /* Pure virtual function. Denotes virtual class. */
     virtual void stream_update() = 0;
 
     int16_t* get_buffer();
@@ -42,10 +42,10 @@ protected:
     const static uint8_t LEFT             = 0;
     const static uint8_t RIGHT            = 1;
 
-    //  Buffer size for one frame (excluding channel info)
+    /*  Buffer size for one frame (excluding channel info) */
     uint32_t frame_size;
 
-    // Volume of sound chip
+    /* Volume of sound chip */
     float volume;
 
     void clear_buffer();
@@ -53,9 +53,9 @@ protected:
     int16_t read_buffer(const uint8_t, uint32_t);
 
 private:
-    // Sound buffer stream
+    /* Sound buffer stream */
     int16_t* buffer;
 
-    // Frames per second
+    /* Frames per second */
     uint32_t fps; 
 };

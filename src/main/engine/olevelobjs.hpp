@@ -21,24 +21,24 @@
 class OLevelObjs
 {
     public:
-        // Spray Counter (Going Through Water).
+        /* Spray Counter (Going Through Water). */
         uint16_t spray_counter;
 
-        // Wheel Spray Type
-        // 00 = Water
-        // 04 = Yellow Stuff
-        // 08 = Green Stuff
-        // 0c = Pink stuff
-        // 10 = Smoke
+        /* Wheel Spray Type */
+        /* 00 = Water */
+        /* 04 = Yellow Stuff */
+        /* 08 = Green Stuff */
+        /* 0c = Pink stuff */
+        /* 10 = Smoke */
         uint16_t spray_type;
 
-	    //	Collision With Sprite Has Ocurred
-	    //
-	    // 0 = No Collision
-	    // 1 = Collision (and increments for every additional collision in this crash cycle)
+	    /*	Collision With Sprite Has Ocurred */
+	    /* */
+	    /* 0 = No Collision */
+	    /* 1 = Collision (and increments for every additional collision in this crash cycle) */
 	    uint8_t collision_sprite;
 
-	    // Sprite Collision Counter (Hitting Scenery)
+	    /* Sprite Collision Counter (Hitting Scenery) */
 	    int16_t sprite_collision_counter;
 
         OLevelObjs(void);
@@ -52,10 +52,10 @@ class OLevelObjs
         void hide_sprite(oentry*);
 
     private:
-        // Default sprite entries for stage 1 initialization
+        /* Default sprite entries for stage 1 initialization */
         const static uint8_t DEF_SPRITE_ENTRIES = 0x44;
         
-        // Hi-Score Sprite Entries
+        /* Hi-Score Sprite Entries */
         const static uint8_t HISCORE_SPRITE_ENTRIES = 0x40;
 
         const static uint8_t COLLISION_RESET = 4;

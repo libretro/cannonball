@@ -28,44 +28,44 @@
 extern void update_geometry();
 extern void update_timing(void);
 
-// Logo Y Position
+/* Logo Y Position */
 const static int16_t LOGO_Y = -60;
 
-// Columns and rows available
+/* Columns and rows available */
 const static uint16_t COLS = 40;
 const static uint16_t ROWS = 28;
 
-// Horizon Destination Position
+/* Horizon Destination Position */
 const static uint16_t HORIZON_DEST = 0x3A0;
 
-// ------------------------------------------------------------------------------------------------
-// Text Labels for menus
-// ------------------------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------------------------ */
+/* Text Labels for menus */
+/* ------------------------------------------------------------------------------------------------ */
 
-// Back Labels
+/* Back Labels */
 const static char* ENTRY_BACK       = "BACK";
 
-// Main Menu
+/* Main Menu */
 const static char* ENTRY_PLAYGAME   = "PLAY GAME";
 const static char* ENTRY_GAMEMODES  = "GAME MODES";
 const static char* ENTRY_SETTINGS   = "SETTINGS";
 const static char* ENTRY_ABOUT      = "ABOUT";
 const static char* ENTRY_EXIT       = "EXIT";
 
-// Game Modes Menu
+/* Game Modes Menu */
 const static char* ENTRY_ENHANCED   = "SET ENHANCED MODE";
 const static char* ENTRY_ORIGINAL   = "SET ORIGINAL MODE";
 const static char* ENTRY_CONT       = "CONTINUOUS MODE";
 const static char* ENTRY_TIMETRIAL  = "TIME TRIAL MODE";
 
-// Time Trial Menu
+/* Time Trial Menu */
 const static char* ENTRY_START      =  "START TIME TRIAL";
 const static char* ENTRY_LAPS       =  "NO OF LAPS ";
 
-// Continuous Menu
+/* Continuous Menu */
 const static char* ENTRY_START_CONT = "START CONTINUOUS MODE";
 
-// Settings Menu
+/* Settings Menu */
 const static char* ENTRY_VIDEO      = "VIDEO";
 const static char* ENTRY_SOUND      = "SOUND";
 const static char* ENTRY_CONTROLS   = "CONTROLS";
@@ -73,7 +73,7 @@ const static char* ENTRY_ENGINE     = "GAME ENGINE";
 const static char* ENTRY_SCORES     = "CLEAR HISCORES";
 const static char* ENTRY_SAVE       = "SAVE AND RETURN";
 
-// Video Menu
+/* Video Menu */
 const static char* ENTRY_FPS        = "FRAME RATE ";
 const static char* ENTRY_FULLSCREEN = "FULL SCREEN ";
 const static char* ENTRY_WIDESCREEN = "WIDESCREEN ";
@@ -81,7 +81,7 @@ const static char* ENTRY_HIRES      = "HIRES ";
 const static char* ENTRY_SCALE      = "WINDOW SCALE ";
 const static char* ENTRY_SCANLINES  = "SCANLINES ";
 
-// Sound Menu
+/* Sound Menu */
 const static char* ENTRY_MUTE       = "SOUND ";
 const static char* ENTRY_BGM        = "BGM VOL ";
 const static char* ENTRY_SFX        = "SFX VOL ";
@@ -90,7 +90,7 @@ const static char* ENTRY_PREVIEWSND = "PREVIEW MUSIC ";
 const static char* ENTRY_FIXSAMPLES = "FIX SAMPLES ";
 const static char* ENTRY_MUSICTEST  = "MUSIC TEST";
 
-// Controls Menu
+/* Controls Menu */
 const static char* ENTRY_GEAR       = "GEAR ";
 const static char* ENTRY_ANALOG     = "ANALOG ";
 const static char* ENTRY_REDEFJOY   = "REDEFINE GAMEPAD";
@@ -98,7 +98,7 @@ const static char* ENTRY_REDEFKEY   = "REDEFINE KEYS";
 const static char* ENTRY_DSTEER     = "DIGITAL STEER SPEED ";
 const static char* ENTRY_DPEDAL     = "DIGITAL PEDAL SPEED ";
 
-// Game Engine Menu
+/* Game Engine Menu */
 const static char* ENTRY_FREEPLAY   = "FREE PLAY ";
 const static char* ENTRY_FORCE_AI   = "FORCE AI TO PLAY ";
 const static char* ENTRY_TRACKS     = "TRACKS ";
@@ -118,7 +118,7 @@ const static char* ENTRY_COLOR      = "CAR COLOR ";
 
 const static char* COLOR_LABELS[7]  = { "RED", "BLUE", "YELLOW", "GREEN", "CYAN", "BLACK", "WHITE" };
 
-// Music Test Menu
+/* Music Test Menu */
 const static char* ENTRY_MUSIC1     = "MAGICAL SOUND SHOWER";
 const static char* ENTRY_MUSIC2     = "PASSING BREEZE";
 const static char* ENTRY_MUSIC3     = "SPLASH WAVE";
@@ -137,7 +137,7 @@ Menu::~Menu(void)
 
 void Menu::populate()
 {
-    // Create Menus
+    /* Create Menus */
     menu_main.push_back(ENTRY_PLAYGAME);
     menu_main.push_back(ENTRY_GAMEMODES);
     menu_main.push_back(ENTRY_SETTINGS);
@@ -172,8 +172,8 @@ void Menu::populate()
     menu_video.push_back(ENTRY_BACK);
 
     menu_sound.push_back(ENTRY_MUTE);
-    //menu_sound.push_back(ENTRY_BGM);
-    //menu_sound.push_back(ENTRY_SFX);
+    /*menu_sound.push_back(ENTRY_BGM); */
+    /*menu_sound.push_back(ENTRY_SFX); */
     menu_sound.push_back(ENTRY_ADVERTISE);
     menu_sound.push_back(ENTRY_PREVIEWSND);
     menu_sound.push_back(ENTRY_FIXSAMPLES);
@@ -219,7 +219,7 @@ void Menu::populate()
     menu_about.push_back(" ");
     menu_about.push_back("CANNONBALL IS FREE AND MAY NOT BE SOLD.");
 
-    // Redefine menu text
+    /* Redefine menu text */
     text_redefine.push_back("PRESS UP");
     text_redefine.push_back("PRESS DOWN");
     text_redefine.push_back("PRESS LEFT");
@@ -236,7 +236,7 @@ void Menu::populate()
 
 void Menu::init()
 {   
-    // If we got a new high score on previous time trial, then save it!
+    /* If we got a new high score on previous time trial, then save it! */
     if (outrun.ttrial.new_high_score)
     {
         outrun.ttrial.new_high_score = false;
@@ -245,13 +245,13 @@ void Menu::init()
 
     outrun.select_course(false, config.engine.prototype != 0);
     video.enabled = true;
-    video.sprite_layer->set_x_clip(false); // Stop clipping in wide-screen mode.
+    video.sprite_layer->set_x_clip(false); /* Stop clipping in wide-screen mode. */
     video.sprite_layer->reset();
     video.clear_text_ram();
     video.tile_layer->restore_tiles();
     ologo.enable(LOGO_Y);
 
-    // Setup palette, road and colours for background
+    /* Setup palette, road and colours for background */
     oroad.stage_lookup_off = 9;
     oinitengine.init_road_seg_master();
     opalette.setup_sky_palette();
@@ -275,7 +275,7 @@ void Menu::init()
     set_menu(&menu_main);
     refresh_menu();
 
-    // Reset audio, so we can play tones
+    /* Reset audio, so we can play tones */
     osoundint.has_booted = true;
     osoundint.init();
     cannonball::audio.clear_wav();
@@ -316,7 +316,7 @@ void Menu::tick()
 
 void Menu::tick_ui()
 {
-    // Skip odd frames at 60fps
+    /* Skip odd frames at 60fps */
     frame++;
 
     video.clear_text_ram();
@@ -335,21 +335,21 @@ void Menu::tick_ui()
         redefine_joystick();
     }
 
-    // Show messages
+    /* Show messages */
     if (message_counter > 0)
     {
         message_counter--;
         ohud.blit_text_new(0, 1, msg.c_str(), ohud.GREY);
     }
      
-    // Shift horizon
+    /* Shift horizon */
     if (oroad.horizon_base > HORIZON_DEST)
     {
         oroad.horizon_base -= 60 / (config.fps < 60 ? config.fps : 60);
         if (oroad.horizon_base < HORIZON_DEST)
             oroad.horizon_base = HORIZON_DEST;
     }
-    // Advance road
+    /* Advance road */
     else
     {
         uint32_t scroll_speed = (config.fps >= 60) ? config.menu.road_scroll_speed : config.menu.road_scroll_speed << 1;
@@ -361,7 +361,7 @@ void Menu::tick_ui()
         uint32_t result = 0x12F * (oinitengine.car_increment >> 16);
         oroad.road_pos_change = result;
         oroad.road_pos += result;
-        if (oroad.road_pos >> 16 > ROAD_END) // loop to beginning of track data
+        if (oroad.road_pos >> 16 > ROAD_END) /* loop to beginning of track data */
             oroad.road_pos = 0;
         oinitengine.update_road();
         oinitengine.set_granular_position();
@@ -370,7 +370,7 @@ void Menu::tick_ui()
         oinitengine.car_x_pos = oroad.car_x_bak;
     }
 
-    // Do Animations at 30 fps
+    /* Do Animations at 30 fps */
     if (config.fps == 30
         || (config.fps == 60 && (frame & 1) == 0)
         || (config.fps == 120 && (frame & 3) == 1))
@@ -380,7 +380,7 @@ void Menu::tick_ui()
         osprites.update_sprites();
     }
 
-    // Draw FPS
+    /* Draw FPS */
     if (config.video.fps_count)
         ohud.draw_fps_counter(cannonball::fps_counter);
 
@@ -391,23 +391,23 @@ void Menu::draw_menu_options()
 {
     int8_t x = 0;
 
-    // Find central column in screen. 
+    /* Find central column in screen.  */
     int8_t y = 13 + ((ROWS - 13) >> 1) - ((menu_selected->size() * 2) >> 1);
 
     for (int i = 0; i < (int) menu_selected->size(); i++)
     {
         std::string s = menu_selected->at(i);
 
-        // Centre the menu option
+        /* Centre the menu option */
         x = 20 - (s.length() >> 1);
         ohud.blit_text_new(x, y, s.c_str(), ohud.GREEN);
 
         if (!is_text_menu)
         {
-            // Draw minicar
+            /* Draw minicar */
             if (i == cursor)
                 video.write_text32(ohud.translate(x - 3, y), roms.rom0.read32(TILES_MINICARS1));
-            // Erase minicar from this position
+            /* Erase minicar from this position */
             else
                 video.write_text32(ohud.translate(x - 3, y), 0x20202020);
         }
@@ -415,13 +415,13 @@ void Menu::draw_menu_options()
     }
 }
 
-// Draw a single line of text
+/* Draw a single line of text */
 void Menu::draw_text(std::string s)
 {
-    // Centre text
+    /* Centre text */
     int8_t x = 20 - (s.length() >> 1);
 
-    // Find central column in screen. 
+    /* Find central column in screen.  */
     int8_t y = 13 + ((ROWS - 13) >> 1) - 1;
 
     ohud.blit_text_new(x, y, s.c_str(), ohud.GREEN);
@@ -444,7 +444,7 @@ static bool menu_starts_with(
 
 void Menu::tick_menu()
 {
-    // Tick Controls
+    /* Tick Controls */
     if (input.has_pressed(Input::DOWN) || oinputs.is_analog_r())
     {
         osoundint.queue_sound(sound::BEEP1);
@@ -461,7 +461,7 @@ void Menu::tick_menu()
     }
     else if (input.has_pressed(Input::ACCEL) || input.has_pressed(Input::START) || oinputs.is_analog_select())
     {
-        // Get option that was selected
+        /* Get option that was selected */
         const char* OPTION = menu_selected->at(cursor).c_str();
 
         if (menu_selected == &menu_main)
@@ -694,7 +694,7 @@ void Menu::tick_menu()
             {
                 display_message("PRESS MENU TO END AT ANY STAGE");
                 state = STATE_REDEFINE_JOY;
-                redef_state = config.controls.analog == 1 ? 2 : 0; // Ignore pedals when redefining analog
+                redef_state = config.controls.analog == 1 ? 2 : 0; /* Ignore pedals when redefining analog */
                 input.joy_button = -1;
             }
             else if (SELECTED(ENTRY_DSTEER))
@@ -845,7 +845,7 @@ void Menu::tick_menu()
     }
 }
 
-// Set Current Menu
+/* Set Current Menu */
 void Menu::set_menu(std::vector<std::string> *menu)
 {
     menu_selected = menu;
@@ -854,7 +854,7 @@ void Menu::set_menu(std::vector<std::string> *menu)
     is_text_menu = (menu == &menu_about);
 }
 
-// Refresh menu options with latest config data
+/* Refresh menu options with latest config data */
 void Menu::refresh_menu()
 {
     int16_t cursor_backup = cursor;
@@ -862,7 +862,7 @@ void Menu::refresh_menu()
 
     for (cursor = 0; cursor < (int) menu_selected->size(); cursor++)
     {
-        // Get option that was selected
+        /* Get option that was selected */
         const char* OPTION = menu_selected->at(cursor).c_str();
 
         if (menu_selected == &menu_timetrial)
@@ -991,7 +991,7 @@ void Menu::refresh_menu()
     cursor = cursor_backup;
 }
 
-// Append Menu Text For A Particular Menu Entry
+/* Append Menu Text For A Particular Menu Entry */
 void Menu::set_menu_text(std::string s1, std::string s2)
 {
     s1.append(s2);
@@ -1001,7 +1001,7 @@ void Menu::set_menu_text(std::string s1, std::string s2)
 
 void Menu::redefine_keyboard()
 {
-    if (redef_state == 7 && config.controls.gear != config.controls.GEAR_SEPARATE) // Skip redefine of second gear press
+    if (redef_state == 7 && config.controls.gear != config.controls.GEAR_SEPARATE) /* Skip redefine of second gear press */
         redef_state++;
 
     switch (redef_state)
@@ -1043,7 +1043,7 @@ void Menu::redefine_keyboard()
 
 void Menu::redefine_joystick()
 {
-    if (redef_state == 3 && config.controls.gear != config.controls.GEAR_SEPARATE) // Skip redefine of second gear press
+    if (redef_state == 3 && config.controls.gear != config.controls.GEAR_SEPARATE) /* Skip redefine of second gear press */
         redef_state++;
 
     switch (redef_state)
@@ -1079,7 +1079,7 @@ void Menu::redefine_joystick()
     }
 }
 
-// Display a contextual message in the top left of the screen
+/* Display a contextual message in the top left of the screen */
 void Menu::display_message(std::string s)
 {
     msg = s;
@@ -1096,7 +1096,7 @@ bool Menu::check_jap_roms()
     return true;
 }
 
-// Reinitalize Video, and stop audio to avoid crackles
+/* Reinitalize Video, and stop audio to avoid crackles */
 void Menu::restart_video()
 {
     if (config.sound.enabled)
@@ -1112,7 +1112,7 @@ void Menu::start_game(int mode, int settings)
 {
     int fps_prev = config.fps;
 
-    // Enhanced Settings
+    /* Enhanced Settings */
     if (settings == 1)
     {
         if (!config.video.hires)
@@ -1149,7 +1149,7 @@ void Menu::start_game(int mode, int settings)
         lr_options::set_frontend_variable(&config.engine.fix_bugs);
         lr_options::set_frontend_variable(&config.sound.preview);
     }
-    // Original Settings
+    /* Original Settings */
     else if (settings == 2)
     {
         if (config.video.hires)
@@ -1185,7 +1185,7 @@ void Menu::start_game(int mode, int settings)
         lr_options::set_frontend_variable(&config.engine.fix_bugs);
         lr_options::set_frontend_variable(&config.sound.preview);
     }
-    // Otherwise, use whatever is already setup...
+    /* Otherwise, use whatever is already setup... */
     else
     {
         config.engine.fix_bugs = config.engine.fix_bugs_backup;
