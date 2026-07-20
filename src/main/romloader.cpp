@@ -10,7 +10,7 @@
 
 #include <cstddef>
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include <encodings/crc32.h>
@@ -23,7 +23,7 @@
 extern retro_log_printf_t log_cb;
 extern char rom_path[1024];
 
-static std::unordered_map<uint32_t, std::string> crc_map;
+static std::map<uint32_t, std::string> crc_map;
 static bool map_created = false;
 static std::string mapped_path;
 
@@ -284,7 +284,7 @@ int RomLoader::load_crc32(const char* debug,
         return 1;
     }
 
-    const std::unordered_map<uint32_t, std::string>::const_iterator match =
+    const std::map<uint32_t, std::string>::const_iterator match =
         crc_map.find(expected_crc);
 
     if (match == crc_map.end())
