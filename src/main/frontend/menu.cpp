@@ -8,8 +8,6 @@
 
 #include <vector>
 #include <iterator>
-#include <boost/range/as_literal.hpp>
-#include <boost/algorithm/string/compare.hpp>
 
 #include "main.hpp"
 #include "menu.hpp"
@@ -19,7 +17,6 @@
 #include "setup.hpp"
 #endif
 #include "../utils.hpp"
-#include "../cannonboard/interface.hpp"
 
 #include "engine/ohud.hpp"
 #include "engine/oinputs.hpp"
@@ -28,7 +25,6 @@
 #include "engine/opalette.hpp"
 #include "engine/otiles.hpp"
 
-#include "frontend/cabdiag.hpp"
 #include "frontend/ttrial.hpp"
 
 #ifdef __LIBRETRO__
@@ -37,53 +33,6 @@ extern void update_geometry();
 extern void update_timing(void);
 #endif
 
-namespace boost {
-    namespace algorithm {
-
-        template<typename Range1T, typename Range2T, typename PredicateT>
-            inline bool starts_with( 
-            const Range1T& Input, 
-            const Range2T& Test,
-            PredicateT Comp)
-        {
-            iterator_range<BOOST_STRING_TYPENAME range_const_iterator<Range1T>::type> lit_input(::boost::as_literal(Input));
-            iterator_range<BOOST_STRING_TYPENAME range_const_iterator<Range2T>::type> lit_test(::boost::as_literal(Test));
-
-            typedef BOOST_STRING_TYPENAME 
-                range_const_iterator<Range1T>::type Iterator1T;
-            typedef BOOST_STRING_TYPENAME 
-                range_const_iterator<Range2T>::type Iterator2T;
-
-            Iterator1T InputEnd=::boost::end(lit_input);
-            Iterator2T TestEnd=::boost::end(lit_test);
-
-            Iterator1T it=::boost::begin(lit_input);
-            Iterator2T pit=::boost::begin(lit_test);
-            for(;
-                it!=InputEnd && pit!=TestEnd;
-                ++it,++pit)
-            {
-                if( !(Comp(*it,*pit)) )
-                    return false;
-            }
-
-            return pit==TestEnd;
-        }
-
-        template<typename Range1T, typename Range2T>
-        inline bool starts_with( 
-            const Range1T& Input, 
-            const Range2T& Test)
-        {
-            return ::boost::algorithm::starts_with(Input, Test, is_equal());
-        }
-
-    } // namespace algorithm
-
-    // pull names to the boost namespace
-    using algorithm::starts_with;
-
-} // namespace boost
 
 // Logo Y Position
 const static int16_t LOGO_Y = -60;
@@ -126,16 +75,9 @@ const static char* ENTRY_START_CONT = "START CONTINUOUS MODE";
 const static char* ENTRY_VIDEO      = "VIDEO";
 const static char* ENTRY_SOUND      = "SOUND";
 const static char* ENTRY_CONTROLS   = "CONTROLS";
-const static char* ENTRY_CANNONBOARD= "CANNONBOARD";
 const static char* ENTRY_ENGINE     = "GAME ENGINE";
 const static char* ENTRY_SCORES     = "CLEAR HISCORES";
 const static char* ENTRY_SAVE       = "SAVE AND RETURN";
-
-// CannonBoard Menu
-const static char* ENTRY_C_INTERFACE= "INTERFACE DIAGNOSTICS";
-const static char* ENTRY_C_INPUTS   = "INPUT TEST";
-const static char* ENTRY_C_OUTPUTS  = "OUTPUT TEST";
-const static char* ENTRY_C_CRT      = "CRT TEST";
 
 // Video Menu
 const static char* ENTRY_FPS        = "FRAME RATE ";
@@ -171,6 +113,16 @@ const static char* ENTRY_TRAFFIC    = "TRAFFIC ";
 const static char* ENTRY_OBJECTS    = "OBJECTS ";
 const static char* ENTRY_PROTOTYPE  = "PROTOTYPE STAGE 1 ";
 const static char* ENTRY_ATTRACT    = "NEW ATTRACT ";
+const static char* ENTRY_TIMER      = "TIMING FIXES ";
+const static char* ENTRY_SUB_ENHANCEMENTS = "ENHANCEMENTS";
+const static char* ENTRY_SUB_HANDLING     = "CAR SETUP";
+const static char* ENTRY_GRIP       = "GRIPPY TYRES ";
+const static char* ENTRY_OFFROAD    = "OFFROAD TYRES ";
+const static char* ENTRY_BUMPER     = "STRONG BUMPER ";
+const static char* ENTRY_TURBO      = "FASTER CAR ";
+const static char* ENTRY_COLOR      = "CAR COLOR ";
+
+const static char* COLOR_LABELS[7]  = { "RED", "BLUE", "YELLOW", "GREEN", "CYAN", "BLACK", "WHITE" };
 
 // Music Test Menu
 const static char* ENTRY_MUSIC1     = "MAGICAL SOUND SHOWER";
@@ -178,17 +130,14 @@ const static char* ENTRY_MUSIC2     = "PASSING BREEZE";
 const static char* ENTRY_MUSIC3     = "SPLASH WAVE";
 const static char* ENTRY_MUSIC4     = "LAST WAVE";
 
-Menu::Menu(Interface* cannonboard)
+Menu::Menu()
 {
-    this->cannonboard = cannonboard;
-    cabdiag = new CabDiag(cannonboard);
-    ttrial  = new TTrial(config.ttrial.best_times);
+    ttrial = new TTrial(config.ttrial.best_times);
 }
 
 
 Menu::~Menu(void)
 {
-    delete cabdiag;
     delete ttrial;
 }
 
@@ -221,17 +170,9 @@ void Menu::populate()
     menu_settings.push_back(ENTRY_SOUND);
     #endif
     menu_settings.push_back(ENTRY_CONTROLS);
-    if (config.cannonboard.enabled)
-        menu_settings.push_back(ENTRY_CANNONBOARD);
     menu_settings.push_back(ENTRY_ENGINE);
     menu_settings.push_back(ENTRY_SCORES);
     menu_settings.push_back(ENTRY_SAVE);
-
-    menu_cannonboard.push_back(ENTRY_C_INTERFACE);
-    menu_cannonboard.push_back(ENTRY_C_INPUTS);
-    menu_cannonboard.push_back(ENTRY_C_OUTPUTS);
-    menu_cannonboard.push_back(ENTRY_C_CRT);
-    menu_cannonboard.push_back(ENTRY_BACK);
 
     menu_video.push_back(ENTRY_FPS);
     menu_video.push_back(ENTRY_WIDESCREEN);
@@ -253,15 +194,27 @@ void Menu::populate()
     menu_controls.push_back(ENTRY_DPEDAL);
     menu_controls.push_back(ENTRY_BACK);
 
+    menu_engine.push_back(ENTRY_TIME);
+    menu_engine.push_back(ENTRY_TRAFFIC);
     menu_engine.push_back(ENTRY_TRACKS);
     menu_engine.push_back(ENTRY_FREEPLAY);
     menu_engine.push_back(ENTRY_FORCE_AI);
-    menu_engine.push_back(ENTRY_TIME);
-    menu_engine.push_back(ENTRY_TRAFFIC);
-    menu_engine.push_back(ENTRY_OBJECTS);
-    menu_engine.push_back(ENTRY_PROTOTYPE);
-    menu_engine.push_back(ENTRY_ATTRACT);
+    menu_engine.push_back(ENTRY_SUB_ENHANCEMENTS);
+    menu_engine.push_back(ENTRY_SUB_HANDLING);
     menu_engine.push_back(ENTRY_BACK);
+
+    menu_enhancements.push_back(ENTRY_TIMER);
+    menu_enhancements.push_back(ENTRY_ATTRACT);
+    menu_enhancements.push_back(ENTRY_OBJECTS);
+    menu_enhancements.push_back(ENTRY_PROTOTYPE);
+    menu_enhancements.push_back(ENTRY_BACK);
+
+    menu_handling.push_back(ENTRY_GRIP);
+    menu_handling.push_back(ENTRY_OFFROAD);
+    menu_handling.push_back(ENTRY_BUMPER);
+    menu_handling.push_back(ENTRY_TURBO);
+    menu_handling.push_back(ENTRY_COLOR);
+    menu_handling.push_back(ENTRY_BACK);
 
     menu_musictest.push_back(ENTRY_MUSIC1);
     menu_musictest.push_back(ENTRY_MUSIC2);
@@ -269,7 +222,7 @@ void Menu::populate()
     menu_musictest.push_back(ENTRY_MUSIC4);
     menu_musictest.push_back(ENTRY_BACK);
 
-    menu_about.push_back("CANNONBALL 0.3 © CHRIS WHITE 2014");
+    menu_about.push_back("CANNONBALL 0.3 \xA9 CHRIS WHITE 2014");
     menu_about.push_back("REASSEMBLER.BLOGSPOT.COM");
     menu_about.push_back(" ");
     menu_about.push_back("CANNONBALL IS FREE AND MAY NOT BE SOLD.");
@@ -338,13 +291,10 @@ void Menu::init()
     frame = 0;
     message_counter = 0;
 
-    if (config.cannonboard.enabled)
-        display_message(cannonboard->started() ? "CANNONBOARD FOUND!" : "CANNONBOARD ERROR!");
-
     state = STATE_MENU;
 }
 
-void Menu::tick(Packet* packet)
+void Menu::tick()
 {
     switch (state)
     {
@@ -352,15 +302,6 @@ void Menu::tick(Packet* packet)
         case STATE_REDEFINE_KEYS:
         case STATE_REDEFINE_JOY:
             tick_ui();
-            break;
-
-        case STATE_DIAGNOSTICS:
-            if (cabdiag->tick(packet))
-            {
-                init();
-                set_menu(&menu_cannonboard);
-                refresh_menu();
-            }
             break;
 
         case STATE_TTRIAL:
@@ -494,7 +435,20 @@ void Menu::draw_text(std::string s)
     ohud.blit_text_new(x, y, s.c_str(), ohud.GREEN);
 }
 
-#define SELECTED(string) boost::starts_with(OPTION, string)
+static bool menu_starts_with(
+    const std::string& value,
+    const std::string& prefix)
+{
+    return
+        value.size() >= prefix.size() &&
+        value.compare(
+            0,
+            prefix.size(),
+            prefix) == 0;
+}
+
+
+#define SELECTED(string) menu_starts_with(OPTION, string)
 
 void Menu::tick_menu()
 {
@@ -523,8 +477,6 @@ void Menu::tick_menu()
             if (SELECTED(ENTRY_PLAYGAME))
             {
                 start_game(Outrun::MODE_ORIGINAL);
-                //cabdiag->set(CabDiag::STATE_MOTORT);
-                //state = STATE_DIAGNOSTICS;
                 return;
             }
             else if (SELECTED(ENTRY_GAMEMODES))
@@ -600,9 +552,7 @@ void Menu::tick_menu()
         }
         else if (menu_selected == &menu_settings)
         {
-            if (SELECTED(ENTRY_CANNONBOARD))
-                set_menu(&menu_cannonboard);
-            else if (SELECTED(ENTRY_VIDEO))
+            if (SELECTED(ENTRY_VIDEO))
                 set_menu(&menu_video);
             else if (SELECTED(ENTRY_SOUND))
                 set_menu(&menu_sound);
@@ -629,31 +579,6 @@ void Menu::tick_menu()
         else if (menu_selected == &menu_about)
         {
             set_menu(&menu_main);
-        }
-        else if (menu_selected == &menu_cannonboard)
-        {
-            if (SELECTED(ENTRY_BACK))
-                set_menu(&menu_settings);
-            else if (SELECTED(ENTRY_C_INTERFACE))
-            {
-                cabdiag->set(CabDiag::STATE_INTERFACE);
-                state = STATE_DIAGNOSTICS; return;
-            }
-            else if (SELECTED(ENTRY_C_INPUTS))
-            {
-                cabdiag->set(CabDiag::STATE_INPUT);
-                state = STATE_DIAGNOSTICS; return;
-            }
-            else if (SELECTED(ENTRY_C_OUTPUTS))
-            {
-                cabdiag->set(CabDiag::STATE_OUTPUT);
-                state = STATE_DIAGNOSTICS; return;
-            }
-            else if (SELECTED(ENTRY_C_CRT))
-            {
-                cabdiag->set(CabDiag::STATE_CRT);
-                state = STATE_DIAGNOSTICS; return;
-            }
         }
         else if (menu_selected == &menu_video)
         {
@@ -916,6 +841,24 @@ void Menu::tick_menu()
                     config.engine.dip_traffic++;
 #endif
             }
+            else if (SELECTED(ENTRY_SUB_ENHANCEMENTS))
+                set_menu(&menu_enhancements);
+            else if (SELECTED(ENTRY_SUB_HANDLING))
+                set_menu(&menu_handling);
+            else if (SELECTED(ENTRY_BACK))
+                set_menu(&menu_settings);
+        }
+        else if (menu_selected == &menu_enhancements)
+        {
+            if (SELECTED(ENTRY_TIMER))
+#ifdef __LIBRETRO__
+            {
+                config.engine.fix_timer = !config.engine.fix_timer;
+                lr_options::set_frontend_variable(&config.engine.fix_timer);
+            }
+#else
+                config.engine.fix_timer = !config.engine.fix_timer;
+#endif
             else if (SELECTED(ENTRY_OBJECTS))
 #ifdef __LIBRETRO__
             {
@@ -943,8 +886,49 @@ void Menu::tick_menu()
 #else
                 config.engine.new_attract ^= 1;
 #endif
-            if (SELECTED(ENTRY_BACK))
-                set_menu(&menu_settings);
+            else if (SELECTED(ENTRY_BACK))
+                set_menu(&menu_engine);
+        }
+        else if (menu_selected == &menu_handling)
+        {
+            if (SELECTED(ENTRY_GRIP))
+            {
+                config.engine.grippy_tyres = !config.engine.grippy_tyres;
+#ifdef __LIBRETRO__
+                lr_options::set_frontend_variable(&config.engine.grippy_tyres);
+#endif
+            }
+            else if (SELECTED(ENTRY_OFFROAD))
+            {
+                config.engine.offroad = !config.engine.offroad;
+#ifdef __LIBRETRO__
+                lr_options::set_frontend_variable(&config.engine.offroad);
+#endif
+            }
+            else if (SELECTED(ENTRY_BUMPER))
+            {
+                config.engine.bumper = !config.engine.bumper;
+#ifdef __LIBRETRO__
+                lr_options::set_frontend_variable(&config.engine.bumper);
+#endif
+            }
+            else if (SELECTED(ENTRY_TURBO))
+            {
+                config.engine.turbo = !config.engine.turbo;
+#ifdef __LIBRETRO__
+                lr_options::set_frontend_variable(&config.engine.turbo);
+#endif
+            }
+            else if (SELECTED(ENTRY_COLOR))
+            {
+                if (++config.engine.car_pal > 6)
+                    config.engine.car_pal = 0;
+#ifdef __LIBRETRO__
+                lr_options::set_frontend_variable(&config.engine.car_pal);
+#endif
+            }
+            else if (SELECTED(ENTRY_BACK))
+                set_menu(&menu_engine);
         }
         else if (menu_selected == &menu_musictest)
         {
@@ -1088,13 +1072,30 @@ void Menu::refresh_menu()
                 else if (config.engine.dip_traffic == 3) s = "HARDEST";          
                 set_menu_text(ENTRY_TRAFFIC, s);
             }
+        }
+        else if (menu_selected == &menu_enhancements)
+        {
+            if (SELECTED(ENTRY_TIMER))
+                set_menu_text(ENTRY_TIMER, config.engine.fix_timer ? "ON" : "OFF");
             else if (SELECTED(ENTRY_OBJECTS))
                 set_menu_text(ENTRY_OBJECTS, config.engine.level_objects ? "ENHANCED" : "ORIGINAL");
             else if (SELECTED(ENTRY_PROTOTYPE))
                 set_menu_text(ENTRY_PROTOTYPE, config.engine.prototype ? "ON" : "OFF");
             else if (SELECTED(ENTRY_ATTRACT))
                 set_menu_text(ENTRY_ATTRACT, config.engine.new_attract ? "ON" : "OFF");
-
+        }
+        else if (menu_selected == &menu_handling)
+        {
+            if (SELECTED(ENTRY_GRIP))
+                set_menu_text(ENTRY_GRIP, config.engine.grippy_tyres ? "ON" : "OFF");
+            else if (SELECTED(ENTRY_OFFROAD))
+                set_menu_text(ENTRY_OFFROAD, config.engine.offroad ? "ON" : "OFF");
+            else if (SELECTED(ENTRY_BUMPER))
+                set_menu_text(ENTRY_BUMPER, config.engine.bumper ? "ON" : "OFF");
+            else if (SELECTED(ENTRY_TURBO))
+                set_menu_text(ENTRY_TURBO, config.engine.turbo ? "ON" : "OFF");
+            else if (SELECTED(ENTRY_COLOR))
+                set_menu_text(ENTRY_COLOR, COLOR_LABELS[config.engine.car_pal]);
         }
     }
     cursor = cursor_backup;

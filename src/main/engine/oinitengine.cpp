@@ -35,6 +35,9 @@ OInitEngine oinitengine;
 // Continuous Mode Level Ordering
 const static uint8_t CONTINUOUS_LEVELS[] = {0, 0x8, 0x9, 0x10, 0x11, 0x12, 0x18, 0x19, 0x1A, 0x1B, 0x20, 0x21, 0x22, 0x23, 0x24};
 
+// Set to 0 to 4 to test bonus sequence, -1 disables
+const static int DEBUG_BONUS = -1;
+
 OInitEngine::OInitEngine()
 {
 }
@@ -81,7 +84,7 @@ void OInitEngine::init(int8_t level)
     if (level)
         trackloader.init_path(oroad.stage_lookup_off);
 
-	opalette.setup_sky_palette();
+    opalette.setup_sky_palette();
 	opalette.setup_ground_color();
 	opalette.setup_road_centre();
 	opalette.setup_road_stripes();
@@ -286,18 +289,13 @@ void OInitEngine::update_engine()
         ohud.blit_text1(HUD_KPH1);
         ohud.blit_text1(HUD_KPH2);
 
-        // Blit High/Low Gear
-#ifdef __LIBRETRO__
-        if (!config.cannonboard.enabled)
-#else
-        if (config.controls.gear == config.controls.GEAR_BUTTON && !config.cannonboard.enabled)
-#endif
-        {
-            if (oinputs.gear)
-                ohud.blit_text_new(9, 26, "H");
-            else
-                ohud.blit_text_new(9, 26, "L");
-        }
+        // Blit High/Low Gear.
+        // Libretro displays the current transmission state in every gear mode,
+        // including automatic transmission.
+        if (oinputs.gear)
+            ohud.blit_text_new(9, 26, "H", OHud::GREEN);
+        else
+            ohud.blit_text_new(9, 26, "L", OHud::GREY);
 
         if (config.engine.layout_debug)
             ohud.draw_debug_info(oroad.road_pos, oroad.height_lookup_wrk, trackloader.read_sprite_pattern_index());
@@ -338,8 +336,16 @@ void OInitEngine::check_road_split()
     {
         // State 0: No road split. Check current road position with ROAD_END.
         case SPLIT_NONE:
-            if (oroad.road_pos >> 16 <= ROAD_END) return; 
-            check_stage(); // Do Split - Split behaviour depends on stage
+            if (DEBUG_BONUS == -1)
+            {
+                if (oroad.road_pos >> 16 <= ROAD_END) return;
+                check_stage(); // Do Split - Split behaviour depends on stage
+            }
+            else
+            {
+                if (oroad.road_pos >> 16 <= 0x100) return;
+                init_bonus(DEBUG_BONUS);
+            }
             break;
 
         // State 1: (Does this ever need to be called directly?)
@@ -530,24 +536,7 @@ void OInitEngine::check_stage()
             if (outrun.game_state == GS_INGAME)
             {
                 if (ostats.cur_stage == 5 || ostats.cur_stage == 10)
-                {
-                    switch (omusic.music_selected)
-                    {
-                        // Cycle in-built sounds
-                        case sound::MUSIC_BREEZE:
-                            omusic.music_selected = sound::MUSIC_SPLASH;
-                            osoundint.queue_sound(sound::MUSIC_SPLASH2); // Play without rev effect
-                            break;
-                        case sound::MUSIC_SPLASH:
-                            omusic.music_selected = sound::MUSIC_MAGICAL;
-                            osoundint.queue_sound(sound::MUSIC_MAGICAL2); // Play without rev effect
-                            break;
-                        case sound::MUSIC_MAGICAL:
-                            omusic.music_selected = sound::MUSIC_BREEZE;
-                            osoundint.queue_sound(sound::MUSIC_BREEZE2); // Play without rev effect
-                            break;
-                    }                 
-                }
+                    omusic.cycle_music();
             }              
         }
     }

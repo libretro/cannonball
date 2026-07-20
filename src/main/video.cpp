@@ -10,65 +10,45 @@
 ***************************************************************************/
 
 #include "video.hpp"
-#ifdef __LIBRETRO__
-#include "lr_setup.hpp"
-#else
-#include "setup.hpp"
-#endif
 #include "globals.hpp"
 #include "frontend/config.hpp"
+#include "engine/oroad.hpp"
+
+#ifdef __LIBRETRO__
+#include "lr_setup.hpp"
+#include <libretro.h>
+
+extern retro_video_refresh_t video_cb;
+
+#define Rshift 11
+#define Gshift 6
+#define Bshift 0
+#define CURRENT_RGB() ((r << Rshift) | (g << Gshift) | (b << Bshift))
+#else
+#include <iostream>
 
 #ifdef WITH_OPENGL
-
-#if defined SDL2
 #include "sdl2/rendergl.hpp"
-#else
-#include "sdl/rendergl.hpp"
-#endif
-
-#endif
-
-#if defined SDL2
-
-#if defined WITH_OPENGLES
+#elif WITH_OPENGLES
 #include "sdl2/rendergles.hpp"
 #else
 #include "sdl2/rendersurface.hpp"
 #endif
-
-#else
-#include <libretro.h>
-extern retro_video_refresh_t       video_cb;
-#define Rshift 11
-#define Gshift 6
-#define Bshift 0
-#define CURRENT_RGB() (r << Rshift) | (g << Gshift) | (b << Bshift);
-#endif //SDL2
+#endif
 
 Video video;
 
 Video::Video(void)
 {
 #ifndef __LIBRETRO__
-    #ifdef WITH_OPENGL
-    renderer     = new RenderGL();
-    
-    #elif defined SDL2
-
-    #ifdef WITH_OPENGLES
-    renderer	 = new RenderGLES();
-    #else
-    renderer     = new RenderSurface();
-    #endif
-
-    #else
-    renderer     = new RenderSW();
-    #endif
+    renderer     = new Render();
 #endif
-
     pixels       = NULL;
     sprite_layer = new hwsprites();
     tile_layer   = new hwtiles();
+
+    set_shadow_intensity(shadow::ORIGINAL);
+    enabled      = false;
 }
 
 Video::~Video(void)
@@ -89,7 +69,7 @@ int Video::init(Roms* roms, video_settings_t* settings)
 
     // Internal pixel array. The size of this is always constant
     if (pixels) delete[] pixels;
-    pixels = new uint16_t[(config.s16_width * config.s16_height)];
+    pixels = new uint16_t[config.s16_width * config.s16_height];
 
     // Convert S16 tiles to a more useable format
     tile_layer->init(roms->tiles.rom, config.video.hires != 0);
@@ -127,6 +107,7 @@ void Video::disable()
 #ifndef __LIBRETRO__
     renderer->disable();
 #endif
+    enabled = false;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -161,22 +142,52 @@ int Video::set_video_mode(video_settings_t* settings)
     if (settings->scale < 1)
         settings->scale = 1;
 
+    set_shadow_intensity(settings->shadow == 0 ? shadow::ORIGINAL : shadow::MAME);
+
 #ifndef __LIBRETRO__
-    renderer->init(config.s16_width, config.s16_height, settings->scale, settings->mode, settings->scanlines);
+    renderer->init(config.s16_width, config.s16_height,
+                   settings->scale, settings->mode,
+                   settings->scanlines);
 #endif
 
     return 1;
 }
 
-void Video::draw_frame()
+// --------------------------------------------------------------------------------------------
+// Shadow Colours.
+// 63% Intensity is the correct value derived from hardware as follows:
+//
+// 1/ Shadows are just an extra 220 ohm resistor that goes to ground when enabled.
+// 2/ This is in parallel with the resistor-"DAC" (3.9k, 2k, 1k, 0.5k, 0.25k),
+//    and otherwise left floating.
+//
+// Static calculation example:
+//
+// const float rDAC   = 1.f / (1.f/3900.f + 1.f/2000.f + 1.f/1000.f + 1.f/500.f + 1.f/250.f);
+// const float rShade = 220.f;
+// const float shadeAttenuation = rShade / (rShade + rDAC); // 0.63f
+//
+// (MAME uses an incorrect value which is closer to 78% Intensity)
+// --------------------------------------------------------------------------------------------
+
+void Video::set_shadow_intensity(float f)
 {
-#ifndef __LIBRETRO__
+#ifdef __LIBRETRO__
+    shadow_multi = (uint32_t) (255.0f * f + 0.5f);
+#else
+    renderer->set_shadow_intensity(f);
+#endif
+}
+
+void Video::prepare_frame()
+{
+#ifdef __LIBRETRO__
+    if (!pixels)
+        return;
+#else
     // Renderer Specific Frame Setup
     if (!renderer->start_frame())
         return;
-#else
-    if (!pixels)
-       return;
 #endif
 
     if (!enabled)
@@ -193,24 +204,54 @@ void Video::draw_frame()
         (hwroad.*hwroad.render_background)(pixels);
         tile_layer->render_tile_layer(pixels, 1, 0);      // background layer
         tile_layer->render_tile_layer(pixels, 0, 0);      // foreground layer
-        (hwroad.*hwroad.render_foreground)(pixels);
+
+        if (!config.engine.fix_bugs || oroad.horizon_base != ORoad::HORIZON_OFF)
+            (hwroad.*hwroad.render_foreground)(pixels);
         sprite_layer->render(8);
         tile_layer->render_text_layer(pixels, 1);
      }
+}
 
+void Video::render_frame()
+{
 #ifdef __LIBRETRO__
+    uint16_t* output = pixels;
+
+    for (int i = 0;
+         i < config.s16_width * config.s16_height;
+         i++)
     {
-       uint16_t *spix    = pixels;
-
-       for (int i = 0; i < (config.s16_width * config.s16_height); i++)
-          spix[i] = rgb[spix[i] % (S16_PALETTE_ENTRIES * 3)];
-
-       video_cb(pixels, config.s16_width, config.s16_height,
-             config.s16_width << 1);
+        output[i] = (uint16_t)
+            rgb[output[i] % (S16_PALETTE_ENTRIES * 3)];
     }
+
+    video_cb(
+        pixels,
+        config.s16_width,
+        config.s16_height,
+        config.s16_width << 1
+    );
 #else
     renderer->draw_frame(pixels);
     renderer->finalize_frame();
+#endif
+}
+
+bool Video::supports_window()
+{
+#ifdef __LIBRETRO__
+    return false;
+#else
+    return renderer->supports_window();
+#endif
+}
+
+bool Video::supports_vsync()
+{
+#ifdef __LIBRETRO__
+    return false;
+#else
+    return renderer->supports_vsync();
 #endif
 }
 
@@ -409,24 +450,29 @@ void Video::refresh_palette(uint32_t palAddr)
     uint32_t r = (a & 0x000f) << 1; // r rrr0
     uint32_t g = (a & 0x00f0) >> 3; // g ggg0
     uint32_t b = (a & 0x0f00) >> 7; // b bbb0
-
     if ((a & 0x1000) != 0)
         r |= 1; // r rrrr
     if ((a & 0x2000) != 0)
         g |= 1; // g gggg
     if ((a & 0x4000) != 0)
         b |= 1; // b bbbb
+
 #ifdef __LIBRETRO__
     palAddr >>= 1;
 
     rgb[palAddr] = CURRENT_RGB();
 
-    r = r * 202 / 256;
-    g = g * 202 / 256;
-    b = b * 202 / 256;
+    r = r * shadow_multi / 255;
+    g = g * shadow_multi / 255;
+    b = b * shadow_multi / 255;
 
     rgb[palAddr + S16_PALETTE_ENTRIES] =
-       rgb[palAddr + (S16_PALETTE_ENTRIES * 2)] = CURRENT_RGB();
+        CURRENT_RGB();
+
+    // Conserva il comportamento del core precedente
+    // qualora venga usato il terzo banco della palette.
+    rgb[palAddr + (S16_PALETTE_ENTRIES * 2)] =
+        CURRENT_RGB();
 #else
     renderer->convert_palette(palAddr, r, g, b);
 #endif

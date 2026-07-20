@@ -278,7 +278,8 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
 
 void hwtiles::render_text_layer(uint16_t* buf, uint8_t priority_draw)
 {
-    uint16_t mx, my, Code, Colour, x, y, Priority, TileIndex = 0;
+    uint16_t mx, my, Code, Colour, Priority, TileIndex = 0;
+    int16_t x, y;
 
     for (my = 0; my < 32; my++) 
     {

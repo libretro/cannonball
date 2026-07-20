@@ -9,7 +9,6 @@ INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
 endif
 
 FLAGS += -D__LIBRETRO__
-#FLAGS += -DCANNONBOARD
 FLAGS += -DCOMPILE_SOUND_CODE
 
 SOURCES_C :=
@@ -19,6 +18,7 @@ else
 SOURCES_C += \
 	       $(LIBRETRO_COMM_DIR)/file/file_path.c \
 	       $(LIBRETRO_COMM_DIR)/file/file_path_io.c \
+	       $(LIBRETRO_COMM_DIR)/file/retro_dirent.c \
 	       $(LIBRETRO_COMM_DIR)/compat/compat_strl.c \
 	       $(LIBRETRO_COMM_DIR)/compat/compat_snprintf.c \
 	       $(LIBRETRO_COMM_DIR)/compat/compat_posix_string.c \
@@ -45,8 +45,6 @@ SOURCES_CXX := \
 	       $(CORE_DIR)/src/main/utils.cpp \
 	       $(CORE_DIR)/src/main/video.cpp \
 	       \
-	       $(CORE_DIR)/src/main/cannonboard/interface.cpp \
-	       $(CORE_DIR)/src/main/cannonboard/asyncserial.cpp
 
 	       SOURCES_CXX += $(CORE_DIR)/src/main/engine/oanimseq.cpp \
 			      $(CORE_DIR)/src/main/engine/oattractai.cpp \
@@ -84,7 +82,7 @@ SOURCES_CXX := \
 			      $(CORE_DIR)/src/main/hwvideo/hwsprites.cpp \
 			      $(CORE_DIR)/src/main/hwvideo/hwtiles.cpp \
 			      \
-			      $(CORE_DIR)/src/main/frontend/cabdiag.cpp \
+			      $(CORE_DIR)/deps/pugixml/pugixml.cpp \
 			      $(CORE_DIR)/src/main/frontend/config.cpp \
 			      $(CORE_DIR)/src/main/frontend/menu.cpp \
 			      $(CORE_DIR)/src/main/frontend/ttrial.cpp

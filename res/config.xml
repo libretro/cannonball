@@ -1,4 +1,18 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    External Data Required
+-->
+<data>
+    <!-- OutRun Revision B ROM directory -->
+    <rompath>roms/</rompath>
+    <!-- Path to load required binary files from -->
+    <respath>./res/</respath>
+    <!-- Path to write XML for scores -->
+    <savepath>./</savepath>
+    <!-- Use CRC 32 Based ROM Loading (i.e. rely on scanning file contents, not on filenames) -->
+    <crc32>1</crc32>
+</data>
 
 <!-- 
     Video Settings
@@ -11,7 +25,6 @@
          2 is full-screen stretched, no borders. (Aspect ratio will be lost. Scanlines will be disabled.)
     -->
     <mode>0</mode>
-
     <!-- 
         Windowed Mode Settings 
         Scale: Scale or zoom factor for window mode. 1 is original size. 
@@ -19,7 +32,6 @@
     <window>
         <scale>2</scale>
     </window>
-
     <!-- 
         Scanline intensity.
         0   = No scanlines
@@ -32,7 +44,6 @@
         Scanlines may result in some borders around the screen in full-screen mode.
     -->
     <scanlines>0</scanlines>
-
     <!-- FPS 
          0 = 30    FPS. Optimized Mode       (Slow computers)
          1 = 30/60 FPS. Original Game Mode.  (The original experience)
@@ -53,6 +64,12 @@
     
     <!-- Open GL Filtering for Scaling. 0 = Nearest Neighbour. 1 = Linear -->
     <filtering>0</filtering>
+
+    <!-- Use VSync if supported -->
+    <vsync>1</vsync>
+
+    <!-- Shadow Intensity (0 = Match Hardware (Darker Shadows), 1 = MAME (Lighter Shadows) -->
+    <shadow>0</shadow>
 </video>
 
 <!-- 
@@ -61,6 +78,9 @@
 <sound>
     <!-- Toggle Sound -->
     <enable>1</enable>
+
+	<!-- Sample Rate (Must be supported by your audio card. Example: 48000, 44100 etc.) -->
+	<rate>48000</rate>
     
     <!-- Advertise Sound In Attract Mode -->
     <advertise>1</advertise>
@@ -71,58 +91,59 @@
     <!-- OutRun shipped with a corrupt PCM sample ROM. This uses the repaired ROM 'opr-10188.71f' -->
     <fix_samples>0</fix_samples>
     
-    <!-- Custom Music: Play a WAV file instead of the inbuilt music -->
-    <custom_music>
-        <!-- Magical Sound Shower Replacement -->
-        <track1 enabled = "0">
-            <title>MAGICAL SOUND SHOWER REMIX</title>
-            <filename>track1.wav</filename>
-        </track1>
-        <!-- Passing Breeze Replacement -->
-        <track2 enabled = "0">
-            <title>PASSING BREEZE REMIX</title>
-            <filename>track2.wav</filename>
-        </track2>
-        <!-- Splash Wave Replacement -->
-        <track3 enabled = "0">
-            <title>SPLASH WAVE REMIX</title>
-            <filename>track3.wav</filename>
-        </track3>
-        <track4 enabled = "0">
-            <title>LAST WAVE REMIX</title>
-            <filename>track4.wav</filename>
-        </track4>
-    </custom_music>
+    <!-- Override Music Selection Timeout (Default: 30 Seconds, Max: 99 Seconds) -->
+    <music_timer>30</music_timer>
+
+	<!-- Add Additional Music To Music Selection Menu.
+
+         1/ Music should be placed in the "res" directory.
+         2/ Music should either be in .wav format (streaming) OR
+            .bin format (Native OutRun Engine Format as also used by the 3DS and Switch conversions)
+
+         Binary files should be 32K or under. They must be ripped correctly from the 3DS/Switch Ports.
+    -->
+	<custom_music>
+		<track1 enabled="0">
+			<title>RADIATION</title>
+			<filename>switch_radiation.bin</filename>
+		</track1>
+		<track2 enabled="0">
+			<title>CRUISING LINE</title>
+			<filename>switch_cruisingline.bin</filename>
+		</track2>
+		<track3 enabled="0">
+			<title>CAMINO A MI AMOR</title>
+			<filename>switch_camino.bin</filename>
+		</track3>
+		<track4 enabled="0">
+			<title>STEP ON BEAT</title>
+			<filename>switch_steponbeat.bin</filename>
+		</track4>
+		<track5 enabled="0">
+			<title>STEP ON BEAT MEGADRIVE</title>
+			<filename>switch_steponbeat_md.bin</filename>
+		</track5>
+		<track6 enabled="0">
+			<title>MIDNIGHT HIGHWAY</title>
+			<filename>switch_midnighthighway.wav</filename>
+		</track6>
+	</custom_music>
 </sound>
 
 <!--
-    CannonBoard Arduino Based Interface
+    SMARTYPI Interface
  -->
- 
-<cannonboard enabled = "0">
-    <!-- Port Name -->
-    <port>COM6</port>
-    
-    <!-- Baud Rate -->
-    <baud>57600</baud>
-    
+<smartypi enabled="0">
     <!-- Machine Type. 0 = Moving, 1 = Up Cockpit, 2 = Mini -->
-    <cabinet>0</cabinet>
-    
-    <!-- Write Debug Information To Console-->
-    <debug>1</debug>
-</cannonboard>
+    <cabinet>1</cabinet>
+    <!-- Write Lamp/Motor Outputs To Console-->
+    <outputs>1</outputs>
+</smartypi>
 
 <!-- 
     Controls Settings
-    
-    There are two high level modes
-    
-    0 = Standard PC Input (keyboard/joypad/wheel)
-    1 = Original OutRun Controls (Requires CannonBoard PCB setup)
-    
 -->
-<controls mode = "1">
+<controls>
     <!-- Gears: 
         0 = Manual   (Click to shift, for normal play)
         1 = Manual   (Hold to shift, for cabinet play)
@@ -134,12 +155,17 @@
     <!-- Use the N'th joystick on the system. -->
     <pad_id>0</pad_id>
     
+    <!-- Use simple rumble effect if supported on controller (not to be confused with force feedback)
+         This is a value between 0 and 1.0 [0 = off, 1 = full]
+    -->
+    <rumble>1</rumble>
+
     <!-- Keyboard Button Configuration. Easiest to configure with inbuilt menu. -->
     <keyconfig>
-        <up>273</up>
-        <down>274</down>
-        <left>276</left>
-        <right>275</right>
+        <up>1073741906</up>
+        <down>1073741905</down>
+        <left>1073741904</left>
+        <right>1073741903</right>
         <acc>122</acc>
         <brake>120</brake>
         <gear1>32</gear1>
@@ -150,41 +176,43 @@
         <view>304</view>
     </keyconfig>
     
-    <!-- Gamepad / Joystick Button Configuration. Easiest to configure with inbuilt menu. -->
+    <!-- Gamepad / Joystick Button Configuration. Easiest to configure with inbuilt menu.
+         Set these values to '-1' to attempt auto-detection/auto-assignment -->
     <padconfig>
-        <acc>0</acc>
-        <brake>1</brake>
-        <gear1>2</gear1>
-        <gear2>2</gear2>
-        <start>3</start>
-        <coin>4</coin>
-        <menu>5</menu>    
-        <view>6</view>
+        <acc>-1</acc>
+        <brake>-1</brake>
+        <gear1>-1</gear1>
+        <gear2>-1</gear2>
+        <start>-1</start>
+        <coin>-1</coin>
+        <menu>-1</menu>
+        <view>-1</view>
+        <up>-1</up>
+        <down>-1</down>
+        <left>-1</left>
+        <right>-1</right>
     </padconfig>
-           
+
     <!-- Digital Controls: Steering Adjust Speed (1 to 9) -->
     <steerspeed>3</steerspeed>
-    
     <!-- Digital Controls: Pedal Adjust Speed (1 to 9) -->
     <pedalspeed>4</pedalspeed>
-    
+
     <!-- Analog Controls
          0 = Off
          1 = On
          2 = Wheel Only
     -->
-    <analog enabled = "0">
-        <!-- Select axis for analog controls 
-             You can place the accelerator and the brake on the same axis if your controller
-             has a split axis setup.
-             
-             For an XBox 360 Controller, the wheel should be axis 0 and the pedals on axis 2.
+    <analog enabled="1">
+		<!-- Select axis for analog controls
+             Set the axis to -1 to attempt to auto-detect the axis on first boot.
+             Set invert to "1" when off and on and reversed (shouldn't be needed on gamepads).
           -->
-        <axis>
-            <wheel>0</wheel>
-            <accel>2</accel>
-            <brake>3</brake>
-        </axis>
+		<axis>
+			<wheel>-1</wheel>
+			<accel invert="0">-1</accel>
+			<brake invert="0">-1</brake>
+		</axis>
         
         <!-- Analog Wheel Settings -->
         <wheel>
@@ -192,35 +220,23 @@
                  Example:  0 means use the entire wheel (this works best if haptic is enabled)
                  larger values mean to progressively use less of the wheel turning circle -->
             <zone>0</zone>
-            
             <!-- Dead Zone In Centre Of Wheel. Total Wheel Range = 128
                  A Dead zone is useful if the centre accuracy of your wheel is poor.
                  A good Logitech Racing wheel should not need this -->
-            <dead>0</dead>
+            <dead>16</dead>
         </wheel>
         
-        <!-- Analog Pedal Settings -->
-        <pedals>
-            <!-- Central Dead Zone: Only used for split axis controls -->
-            <dead>1</dead>
-        </pedals>
-        
-        <!-- Force Feedback / Haptic Support -->
-        <haptic enabled = "0">
-        
+        <!-- Force Feedback / Haptic Support (For Gamepads, use the simple rumble support instead -->
+        <haptic enabled="0">
             <!-- Make both of the below values negative, 
                  if force feedback is in the wrong direction -->
-        
             <!-- Maximum Force To Apply (0 to 10000) -->
             <max_force>8500</max_force>
-            
             <!-- Minimum Force To Apply (0 to max_force) -->
             <min_force>7000</min_force>
-            
             <!-- Length of each effect. (1/x seconds) 1/20th suggested. -->
             <force_duration>20</force_duration>
         </haptic>
-        
     </analog>
 </controls>
 
@@ -247,7 +263,7 @@
     <traffic>1</traffic>
     
     <!-- Freeplay Mode -->
-    <freeplay>0</freeplay>
+    <freeplay>1</freeplay>
     
     <!-- The original Japanese release of OutRun featured slightly different
          tracks and course ordering. 
@@ -271,7 +287,6 @@
          This will affect initial traffic patterns in attract mode for example.
     -->
     <randomgen>1</randomgen>
-    
     <!-- Fix minor bugs present in the original engine. -->
     <!-- Tile on music select screen, ms value at checkpoint etc. -->
     <fix_bugs>1</fix_bugs>
@@ -286,16 +301,38 @@
          Ferrari AI when driving
     -->
     <new_attract>1</new_attract>
+
+    <!-- Off Road Driving (No Speed Loss)-->
+    <offroad>0</offroad>
+
+    <!-- Extra Grippy Tyres (Easy Cornerings)-->
+    <grippy_tyres>0</grippy_tyres>
+
+    <!-- Bumper (Ram other cars and skid less) -->
+    <bumper>0</bumper>
+
+    <!-- Drive 20% Faster -->
+    <turbo>0</turbo>
+
+    <!-- 0 = Red, 1 = Blue, 2 = Yellow, 3 = Green, 4 = Cyan -->
+    <car_color>0</car_color>
     
     <!-- Display debug info that's useful for LayOut track editing -->
     <layout_debug>0</layout_debug>
 </engine>
 
+<scores>
+    <!-- Enhancement: Allow deletion of third initial in Hi-Score Table -->
+    <delete_last_entry>1</delete_last_entry>
+
+    <!-- Override Highscore Table Timeout (Default: 30 Seconds, Max: 99 Seconds) -->
+    <hiscore_timer>40</hiscore_timer>
+</scores>
+
 <!-- Settings for Time Trial Mode -->
 <time_trial>
     <!-- Default Number of Laps (1 - 5) -->
     <laps>3</laps>
-    
     <!-- Default Amount of Traffic (0 - 8), where 0 is off -->
     <traffic>3</traffic>
 </time_trial>

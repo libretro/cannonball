@@ -110,7 +110,9 @@ int32_t        dt1_freq[8*32];      /* 8 DT1 levels, 32 KC values */
 uint32_t       noise_tab[32];       /* 17bit Noise Generator periods */
 
 
-#define M_PI             3.14159265358979323846
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 #define FREQ_SH          16  /* 16.16 fixed point (frequency calculations) */
 #define EG_SH            16  /* 16.16 fixed point (envelope generator timing) */

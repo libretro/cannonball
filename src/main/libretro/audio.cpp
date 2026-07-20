@@ -13,6 +13,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <streams/file_stream.h>
 #include "audio.hpp"
 #include "frontend/config.hpp" // fps
 #include "engine/audio/osoundint.hpp"
@@ -41,7 +42,7 @@ static int bytes_per_sample; // Number of bytes per sample entry (usually 4 byte
 
 Audio::Audio()
 {
-
+    custom_wav_volume = 200;
 }
 
 Audio::~Audio()
@@ -118,142 +119,461 @@ void Audio::resume_audio()
 // Called every frame to update the audio
 void Audio::tick()
 {
-   static unsigned SND_RATE      = 44100;
+    static const unsigned SND_RATE = 44100;
+
     int bytes_written = 0;
-    int newpos;
+    int newpos = 0;
 
     if (!sound_enabled)
-       return;
+        return;
 
-    // Update audio streams from PCM & YM Devices
     osoundint.pcm->stream_update();
     osoundint.ym->stream_update();
 
-    // Get the audio buffers we've just output
-    int16_t *pcm_buffer = osoundint.pcm->get_buffer();
-    int16_t *ym_buffer  = osoundint.ym->get_buffer();
-    int16_t *wav_buffer = wavfile.data;
+    int16_t* pcm_buffer = osoundint.pcm->get_buffer();
+    int16_t* ym_buffer  = osoundint.ym->get_buffer();
+    int16_t* wav_buffer = wavfile.data;
 
-    int samples_written = osoundint.pcm->buffer_size;
+    const int samples_written =
+        osoundint.pcm->buffer_size;
 
-    // And mix them into the mix_buffer
     for (int i = 0; i < samples_written; i++)
     {
-        int32_t mix_data = wav_buffer[wavfile.pos] + pcm_buffer[i] + ym_buffer[i];
+        const int32_t wav_sample =
+            (int32_t)(
+                ((int64_t)wav_buffer[wavfile.pos] *
+                 (int64_t)custom_wav_volume) /
+                100);
 
-        // Clip mix data
-        if (mix_data >= (1 << 15))
-            mix_data = (1 << 15);
-        else if (mix_data < -(1 << 15))
-            mix_data = -(1 << 15);
+        int32_t mix_data =
+            wav_sample +
+            (int32_t)pcm_buffer[i] +
+            (int32_t)ym_buffer[i];
 
-        mix_buffer[i] = mix_data;
+        if (mix_data > 32767)
+            mix_data = 32767;
+        else if (mix_data < -32768)
+            mix_data = -32768;
 
-        // Loop wav files
+        mix_buffer[i] =
+            (uint16_t)(int16_t)mix_data;
+
         if (++wavfile.pos >= wavfile.length)
             wavfile.pos = 0;
     }
 
-    // Cast mix_buffer to a byte array, to align it with internal SDL format 
-    uint8_t* mbuf8 = (uint8_t*) mix_buffer;
+    uint8_t* mbuf8 =
+        (uint8_t*)mix_buffer;
 
-    // produce samples from the sound emulation
-    bytes_written = (BITS == 8 ? samples_written : samples_written*2);
-    
-    // now we copy the data into the buffer and adjust the positions
-    newpos = dsp_write_pos + bytes_written;
-    if (newpos/dsp_buffer_bytes == dsp_write_pos/dsp_buffer_bytes) 
+    bytes_written =
+        BITS == 8
+            ? samples_written
+            : samples_written * 2;
+
+    newpos =
+        dsp_write_pos + bytes_written;
+
+    if (newpos / dsp_buffer_bytes ==
+        dsp_write_pos / dsp_buffer_bytes)
     {
-        // no wrap
-        memcpy(dsp_buffer+(dsp_write_pos%dsp_buffer_bytes), mbuf8, bytes_written);
+        memcpy(
+            dsp_buffer +
+                (dsp_write_pos % dsp_buffer_bytes),
+            mbuf8,
+            bytes_written);
     }
-    else 
+    else
     {
-        // wraps
-        int first_part_size = dsp_buffer_bytes - (dsp_write_pos%dsp_buffer_bytes);
-        memcpy(dsp_buffer+(dsp_write_pos%dsp_buffer_bytes), mbuf8, first_part_size);
-        memcpy(dsp_buffer, mbuf8+first_part_size, bytes_written-first_part_size);
+        const int first_part_size =
+            dsp_buffer_bytes -
+            (dsp_write_pos % dsp_buffer_bytes);
+
+        memcpy(
+            dsp_buffer +
+                (dsp_write_pos % dsp_buffer_bytes),
+            mbuf8,
+            first_part_size);
+
+        memcpy(
+            dsp_buffer,
+            mbuf8 + first_part_size,
+            bytes_written - first_part_size);
     }
+
     dsp_write_pos = newpos;
-
-    // Sound callback has not yet been called
     dsp_read_pos += bytes_written;
 
-    while (dsp_read_pos > dsp_buffer_bytes) 
+    while (dsp_read_pos > dsp_buffer_bytes)
     {
         dsp_write_pos -= dsp_buffer_bytes;
-        dsp_read_pos -= dsp_buffer_bytes;
+        dsp_read_pos  -= dsp_buffer_bytes;
     }
 
-   int audio_frames = SND_RATE / config.fps;
-   audio_batch_cb((int16_t*)mix_buffer, audio_frames);
+    const int audio_frames =
+        SND_RATE / config.fps;
+
+    audio_batch_cb(
+        (const int16_t*)mix_buffer,
+        audio_frames);
 }
 
 // Empty Wav Buffer
 static int16_t EMPTY_BUFFER[] = {0, 0, 0, 0};
 
+static uint16_t wav_read_le16(const uint8_t* data)
+{
+    return
+        (uint16_t)data[0] |
+        ((uint16_t)data[1] << 8);
+}
+
+static uint32_t wav_read_le32(const uint8_t* data)
+{
+    return
+        (uint32_t)data[0] |
+        ((uint32_t)data[1] << 8) |
+        ((uint32_t)data[2] << 16) |
+        ((uint32_t)data[3] << 24);
+}
+
+static int16_t wav_read_pcm_sample(
+    const uint8_t* data,
+    uint16_t bits_per_sample)
+{
+    switch (bits_per_sample)
+    {
+        case 8:
+            return
+                (int16_t)(
+                    ((int32_t)data[0] - 128) *
+                    256);
+
+        case 16:
+            return
+                (int16_t)wav_read_le16(data);
+
+        case 24:
+        {
+            int32_t value =
+                (int32_t)data[0] |
+                ((int32_t)data[1] << 8) |
+                ((int32_t)data[2] << 16);
+
+            if (value & 0x00800000)
+                value |= (int32_t)0xff000000;
+
+            return
+                (int16_t)(value / 256);
+        }
+
+        case 32:
+        {
+            const int32_t value =
+                (int32_t)wav_read_le32(data);
+
+            return
+                (int16_t)(value / 65536);
+        }
+    }
+
+    return 0;
+}
+
 void Audio::load_wav(const char* filename)
 {
+    void* file_buffer = NULL;
+    int64_t file_length = 0;
+
     if (!sound_enabled)
-       return;
+        return;
 
-#if 0
-   /* TODO/FIXME */
+    clear_wav();
+
+    if (!filestream_read_file(
+            filename,
+            &file_buffer,
+            &file_length) ||
+        !file_buffer ||
+        file_length < 12)
     {
-        clear_wav();
+        if (file_buffer)
+            free(file_buffer);
 
-        // Load Wav File
-        SDL_AudioSpec wave;
-    
-        uint8_t *data;
-        uint32_t length;
+        if (log_cb)
+            log_cb(
+                RETRO_LOG_ERROR,
+                "[Cannonball]: Could not load WAV: %s\n",
+                filename);
 
-        pause_audio();
+        return;
+    }
 
-        if( SDL_LoadWAV(filename, &wave, &data, &length) == NULL)
+    const uint8_t* file_data =
+        (const uint8_t*)file_buffer;
+
+    const size_t file_size =
+        (size_t)file_length;
+
+    if (memcmp(file_data, "RIFF", 4) != 0 ||
+        memcmp(file_data + 8, "WAVE", 4) != 0)
+    {
+        if (log_cb)
+            log_cb(
+                RETRO_LOG_ERROR,
+                "[Cannonball]: Invalid RIFF/WAVE file: %s\n",
+                filename);
+
+        free(file_buffer);
+        return;
+    }
+
+    uint16_t audio_format = 0;
+    uint16_t channels = 0;
+    uint16_t bits_per_sample = 0;
+    uint32_t sample_rate = 0;
+
+    const uint8_t* pcm_data = NULL;
+    size_t pcm_size = 0;
+
+    size_t offset = 12;
+
+    while (offset + 8 <= file_size)
+    {
+        const uint8_t* chunk_id =
+            file_data + offset;
+
+        const uint32_t chunk_size =
+            wav_read_le32(file_data + offset + 4);
+
+        offset += 8;
+
+        if ((size_t)chunk_size >
+            file_size - offset)
         {
-            wavfile.loaded = 0;
-            resume_audio();
-            log_cb(RETRO_LOG_ERROR, "Could not load WAV: %s\n", filename);
+            if (log_cb)
+                log_cb(
+                    RETRO_LOG_ERROR,
+                    "[Cannonball]: Truncated WAV chunk: %s\n",
+                    filename);
+
+            free(file_buffer);
             return;
         }
-        
-        // Halve Volume Of Wav File
-        uint8_t* data_vol = new uint8_t[length];
-        SDL_MixAudio(data_vol, data, length, SDL_MIX_MAXVOLUME / 2);
 
-        // WAV File Needs Conversion To Target Format
-        if (wave.format != AUDIO_S16 || wave.channels != 2 || wave.freq != FREQ)
+        if (memcmp(chunk_id, "fmt ", 4) == 0 &&
+            chunk_size >= 16)
         {
-            SDL_AudioCVT cvt;
-            SDL_BuildAudioCVT(&cvt, wave.format, wave.channels, wave.freq,
-                                    AUDIO_S16,   CHANNELS,      FREQ);
+            audio_format =
+                wav_read_le16(file_data + offset);
 
-            cvt.buf = (uint8_t*) malloc(length*cvt.len_mult);
-            memcpy(cvt.buf, data_vol, length);
-            cvt.len = length;
-            SDL_ConvertAudio(&cvt);
-            SDL_FreeWAV(data);
-            delete[] data_vol;
+            channels =
+                wav_read_le16(file_data + offset + 2);
 
-            wavfile.data = (int16_t*) cvt.buf;
-            wavfile.length = cvt.len_cvt / 2;
-            wavfile.pos = 0;
-            wavfile.loaded = 1;
+            sample_rate =
+                wav_read_le32(file_data + offset + 4);
+
+            bits_per_sample =
+                wav_read_le16(file_data + offset + 14);
         }
-        // No Conversion Needed
-        else
+        else if (memcmp(chunk_id, "data", 4) == 0)
         {
-            SDL_FreeWAV(data);
-            wavfile.data = (int16_t*) data_vol;
-            wavfile.length = length / 2;
-            wavfile.pos = 0;
-            wavfile.loaded = 2;
+            pcm_data =
+                file_data + offset;
+
+            pcm_size =
+                chunk_size;
         }
 
-        resume_audio();
+        offset += chunk_size;
+
+        if (chunk_size & 1)
+            offset++;
     }
-#endif
+
+    const bool supported_bits =
+        bits_per_sample == 8  ||
+        bits_per_sample == 16 ||
+        bits_per_sample == 24 ||
+        bits_per_sample == 32;
+
+    if (!pcm_data ||
+        audio_format != 1 ||
+        (channels != 1 && channels != 2) ||
+        !supported_bits ||
+        sample_rate == 0)
+    {
+        if (log_cb)
+            log_cb(
+                RETRO_LOG_ERROR,
+                "[Cannonball]: Unsupported WAV format: "
+                "%s [format=%u, %u Hz, "
+                "%u channel(s), %u bit]\n",
+                filename,
+                audio_format,
+                sample_rate,
+                channels,
+                bits_per_sample);
+
+        free(file_buffer);
+        return;
+    }
+
+    const size_t bytes_per_input_sample =
+        bits_per_sample / 8;
+
+    const size_t input_frame_bytes =
+        channels * bytes_per_input_sample;
+
+    const uint64_t input_frames =
+        pcm_size / input_frame_bytes;
+
+    if (input_frames == 0)
+    {
+        if (log_cb)
+            log_cb(
+                RETRO_LOG_ERROR,
+                "[Cannonball]: Empty WAV data: %s\n",
+                filename);
+
+        free(file_buffer);
+        return;
+    }
+
+    const uint64_t output_frames =
+        (input_frames * (uint64_t)FREQ +
+         (sample_rate / 2)) /
+        sample_rate;
+
+    const uint64_t output_samples =
+        output_frames * CHANNELS;
+
+    if (output_frames == 0 ||
+        output_samples > 0xffffffffULL)
+    {
+        if (log_cb)
+            log_cb(
+                RETRO_LOG_ERROR,
+                "[Cannonball]: WAV is too large: %s\n",
+                filename);
+
+        free(file_buffer);
+        return;
+    }
+
+    int16_t* output_data =
+        (int16_t*)malloc(
+            (size_t)output_samples *
+            sizeof(int16_t));
+
+    if (!output_data)
+    {
+        if (log_cb)
+            log_cb(
+                RETRO_LOG_ERROR,
+                "[Cannonball]: Not enough memory for WAV: %s\n",
+                filename);
+
+        free(file_buffer);
+        return;
+    }
+
+    for (uint64_t output_frame = 0;
+         output_frame < output_frames;
+         output_frame++)
+    {
+        const uint64_t source_position =
+            output_frame *
+            (uint64_t)sample_rate;
+
+        uint64_t source_frame =
+            source_position / FREQ;
+
+        const int64_t fraction =
+            (int64_t)(
+                source_position % FREQ);
+
+        const int64_t inverse_fraction =
+            (int64_t)FREQ - fraction;
+
+        if (source_frame >= input_frames)
+            source_frame = input_frames - 1;
+
+        const uint64_t next_frame =
+            source_frame + 1 < input_frames
+                ? source_frame + 1
+                : source_frame;
+
+        const uint8_t* current =
+            pcm_data +
+            (size_t)source_frame *
+                input_frame_bytes;
+
+        const uint8_t* next =
+            pcm_data +
+            (size_t)next_frame *
+                input_frame_bytes;
+
+        for (uint32_t channel = 0;
+             channel < CHANNELS;
+             channel++)
+        {
+            const uint32_t source_channel =
+                channels == 1
+                    ? 0
+                    : channel;
+
+            const size_t sample_offset =
+                source_channel *
+                bytes_per_input_sample;
+
+            const int16_t sample_current =
+                wav_read_pcm_sample(
+                    current + sample_offset,
+                    bits_per_sample);
+
+            const int16_t sample_next =
+                wav_read_pcm_sample(
+                    next + sample_offset,
+                    bits_per_sample);
+
+            int64_t sample =
+                ((int64_t)sample_current *
+                    inverse_fraction +
+                 (int64_t)sample_next *
+                    fraction) /
+                (int64_t)FREQ;
+
+            output_data[
+                output_frame * CHANNELS +
+                channel] =
+                    (int16_t)sample;
+        }
+    }
+
+    free(file_buffer);
+
+    wavfile.data =
+        output_data;
+
+    wavfile.length =
+        (uint32_t)output_samples;
+
+    wavfile.pos = 0;
+    wavfile.loaded = 1;
+
+    resume_audio();
+
+    if (log_cb)
+        log_cb(
+            RETRO_LOG_INFO,
+            "[Cannonball]: Loaded WAV: %s "
+            "(PCM%u, %u Hz, %u channel(s), "
+            "%llu output frames)\n",
+            filename,
+            bits_per_sample,
+            sample_rate,
+            channels,
+            (unsigned long long)output_frames);
 }
 
 void Audio::clear_wav()

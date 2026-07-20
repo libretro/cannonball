@@ -163,6 +163,41 @@ namespace lr_options
       return true;
    }
 
+   static bool val_to_str_car_color(int val, char *str, size_t len)
+   {
+      if (!str || (len == 0))
+         return false;
+
+      switch (val)
+      {
+         case 0:
+            strlcpy(str, "RED", len);
+            break;
+         case 1:
+            strlcpy(str, "BLUE", len);
+            break;
+         case 2:
+            strlcpy(str, "YELLOW", len);
+            break;
+         case 3:
+            strlcpy(str, "GREEN", len);
+            break;
+         case 4:
+            strlcpy(str, "CYAN", len);
+            break;
+         case 5:
+            strlcpy(str, "BLACK", len);
+            break;
+         case 6:
+            strlcpy(str, "WHITE", len);
+            break;
+         default:
+            return false;
+      }
+
+      return true;
+   }
+
    static void add_entry(const char *key, uintptr_t addr, lr_options_val_to_str_t val_to_str)
    {
       lr_options_entry_t *entry = NULL;
@@ -239,6 +274,26 @@ namespace lr_options
       add_entry("cannonball_force_ai",
             (uintptr_t)(void*)&config.engine.force_ai,
             val_to_str_bool);
+
+      add_entry("cannonball_grippy_tyres",
+            (uintptr_t)(void*)&config.engine.grippy_tyres,
+            val_to_str_bool);
+
+      add_entry("cannonball_offroad_tyres",
+            (uintptr_t)(void*)&config.engine.offroad,
+            val_to_str_bool);
+
+      add_entry("cannonball_strong_bumper",
+            (uintptr_t)(void*)&config.engine.bumper,
+            val_to_str_bool);
+
+      add_entry("cannonball_faster_car",
+            (uintptr_t)(void*)&config.engine.turbo,
+            val_to_str_bool);
+
+      add_entry("cannonball_car_color",
+            (uintptr_t)(void*)&config.engine.car_pal,
+            val_to_str_car_color);
 
       add_entry("cannonball_sound_advertise",
             (uintptr_t)(void*)&config.sound.advertise,
