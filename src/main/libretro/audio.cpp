@@ -442,7 +442,7 @@ void Audio::load_wav(const char* filename)
         output_frames * CHANNELS;
 
     if (output_frames == 0 ||
-        output_samples > 0xffffffffULL)
+        output_samples > (uint64_t)0xffffffffU)
     {
         if (log_cb)
             log_cb(
@@ -562,12 +562,12 @@ void Audio::load_wav(const char* filename)
             RETRO_LOG_INFO,
             "[Cannonball]: Loaded WAV: %s "
             "(PCM%u, %u Hz, %u channel(s), "
-            "%llu output frames)\n",
+            "%lu output frames)\n",
             filename,
             bits_per_sample,
             sample_rate,
             channels,
-            (unsigned long long)output_frames);
+            (unsigned long)output_frames);
 }
 
 void Audio::clear_wav()
