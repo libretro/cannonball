@@ -15,10 +15,9 @@
 extern void lr_options_init();
 extern void lr_options_close();
 
-/* Use function overloading to simplify usage
- * (i.e. reduce verbosity by avoiding the need
- * to cast pointers) */
-extern void lr_options_set_frontend_variable(const bool *config_var);
-extern void lr_options_set_frontend_variable(const int *config_var);
+/* Split by pointer type (was an overload) to keep the call sites free
+ * of casts while remaining C89-compatible. */
+extern void lr_options_set_frontend_variable_bool(const bool *config_var);
+extern void lr_options_set_frontend_variable_int(const int *config_var);
 
 

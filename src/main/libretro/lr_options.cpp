@@ -416,7 +416,7 @@ static void set_variable(uintptr_t addr, int val)
    environ_cb(RETRO_ENVIRONMENT_SET_VARIABLE, &var);
 }
 
-void lr_options_set_frontend_variable(const bool *config_var)
+void lr_options_set_frontend_variable_bool(const bool *config_var)
 {
    uintptr_t addr;
    int val;
@@ -430,7 +430,7 @@ void lr_options_set_frontend_variable(const bool *config_var)
    set_variable(addr, val);
 }
 
-void lr_options_set_frontend_variable(const int *config_var)
+void lr_options_set_frontend_variable_int(const int *config_var)
 {
    uintptr_t addr;
    int val;
