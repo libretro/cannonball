@@ -514,7 +514,7 @@ static void update_variables(bool startup)
       {
          config.controls.min_force = 0;
          config.controls.max_force = 0;
-         forcefeedback::deactivate_rumble();
+         forcefeedback_deactivate_rumble();
       }
       else
       {
@@ -526,7 +526,7 @@ static void update_variables(bool startup)
 
       if ((config.controls.min_force != min_force_last) ||
           (config.controls.max_force != max_force_last))
-         forcefeedback::update_force_limits(
+         forcefeedback_update_force_limits(
                config.controls.max_force,
                config.controls.min_force,
                config.controls.force_duration);
@@ -1067,9 +1067,9 @@ bool retro_load_game(const struct retro_game_info *info)
          config.controls.keyconfig, config.controls.padconfig, 
          config.controls.analog,    config.controls.axis, config.controls.asettings);
 
-   config.controls.haptic = forcefeedback::init_rumble_interface(environ_cb);
+   config.controls.haptic = forcefeedback_init_rumble_interface(environ_cb);
    if (config.controls.haptic) 
-      config.controls.haptic = forcefeedback::init(
+      config.controls.haptic = forcefeedback_init(
             config.controls.max_force,
             config.controls.min_force,
             config.controls.force_duration);
@@ -1094,7 +1094,7 @@ void retro_unload_game(void)
 {
     audio.stop_audio();
     input.close();
-    forcefeedback::close();
+    forcefeedback_close();
     delete menu;
 }
 
@@ -1133,7 +1133,7 @@ void retro_init(void)
    if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
       libretro_supports_bitmasks = true;
 
-   lr_options::init();
+   lr_options_init();
 
    option_visibility_set = false;
    sound_enable_prev     = true;
@@ -1142,7 +1142,7 @@ void retro_init(void)
 
 void retro_deinit(void)
 {
-   lr_options::close();
+   lr_options_close();
 
    libretro_fps_record_inhibit = false;
    libretro_fps_prev = 0;
@@ -1162,7 +1162,7 @@ void retro_reset(void)
     tick_frame = true;
     fps_counter = 0;
 
-    forcefeedback::deactivate_rumble();
+    forcefeedback_deactivate_rumble();
 
     audio.clear_wav();
 
@@ -1390,5 +1390,5 @@ void retro_run(void)
 
     /* Stop any haptic feedback effects if */
     /* duration timer has elapsed */
-    forcefeedback::update_rumble_interface();
+    forcefeedback_update_rumble_interface();
 }

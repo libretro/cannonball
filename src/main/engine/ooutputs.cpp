@@ -803,7 +803,7 @@ void OOutputs::motor_output(uint8_t cmd)
     else if (cmd > MOTOR_CENTRE) /* right */
         force = 15 - cmd;
 
-    forcefeedback::set(cmd, force);
+    forcefeedback_set(cmd, force);
 }
 
 /* ------------------------------------------------------------------------------------------------ */

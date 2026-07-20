@@ -506,7 +506,7 @@ void Menu::tick_menu()
             {
                 if (++config.cont_traffic > TTrial::MAX_TRAFFIC)
                     config.cont_traffic = 0;
-                lr_options::set_frontend_variable(&config.cont_traffic);
+                lr_options_set_frontend_variable(&config.cont_traffic);
             }
             else if (SELECTED(ENTRY_BACK))
                 set_menu(&menu_gamemodes);
@@ -525,13 +525,13 @@ void Menu::tick_menu()
             {
                 if (++config.ttrial.laps > TTrial::MAX_LAPS)
                     config.ttrial.laps = 1;
-                lr_options::set_frontend_variable(&config.ttrial.laps);
+                lr_options_set_frontend_variable(&config.ttrial.laps);
             }
             else if (SELECTED(ENTRY_TRAFFIC))
             {
                 if (++config.ttrial.traffic > TTrial::MAX_TRAFFIC)
                     config.ttrial.traffic = 0;
-                lr_options::set_frontend_variable(&config.ttrial.traffic);
+                lr_options_set_frontend_variable(&config.ttrial.traffic);
             }
             else if (SELECTED(ENTRY_BACK))
                 set_menu(&menu_gamemodes);
@@ -579,7 +579,7 @@ void Menu::tick_menu()
                 config.video.widescreen = !config.video.widescreen;
                 restart_video();
                 update_geometry();
-                lr_options::set_frontend_variable(&config.video.widescreen);
+                lr_options_set_frontend_variable(&config.video.widescreen);
             }
             else if (SELECTED(ENTRY_HIRES))
             {
@@ -597,7 +597,7 @@ void Menu::tick_menu()
                 restart_video();
                 video.sprite_layer->set_x_clip(false);
                 update_geometry();
-                lr_options::set_frontend_variable(&config.video.hires);
+                lr_options_set_frontend_variable(&config.video.hires);
             }
             else if (SELECTED(ENTRY_SCALE))
             {
@@ -622,7 +622,7 @@ void Menu::tick_menu()
                 config.set_fps(config.video.fps);
                 if (config.fps != fps_prev)
                     update_timing();
-                lr_options::set_frontend_variable(&config.video.fps);
+                lr_options_set_frontend_variable(&config.video.fps);
             }
             else if (SELECTED(ENTRY_BACK))
                 set_menu(&menu_settings);
@@ -636,17 +636,17 @@ void Menu::tick_menu()
                     cannonball::audio.start_audio();
                 else
                     cannonball::audio.stop_audio();              
-                lr_options::set_frontend_variable(&config.sound.enabled);
+                lr_options_set_frontend_variable(&config.sound.enabled);
             }
             else if (SELECTED(ENTRY_ADVERTISE))
             {
                 config.sound.advertise = !config.sound.advertise;
-                lr_options::set_frontend_variable(&config.sound.advertise);
+                lr_options_set_frontend_variable(&config.sound.advertise);
             }
             else if (SELECTED(ENTRY_PREVIEWSND))
             {
                 config.sound.preview = !config.sound.preview;
-                lr_options::set_frontend_variable(&config.sound.preview);
+                lr_options_set_frontend_variable(&config.sound.preview);
             }
             else if (SELECTED(ENTRY_FIXSAMPLES))
             {
@@ -661,7 +661,7 @@ void Menu::tick_menu()
                 {
                     display_message(rom_type == 1 ? "CANT LOAD FIXED SAMPLES" : "CANT LOAD ORIGINAL SAMPLES");
                 }
-                lr_options::set_frontend_variable(&config.sound.fix_samples);
+                lr_options_set_frontend_variable(&config.sound.fix_samples);
             }
             else if (SELECTED(ENTRY_MUSICTEST))
                 set_menu(&menu_musictest);
@@ -674,14 +674,14 @@ void Menu::tick_menu()
             {
                 if (++config.controls.gear > config.controls.GEAR_AUTO)
                     config.controls.gear = config.controls.GEAR_BUTTON;
-                lr_options::set_frontend_variable(&config.controls.gear);
+                lr_options_set_frontend_variable(&config.controls.gear);
             }
             else if (SELECTED(ENTRY_ANALOG))
             {
                 if (++config.controls.analog >= 2)
                     config.controls.analog = 0;
                 input.analog = config.controls.analog;
-                lr_options::set_frontend_variable(&config.controls.analog);
+                lr_options_set_frontend_variable(&config.controls.analog);
             }
             else if (SELECTED(ENTRY_REDEFKEY))
             {
@@ -701,13 +701,13 @@ void Menu::tick_menu()
             {
                 if (++config.controls.steer_speed > 9)
                     config.controls.steer_speed = 1;
-                lr_options::set_frontend_variable(&config.controls.steer_speed);
+                lr_options_set_frontend_variable(&config.controls.steer_speed);
             }
             else if (SELECTED(ENTRY_DPEDAL))
             {
                 if (++config.controls.pedal_speed > 9)
                     config.controls.pedal_speed = 1;
-                lr_options::set_frontend_variable(&config.controls.pedal_speed);
+                lr_options_set_frontend_variable(&config.controls.pedal_speed);
             }
             else if (SELECTED(ENTRY_BACK))
                 set_menu(&menu_settings);
@@ -717,17 +717,17 @@ void Menu::tick_menu()
             if (SELECTED(ENTRY_TRACKS))
             {
                 config.engine.jap = !config.engine.jap;
-                lr_options::set_frontend_variable(&config.engine.jap);
+                lr_options_set_frontend_variable(&config.engine.jap);
             }
             else if (SELECTED(ENTRY_FREEPLAY))
             {
                config.engine.freeplay = !config.engine.freeplay;
-	       lr_options::set_frontend_variable(&config.engine.freeplay);
+	       lr_options_set_frontend_variable(&config.engine.freeplay);
             }
             else if (SELECTED(ENTRY_FORCE_AI))
             {
                config.engine.force_ai = !config.engine.force_ai;
-	       lr_options::set_frontend_variable(&config.engine.force_ai);
+	       lr_options_set_frontend_variable(&config.engine.force_ai);
             }
             else if (SELECTED(ENTRY_TIME))
             {
@@ -741,7 +741,7 @@ void Menu::tick_menu()
                 else
                     config.engine.freeze_timer = 0;
 
-                lr_options::set_frontend_variable(&config.engine.dip_time);
+                lr_options_set_frontend_variable(&config.engine.dip_time);
             }
             else if (SELECTED(ENTRY_TRAFFIC))
             {
@@ -755,7 +755,7 @@ void Menu::tick_menu()
                 else
                     config.engine.disable_traffic = 0;
 
-                lr_options::set_frontend_variable(&config.engine.dip_traffic);
+                lr_options_set_frontend_variable(&config.engine.dip_traffic);
             }
             else if (SELECTED(ENTRY_SUB_ENHANCEMENTS))
                 set_menu(&menu_enhancements);
@@ -769,22 +769,22 @@ void Menu::tick_menu()
             if (SELECTED(ENTRY_TIMER))
             {
                 config.engine.fix_timer = !config.engine.fix_timer;
-                lr_options::set_frontend_variable(&config.engine.fix_timer);
+                lr_options_set_frontend_variable(&config.engine.fix_timer);
             }
             else if (SELECTED(ENTRY_OBJECTS))
             {
                 config.engine.level_objects = !config.engine.level_objects;
-                lr_options::set_frontend_variable(&config.engine.level_objects);
+                lr_options_set_frontend_variable(&config.engine.level_objects);
             }
             else if (SELECTED(ENTRY_PROTOTYPE))
             {
                 config.engine.prototype = !config.engine.prototype;
-                lr_options::set_frontend_variable(&config.engine.prototype);
+                lr_options_set_frontend_variable(&config.engine.prototype);
             }
             else if (SELECTED(ENTRY_ATTRACT))
             {
                 config.engine.new_attract ^= 1;
-                lr_options::set_frontend_variable(&config.engine.new_attract);
+                lr_options_set_frontend_variable(&config.engine.new_attract);
             }
             else if (SELECTED(ENTRY_BACK))
                 set_menu(&menu_engine);
@@ -794,28 +794,28 @@ void Menu::tick_menu()
             if (SELECTED(ENTRY_GRIP))
             {
                 config.engine.grippy_tyres = !config.engine.grippy_tyres;
-                lr_options::set_frontend_variable(&config.engine.grippy_tyres);
+                lr_options_set_frontend_variable(&config.engine.grippy_tyres);
             }
             else if (SELECTED(ENTRY_OFFROAD))
             {
                 config.engine.offroad = !config.engine.offroad;
-                lr_options::set_frontend_variable(&config.engine.offroad);
+                lr_options_set_frontend_variable(&config.engine.offroad);
             }
             else if (SELECTED(ENTRY_BUMPER))
             {
                 config.engine.bumper = !config.engine.bumper;
-                lr_options::set_frontend_variable(&config.engine.bumper);
+                lr_options_set_frontend_variable(&config.engine.bumper);
             }
             else if (SELECTED(ENTRY_TURBO))
             {
                 config.engine.turbo = !config.engine.turbo;
-                lr_options::set_frontend_variable(&config.engine.turbo);
+                lr_options_set_frontend_variable(&config.engine.turbo);
             }
             else if (SELECTED(ENTRY_COLOR))
             {
                 if (++config.engine.car_pal > 6)
                     config.engine.car_pal = 0;
-                lr_options::set_frontend_variable(&config.engine.car_pal);
+                lr_options_set_frontend_variable(&config.engine.car_pal);
             }
             else if (SELECTED(ENTRY_BACK))
                 set_menu(&menu_engine);
@@ -1140,14 +1140,14 @@ void Menu::start_game(int mode, int settings)
         if (config.fps != fps_prev)
             update_timing();
 
-        lr_options::set_frontend_variable(&config.sound.fix_samples);
-        lr_options::set_frontend_variable(&config.video.fps);
-        lr_options::set_frontend_variable(&config.video.widescreen);
-        lr_options::set_frontend_variable(&config.video.hires);
-        lr_options::set_frontend_variable(&config.engine.level_objects);
-        lr_options::set_frontend_variable(&config.engine.new_attract);
-        lr_options::set_frontend_variable(&config.engine.fix_bugs);
-        lr_options::set_frontend_variable(&config.sound.preview);
+        lr_options_set_frontend_variable(&config.sound.fix_samples);
+        lr_options_set_frontend_variable(&config.video.fps);
+        lr_options_set_frontend_variable(&config.video.widescreen);
+        lr_options_set_frontend_variable(&config.video.hires);
+        lr_options_set_frontend_variable(&config.engine.level_objects);
+        lr_options_set_frontend_variable(&config.engine.new_attract);
+        lr_options_set_frontend_variable(&config.engine.fix_bugs);
+        lr_options_set_frontend_variable(&config.sound.preview);
     }
     /* Original Settings */
     else if (settings == 2)
@@ -1176,14 +1176,14 @@ void Menu::start_game(int mode, int settings)
         if (config.fps != fps_prev)
             update_timing();
 
-        lr_options::set_frontend_variable(&config.sound.fix_samples);
-        lr_options::set_frontend_variable(&config.video.fps);
-        lr_options::set_frontend_variable(&config.video.widescreen);
-        lr_options::set_frontend_variable(&config.video.hires);
-        lr_options::set_frontend_variable(&config.engine.level_objects);
-        lr_options::set_frontend_variable(&config.engine.new_attract);
-        lr_options::set_frontend_variable(&config.engine.fix_bugs);
-        lr_options::set_frontend_variable(&config.sound.preview);
+        lr_options_set_frontend_variable(&config.sound.fix_samples);
+        lr_options_set_frontend_variable(&config.video.fps);
+        lr_options_set_frontend_variable(&config.video.widescreen);
+        lr_options_set_frontend_variable(&config.video.hires);
+        lr_options_set_frontend_variable(&config.engine.level_objects);
+        lr_options_set_frontend_variable(&config.engine.new_attract);
+        lr_options_set_frontend_variable(&config.engine.fix_bugs);
+        lr_options_set_frontend_variable(&config.sound.preview);
     }
     /* Otherwise, use whatever is already setup... */
     else

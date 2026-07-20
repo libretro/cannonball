@@ -14,15 +14,13 @@
 /*----------------------------------------------------------------------------- */
 /* Function prototypes  */
 /*----------------------------------------------------------------------------- */
-namespace forcefeedback
-{
-    extern bool init_rumble_interface(retro_environment_t environ_cb);
-    extern void deactivate_rumble();
-    extern void update_rumble_interface();
-    extern void update_force_limits(int max_force, int min_force, int force_duration);
+extern bool forcefeedback_init_rumble_interface(retro_environment_t environ_cb);
+extern void forcefeedback_deactivate_rumble();
+extern void forcefeedback_update_rumble_interface();
+extern void forcefeedback_update_force_limits(int max_force, int min_force, int force_duration);
 
-    extern bool init(int max_force, int min_force, int force_duration);
-    extern void close();
-    extern int  set(int xdirection, int force);
-    extern bool is_supported();
-}
+extern bool forcefeedback_init(int max_force, int min_force, int force_duration);
+extern void forcefeedback_close();
+extern int  forcefeedback_set(int xdirection, int force);
+extern bool forcefeedback_is_supported();
+
