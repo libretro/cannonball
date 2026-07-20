@@ -7,6 +7,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdio.h> /* remove() */
 
 #include <pugixml/pugixml.hpp>
 
