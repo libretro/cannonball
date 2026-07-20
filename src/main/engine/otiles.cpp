@@ -472,7 +472,7 @@ void OTiles::scroll_tilemaps()
 void OTiles::loop_to_stage1()
 {
     opalette.pal_manip_ctrl = 1;    /* Enable palette fade routines to transition between levels */
-    init_tilemap();                 /* Initalize Default Tilemap (Stage 1) */
+    init_tilemap(0);                 /* Initalize Default Tilemap (Stage 1) */
     opalette.setup_sky_change();    /* Setup data in RAM necessary for sky palette fade. */
 }
 
@@ -819,7 +819,7 @@ void OTiles::fill_tilemap_color(uint16_t color)
     uint32_t dst        = 0x10F000;
     const uint16_t TILE = color == 0 ? 0x20 : 0x1310;  /* Default tile value for background */
 
-    set_scroll(); /* Reset scroll */
+    set_scroll(0, 0); /* Reset scroll */
 
     video.write_pal16(&pal_addr, color);
 

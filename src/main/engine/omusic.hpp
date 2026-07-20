@@ -25,7 +25,7 @@ public:
     void tick();
     void blit();
     void check_start();
-    void play_music(int index = -1);
+    void play_music(int index);
     void cycle_music();
 
 private:

@@ -115,7 +115,7 @@ void Outrun::tick(bool tick_frame)
                 if (mode > ORoad::VIEW_INCAR)
                     mode = ORoad::VIEW_ORIGINAL;
 
-                oroad.set_view_mode(mode);
+                oroad.set_view_mode(mode, false);
             }
         }
     }
@@ -375,7 +375,7 @@ void Outrun::main_switch()
             osoundint.queue_sound(SOUND_STOP_CHEERS);
             osoundint.queue_sound(SOUND_VOICE_GETREADY);
             osoundint.queue_sound(SOUND_REVS);             /* Moved from Z80 Code for extra flexibility */
-            omusic.play_music();
+            omusic.play_music(-1);
             
             if (!freeze_timer)
                 ostats.time_counter = ostats.TIME[config.engine.dip_time * 40]; /* Set time to begin level with */
@@ -457,17 +457,17 @@ void Outrun::main_switch()
             }
             else
             {
-                ohud.blit_text_big(7, ttrial.new_high_score ? "NEW RECORD" : "BAD LUCK");
+                ohud.blit_text_big(7, ttrial.new_high_score ? "NEW RECORD" : "BAD LUCK", false);
 
                 ohud.blit_text1(TEXT1_LAPTIME1);
                 ohud.blit_text1(TEXT1_LAPTIME2);
                 ohud.draw_lap_timer(0x110554, ttrial.best_lap, ttrial.best_lap[2]);
 
-                ohud.blit_text_new(9,  14, "OVERTAKES          - ");
+                ohud.blit_text_new(9,  14, "OVERTAKES          - ", OHud::GREY);
                 ohud.blit_text_new(31, 14, Utils::to_string((int) ttrial.overtakes).c_str(), OHud::GREEN);
-                ohud.blit_text_new(9,  16, "VEHICLE COLLISIONS - ");
+                ohud.blit_text_new(9,  16, "VEHICLE COLLISIONS - ", OHud::GREY);
                 ohud.blit_text_new(31, 16, Utils::to_string((int) ttrial.vehicle_cols).c_str(), OHud::GREEN);
-                ohud.blit_text_new(9,  18, "CRASHES            - ");
+                ohud.blit_text_new(9,  18, "CRASHES            - ", OHud::GREY);
                 ohud.blit_text_new(31, 18, Utils::to_string((int) ttrial.crashes).c_str(), OHud::GREEN);
             }
             osoundint.queue_sound(SOUND_NEW_COMMAND);

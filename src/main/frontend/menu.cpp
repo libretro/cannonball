@@ -406,10 +406,10 @@ void Menu::draw_menu_options()
         {
             /* Draw minicar */
             if (i == cursor)
-                video.write_text32(ohud.translate(x - 3, y), roms.rom0.read32(TILES_MINICARS1));
+                video.write_text32(ohud.translate(x - 3, y, 0x110030), roms.rom0.read32(TILES_MINICARS1));
             /* Erase minicar from this position */
             else
-                video.write_text32(ohud.translate(x - 3, y), 0x20202020);
+                video.write_text32(ohud.translate(x - 3, y, 0x110030), 0x20202020);
         }
         y += 2;
     }
@@ -468,7 +468,7 @@ void Menu::tick_menu()
         {
             if (SELECTED(ENTRY_PLAYGAME))
             {
-                start_game(Outrun::MODE_ORIGINAL);
+                start_game(Outrun::MODE_ORIGINAL, 0);
                 return;
             }
             else if (SELECTED(ENTRY_GAMEMODES))
@@ -500,7 +500,7 @@ void Menu::tick_menu()
             if (SELECTED(ENTRY_START_CONT))
             {
                 outrun.custom_traffic = config.cont_traffic;
-                start_game(Outrun::MODE_CONT);
+                start_game(Outrun::MODE_CONT, 0);
             }
             else if (SELECTED(ENTRY_TRAFFIC))
             {

@@ -89,8 +89,8 @@ void OStats::do_timers()
     else if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
     {
         stage_counters[outrun.ttrial.current_lap]++;
-        ohud.draw_stage_number(ohud.translate(30, 2 + outrun.ttrial.current_lap), (outrun.ttrial.current_lap + 1), OHud::GREY);
-        ohud.draw_lap_timer(ohud.translate(32, 2 + outrun.ttrial.current_lap), stage_times[cur_stage], ms_value);
+        ohud.draw_stage_number(ohud.translate(30, 2 + outrun.ttrial.current_lap, 0x110030), (outrun.ttrial.current_lap + 1), OHud::GREY);
+        ohud.draw_lap_timer(ohud.translate(32, 2 + outrun.ttrial.current_lap, 0x110030), stage_times[cur_stage], ms_value);
     }
 }
 
@@ -225,7 +225,7 @@ void OStats::init_next_level()
         osoundint.queue_sound(SOUND_VOICE_CHECKPOINT);
         
         /* Update Stage Number on HUD */
-        ohud.draw_stage_number(0x110d76, cur_stage+1);
+        ohud.draw_stage_number(0x110d76, cur_stage+1, OHud::GREEN);
         /* No need to redraw the stage info as that was a bug in the original game */
     }
 }

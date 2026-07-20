@@ -42,7 +42,7 @@ public:
     void init_tilemap_palette(uint16_t);
     void fill_tilemap_color(uint16_t);
 	void write_tilemap_hw();
-    void set_scroll(int16_t h_scroll = 0, int16_t v_scroll = 0);
+    void set_scroll(int16_t h_scroll, int16_t v_scroll);
 
 private:	
     /* Page to use for tilemap. Alternates between 0 and 1 dependent on stage number */
@@ -99,7 +99,7 @@ private:
     /* ----------------------------------------------------------------------- */
     
     void clear_tile_info();
-    void init_tilemap(int16_t stage_id = 0);
+    void init_tilemap(int16_t stage_id);
     void init_tilemap_props(uint16_t);
     void scroll_tilemaps();
     void init_next_tilemap();

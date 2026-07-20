@@ -160,7 +160,7 @@ public:
 	void tick();
     uint8_t get_view_mode();
     int16_t get_road_y(uint16_t);
-    void set_view_mode(uint8_t, bool snap = false);
+    void set_view_mode(uint8_t, bool snap);
 
 private:
     /* Enhancement: View Mode */

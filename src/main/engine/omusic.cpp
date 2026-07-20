@@ -250,7 +250,7 @@ void OMusic::tick()
 
             if (++preview_counter >= 10)
             {
-                play_music();
+                play_music(-1);
                 preview_counter = 0;
             }
         }
@@ -288,7 +288,7 @@ void OMusic::play_music(int index)
 void OMusic::cycle_music()
 {
     if (++music_selected > 2) music_selected = 0;
-    play_music();
+    play_music(-1);
 }
 
 /* Original Version of Music Selection Screen With 3 Tracks. */
@@ -419,7 +419,7 @@ void OMusic::blit_music_select()
         video.write_pal32(&dst_addr, roms.rom0.read32(&src_addr));
 
     /* Set Tilemap Scroll */
-    otiles.set_scroll(config.s16_x_off);
+    otiles.set_scroll(config.s16_x_off, 0);
     
     /* -------------------------------------------------------------------------------------------- */
     /* Blit to Tilemap 16: Widescreen Version. Uses Custom Tilemap.  */

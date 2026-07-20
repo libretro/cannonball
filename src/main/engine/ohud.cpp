@@ -52,11 +52,11 @@ void OHud::draw_main_hud()
     }
     else if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
     {
-        draw_score(translate(3, 2), 0, 2);
+        draw_score(translate(3, 2, 0x110030), 0, 2);
         blit_text1(2, 1, HUD_SCORE1);
         blit_text1(2, 2, HUD_SCORE2);
-        blit_text_big(4, "TIME TO BEAT");
-        draw_lap_timer(translate(16, 7), outrun.ttrial.best_lap, outrun.ttrial.best_lap[2]);
+        blit_text_big(4, "TIME TO BEAT", false);
+        draw_lap_timer(translate(16, 7, 0x110030), outrun.ttrial.best_lap, outrun.ttrial.best_lap[2]);
     }
     else if (outrun.cannonball_mode == Outrun::MODE_CONT)
     {
@@ -72,14 +72,14 @@ void OHud::draw_main_hud()
 
 void OHud::clear_timetrial_text()
 {
-    blit_text_big(4,     "            ");
-    blit_text_new(16, 7, "            ");
+    blit_text_big(4,     "            ", false);
+    blit_text_new(16, 7, "            ", OHud::GREY);
 }
 
 void OHud::draw_fps_counter(int16_t fps)
 {
     std::string str = "FPS " + Utils::to_string(fps);
-    blit_text_new(30, 0, str.c_str());
+    blit_text_new(30, 0, str.c_str(), OHud::GREY);
 }
 
 
@@ -158,7 +158,7 @@ void OHud::draw_timer1(uint16_t time)
     }
     else
     {
-        uint32_t dst_addr = translate(7, 1);
+        uint32_t dst_addr = translate(7, 1, 0x110030);
         const uint16_t PAL = 0x8AA0;
         const uint16_t O = (('O' - 0x41) * 2) + PAL; /* Convert character to real index (D0-0x41) so A is 0x01 */
         const uint16_t F = (('F' - 0x41) * 2) + PAL;
@@ -569,7 +569,7 @@ void OHud::blit_text1(uint32_t src_addr)
 
 void OHud::blit_text1(uint8_t x, uint8_t y, uint32_t src_addr)
 {
-    uint32_t dst_addr = translate(x, y);
+    uint32_t dst_addr = translate(x, y, 0x110030);
     src_addr += 4;
     uint16_t counter = roms.rom0.read16(&src_addr);  /* Number of tiles to blit */
     uint16_t data = roms.rom0.read16(&src_addr);     /* Tile data to blit */
@@ -637,13 +637,13 @@ void OHud::blit_text2(uint32_t src_addr)
 void OHud::draw_debug_info(uint32_t pos, uint16_t height_pat, uint8_t sprite_pat)
 {
     ohud.blit_text_new(0,  4, "LEVEL POS", OHud::GREEN);
-    ohud.blit_text_new(16, 4, "    ");
+    ohud.blit_text_new(16, 4, "    ", OHud::GREY);
     ohud.blit_text_new(16, 4, Utils::to_string((int)(pos >> 16)).c_str(), OHud::PINK);
     ohud.blit_text_new(0,  5, "HEIGHT PATTERN", OHud::GREEN);
-    ohud.blit_text_new(16, 5, "    ");
+    ohud.blit_text_new(16, 5, "    ", OHud::GREY);
     ohud.blit_text_new(16, 5, Utils::to_string((int)height_pat).c_str(), OHud::PINK);
     ohud.blit_text_new(0,  6, "SPRITE PATTERN", OHud::GREEN);
-    ohud.blit_text_new(16, 6, "    ");
+    ohud.blit_text_new(16, 6, "    ", OHud::GREY);
     ohud.blit_text_new(16, 6, Utils::to_string((int)sprite_pat).c_str(), OHud::PINK);
 }
 
@@ -657,8 +657,8 @@ void OHud::blit_text_big(const uint8_t Y, const char* text, bool do_notes)
     /* Clear complete row in text ram before blitting */
     for (uint8_t x = 0; x < 40; x++)
     {
-        video.write_text16(translate(x, Y) + 0x110000, 0); /* Write blank space to text ram */
-        video.write_text16(translate(x, Y) + 0x11007E, 0); /* Write blank space to text ram */
+        video.write_text16(translate(x, Y, 0x110030) + 0x110000, 0); /* Write blank space to text ram */
+        video.write_text16(translate(x, Y, 0x110030) + 0x11007E, 0); /* Write blank space to text ram */
     }
 
     /* Draw Notes */
@@ -668,11 +668,11 @@ void OHud::blit_text_big(const uint8_t Y, const char* text, bool do_notes)
         const uint32_t NOTE_TILES1 = 0x8A7A8A7B;
         const uint32_t NOTE_TILES2 = 0x8A7C8A7D;
 
-        video.write_text32(translate(X - 2, Y) + 0x110000, NOTE_TILES1);
-        video.write_text32(translate(X - 2, Y) + 0x110080, NOTE_TILES2);
+        video.write_text32(translate(X - 2, Y, 0x110030) + 0x110000, NOTE_TILES1);
+        video.write_text32(translate(X - 2, Y, 0x110030) + 0x110080, NOTE_TILES2);
     }
 
-    uint32_t dst_addr = translate(X, Y) + 0x110000;
+    uint32_t dst_addr = translate(X, Y, 0x110030) + 0x110000;
 
     /* Blit each tile */
     for (uint16_t i = 0; i < length; i++)
@@ -719,7 +719,7 @@ void OHud::blit_text_big(const uint8_t Y, const char* text, bool do_notes)
 /* Normal font: 41 onwards */
 void OHud::blit_text_new(uint16_t x, uint16_t y, const char* text, uint16_t pal)
 {
-    uint32_t dst_addr = translate(x, y); 
+    uint32_t dst_addr = translate(x, y, 0x110030); 
     uint16_t length = (uint16_t) strlen(text);
 
     for (uint16_t i = 0; i < length; i++)

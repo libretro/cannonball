@@ -1349,7 +1349,7 @@ void OSound::engine_process_chan(uint8_t* chan, uint8_t* pcm)
         /* No revs, mute engine channel and get out of here */
         if (revs == 0)
         {
-            engine_mute_channel(chan, pcm);
+            engine_mute_channel(chan, pcm, true);
             return;
         }
         /* 0x766E */
@@ -1399,7 +1399,7 @@ void OSound::engine_process_chan(uint8_t* chan, uint8_t* pcm)
     /* Check engine volume and mute channel if disabled */
     if (!chan[CH_ENGINES_VOL0])
     {
-        engine_mute_channel(chan, pcm);
+        engine_mute_channel(chan, pcm, true);
         return;
     }
 
@@ -1420,7 +1420,7 @@ void OSound::engine_process_chan(uint8_t* chan, uint8_t* pcm)
     uint16_t revs = r16(pcm);
     if (revs == 0)
     {
-        engine_mute_channel(chan, pcm);
+        engine_mute_channel(chan, pcm, true);
         return;
     }
 

@@ -352,20 +352,20 @@ void OAnimSeq::tick_end_seq()
         case 1: /* tick & blit */
             anim_seq_outro_ferrari();                           /* Ferrari Sprite */
             anim_seq_outro(&anim_obj1, oferrari.ferrari_pal);   /* Car Door Opening Animation */
-            anim_seq_outro(&anim_obj2);                         /* Interior of Ferrari */
+            anim_seq_outro(&anim_obj2, -1);                         /* Interior of Ferrari */
             anim_seq_shadow(&anim_ferrari, &anim_obj3);         /* Car Shadow */
                                                                 /* Man Sprite */
             /* Fix Wrong Palette Bug: Only occurs on 3 of the 5 possible end sequences (0 and 3 are ok) */
             anim_seq_outro(&anim_pass1, config.engine.fix_bugs ? 10 : -1);
             anim_seq_shadow(&anim_pass1, &anim_obj4);           /* Man Shadow */
-            anim_seq_outro(&anim_pass2);                        /* Female Sprite */
+            anim_seq_outro(&anim_pass2, -1);                        /* Female Sprite */
             anim_seq_shadow(&anim_pass2, &anim_obj5);           /* Female Shadow */
-            anim_seq_outro(&anim_obj6);                         /* Man Presenting Trophy */
+            anim_seq_outro(&anim_obj6, -1);                         /* Man Presenting Trophy */
             if (end_seq == 4)
-                anim_seq_outro(&anim_obj7);                     /* Varies */
+                anim_seq_outro(&anim_obj7, -1);                     /* Varies */
             else
                 anim_seq_shadow(&anim_obj6, &anim_obj7);
-            anim_seq_outro(&anim_obj8);                         /* Effects */
+            anim_seq_outro(&anim_obj8, -1);                         /* Effects */
             break;
     }
 }

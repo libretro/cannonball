@@ -62,7 +62,7 @@ public:
     void set_mode(int);
     bool diag_motor(int16_t input_motor, uint8_t hw_motor_limit);
     bool calibrate_motor(int16_t input_motor, uint8_t hw_motor_limit);
-    void tick(int16_t input_motor = 0);
+    void tick(int16_t input_motor);
     void writeDigitalToConsole();
     void set_digital(uint8_t);
     void clear_digital(uint8_t);

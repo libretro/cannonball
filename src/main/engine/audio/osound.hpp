@@ -404,7 +404,7 @@ private:
     void vol_thicken(uint16_t& pos, uint8_t* chan, uint8_t* pcm);
     uint8_t get_adjusted_vol(uint16_t& pos, uint8_t* chan);
     void engine_set_pitch(uint16_t& pos, uint8_t* pcm);
-    void engine_mute_channel(uint8_t* chan, uint8_t* pcm, bool do_check = true);
+    void engine_mute_channel(uint8_t* chan, uint8_t* pcm, bool do_check);
     void unk78c7(uint8_t* chan, uint8_t* pcm);
     void ferrari_vol_pan(uint8_t* chan, uint8_t* pcm);
     uint16_t engine_get_table_adr(uint8_t* chan, uint8_t* pcm);

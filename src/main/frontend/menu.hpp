@@ -88,5 +88,5 @@ private:
     void display_message(std::string);
     bool check_jap_roms();
     void restart_video();
-    void start_game(int mode, int settings = 0);
+    void start_game(int mode, int settings);
 };

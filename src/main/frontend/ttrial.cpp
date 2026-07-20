@@ -63,7 +63,7 @@ int TTrial::tick()
             omap.init();
             omap.load_sprites();
             omap.position_ferrari(FERRARI_POS[level_selected = 0]);
-            ohud.blit_text_big(1, "STEER TO SELECT TRACK");
+            ohud.blit_text_big(1, "STEER TO SELECT TRACK", false);
             ohud.blit_text1(2, 25, TEXT1_LAPTIME1);
             ohud.blit_text1(2, 26, TEXT1_LAPTIME2);
             osoundint.queue_sound(SOUND_PCM_WAVE);
@@ -108,7 +108,7 @@ int TTrial::tick()
                 }
                 omap.position_ferrari(FERRARI_POS[level_selected]);
                 outils::convert_counter_to_time(best_times[level_selected], best_converted);
-                ohud.draw_lap_timer(ohud.translate(7, 26), best_converted, best_converted[2]);
+                ohud.draw_lap_timer(ohud.translate(7, 26, 0x110030), best_converted, best_converted[2]);
                 omap.blit();
                 oroad.tick();
                 osprites.sprite_copy();
