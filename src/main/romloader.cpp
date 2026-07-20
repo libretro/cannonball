@@ -43,19 +43,19 @@ static std::string join_path(const std::string& directory,
 static bool read_exact(RFILE* file, void* data, size_t size)
 {
     size_t total = 0;
-    uint8_t* output = static_cast<uint8_t*>(data);
+    uint8_t* output = (uint8_t*)(data);
 
     while (total < size)
     {
         const int64_t count = filestream_read(
             file,
             output + total,
-            static_cast<int64_t>(size - total));
+            (int64_t)(size - total));
 
         if (count <= 0)
             return false;
 
-        total += static_cast<size_t>(count);
+        total += (size_t)(count);
     }
 
     return true;
@@ -79,7 +79,7 @@ static bool calculate_crc32(const std::string& path, uint32_t& checksum)
         const int64_t count = filestream_read(
             file,
             buffer,
-            static_cast<int64_t>(sizeof(buffer)));
+            (int64_t)(sizeof(buffer)));
 
         if (count < 0)
         {
@@ -90,7 +90,7 @@ static bool calculate_crc32(const std::string& path, uint32_t& checksum)
         if (count == 0)
             break;
 
-        crc = encoding_crc32(crc, buffer, static_cast<size_t>(count));
+        crc = encoding_crc32(crc, buffer, (size_t)(count));
     }
 
     filestream_close(file);
@@ -159,7 +159,7 @@ int RomLoader::load_auto(const char* filename,
                "Unable to locate ROM by CRC32 or canonical name: %s "
                "(CRC32: 0x%08x)\n",
                filename,
-               static_cast<unsigned>(expected_crc));
+               (unsigned)(expected_crc));
 
     loaded = false;
     return 1;
@@ -185,7 +185,7 @@ int RomLoader::load_rom(const char* filename,
         return 1;
     }
 
-    std::vector<uint8_t> buffer(static_cast<size_t>(file_length));
+    std::vector<uint8_t> buffer((size_t)(file_length));
     const bool read_ok = read_exact(source, &buffer[0], buffer.size());
     filestream_close(source);
 
@@ -209,12 +209,12 @@ int RomLoader::load_rom(const char* filename,
         log_cb(RETRO_LOG_WARN,
                "%s has incorrect checksum. Expected: 0x%08x, Found: 0x%08x\n",
                filename,
-               static_cast<unsigned>(expected_crc),
-               static_cast<unsigned>(checksum));
+               (unsigned)(expected_crc),
+               (unsigned)(checksum));
     }
 
     for (int i = 0; i < file_length; i++)
-        rom[(i * interleave) + offset] = buffer[static_cast<size_t>(i)];
+        rom[(i * interleave) + offset] = buffer[(size_t)(i)];
 
     loaded = true;
     return 0;
@@ -293,7 +293,7 @@ int RomLoader::load_crc32(const char* debug,
             log_cb(RETRO_LOG_ERROR,
                    "Unable to locate ROM. Expected name: %s, CRC32: 0x%08x\n",
                    debug,
-                   static_cast<unsigned>(expected_crc));
+                   (unsigned)(expected_crc));
 
         loaded = false;
         return 1;
@@ -310,7 +310,7 @@ int RomLoader::load_crc32(const char* debug,
         return 1;
     }
 
-    std::vector<uint8_t> buffer(static_cast<size_t>(file_length));
+    std::vector<uint8_t> buffer((size_t)(file_length));
     const bool read_ok = read_exact(source, &buffer[0], buffer.size());
     filestream_close(source);
 
@@ -326,7 +326,7 @@ int RomLoader::load_crc32(const char* debug,
     }
 
     for (int i = 0; i < file_length; i++)
-        rom[(i * interleave) + offset] = buffer[static_cast<size_t>(i)];
+        rom[(i * interleave) + offset] = buffer[(size_t)(i)];
 
     if (verbose && log_cb)
         log_cb(RETRO_LOG_INFO,
@@ -363,7 +363,7 @@ int RomLoader::load_binary(const char* filename)
 
     unload();
 
-    length = static_cast<uint32_t>(file_length);
+    length = (uint32_t)(file_length);
     rom = new uint8_t[length];
 
     const bool read_ok = read_exact(source, rom, length);

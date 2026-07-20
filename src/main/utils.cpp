@@ -41,5 +41,5 @@ uint32_t Utils::from_hex_string(std::string s)
     ss << std::hex << s;
     ss >> x;
     /* output it as a signed type */
-    return static_cast<unsigned int>(x);
+    return (unsigned int)(x);
 }

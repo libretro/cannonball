@@ -320,19 +320,19 @@ void Config::save_scores(const std::string &filename)
             e->initial1 == 0x20
                 ? "."
                 : Utils::to_string(
-                    static_cast<char>(e->initial1));
+                    (char)(e->initial1));
 
         const std::string initial2 =
             e->initial2 == 0x20
                 ? "."
                 : Utils::to_string(
-                    static_cast<char>(e->initial2));
+                    (char)(e->initial2));
 
         const std::string initial3 =
             e->initial3 == 0x20
                 ? "."
                 : Utils::to_string(
-                    static_cast<char>(e->initial3));
+                    (char)(e->initial3));
 
         score
             .append_child("initial1")
