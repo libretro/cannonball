@@ -25,4 +25,4 @@ namespace forcefeedback
     extern void close();
     extern int  set(int xdirection, int force);
     extern bool is_supported();
-};
+}

@@ -24,7 +24,7 @@ public:
     {
         GREY  = 0x84,
         PINK  = 0x86,
-        GREEN = 0x92,
+        GREEN = 0x92
     } colors;
 
     // Base for digits, for fast digit drawing

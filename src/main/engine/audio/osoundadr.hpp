@@ -106,4 +106,4 @@ namespace z80_adr
 
     // Traffic Volume Multiply Table. How much to increase traffic volume by dependent on distance.
     const static uint16_t TRAFFIC_VOL_MULTIPLY = 0x7CEF;
-};
+}

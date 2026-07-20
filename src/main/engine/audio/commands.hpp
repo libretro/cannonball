@@ -49,7 +49,7 @@ namespace sound
         YM_SET_LEVELS    = 0xA2,
         // 0xA3 Unused - Should be voice 4, but isn't hooked up
         PCM_WAVE         = 0xA4, // Wave Sample
-        MUSIC_LASTWAVE   = 0xA5, // Music: Last Wave
+        MUSIC_LASTWAVE   = 0xA5 // Music: Last Wave
     };
 
     // ----------------------------------------------------------------------------
@@ -65,6 +65,6 @@ namespace sound
         TRAFFIC1,
         TRAFFIC2,
         TRAFFIC3,
-        TRAFFIC4,
+        TRAFFIC4
     };
-};
+}

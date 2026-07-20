@@ -25,7 +25,7 @@ public:
         BONUS_SEQ1 = 0x10,      // 10 = End Seq Animation Stage #1
         BONUS_SEQ2 = 0x14,      // 14 = End Seq Animation Stage #2
         BONUS_SEQ3 = 0x18,      // 18 = End Seq Animation Stage #3
-        BONUS_END = 0x1C,       // 1C = End Bonus Sequence
+        BONUS_END = 0x1C       // 1C = End Bonus Sequence
     };
 
     // Bonus State
@@ -40,7 +40,7 @@ public:
         BONUS_TEXT_INIT = 0,
         BONUS_TEXT_SECONDS = 1,
         BONUS_TEXT_CLEAR = 2,
-        BONUS_TEXT_DONE = 3,
+        BONUS_TEXT_DONE = 3
     };
 
     // Timer used by bonus mode logic (Added from Rev. A onwards)

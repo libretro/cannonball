@@ -34,7 +34,7 @@ private:
         STATE_MENU,
         STATE_REDEFINE_KEYS,
         STATE_REDEFINE_JOY,
-        STATE_TTRIAL,
+        STATE_TTRIAL
     };
 
     TTrial* ttrial;

@@ -70,7 +70,7 @@ public:
         FERRARI_LOGIC = 3,
         
         // Ferrari End Sequence Logic
-        FERRARI_END_SEQ = 4,
+        FERRARI_END_SEQ = 4
     };
 
     // Which routine is in use
@@ -138,7 +138,7 @@ public:
     {
         TRACTION_ON = 0,
         TRACTION_HALF = 1,
-        TRACTION_OFF = 2,
+        TRACTION_OFF = 2
     };
 
     // Ferrari is slipping/skidding either after collision or round bend

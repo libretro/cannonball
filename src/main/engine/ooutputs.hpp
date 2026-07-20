@@ -50,7 +50,7 @@ public:
         D_COIN2_SUCC = 0x10, // bit 4 = Coin successfully inserted - Chute 1
         D_MOTOR      = 0x20, // bit 5 = steering wheel central vibration
         D_UNUSED     = 0x40, // bit 6 = ?
-        D_SOUND      = 0x80, // bit 7 = sound enable
+        D_SOUND      = 0x80 // bit 7 = sound enable
     };
 
     CoinChute chute1, chute2;

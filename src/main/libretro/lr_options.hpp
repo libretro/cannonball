@@ -22,5 +22,5 @@ namespace lr_options
     * to cast pointers) */
    extern void set_frontend_variable(const bool *config_var);
    extern void set_frontend_variable(const int *config_var);
-};
+}
 

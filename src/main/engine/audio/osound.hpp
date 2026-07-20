@@ -33,7 +33,7 @@ namespace pcm_sample
         WAVE    = 0xE0, // 0xE0 - Wave
         CRASH4  = 0xE1  // 0xE1 - Crash 4
     };
-};
+}
 
 // Internal Channel Offsets in RAM
 namespace channel
@@ -86,7 +86,7 @@ namespace channel
     const static int16_t ENGINE_CH4 = 0x460; // 0xFC60: Engine Channel - Traffic 3
     const static int16_t ENGINE_CH5 = 0x480; // 0xFC80: Engine Channel - Traffic 4
 
-};
+}
 
 // ------------------------------------------------------------------------------------------------
 // Internal Format of Sound Data in RAM before sending to hardware
@@ -168,9 +168,9 @@ namespace ch
         CTRL        = 0x17,
         FM_LOOP     = 0x18,
         SEQ_ADR1    = 0x1C,
-        SEQ_ADR2    = 0x1E,
+        SEQ_ADR2    = 0x1E
     };
-};
+}
 
 // +0x00: [Byte] Engine Volume
 // +0x01: [Byte] Engine Volume (seems same as 0x00)
@@ -202,9 +202,9 @@ namespace ch_engines
         PITCH_L = 0x04,
         PITCH_H = 0x05,
         VOL6    = 0x06,
-        ACTIVE  = 0x08,
+        ACTIVE  = 0x08
     };
-};
+}
 
 // MML Command Languge Defines
 namespace mml
@@ -232,9 +232,9 @@ namespace mml
         LONG		     = 0x15, // used for 'long' notes, restsand percussion samples
         RIGHT_CH_ONLY	 = 0x16, // send FM output to right channel / speaker only
         LEFT_CH_ONLY	 = 0x17, // send FM output to left channel / speaker only
-        BOTH_CH		     = 0x18, // send FM output to both channels / speakers
+        BOTH_CH		     = 0x18 // send FM output to both channels / speakers
     };
-};
+}
 
 
 

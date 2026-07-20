@@ -445,4 +445,4 @@ namespace lr_options
 
       set_variable(addr, val);
    }
-};
+}

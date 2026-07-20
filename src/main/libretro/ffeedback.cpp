@@ -154,4 +154,4 @@ namespace forcefeedback
     {
         return !!rumble.set_rumble_state;
     }
-};
+}

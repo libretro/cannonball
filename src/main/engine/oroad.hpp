@@ -79,7 +79,7 @@ public:
 		ROAD_BOTH_P0_INV = 5, // Both Roads (Road 0 Priority) (Road Split. Invert Road 1)
 		ROAD_BOTH_P1_INV = 6, // Both Roads (Road 1 Priority) (Road Split. Invert Road 1)
 		ROAD_R0_SPLIT = 7,    // Road 0 (Road Split.)
-		ROAD_R1_SPLIT = 8,    // Road 1 (Road Split. Invert Road 1)
+		ROAD_R1_SPLIT = 8    // Road 1 (Road Split. Invert Road 1)
 	};
 
 	// 0x30B: Road Load Split.

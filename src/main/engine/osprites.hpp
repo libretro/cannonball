@@ -31,7 +31,7 @@ public:
         SHADOW = 0x10,          // Bit 4: Sprite has shadows
 		DRAW_SPRITE = 0x20,	    // Bit 5: Toggle sprite visibility
         TRAFFIC_RHS = 0x40,	    // Bit 6: Traffic Sprites - Set to spawn on RHS
-		ENABLE = 0x80,	        // Bit 7: Toggle sprite visibility
+		ENABLE = 0x80	        // Bit 7: Toggle sprite visibility
 	};
 
     // Note, the original game has 0x4F entries.

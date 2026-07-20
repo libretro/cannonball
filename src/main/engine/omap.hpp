@@ -52,7 +52,7 @@ private:
         // Display Map
         MAP_DISPLAY = 0x14,
         // Clear Course Map
-        MAP_CLEAR = 0x18,
+        MAP_CLEAR = 0x18
     };
 
     // Direction to move on mini-map
@@ -88,7 +88,7 @@ private:
     void end_route();
     void init_map_delay();
     void map_display();
-    void move_mini_car(oentry*);  ;
+    void move_mini_car(oentry*);  
 };
 
 extern OMap omap;

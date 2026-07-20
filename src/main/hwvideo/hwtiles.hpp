@@ -11,7 +11,7 @@ public:
     {
         LEFT,
         RIGHT,
-        CENTRE,
+        CENTRE
     };
 
     uint8_t text_ram[0x1000]; // Text RAM
