@@ -1049,7 +1049,7 @@ bool retro_load_game(const struct retro_game_info *info)
       Roms_load_pcm_rom(&roms, true);
 
    /* Load patched widescreen tilemaps */
-   if (!omusic.load_widescreen_map(std::string(rom_path) + "res/"))
+   if (!omusic.load_widescreen_map())
    {
       if (log_cb)
          log_cb(RETRO_LOG_WARN, "[Cannonball]: Unable to load widescreen tilemaps.\n");

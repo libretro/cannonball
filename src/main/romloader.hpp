@@ -41,6 +41,7 @@ int RomLoader_load_crc32(RomLoader* self, const char* debug, const int offset, c
                    const bool verbose = true);
 
 int RomLoader_load_binary(RomLoader* self, const char* filename);
+int RomLoader_load_mem(RomLoader* self, const uint8_t* data, uint32_t len);
 
 void RomLoader_unload(RomLoader* self);
 

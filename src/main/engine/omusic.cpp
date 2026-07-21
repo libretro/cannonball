@@ -13,6 +13,7 @@
 #include "engine/oinputs.hpp"
 #include "engine/ologo.hpp"
 #include "engine/omusic.hpp"
+#include "engine/tilemap_data.h"
 #include "engine/otiles.hpp"
 #include "engine/otraffic.hpp"
 #include "engine/ostats.hpp"
@@ -33,20 +34,20 @@ OMusic::~OMusic(void)
 }
 
 /* Load Modified Widescreen version of tilemap */
-bool OMusic::load_widescreen_map(std::string path)
+bool OMusic::load_widescreen_map()
 {
     int status = 0;
 
     if (tilemap == NULL)
     {
         tilemap = new RomLoader();
-        status += RomLoader_load_binary(tilemap, std::string(path + "tilemap.bin").c_str());
+        status += RomLoader_load_mem(tilemap, tilemap_bin, TILEMAP_BIN_SIZE);
     }
 
     if (tile_patch == NULL)
     {
         tile_patch = new RomLoader();
-        status += RomLoader_load_binary(tile_patch, std::string(path + "tilepatch.bin").c_str());
+        status += RomLoader_load_mem(tile_patch, tilepatch_bin, TILEPATCH_BIN_SIZE);
     }
 
     return status == 0;

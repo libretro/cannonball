@@ -19,6 +19,7 @@
 #include <streams/file_stream.h>
 
 #include "romloader.hpp"
+#include <string.h>
 
 static int RomLoader_create_map(RomLoader* self);
 
@@ -371,6 +372,25 @@ int RomLoader_load_binary(RomLoader* self, const char* filename)
         RomLoader_unload(self);
         return 1;
     }
+
+    self->loaded = true;
+    return 0;
+}
+
+/* Load from an embedded memory buffer (no external file needed). */
+int RomLoader_load_mem(RomLoader* self, const uint8_t* data, uint32_t len)
+{
+    if (!data || len == 0)
+    {
+        self->loaded = false;
+        return 1;
+    }
+
+    RomLoader_unload(self);
+
+    self->length = len;
+    self->rom    = new uint8_t[self->length];
+    memcpy(self->rom, data, self->length);
 
     self->loaded = true;
     return 0;
