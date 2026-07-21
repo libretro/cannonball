@@ -268,7 +268,7 @@ void ORoad_clear_road_ram(ORoad* self)
     uint32_t adr = 0x80000; /* start of road ram */
 
     { uint8_t scanline; for (scanline = 0; scanline < S16_HEIGHT; scanline++)
-        HWRoad_write16(&hwroad, &adr, scanline); }
+        HWRoad_write16_a(&hwroad, &adr, scanline); }
 
     HWRoad_read_road_control(&hwroad);
 }
@@ -1595,14 +1595,14 @@ void ORoad_output_hscroll(ORoad* self, int16_t* src, uint32_t dst)
         int16_t d2l = -src[src_addr++] + d6;
         int16_t d3h = -src[src_addr++] + d6;
         int16_t d3l = -src[src_addr++] + d6;
-        HWRoad_write16(&hwroad, &dst, d0h);
-        HWRoad_write16(&hwroad, &dst, d0l);
-        HWRoad_write16(&hwroad, &dst, d1h);
-        HWRoad_write16(&hwroad, &dst, d1l);
-        HWRoad_write16(&hwroad, &dst, d2h);
-        HWRoad_write16(&hwroad, &dst, d2l);
-        HWRoad_write16(&hwroad, &dst, d3h);
-        HWRoad_write16(&hwroad, &dst, d3l);
+        HWRoad_write16_a(&hwroad, &dst, d0h);
+        HWRoad_write16_a(&hwroad, &dst, d0l);
+        HWRoad_write16_a(&hwroad, &dst, d1h);
+        HWRoad_write16_a(&hwroad, &dst, d1l);
+        HWRoad_write16_a(&hwroad, &dst, d2h);
+        HWRoad_write16_a(&hwroad, &dst, d2l);
+        HWRoad_write16_a(&hwroad, &dst, d3h);
+        HWRoad_write16_a(&hwroad, &dst, d3l);
     } }
 }
 

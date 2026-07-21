@@ -211,7 +211,7 @@ void Video_write_text8(Video* self, uint32_t addr, const uint8_t data)
     self->tile_layer->text_ram[addr & 0xFFF] = data;
 }
 
-void Video_write_text16(Video* self, uint32_t* addr, const uint16_t data)
+void Video_write_text16_a(Video* self, uint32_t* addr, const uint16_t data)
 {
     self->tile_layer->text_ram[*addr & 0xFFF] = (data >> 8) & 0xFF;
     self->tile_layer->text_ram[(*addr+1) & 0xFFF] = data & 0xFF;
@@ -225,7 +225,7 @@ void Video_write_text16(Video* self, uint32_t addr, const uint16_t data)
     self->tile_layer->text_ram[(addr+1) & 0xFFF] = data & 0xFF;
 }
 
-void Video_write_text32(Video* self, uint32_t* addr, const uint32_t data)
+void Video_write_text32_a(Video* self, uint32_t* addr, const uint32_t data)
 {
     self->tile_layer->text_ram[*addr & 0xFFF] = (data >> 24) & 0xFF;
     self->tile_layer->text_ram[(*addr+1) & 0xFFF] = (data >> 16) & 0xFF;
@@ -263,7 +263,7 @@ void Video_write_tile8(Video* self, uint32_t addr, const uint8_t data)
     self->tile_layer->tile_ram[addr & 0xFFFF] = data;
 } 
 
-void Video_write_tile16(Video* self, uint32_t* addr, const uint16_t data)
+void Video_write_tile16_a(Video* self, uint32_t* addr, const uint16_t data)
 {
     self->tile_layer->tile_ram[*addr & 0xFFFF] = (data >> 8) & 0xFF;
     self->tile_layer->tile_ram[(*addr+1) & 0xFFFF] = data & 0xFF;
@@ -277,7 +277,7 @@ void Video_write_tile16(Video* self, uint32_t addr, const uint16_t data)
     self->tile_layer->tile_ram[(addr+1) & 0xFFFF] = data & 0xFF;
 }   
 
-void Video_write_tile32(Video* self, uint32_t* addr, const uint32_t data)
+void Video_write_tile32_a(Video* self, uint32_t* addr, const uint32_t data)
 {
     self->tile_layer->tile_ram[*addr & 0xFFFF] = (data >> 24) & 0xFF;
     self->tile_layer->tile_ram[(*addr+1) & 0xFFFF] = (data >> 16) & 0xFF;
@@ -331,7 +331,7 @@ void Video_write_pal16(Video* self, uint32_t* palAddr, const uint16_t data)
     *palAddr += 2;
 }
 
-void Video_write_pal32(Video* self, uint32_t* palAddr, const uint32_t data)
+void Video_write_pal32_a(Video* self, uint32_t* palAddr, const uint32_t data)
 {    
     uint32_t adr = *palAddr & 0x1fff;
 
@@ -369,7 +369,7 @@ uint16_t Video_read_pal16(Video* self, uint32_t palAddr)
     return (self->palette[adr] << 8) | self->palette[adr+1];
 }
 
-uint16_t Video_read_pal16(Video* self, uint32_t* palAddr)
+uint16_t Video_read_pal16_a(Video* self, uint32_t* palAddr)
 {
     uint32_t adr = *palAddr & 0x1fff;
     *palAddr += 2;

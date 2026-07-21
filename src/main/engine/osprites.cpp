@@ -297,7 +297,7 @@ void OSprites_copy_palette_data(OSprites* self)
         uint32_t src_addr = self->pal_addresses[i++] << 3;
         uint32_t dst_addr = PAL_SPRITES + (self->pal_addresses[i++] << 5);
         { uint16_t j; for (j = 0; j < 8; j++)
-            Video_write_pal32(&video, &dst_addr, PALETTE_EXPANSION[src_addr++]); }
+            Video_write_pal32_a(&video, &dst_addr, PALETTE_EXPANSION[src_addr++]); }
     } }
     self->pal_copy_count = 0; /* All entries copied */
 }

@@ -26,7 +26,7 @@ void HWRoad_init(struct HWRoad* self, const uint8_t*, const bool hires);
 
 void HWRoad_write16(struct HWRoad* self, uint32_t adr, const uint16_t data);
 
-void HWRoad_write16(struct HWRoad* self, uint32_t* adr, const uint16_t data);
+void HWRoad_write16_a(struct HWRoad* self, uint32_t* adr, const uint16_t data);
 
 void HWRoad_write32(struct HWRoad* self, uint32_t* adr, const uint32_t data);
 

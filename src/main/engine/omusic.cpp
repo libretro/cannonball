@@ -427,7 +427,7 @@ static void OMusic_blit_music_select(OMusic* self)
 
     /* Write 32 Palette Longs to Palette RAM */
     { int i; for (i = 0; i < 32; i++)
-        Video_write_pal32(&video, &dst_addr, RomLoader_read32_a(&(roms.rom0), &src_addr)); }
+        Video_write_pal32_a(&video, &dst_addr, RomLoader_read32_a(&(roms.rom0), &src_addr)); }
 
     /* Set Tilemap Scroll */
     OTiles_set_scroll(&otiles, config.s16_x_off, 0);
@@ -447,7 +447,7 @@ static void OMusic_blit_music_select(OMusic* self)
         {
             dst_addr = tilemap16;
             { int x; for (x = 0; x < cols; x++)
-                Video_write_tile16(&video, &dst_addr, RomLoader_read16_a(self->tilemap, &src_addr)); }
+                Video_write_tile16_a(&video, &dst_addr, RomLoader_read16_a(self->tilemap, &src_addr)); }
             tilemap16 += 0x80; /* next line of tiles */
         } }
      }}
@@ -469,7 +469,7 @@ static void OMusic_blit_music_select(OMusic* self)
                 /* No Compression: write tile directly to tile ram */
                 if (data != 0)
                 {
-                    Video_write_tile16(&video, &dst_addr, data);    
+                    Video_write_tile16_a(&video, &dst_addr, data);    
                     x++;
                 }
                 /* Compression */
@@ -480,7 +480,7 @@ static void OMusic_blit_music_select(OMusic* self)
 
                     { uint16_t i; for (i = 0; i <= count; i++)
                     {
-                        Video_write_tile16(&video, &dst_addr, value);
+                        Video_write_tile16_a(&video, &dst_addr, value);
                         x++;
                     } }
                 }

@@ -57,11 +57,11 @@ void Video_clear_text_ram(Video* self);
 
 void Video_write_text8(Video* self, uint32_t, const uint8_t);
 
-void Video_write_text16(Video* self, uint32_t*, const uint16_t);
+void Video_write_text16_a(Video* self, uint32_t*, const uint16_t);
 
 void Video_write_text16(Video* self, uint32_t, const uint16_t);
 
-void Video_write_text32(Video* self, uint32_t*, const uint32_t);
+void Video_write_text32_a(Video* self, uint32_t*, const uint32_t);
 
 void Video_write_text32(Video* self, uint32_t, const uint32_t);
 
@@ -71,11 +71,11 @@ void Video_clear_tile_ram(Video* self);
 
 void Video_write_tile8(Video* self, uint32_t, const uint8_t);
 
-void Video_write_tile16(Video* self, uint32_t*, const uint16_t);
+void Video_write_tile16_a(Video* self, uint32_t*, const uint16_t);
 
 void Video_write_tile16(Video* self, uint32_t, const uint16_t);
 
-void Video_write_tile32(Video* self, uint32_t*, const uint32_t);
+void Video_write_tile32_a(Video* self, uint32_t*, const uint32_t);
 
 void Video_write_tile32(Video* self, uint32_t, const uint32_t);
 
@@ -87,13 +87,13 @@ void Video_write_pal8(Video* self, uint32_t*, const uint8_t);
 
 void Video_write_pal16(Video* self, uint32_t*, const uint16_t);
 
-void Video_write_pal32(Video* self, uint32_t*, const uint32_t);
+void Video_write_pal32_a(Video* self, uint32_t*, const uint32_t);
 
 void Video_write_pal32(Video* self, uint32_t, const uint32_t);
 
 uint8_t Video_read_pal8(Video* self, uint32_t);
 
-uint16_t Video_read_pal16(Video* self, uint32_t*);
+uint16_t Video_read_pal16_a(Video* self, uint32_t*);
 
 uint16_t Video_read_pal16(Video* self, uint32_t);
 

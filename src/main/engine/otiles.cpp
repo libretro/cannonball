@@ -80,7 +80,7 @@ void OTiles_setup_palette_hud(OTiles* self)
     /* Write longs of palette data. Read from ROM. */
     { int i; for (i = 0; i <= 0x1F; i++)
     {
-        Video_write_pal32(&video, &pal_addr, RomLoader_read32_a(&(roms.rom0), &src_addr));
+        Video_write_pal32_a(&video, &pal_addr, RomLoader_read32_a(&(roms.rom0), &src_addr));
     } }
 }
 
@@ -101,10 +101,10 @@ void OTiles_setup_palette_tilemap(OTiles* self)
         uint32_t tile_data_addr = 0x17050 + offset;
         
         /* Write 4 x longs of palette data. Read from ROM. */
-        Video_write_pal32(&video, &pal_addr, RomLoader_read32_a(&(roms.rom0), &tile_data_addr));
-        Video_write_pal32(&video, &pal_addr, RomLoader_read32_a(&(roms.rom0), &tile_data_addr));
-        Video_write_pal32(&video, &pal_addr, RomLoader_read32_a(&(roms.rom0), &tile_data_addr));
-        Video_write_pal32(&video, &pal_addr, RomLoader_read32_a(&(roms.rom0), &tile_data_addr));
+        Video_write_pal32_a(&video, &pal_addr, RomLoader_read32_a(&(roms.rom0), &tile_data_addr));
+        Video_write_pal32_a(&video, &pal_addr, RomLoader_read32_a(&(roms.rom0), &tile_data_addr));
+        Video_write_pal32_a(&video, &pal_addr, RomLoader_read32_a(&(roms.rom0), &tile_data_addr));
+        Video_write_pal32_a(&video, &pal_addr, RomLoader_read32_a(&(roms.rom0), &tile_data_addr));
     } }
 }
 
@@ -119,10 +119,10 @@ void OTiles_setup_palette_widescreen(OTiles* self)
 
     { int i; for (i = 0; i < 10; i++)
     {
-        Video_write_pal32(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
-        Video_write_pal32(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
-        Video_write_pal32(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
-        Video_write_pal32(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
+        Video_write_pal32_a(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
+        Video_write_pal32_a(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
+        Video_write_pal32_a(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
+        Video_write_pal32_a(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
     } }
 
     /* Create new palette (Entry 72). */
@@ -130,15 +130,15 @@ void OTiles_setup_palette_widescreen(OTiles* self)
     /* This is needed for some of the new Widescreen tiles */
     src_addr = S16_PALETTE_BASE + (53 * 16);
     pal_addr = S16_PALETTE_BASE + (72 * 16);
-    Video_write_pal32(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
-    Video_write_pal32(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
-    Video_write_pal32(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
-    Video_write_pal32(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
+    Video_write_pal32_a(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
+    Video_write_pal32_a(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
+    Video_write_pal32_a(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
+    Video_write_pal32_a(&video, &pal_addr, Video_read_pal32(&video, &src_addr));
 
     /* Copy wheel colour from Palette 50 to Palette 72, index 2. */
     src_addr = S16_PALETTE_BASE + (50 * 16) + 4;
     pal_addr = S16_PALETTE_BASE + (72 * 16) + 4;
-    Video_write_pal16(&video, &pal_addr, Video_read_pal16(&video, &src_addr));
+    Video_write_pal16(&video, &pal_addr, Video_read_pal16_a(&video, &src_addr));
 }
 
 /* Reset Tiles, Palette And Road Split Data */
@@ -215,7 +215,7 @@ static void OTiles_clear_tile_info(OTiles* self)
     /* 2. Clear portion of TEXT RAM containing tilemap info (110E80 - 110FFF) */
     uint32_t dst_addr = HW_FG_PSEL;
     { uint8_t i; for (i = 0; i <= 0x5F; i++)
-        Video_write_text32(&video, &dst_addr, 0); }
+        Video_write_text32_a(&video, &dst_addr, 0); }
 
     /* 3. Clear all of TILE RAM 100000 - 10FFFF */
     Video_clear_tile_ram(&video);
@@ -321,7 +321,7 @@ static void OTiles_copy_fg_tiles(OTiles* self, uint32_t dst_addr)
                     /* copy_compressed: */
                     { uint16_t i; for (i = 0; i <= count; i++)
                     {
-                        Video_write_tile16(&video, &tileram_addr, value);
+                        Video_write_tile16_a(&video, &tileram_addr, value);
                         if (--x < 0)
                             break; /* Break out of do/while loop to compression_done */
                     } }
@@ -330,7 +330,7 @@ static void OTiles_copy_fg_tiles(OTiles* self, uint32_t dst_addr)
                 else
                 {
                     /* copy_next_word: */
-                    Video_write_tile16(&video, &tileram_addr, data);
+                    Video_write_tile16_a(&video, &tileram_addr, data);
                     --x;
                 }
                 /* cont: */
@@ -383,7 +383,7 @@ static void OTiles_copy_bg_tiles(OTiles* self, uint32_t dst_addr)
                     /* copy_compressed: */
                     { uint16_t i; for (i = 0; i <= count; i++)
                     {
-                        Video_write_tile16(&video, &tileram_addr, value);
+                        Video_write_tile16_a(&video, &tileram_addr, value);
                         if (--x < 0)
                             break; /* Break out of do/while loop to compression_done */
                     } }
@@ -392,7 +392,7 @@ static void OTiles_copy_bg_tiles(OTiles* self, uint32_t dst_addr)
                 else
                 {
                     /* copy_next_word: */
-                    Video_write_tile16(&video, &tileram_addr, data);
+                    Video_write_tile16_a(&video, &tileram_addr, data);
                     --x;
                 }
                 /* cont: */
@@ -773,10 +773,10 @@ static void OTiles_copy_to_palram(OTiles* self, const uint8_t blocks, uint32_t s
 {
     { uint8_t i; for (i = 0; i <= blocks; i++)
     {
-        Video_write_pal32(&video, &dst, RomLoader_read32(&(roms.rom0), src));
-        Video_write_pal32(&video, &dst, RomLoader_read32(&(roms.rom0), src + 0x4));
-        Video_write_pal32(&video, &dst, RomLoader_read32(&(roms.rom0), src + 0x8));
-        Video_write_pal32(&video, &dst, RomLoader_read32(&(roms.rom0), src + 0xc));
+        Video_write_pal32_a(&video, &dst, RomLoader_read32(&(roms.rom0), src));
+        Video_write_pal32_a(&video, &dst, RomLoader_read32(&(roms.rom0), src + 0x4));
+        Video_write_pal32_a(&video, &dst, RomLoader_read32(&(roms.rom0), src + 0x8));
+        Video_write_pal32_a(&video, &dst, RomLoader_read32(&(roms.rom0), src + 0xc));
     } }
 }
 
@@ -836,7 +836,7 @@ void OTiles_fill_tilemap_color(OTiles* self, uint16_t color)
     Video_write_pal16(&video, &pal_addr, color);
 
     { uint16_t i; for (i = 0; i <= 0x7FF; i++)
-        Video_write_tile16(&video, &dst, TILE); }
+        Video_write_tile16_a(&video, &dst, TILE); }
 }
 
 /* Set Tilemap Scroll. Reset Pages */

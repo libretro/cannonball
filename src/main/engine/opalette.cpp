@@ -44,7 +44,7 @@ void OPalette_setup_sky_palette(OPalette* self)
     uint32_t dst = 0x120F00; /* palette ram */
 
     { int16_t i; for (i = 0; i <= 0x1F; i++)
-        Video_write_pal32(&video, &dst, TrackLoader_read32_a(trackloader.pal_sky_data, &src)); }
+        Video_write_pal32_a(&video, &dst, TrackLoader_read32_a(trackloader.pal_sky_data, &src)); }
 }
 
 /* Setup data in RAM necessary for sky palette fade. */
@@ -246,7 +246,7 @@ void OPalette_cycle_sky_palette(OPalette* self)
     uint32_t pal_addr = 0x120F00; /* dst */
 
     { int16_t i; for (i = 0; i <= 0x1F; i++)
-        Video_write_pal32(&video, &pal_addr, self->pal_manip[i + pal_index]); }
+        Video_write_pal32_a(&video, &pal_addr, self->pal_manip[i + pal_index]); }
  } }}
 
 /* ---------------------------------------------------------------------------- */
@@ -370,7 +370,7 @@ void OPalette_write_current_pal_to_ram(OPalette* self)
     /* Copy all of the road colour 1 stuff to RAM (0x120800 - 0x120810)   */
     { int16_t i; for (i = 0; i <= 7; i++)
     {
-        self->pal_fade[dst] = Video_read_pal16(&video, &src);
+        self->pal_fade[dst] = Video_read_pal16_a(&video, &src);
         dst += 9;
     } }
 
@@ -379,7 +379,7 @@ void OPalette_write_current_pal_to_ram(OPalette* self)
     /* Copy all of the palette ground 1 stuff (0x20 bytes total) */
     { int16_t i; for (i = 0; i <= 0xF; i++)
     {
-        self->pal_fade[dst] = Video_read_pal16(&video, &src);
+        self->pal_fade[dst] = Video_read_pal16_a(&video, &src);
         dst += 9;
     } }
 }
@@ -509,8 +509,8 @@ void OPalette_setup_ground_color(OPalette* self)
     { int16_t i; for (i = 0; i < 8; i++)
     {
         uint32_t data = TrackLoader_read32_a(trackloader.pal_gnd_data, &src);
-        Video_write_pal32(&video, &dst_pal_ground1, data);
-        Video_write_pal32(&video, &dst_pal_ground2, data);
+        Video_write_pal32_a(&video, &dst_pal_ground1, data);
+        Video_write_pal32_a(&video, &dst_pal_ground2, data);
     } }
 }
 

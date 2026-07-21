@@ -729,10 +729,10 @@ static void Outrun_init_motor_calibration(Outrun* self)
     /* Write Palette To RAM */
     uint32_t dst = 0x120000;
     const static uint32_t PAL_SERVICE[] = {0xFF, 0xFF00FF, 0xFF00FF, 0xFF0000};
-    Video_write_pal32(&video, &dst, PAL_SERVICE[0]);
-    Video_write_pal32(&video, &dst, PAL_SERVICE[1]);
-    Video_write_pal32(&video, &dst, PAL_SERVICE[2]);
-    Video_write_pal32(&video, &dst, PAL_SERVICE[3]);
+    Video_write_pal32_a(&video, &dst, PAL_SERVICE[0]);
+    Video_write_pal32_a(&video, &dst, PAL_SERVICE[1]);
+    Video_write_pal32_a(&video, &dst, PAL_SERVICE[2]);
+    Video_write_pal32_a(&video, &dst, PAL_SERVICE[3]);
 }
 
 /* ------------------------------------------------------------------------------- */

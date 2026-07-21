@@ -66,7 +66,7 @@ void OHiScore_setup_pal_best(OHiScore* self)
     uint32_t dst = 0x120F00;
 
     { int i; for (i = 0; i <= 0x1F; i++)
-        Video_write_pal32(&video, &dst, RomLoader_read32_a(&(roms.rom0), &src)); }
+        Video_write_pal32_a(&video, &dst, RomLoader_read32_a(&(roms.rom0), &src)); }
 }
 
 /* Setup road colour for Best Outrunners High Score Entry */
@@ -77,7 +77,7 @@ void OHiScore_setup_road_best(OHiScore* self)
     uint32_t dst = 0x120800;
 
     { int i; for (i = 0; i <= 0x1F; i++)
-        Video_write_pal32(&video, &dst, 0); }
+        Video_write_pal32_a(&video, &dst, 0); }
 }
 
 /* Initalize Default Score Table */
@@ -286,11 +286,11 @@ void OHiScore_blit_alphabet(OHiScore* self)
     /* Address in text ram for characters */
     uint32_t adr = 0x110BF0;
 
-    Video_write_text16(&video, &adr,       0x8D00); /* Full Stop */
+    Video_write_text16_a(&video, &adr,       0x8D00); /* Full Stop */
     Video_write_text16(&video, adr + 0x7E, 0x8D01);
-    Video_write_text16(&video, &adr,       0x8D04); /* Arrow */
+    Video_write_text16_a(&video, &adr,       0x8D04); /* Arrow */
     Video_write_text16(&video, adr + 0x7E, 0x8D05);
-    Video_write_text16(&video, &adr,       0x8D02); /* ED */
+    Video_write_text16_a(&video, &adr,       0x8D02); /* ED */
     Video_write_text16(&video, adr + 0x7E, 0x8D03);
 
     /* Colour selected tile red */
@@ -537,18 +537,18 @@ void OHiScore_tick_minicars(OHiScore* self)
             /* Two versions of routine, one that only blits the car in two tiles */
             if ((minicar->pos >> 8) & BIT_0)
             {
-                Video_write_text32(&video, &textram_adr, RomLoader_read32(&(roms.rom0), tiles_adr)); /* blit car in 2 tiles */
-                Video_write_text32(&video, &textram_adr, RomLoader_read32_a(&(roms.rom0), &tiles_smoke_adr)); /* smoke trail tile 1 */
-                Video_write_text16(&video, &textram_adr, RomLoader_read16_a(&(roms.rom0), &tiles_smoke_adr)); /* smoke trail tile 2 */
+                Video_write_text32_a(&video, &textram_adr, RomLoader_read32(&(roms.rom0), tiles_adr)); /* blit car in 2 tiles */
+                Video_write_text32_a(&video, &textram_adr, RomLoader_read32_a(&(roms.rom0), &tiles_smoke_adr)); /* smoke trail tile 1 */
+                Video_write_text16_a(&video, &textram_adr, RomLoader_read16_a(&(roms.rom0), &tiles_smoke_adr)); /* smoke trail tile 2 */
             }
             /* Blit at an offset */
             /* The second blits the mini-car at an offset halfway into the tile (and hence takes 3 tiles) */
             else
             {
-                Video_write_text32(&video, &textram_adr, RomLoader_read32(&(roms.rom0), 4 + tiles_adr)); /* blit car in 3 tiles */
-                Video_write_text16(&video, &textram_adr, RomLoader_read16(&(roms.rom0), 8 + tiles_adr)); /* blit car in 3 tiles */
-                Video_write_text32(&video, &textram_adr, RomLoader_read32_a(&(roms.rom0), &tiles_smoke_adr)); /* smoke trail tile 1 */
-                Video_write_text16(&video, &textram_adr, RomLoader_read16_a(&(roms.rom0), &tiles_smoke_adr)); /* smoke trail tile 2 */
+                Video_write_text32_a(&video, &textram_adr, RomLoader_read32(&(roms.rom0), 4 + tiles_adr)); /* blit car in 3 tiles */
+                Video_write_text16_a(&video, &textram_adr, RomLoader_read16(&(roms.rom0), 8 + tiles_adr)); /* blit car in 3 tiles */
+                Video_write_text32_a(&video, &textram_adr, RomLoader_read32_a(&(roms.rom0), &tiles_smoke_adr)); /* smoke trail tile 1 */
+                Video_write_text16_a(&video, &textram_adr, RomLoader_read16_a(&(roms.rom0), &tiles_smoke_adr)); /* smoke trail tile 2 */
             }
 
             /* Erase Minicar tiles (0xCFB2) */
@@ -604,7 +604,7 @@ void OHiScore_blit_score_table(OHiScore* self)
     /* Clear tile table ready for High Score Display */
     uint32_t tile_addr = 0x10E000; /* Tile Table 15 */
     { int i; for (i = 0; i <= 0x3FF; i++)
-        Video_write_tile32(&video, &tile_addr, 0x200020); }
+        Video_write_tile32_a(&video, &tile_addr, 0x200020); }
 
     OHud_blit_text2(&ohud, TEXT2_BEST_OR);   /* Print "BEST OUTRUNNERS" */
     OHud_blit_text1(&ohud, TEXT1_SCORE_ETC); /* Print Score, Name, Route, Record */

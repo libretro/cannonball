@@ -194,7 +194,7 @@ void HWRoad_write16(HWRoad* self, uint32_t adr, const uint16_t data)
     self->ram[(adr >> 1) & 0x7FF] = data;
 }
 
-void HWRoad_write16(HWRoad* self, uint32_t* adr, const uint16_t data)
+void HWRoad_write16_a(HWRoad* self, uint32_t* adr, const uint16_t data)
 {
     uint32_t a = *adr;
     self->ram[(a >> 1) & 0x7FF] = data;

@@ -159,11 +159,11 @@ void OHud_draw_timer1(OHud* self, uint16_t time)
         const uint16_t O = (('O' - 0x41) * 2) + PAL; /* Convert character to real index (D0-0x41) so A is 0x01 */
         const uint16_t F = (('F' - 0x41) * 2) + PAL;
         
-        Video_write_text16(&video, &dst_addr,       O);     /* Write first row to text ram */
+        Video_write_text16_a(&video, &dst_addr,       O);     /* Write first row to text ram */
         Video_write_text16(&video, 0x7E + dst_addr, O + 1); /* Write second row to text ram */
-        Video_write_text16(&video, &dst_addr,       F);     /* Write first row to text ram */
+        Video_write_text16_a(&video, &dst_addr,       F);     /* Write first row to text ram */
         Video_write_text16(&video, 0x7E + dst_addr, F + 1); /* Write second row to text ram */
-        Video_write_text16(&video, &dst_addr,       F);     /* Write first row to text ram */
+        Video_write_text16_a(&video, &dst_addr,       F);     /* Write first row to text ram */
         Video_write_text16(&video, 0x7E + dst_addr, F + 1); /* Write second row to text ram */
     }
 }
@@ -204,17 +204,17 @@ void OHud_draw_lap_timer(OHud* self, uint32_t addr, uint8_t* digits, uint8_t ms_
     const uint16_t APOSTROPHE2 = 0x835F;
 
     /* Write Minute Digit */
-    Video_write_text16(&video, &addr, BASE | digits[0]);
-    Video_write_text16(&video, &addr, APOSTROPHE1);
+    Video_write_text16_a(&video, &addr, BASE | digits[0]);
+    Video_write_text16_a(&video, &addr, APOSTROPHE1);
 
     /* Write Seconds */
-    Video_write_text16(&video, &addr, BASE | (digits[1] & 0xF0) >> 4);
-    Video_write_text16(&video, &addr, BASE | (digits[1] & 0xF));
-    Video_write_text16(&video, &addr, APOSTROPHE2);
+    Video_write_text16_a(&video, &addr, BASE | (digits[1] & 0xF0) >> 4);
+    Video_write_text16_a(&video, &addr, BASE | (digits[1] & 0xF));
+    Video_write_text16_a(&video, &addr, APOSTROPHE2);
 
     /* Write Milliseconds */
-    Video_write_text16(&video, &addr, BASE | (ms_value & 0xF0) >> 4);
-    Video_write_text16(&video, &addr, BASE | (ms_value & 0xF));
+    Video_write_text16_a(&video, &addr, BASE | (ms_value & 0xF0) >> 4);
+    Video_write_text16_a(&video, &addr, BASE | (ms_value & 0xF));
 }
 
 /* Draw Score (In-Game HUD) */
@@ -261,15 +261,15 @@ void OHud_draw_score(OHud* self, uint32_t addr, const uint32_t score, uint8_t fo
     { uint8_t i; for (i = 0; i < 7; i++)
     {
         if (!found && !digits[i])
-            Video_write_text16(&video, &addr, BLANK);
+            Video_write_text16_a(&video, &addr, BLANK);
         else
         {
-            Video_write_text16(&video, &addr, digits[i] + BASE);
+            Video_write_text16_a(&video, &addr, digits[i] + BASE);
             found = true;
         }
     } }
 
-    Video_write_text16(&video, &addr, digits[7] + BASE); /* Always draw last digit */
+    Video_write_text16_a(&video, &addr, digits[7] + BASE); /* Always draw last digit */
     delete[] digits;
  }}
 
@@ -302,15 +302,15 @@ void OHud_draw_score_tile(OHud* self, uint32_t addr, const uint32_t score, uint8
     { uint8_t i; for (i = 0; i < 7; i++)
     {
         if (!found && !digits[i])
-            Video_write_tile16(&video, &addr, BLANK);
+            Video_write_tile16_a(&video, &addr, BLANK);
         else
         {
-            Video_write_tile16(&video, &addr, digits[i] + BASE);
+            Video_write_tile16_a(&video, &addr, digits[i] + BASE);
             found = true;
         }
     } }
 
-    Video_write_tile16(&video, &addr, digits[7] + BASE); /* Always draw last digit */
+    Video_write_tile16_a(&video, &addr, digits[7] + BASE); /* Always draw last digit */
     delete[] digits;
  }}
 
@@ -420,8 +420,8 @@ void OHud_blit_speed(OHud* self, uint32_t dst_addr, uint16_t speed)
     digit1 <<= 1;
     digit1 += TILE_BASE;
     
-    Video_write_text16(&video, &dst_addr, digit3);
-    Video_write_text16(&video, &dst_addr, digit2);
+    Video_write_text16_a(&video, &dst_addr, digit3);
+    Video_write_text16_a(&video, &dst_addr, digit2);
     Video_write_text16(&video, dst_addr, digit1);
     dst_addr += 0x7C; /* Set to next horizontal line of number tiles */
 
@@ -429,8 +429,8 @@ void OHud_blit_speed(OHud* self, uint32_t dst_addr, uint16_t speed)
     if (digit3 != 0) digit3++;
     if (digit2 != 0) digit2++;
     digit1++;
-    Video_write_text16(&video, &dst_addr, digit3);
-    Video_write_text16(&video, &dst_addr, digit2);
+    Video_write_text16_a(&video, &dst_addr, digit3);
+    Video_write_text16_a(&video, &dst_addr, digit2);
     Video_write_text16(&video, dst_addr, digit1);
  }}
 
@@ -491,12 +491,12 @@ void OHud_draw_insert_coin(OHud* self)
                 {                
                     /* Blit each tile */
                     { uint16_t i; for (i = 0; i < sizeof(PRESS_START); i++)
-                        Video_write_text16(&video, &dst_addr, (0x8700 | PRESS_START[i])); }
+                        Video_write_text16_a(&video, &dst_addr, (0x8700 | PRESS_START[i])); }
                 }
                 else
                 {
                     { uint16_t i; for (i = 0; i < sizeof(PRESS_START); i++)
-                        Video_write_text16(&video, &dst_addr, (0x8700 | 0x20)); }
+                        Video_write_text16_a(&video, &dst_addr, (0x8700 | 0x20)); }
                 }
             }
             else
@@ -559,7 +559,7 @@ void OHud_blit_text1(OHud* self, uint32_t src_addr)
     { uint16_t i; for (i = 0; i <= counter; i++)
     {
         data = (data & 0xFF00) | RomLoader_read8_a(&(roms.rom0), &src_addr);
-        Video_write_text16(&video, &dst_addr, data);
+        Video_write_text16_a(&video, &dst_addr, data);
     } }
 }
 
@@ -574,7 +574,7 @@ void OHud_blit_text1(OHud* self, uint8_t x, uint8_t y, uint32_t src_addr)
     { uint16_t i; for (i = 0; i <= counter; i++)
     {
         data = (data & 0xFF00) | RomLoader_read8_a(&(roms.rom0), &src_addr);
-        Video_write_text16(&video, &dst_addr, data);
+        Video_write_text16_a(&video, &dst_addr, data);
     } }
  }}
 
@@ -611,7 +611,7 @@ void OHud_blit_text2(OHud* self, uint32_t src_addr)
         if (data == 0x20)
         {
             data = 0;
-            Video_write_text16(&video, &dst_addr, data); /* Write blank space to text ram */
+            Video_write_text16_a(&video, &dst_addr, data); /* Write blank space to text ram */
         }
         /* Normal character */
         else
@@ -619,7 +619,7 @@ void OHud_blit_text2(OHud* self, uint32_t src_addr)
             /* Convert character to real index (D0-0x41) so A is 0x01 */
             data -= 0x41;
             data = (data * 2) + pal;
-            Video_write_text16(&video, &dst_addr, data); /* Write first row to text ram */
+            Video_write_text16_a(&video, &dst_addr, data); /* Write first row to text ram */
             data++;
         }
         Video_write_text16(&video, 0x7E + dst_addr, data); /* Write second row to text ram */
@@ -683,14 +683,14 @@ void OHud_blit_text_big(OHud* self, const uint8_t Y, const char* text, bool do_n
             const uint16_t pal = 0x8CA0;
             c -= 0x40;
             c = (c * 2);
-            Video_write_text16(&video, &dst_addr,       c + pal);     /* Write first row to text ram */
+            Video_write_text16_a(&video, &dst_addr,       c + pal);     /* Write first row to text ram */
             Video_write_text16(&video, 0x7E + dst_addr, c + pal + 1); /* Write second row to text ram */
         }
         /* Blank space */
         else if (c == ' ')
         {
             c = 0;
-            Video_write_text16(&video, &dst_addr, c); /* Write blank space to text ram */
+            Video_write_text16_a(&video, &dst_addr, c); /* Write blank space to text ram */
             Video_write_text16(&video, 0x7E + dst_addr, c); /* Write blank space to text ram */
         }
         /* Normal character */
@@ -700,7 +700,7 @@ void OHud_blit_text_big(OHud* self, const uint8_t Y, const char* text, bool do_n
             /* Convert character to real index (D0-0x41) so A is 0x01 */
             c -= 0x41;
             c = (c * 2);
-            Video_write_text16(&video, &dst_addr,       c + pal);     /* Write first row to text ram */
+            Video_write_text16_a(&video, &dst_addr,       c + pal);     /* Write first row to text ram */
             Video_write_text16(&video, 0x7E + dst_addr, c + pal + 1); /* Write second row to text ram */
         }       
     } }
@@ -732,7 +732,7 @@ void OHud_blit_text_new(OHud* self, uint16_t x, uint16_t y, const char* text, ui
         else if (c == '.')
             c = 0x5b;
 
-        Video_write_text16(&video, &dst_addr, (pal << 8) | c);
+        Video_write_text16_a(&video, &dst_addr, (pal << 8) | c);
     } }
 }
 
