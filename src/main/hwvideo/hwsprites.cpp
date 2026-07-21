@@ -187,7 +187,7 @@ void hwsprites_render(hwsprites* self, const uint8_t priority)
 {
     const uint32_t numbanks = SPRITES_LENGTH / 0x10000;
 
-    for (uint16_t data = 0; data < SPRITE_RAM_SIZE; data += 8) 
+    { uint16_t data; for (data = 0; data < SPRITE_RAM_SIZE; data += 8) 
     {
         /* stop when we hit the end of sprite list */
         if ((self->ramBuff[data+0] & 0x8000) != 0) break;
@@ -314,5 +314,5 @@ void hwsprites_render(hwsprites* self, const uint8_t priority)
             addr += pitch * (yacc >> 9);
             yacc &= 0x1ff;
         }
-     } } } } }}
+     } } } } }} }
 }

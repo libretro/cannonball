@@ -53,7 +53,7 @@ static void OFerrari_convert_revs_speed(OFerrari* self, int32_t, int32_t*);
 static void OFerrari_update_road_pos(OFerrari* self);
 static int32_t OFerrari_tick_smoke(OFerrari* self);
 static void OFerrari_set_wheels(OFerrari* self, uint8_t);
-static inline void OFerrari_draw_sprite(OFerrari* self, oentry*);
+static void OFerrari_draw_sprite(OFerrari* self, oentry*);
 
 OFerrari oferrari;
 
@@ -1312,9 +1312,7 @@ void OFerrari_do_gear_torque(OFerrari* self, int16_t*d1)
     self->gear_bak = self->gear_value;
 }
 
-static 
-
-void OFerrari_do_gear_low(OFerrari* self, int16_t*d1)
+static void OFerrari_do_gear_low(OFerrari* self, int16_t*d1)
 {
     /* Recent Shift from high to low */
     if (self->gear_bak)
@@ -1340,9 +1338,7 @@ void OFerrari_do_gear_low(OFerrari* self, int16_t*d1)
         (*d1) = 0x10;
 }
 
-static 
-
-void OFerrari_do_gear_high(OFerrari* self, int16_t*d1)
+static void OFerrari_do_gear_high(OFerrari* self, int16_t*d1)
 {
     /* Change from Low Gear to High Gear */
     if (!self->gear_bak)
@@ -1762,9 +1758,8 @@ void OFerrari_do_skid(OFerrari* self)
     }
 }
 
-static 
 
-void OFerrari_draw_sprite(OFerrari* self, oentry* sprite)
+static void OFerrari_draw_sprite(OFerrari* self, oentry* sprite)
 {
     if (ORoad_get_view_mode(&oroad) != VIEW_INCAR)
     {

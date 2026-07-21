@@ -358,7 +358,7 @@ void OHud_draw_rev_counter(OHud* self)
     const uint16_t WHITE = 0x400;
     const uint16_t RED   = 0x600;
 
-    for (int8_t i = 0; i <= 0x13; i++)
+    { int8_t i; for (i = 0; i <= 0x13; i++)
     {
         uint16_t tile = 0;
         
@@ -387,7 +387,7 @@ void OHud_draw_rev_counter(OHud* self)
         /* It would be twice as long otherwise */
         if (i & 1)
             addr += 2;
-    }
+    } }
     oferrari.rev_pitch2 = oferrari.rev_pitch1;
  }}
 
