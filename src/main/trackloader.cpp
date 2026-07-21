@@ -12,6 +12,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdlib.h>
 #include <libretro.h>
 
 #include "trackloader.hpp"
@@ -94,9 +95,9 @@ TrackLoader trackloader;
 void TrackLoader_ctor(TrackLoader* self)
 {
     self->layout        = NULL;
-    self->levels        = new Level[STAGES];
-    self->levels_end    = new Level[5];
-    self->level_split   = new Level();
+    self->levels        = (Level*)malloc((STAGES) * sizeof(Level));
+    self->levels_end    = (Level*)malloc((5) * sizeof(Level));
+    self->level_split   = (Level*)calloc(1, sizeof(Level));
     self->current_level = &self->levels[0];
 
     self->mode       = TL_MODE_ORIGINAL;
@@ -105,11 +106,11 @@ void TrackLoader_ctor(TrackLoader* self)
 void TrackLoader_dtor(TrackLoader* self)
 {
     if (self->layout != NULL)
-        delete self->layout;
+        free(self->layout);
 
-    delete[] self->levels_end;
-    delete[] self->levels;
-    delete self->level_split;
+    free(self->levels_end);
+    free(self->levels);
+    free(self->level_split);
 }
 
 void TrackLoader_init(TrackLoader* self, bool jap)

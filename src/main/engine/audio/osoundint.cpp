@@ -21,13 +21,13 @@ OSound osound;
 
 void OSoundInt_ctor(OSoundInt* self)
 {
-    self->pcm_ram = new uint8_t[PCM_RAM_SIZE];
+    self->pcm_ram = (uint8_t*)malloc((PCM_RAM_SIZE) * sizeof(uint8_t));
     self->has_booted = false;
 }
 
 void OSoundInt_dtor(OSoundInt* self)
 {
-    delete[] self->pcm_ram;
+    free(self->pcm_ram);
 }
 
 void OSoundInt_init(OSoundInt* self)

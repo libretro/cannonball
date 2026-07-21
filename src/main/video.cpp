@@ -32,7 +32,7 @@ Video video;
 void Video_ctor(Video* self)
 {
     self->pixels       = NULL;
-    self->sprite_layer = new hwsprites();
+    self->sprite_layer = (hwsprites*)calloc(1, sizeof(hwsprites));
     self->tile_layer = (hwtiles*)malloc(sizeof(hwtiles));
     hwtiles_ctor(self->tile_layer);
 
@@ -42,9 +42,9 @@ void Video_ctor(Video* self)
 
 void Video_dtor(Video* self)
 {
-    delete self->sprite_layer;
+    free(self->sprite_layer);
     free(self->tile_layer);
-    if (self->pixels) delete[] self->pixels;
+    if (self->pixels) free(self->pixels);
 }
 
 int Video_init(Video* self, Roms* roms, video_settings_t* settings)
@@ -53,8 +53,8 @@ int Video_init(Video* self, Roms* roms, video_settings_t* settings)
         return 0;
 
     /* Internal pixel array. The size of this is always constant */
-    if (self->pixels) delete[] self->pixels;
-    self->pixels = new uint16_t[config.s16_width * config.s16_height];
+    if (self->pixels) free(self->pixels);
+    self->pixels = (uint16_t*)malloc((config.s16_width * config.s16_height) * sizeof(uint16_t));
 
     /* Convert S16 tiles to a more useable format */
     hwtiles_init(self->tile_layer, roms->tiles.rom, config.video.hires != 0);
@@ -63,7 +63,7 @@ int Video_init(Video* self, Roms* roms, video_settings_t* settings)
     Video_clear_text_ram(self);
     if (roms->tiles.rom)
     {
-        delete[] roms->tiles.rom;
+        free(roms->tiles.rom);
         roms->tiles.rom = NULL;
     }
 
@@ -71,7 +71,7 @@ int Video_init(Video* self, Roms* roms, video_settings_t* settings)
     hwsprites_init(self->sprite_layer, roms->sprites.rom);
     if (roms->sprites.rom)
     {
-        delete[] roms->sprites.rom;
+        free(roms->sprites.rom);
         roms->sprites.rom = NULL;
     }
 
@@ -79,7 +79,7 @@ int Video_init(Video* self, Roms* roms, video_settings_t* settings)
     HWRoad_init(&hwroad, roms->road.rom, config.video.hires != 0);
     if (roms->road.rom)
     {
-        delete[] roms->road.rom;
+        free(roms->road.rom);
         roms->road.rom = NULL;
     }
 

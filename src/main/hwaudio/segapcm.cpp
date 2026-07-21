@@ -54,6 +54,7 @@
  * 
  */
 
+#include <stdlib.h>
 #include "hwaudio/segapcm.hpp"
 
 void SegaPCM_ctor(SegaPCM* self, uint32_t clock, RomLoader* rom, uint8_t* ram, int32_t bank)
@@ -61,7 +62,7 @@ void SegaPCM_ctor(SegaPCM* self, uint32_t clock, RomLoader* rom, uint8_t* ram, i
     SoundChip_ctor(&self->sc);
     self->ram = ram;
     self->pcm_rom = rom->rom;  
-    self->low = new uint8_t[16];
+    self->low = (uint8_t*)malloc((16) * sizeof(uint8_t));
     self->max_addr = rom->length;
     self->bankshift = bank & 0xFF;
     self->rgnmask = self->max_addr - 1;
@@ -83,7 +84,7 @@ void SegaPCM_ctor(SegaPCM* self, uint32_t clock, RomLoader* rom, uint8_t* ram, i
 void SegaPCM_dtor(SegaPCM* self)
 {
     SoundChip_dtor(&self->sc);
-    delete[] self->low;
+    free(self->low);
 }
 
 void SegaPCM_init(SegaPCM* self, int32_t rate, int32_t fps)

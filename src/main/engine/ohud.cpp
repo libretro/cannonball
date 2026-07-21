@@ -11,6 +11,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "../utils.hpp"
@@ -242,7 +243,7 @@ void OHud_draw_score(OHud* self, uint32_t addr, const uint32_t score, uint8_t fo
     /* Blank tile for comparison purposes */
     const uint16_t BLANK = 0x8020;
 
-    uint8_t* digits = new uint8_t[8];
+    uint8_t* digits = (uint8_t*)malloc((8) * sizeof(uint8_t));
 
     /* Topmost digit */
     digits[0] = ((score >> 16) & 0xF000) >> 12;
@@ -270,7 +271,7 @@ void OHud_draw_score(OHud* self, uint32_t addr, const uint32_t score, uint8_t fo
     } }
 
     Video_write_text16_a(&video, &addr, digits[7] + BASE); /* Always draw last digit */
-    delete[] digits;
+    free(digits);
  }}
 
 /* Same as above function but writes to tile ram instead. */
@@ -283,7 +284,7 @@ void OHud_draw_score_tile(OHud* self, uint32_t addr, const uint32_t score, uint8
     /* Blank tile for comparison purposes */
     const uint16_t BLANK = 0x8020;
 
-    uint8_t* digits = new uint8_t[8];
+    uint8_t* digits = (uint8_t*)malloc((8) * sizeof(uint8_t));
 
     /* Topmost digit */
     digits[0] = ((score >> 16) & 0xF000) >> 12;
@@ -311,7 +312,7 @@ void OHud_draw_score_tile(OHud* self, uint32_t addr, const uint32_t score, uint8
     } }
 
     Video_write_tile16_a(&video, &addr, digits[7] + BASE); /* Always draw last digit */
-    delete[] digits;
+    free(digits);
  }}
 
 /* Modified Version Of Draw Digits */

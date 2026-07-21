@@ -8,6 +8,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdlib.h>
 #include <stddef.h>
 #include <string>
 #include <map>
@@ -113,13 +114,13 @@ void RomLoader_init(RomLoader* self, const uint32_t new_length)
     RomLoader_unload(self);
 
     self->length = new_length;
-    self->rom = new uint8_t[self->length];
+    self->rom = (uint8_t*)malloc((self->length) * sizeof(uint8_t));
     self->loaded = false;
 }
 
 void RomLoader_unload(RomLoader* self)
 {
-    delete[] self->rom;
+    free(self->rom);
     self->rom = NULL;
     self->length = 0;
     self->loaded = false;
@@ -362,7 +363,7 @@ int RomLoader_load_binary(RomLoader* self, const char* filename)
     RomLoader_unload(self);
 
     self->length = (uint32_t)(file_length);
-    self->rom = new uint8_t[self->length];
+    self->rom = (uint8_t*)malloc((self->length) * sizeof(uint8_t));
 
     const bool read_ok = read_exact(source, self->rom, self->length);
     filestream_close(source);
@@ -389,7 +390,7 @@ int RomLoader_load_mem(RomLoader* self, const uint8_t* data, uint32_t len)
     RomLoader_unload(self);
 
     self->length = len;
-    self->rom    = new uint8_t[self->length];
+    self->rom    = (uint8_t*)malloc((self->length) * sizeof(uint8_t));
     memcpy(self->rom, data, self->length);
 
     self->loaded = true;

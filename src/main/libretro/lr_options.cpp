@@ -6,6 +6,7 @@
 ***************************************************************************/
 
 /* Required for snprintf() on some platforms */
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 

@@ -7,6 +7,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdlib.h>
 #include <stdio.h>
 #include "main.hpp"
 #include "engine/oferrari.hpp"
@@ -40,8 +41,8 @@ void OMusic_ctor(OMusic* self)
 
 void OMusic_dtor(OMusic* self)
 {
-    if (self->tilemap)    delete self->tilemap;
-    if (self->tile_patch) delete self->tile_patch;
+    if (self->tilemap)    { RomLoader_dtor(self->tilemap); free(self->tilemap); }
+    if (self->tile_patch) { RomLoader_dtor(self->tile_patch); free(self->tile_patch); }
 }
 
 /* Load Modified Widescreen version of tilemap */
@@ -51,13 +52,13 @@ bool OMusic_load_widescreen_map(OMusic* self)
 
     if (self->tilemap == NULL)
     {
-        self->tilemap = new RomLoader();
+        self->tilemap = (RomLoader*)calloc(1, sizeof(RomLoader));
         status += RomLoader_load_mem(self->tilemap, tilemap_bin, TILEMAP_BIN_SIZE);
     }
 
     if (self->tile_patch == NULL)
     {
-        self->tile_patch = new RomLoader();
+        self->tile_patch = (RomLoader*)calloc(1, sizeof(RomLoader));
         status += RomLoader_load_mem(self->tile_patch, tilepatch_bin, TILEPATCH_BIN_SIZE);
     }
 

@@ -8,6 +8,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdlib.h>
 #include <stdint.h>
 #include "hwaudio/soundchip.hpp"
 
@@ -19,7 +20,7 @@ void SoundChip_ctor(SoundChip* self)
 
 void SoundChip_dtor(SoundChip* self)
 {
-    delete[] self->buffer;
+    free(self->buffer);
 }
 
 void SoundChip_init(SoundChip* self, uint8_t channels, int32_t sample_freq, int32_t fps)
@@ -32,9 +33,9 @@ void SoundChip_init(SoundChip* self, uint8_t channels, int32_t sample_freq, int3
     self->buffer_size = self->frame_size * channels;
 
     if (self->initalized)
-        delete[] self->buffer;
+        free(self->buffer);
     
-    self->buffer = new int16_t[self->buffer_size];
+    self->buffer = (int16_t*)malloc((self->buffer_size) * sizeof(int16_t));
 
     self->initalized = true;
 }

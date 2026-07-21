@@ -59,11 +59,11 @@ void Audio_start_audio(Audio* self)
         { int specified_delay_samps = (FREQ * SND_DELAY) / 1000;
         int dsp_buffer_samps = SAMPLES * DSP_BUFFER_FRAGS + specified_delay_samps;
         dsp_buffer_bytes = CHANNELS * dsp_buffer_samps * (BITS / 8);
-        dsp_buffer = new uint8_t[dsp_buffer_bytes];
+        dsp_buffer = (uint8_t*)malloc((dsp_buffer_bytes) * sizeof(uint8_t));
 
         /* Create Buffer For Mixing */
         uint16_t buffer_size = (FREQ / config.fps) * CHANNELS;
-        self->mix_buffer = new uint16_t[buffer_size];
+        self->mix_buffer = (uint16_t*)malloc((buffer_size) * sizeof(uint16_t));
 
         Audio_clear_buffers(self);
         Audio_clear_wav(self);
@@ -90,8 +90,8 @@ void Audio_stop_audio(Audio* self)
     {
         self->sound_enabled = false;
 
-        delete[] dsp_buffer;
-        delete[] self->mix_buffer;
+        free(dsp_buffer);
+        free(self->mix_buffer);
     }
 }static 
 
@@ -572,7 +572,7 @@ void Audio_clear_wav(Audio* self)
         if (self->wavfile.loaded == 1)
             free(self->wavfile.data);
         else
-            delete[] self->wavfile.data;        
+            free(self->wavfile.data);        
     }
 
     self->wavfile.length = 1;
