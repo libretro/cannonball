@@ -332,7 +332,7 @@ enum { PAL_LOOKUP_LENGTH = (sizeof(PALETTE_EXPANSION) / sizeof(PALETTE_EXPANSION
    void generate()
    {
 	   int src_offset = 111 * 8; // source palette to use (111)
-	   int col_offset = OFerrari::PAL_CYAN * 8; // new colours to apply
+	   int col_offset = PAL_CYAN * 8; // new colours to apply
 
 	   uint32_t c1 = PALETTE_EXPANSION[src_offset++]; // bytes 0  - 3
 	   uint32_t c2 = PALETTE_EXPANSION[src_offset++]; // bytes 4  - 7

@@ -39,7 +39,7 @@ static const uint8_t MAP_FERRARI_SLOT = 25;
 void OMap_init(OMap* self)
 {
     oferrari.car_ctrl_active = false; /* -1 */
-    video.clear_text_ram();
+    Video_clear_text_ram(&video);
     OSprites_disable_sprites(&osprites);
     OTraffic_disable_traffic(&otraffic);
     OSprites_clear_palette_data(&osprites);
@@ -47,8 +47,8 @@ void OMap_init(OMap* self)
     oferrari.car_inc_old      = 0;
     osprites.spr_cnt_main     = 0;
     osprites.spr_cnt_shadow   = 0;
-    oroad.road_ctrl           = ORoad::ROAD_BOTH_P0;
-    oroad.horizon_base        = ORoad::HORIZON_OFF;
+    oroad.road_ctrl           = ROAD_BOTH_P0;
+    oroad.horizon_base        = HORIZON_OFF;
     otiles.fill_tilemap_color(0xABD); /*  Paint pinkish colour on tilemap 16 */
     self->init_sprites = true;
 }

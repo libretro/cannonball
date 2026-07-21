@@ -574,7 +574,7 @@ void OOutputs::car_moving(const int MODE)
     }
     
     /* Motor is not currently moving. Setup new movement as necessary. */
-    if (oferrari.wheel_state != OFerrari::WHEELS_ON)
+    if (oferrari.wheel_state != WHEELS_ON)
     {
         do_motor_offroad();
         return;
@@ -756,7 +756,7 @@ void OOutputs::do_motor_crash()
 /* Source: 0xE9BE */
 void OOutputs::do_motor_offroad()
 {
-    const uint8_t* table = (oferrari.wheel_state != OFerrari::WHEELS_OFF) ? MOTOR_VALUES_OFFROAD2 : MOTOR_VALUES_OFFROAD1;
+    const uint8_t* table = (oferrari.wheel_state != WHEELS_OFF) ? MOTOR_VALUES_OFFROAD2 : MOTOR_VALUES_OFFROAD1;
 
     { const uint16_t car_inc = oinitengine.car_increment >> 16;
     uint8_t index;
@@ -844,14 +844,14 @@ void OOutputs::do_vibrate_upright()
     else if (!ocrash.skid_counter)
     {
         /* 0xEAE2: Disable Vibration once speed below 30 or wheels on-road */
-        if (speed < 30 || oferrari.wheel_state == OFerrari::WHEELS_ON)
+        if (speed < 30 || oferrari.wheel_state == WHEELS_ON)
         {
             clear_digital(D_MOTOR);
             return;
         }
 
         /* 0xEAFC: Both wheels off-road. Faster the car speed, greater the chance of vibrating */
-        if (oferrari.wheel_state == OFerrari::WHEELS_OFF)
+        if (oferrari.wheel_state == WHEELS_OFF)
         {
             if (speed > 220)      index = 3;
             else if (speed > 170) index = 2;
@@ -913,7 +913,7 @@ void OOutputs::do_vibrate_mini()
     /* Car Normal */
     else if (!ocrash.skid_counter)
     {
-        if (speed < 10 || oferrari.wheel_state == OFerrari::WHEELS_ON)
+        if (speed < 10 || oferrari.wheel_state == WHEELS_ON)
         {
             clear_digital(D_MOTOR);
             return;

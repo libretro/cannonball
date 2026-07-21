@@ -117,7 +117,7 @@ void OInitEngine_init(OInitEngine* self, int8_t level)
     if (level)
     {  
         otiles.init_tilemap_palette(level);
-        oroad.road_ctrl  = ORoad::ROAD_BOTH_P0;
+        oroad.road_ctrl  = ROAD_BOTH_P0;
         oroad.road_width = RD_WIDTH_MERGE;        /* Setup a default road width */
     }
 
@@ -130,7 +130,7 @@ void OInitEngine_setup_stage1(OInitEngine* self)
     oroad.road_width = 0x1C2 << 16;     /* Force display of two roads at start */
     ostats.score = 0;
     OStats_clear_stage_times(&ostats);
-    oferrari.reset_car();               /* Reset Car Speed/Rev Values */
+    OFerrari_reset_car(&oferrari);               /* Reset Car Speed/Rev Values */
     outrun.outputs->set_digital(OOutputs::D_EXT_MUTE);
     outrun.outputs->set_digital(OOutputs::D_SOUND);
     osoundint.engine_data[SOUND_ENGINE_VOL] = 0x3F;
@@ -278,18 +278,18 @@ void OInitEngine_update_engine(OInitEngine* self)
     /* Main Car Logic Block */
     /* ------------------------------------------------------------------------ */
 
-    oferrari.move();
+    OFerrari_move(&oferrari);
 
     if (oferrari.car_ctrl_active)
     {
-        oferrari.set_curve_adjust();
-        oferrari.set_ferrari_x();
-        oferrari.do_skid();
-        oferrari.check_wheels();
-        oferrari.set_ferrari_bounds();
+        OFerrari_set_curve_adjust(&oferrari);
+        OFerrari_set_ferrari_x(&oferrari);
+        OFerrari_do_skid(&oferrari);
+        OFerrari_check_wheels(&oferrari);
+        OFerrari_set_ferrari_bounds(&oferrari);
     }
 
-    oferrari.do_sound_score_slip();
+    OFerrari_do_sound_score_slip(&oferrari);
 
     /* ------------------------------------------------------------------------ */
     /* Setup New Sprite Scroll Speed. Based On Granular Difference. */
@@ -601,7 +601,7 @@ void OInitEngine_init_split1(OInitEngine* self)
     self->rd_split_state = SPLIT_CHOICE1;
 
     oroad.road_load_split  = -1;
-    oroad.road_ctrl        = ORoad::ROAD_BOTH_P0_INV; /* Both Roads (Road 0 Priority) (Road Split. Invert Road 0) */
+    oroad.road_ctrl        = ROAD_BOTH_P0_INV; /* Both Roads (Road 0 Priority) (Road Split. Invert Road 0) */
     self->road_width_orig        = oroad.road_width >> 16;
     oroad.road_pos         = 0;
     oroad.tilemap_h_target = 0;
@@ -683,9 +683,9 @@ void OInitEngine_init_split4(OInitEngine* self)
 
      /* Set Appropriate Road Control Value, Dependent On Route Chosen */
     if (self->route_selected != 0)
-        oroad.road_ctrl = ORoad::ROAD_R0_SPLIT;
+        oroad.road_ctrl = ROAD_R0_SPLIT;
     else
-        oroad.road_ctrl = ORoad::ROAD_R1_SPLIT;
+        oroad.road_ctrl = ROAD_R1_SPLIT;
 
     /* Denote road split has been removed (for enemy traFfic logic) */
     self->road_remove_split |= BIT_0;
@@ -723,7 +723,7 @@ void OInitEngine_init_split7(OInitEngine* self)
 {
     self->rd_split_state = 8;
 
-    oroad.road_ctrl = ORoad::ROAD_BOTH_P0;
+    oroad.road_ctrl = ROAD_BOTH_P0;
     self->route_selected = ~self->route_selected; /* invert bits */
     int16_t width2 = (oroad.road_width >> 16) << 1;
     if (self->route_selected == 0) 
@@ -795,7 +795,7 @@ void OInitEngine_init_split_next_level(OInitEngine* self)
 /* Source: 0x8A04 */
 void OInitEngine_init_bonus(OInitEngine* self, int16_t seq)
 {
-    oroad.road_ctrl = ORoad::ROAD_BOTH_P0_INV;
+    oroad.road_ctrl = ROAD_BOTH_P0_INV;
     oroad.road_pos  = 0;
     oroad.tilemap_h_target = 0;
     oanimseq.end_seq = (uint8_t) seq; /* Set End Sequence (0 - 4) */
@@ -851,9 +851,9 @@ void OInitEngine_bonus4(OInitEngine* self)
     {
          /* Set Appropriate Road Control Value, Dependent On Route Chosen */
         if (self->route_selected != 0)
-            oroad.road_ctrl = ORoad::ROAD_R0_SPLIT;
+            oroad.road_ctrl = ROAD_R0_SPLIT;
         else
-            oroad.road_ctrl = ORoad::ROAD_R1_SPLIT;
+            oroad.road_ctrl = ROAD_R1_SPLIT;
 
         /* Denote road split has been removed (for enemy traFfic logic) */
         self->road_remove_split |= BIT_0;

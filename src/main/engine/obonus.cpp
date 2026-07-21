@@ -175,15 +175,15 @@ static void OBonus_blit_bonus_secs(OBonus* self)
     }
     else
     {
-        video.write_text16(text_addr, TILE_ZERO);
-        video.write_text16(text_addr | COL2, TILE_ZERO);
+        Video_write_text16(&video, text_addr, TILE_ZERO);
+        Video_write_text16(&video, text_addr | COL2, TILE_ZERO);
         text_addr += 2;        
     }
 
     /* Blit Digit 2 */
     OHud_blit_large_digit(&ohud, &text_addr, d2);
     /* Blit Dot */
-    video.write_text16(text_addr | COL2, TILE_DOT);
+    Video_write_text16(&video, text_addr | COL2, TILE_DOT);
     text_addr += 2;
     /* Blit Digit 3 */
     OHud_blit_large_digit(&ohud, &text_addr, d3);

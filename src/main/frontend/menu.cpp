@@ -247,7 +247,7 @@ void Menu::init()
     video.enabled = true;
     video.sprite_layer->set_x_clip(false); /* Stop clipping in wide-screen mode. */
     video.sprite_layer->reset();
-    video.clear_text_ram();
+    Video_clear_text_ram(&video);
     video.tile_layer->restore_tiles();
     OLogo_enable(&ologo, LOGO_Y);
 
@@ -262,8 +262,8 @@ void Menu::init()
     OPalette_setup_road_colour(&opalette);
     otiles.setup_palette_hud();
 
-    oroad.init();
-    oroad.road_ctrl = ORoad::ROAD_R0;
+    ORoad_init(&oroad);
+    oroad.road_ctrl = ROAD_R0;
     oroad.horizon_set = 1;
     oroad.horizon_base = HORIZON_DEST + 0x100;
     oinitengine.rd_split_state = SPLIT_NONE;
@@ -319,7 +319,7 @@ void Menu::tick_ui()
     /* Skip odd frames at 60fps */
     frame++;
 
-    video.clear_text_ram();
+    Video_clear_text_ram(&video);
 
     if (state == STATE_MENU)
     {
@@ -384,7 +384,7 @@ void Menu::tick_ui()
     if (config.video.fps_count)
         OHud_draw_fps_counter(&ohud, cannonball_fps_counter);
 
-    oroad.tick();
+    ORoad_tick(&oroad);
 }
 
 void Menu::draw_menu_options()
@@ -406,10 +406,10 @@ void Menu::draw_menu_options()
         {
             /* Draw minicar */
             if (i == cursor)
-                video.write_text32(OHud_translate(&ohud, x - 3, y, 0x110030), roms.rom0.read32(TILES_MINICARS1));
+                Video_write_text32(&video, OHud_translate(&ohud, x - 3, y, 0x110030), roms.rom0.read32(TILES_MINICARS1));
             /* Erase minicar from this position */
             else
-                video.write_text32(OHud_translate(&ohud, x - 3, y, 0x110030), 0x20202020);
+                Video_write_text32(&video, OHud_translate(&ohud, x - 3, y, 0x110030), 0x20202020);
         }
         y += 2;
     } }
@@ -1101,8 +1101,8 @@ void Menu::restart_video()
 {
     if (config.sound.enabled)
         cannonball_audio.stop_audio();
-    video.disable();
-    video.init(&roms, &config.video);
+    Video_disable(&video);
+    Video_init(&video, &roms, &config.video);
     OSoundInt_init(&osoundint);
     if (config.sound.enabled)
         cannonball_audio.start_audio();

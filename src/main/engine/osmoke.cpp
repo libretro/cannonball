@@ -62,14 +62,14 @@ void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry *sprite)
     }
 
     /* Enhancement: When not displaying car, don't draw smoke effects */
-    if (oroad.get_view_mode() == ORoad::VIEW_INCAR && !OCrash_is_flip(&ocrash))
+    if (ORoad_get_view_mode(&oroad) == VIEW_INCAR && !OCrash_is_flip(&ocrash))
         return;
     
     /* ------------------------------------------------------------------------ */
     /* Car Slipping/Skidding */
     /* ------------------------------------------------------------------------ */
 
-    if (oferrari.is_slipping && oferrari.wheel_state == OFerrari::WHEELS_ON)
+    if (oferrari.is_slipping && oferrari.wheel_state == WHEELS_ON)
     {
         OSmoke_tick_smoke_anim(self, sprite, 0, roms.rom0p->read32(outrun.adr.smoke_data + self->smoke_type_slip));
         return;
@@ -79,20 +79,20 @@ void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry *sprite)
     /* Wheels Offroad */
     /* ------------------------------------------------------------------------ */
 
-    if (oferrari.wheel_state != OFerrari::WHEELS_ON)
+    if (oferrari.wheel_state != WHEELS_ON)
     {
         uint32_t smoke_adr = roms.rom0p->read32(outrun.adr.smoke_data + self->smoke_type_offroad);
 
         /* Left Wheel Only */
-        if (sprite == &osprites.jump_table[SPRITE_SMOKE2] && oferrari.wheel_state == OFerrari::WHEELS_LEFT_OFF)
+        if (sprite == &osprites.jump_table[SPRITE_SMOKE2] && oferrari.wheel_state == WHEELS_LEFT_OFF)
             OSmoke_tick_smoke_anim(self, sprite, 1, smoke_adr);
 
         /* Right Wheel Only */
-        else if (sprite == &osprites.jump_table[SPRITE_SMOKE1] && oferrari.wheel_state == OFerrari::WHEELS_RIGHT_OFF)
+        else if (sprite == &osprites.jump_table[SPRITE_SMOKE1] && oferrari.wheel_state == WHEELS_RIGHT_OFF)
             OSmoke_tick_smoke_anim(self, sprite, 1, smoke_adr);
         
         /* Both Wheels */
-        else if (oferrari.wheel_state == OFerrari::WHEELS_OFF)
+        else if (oferrari.wheel_state == WHEELS_OFF)
             OSmoke_tick_smoke_anim(self, sprite, 1, smoke_adr);
 
         return;
@@ -101,19 +101,19 @@ void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry *sprite)
     /* test_crash_intro: */
     
     /* Normal */
-    if (oferrari.car_state == OFerrari::CAR_NORMAL)
+    if (oferrari.car_state == CAR_NORMAL)
     {
         sprite->type = sprite->xw1; /* Copy frame number to type */
     }
     /* Smoke from wheels */
-    else if (oferrari.car_state == OFerrari::CAR_SMOKE)
+    else if (oferrari.car_state == CAR_SMOKE)
     {
         OSmoke_tick_smoke_anim(self, sprite, 1, roms.rom0p->read32(outrun.adr.smoke_data + self->smoke_type_onroad));
     }
     /* Animation Sequence */
     else
     {
-        if (oferrari.wheel_state != OFerrari::WHEELS_ON)
+        if (oferrari.wheel_state != WHEELS_ON)
             sprite->type = sprite->xw1; /* Copy frame number to type */
         else
         {
@@ -188,7 +188,7 @@ static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctr
         int16_t revs = 0;
 
         /* Force smoke during animation sequence */
-        if (oferrari.car_state == OFerrari::CAR_ANIM_SEQ)
+        if (oferrari.car_state == CAR_ANIM_SEQ)
             revs = 0x80;
         else
         {
@@ -251,7 +251,7 @@ static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctr
     }
 
     /* Return if stationary and not in animation sequence */
-    if (oferrari.car_state != OFerrari::CAR_ANIM_SEQ && oinitengine.car_increment >> 16 == 0)
+    if (oferrari.car_state != CAR_ANIM_SEQ && oinitengine.car_increment >> 16 == 0)
         return; 
 
     if (outrun.tick_frame)
@@ -263,7 +263,7 @@ static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctr
         else
         {
             /* One Wheel Off Road */
-            if (oferrari.wheel_state != OFerrari::WHEELS_ON && oferrari.wheel_state != OFerrari::WHEELS_OFF)
+            if (oferrari.wheel_state != WHEELS_ON && oferrari.wheel_state != WHEELS_OFF)
             {
                 sprite->counter = sprite->reload;
                 sprite->xw1++; /* Increment Frame */
@@ -313,7 +313,7 @@ static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctr
     { int8_t x = ((roms.rom0p->read8(addr + frame + 6) >> 3) & 0x1E);
 
     /* Enhancement: When viewing in-car, spread the spray out */
-    if (oroad.get_view_mode() == ORoad::VIEW_INCAR)
+    if (ORoad_get_view_mode(&oroad) == VIEW_INCAR)
         x += 10;
 
     if (sprite == &osprites.jump_table[SPRITE_SMOKE1])
@@ -348,7 +348,7 @@ void OSmoke_draw(OSmoke* self, oentry* sprite)
     if (ocrash.crash_counter && !ocrash.crash_z) return;
 
     /* Return if stationary and not in animation sequence */
-    if (oferrari.car_state != OFerrari::CAR_ANIM_SEQ && oinitengine.car_increment >> 16 == 0)
+    if (oferrari.car_state != CAR_ANIM_SEQ && oinitengine.car_increment >> 16 == 0)
         return; 
     
     OSprites_map_palette(&osprites, sprite);

@@ -110,7 +110,7 @@ int TTrial::tick()
                 outils::convert_counter_to_time(best_times[level_selected], best_converted);
                 OHud_draw_lap_timer(&ohud, OHud_translate(&ohud, 7, 26, 0x110030), best_converted, best_converted[2]);
                 OMap_blit(&omap);
-                oroad.tick();
+                ORoad_tick(&oroad);
                 OSprites_sprite_copy(&osprites);
                 OSprites_update_sprites(&osprites);
                 otiles.write_tilemap_hw();

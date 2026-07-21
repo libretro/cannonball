@@ -30,43 +30,72 @@
 #include "engine/oroad.hpp"
 #include "engine/ostats.hpp"
 
+static void ORoad_set_default_hscroll(ORoad* self);
+static void ORoad_clear_road_ram(ORoad* self);
+static void ORoad_init_stage1(ORoad* self);
+static void ORoad_do_road(ORoad* self);
+static void ORoad_rotate_values(ORoad* self);
+static void ORoad_check_load_road(ORoad* self);
+static void ORoad_setup_road_x(ORoad* self);
+static void ORoad_setup_x_data(ORoad* self, uint32_t);
+static void ORoad_set_tilemap_x(ORoad* self, uint32_t);
+static void ORoad_create_curve(ORoad* self, int16_t&, int16_t&,
+                      const int32_t, const int32_t, const int16_t, const int16_t);
+static void ORoad_setup_hscroll(ORoad* self);
+static void ORoad_do_road_offset(ORoad* self, int16_t*, int16_t, bool);
+static void ORoad_setup_road_y(ORoad* self);
+static void ORoad_init_height_seg(ORoad* self);
+static void ORoad_init_elevation(ORoad* self, uint32_t&);
+static void ORoad_do_elevation(ORoad* self);
+static void ORoad_init_elevation_delay(ORoad* self, uint32_t&);
+static void ORoad_do_elevation_delay(ORoad* self);
+static void ORoad_init_elevation_mixed(ORoad* self, uint32_t&);
+static void ORoad_do_elevation_mixed(ORoad* self);
+static void ORoad_init_horizon_adjust(ORoad* self, uint32_t&);
+static void ORoad_do_horizon_adjust(ORoad* self);
+static void ORoad_set_road_y(ORoad* self);
+static void ORoad_set_y_interpolate(ORoad* self);
+static void ORoad_set_y_horizon(ORoad* self);
+static void ORoad_set_y_2044(ORoad* self);
+static void ORoad_read_next_height(ORoad* self);
+static void ORoad_set_elevation(ORoad* self);
+static void ORoad_set_horizon_y(ORoad* self);
+static void ORoad_do_road_data(ORoad* self);
+static void ORoad_blit_roads(ORoad* self);
+static void ORoad_blit_road(ORoad* self, uint32_t);
+static void ORoad_output_hscroll(ORoad* self, int16_t*, uint32_t);
+static void ORoad_copy_bg_color(ORoad* self);
+
 ORoad oroad;
 
-ORoad::ORoad(void)
-{
 
-}
 
-ORoad::~ORoad(void)
-{
-}
-
-void ORoad::tick()
+void ORoad_tick(ORoad* self)
 {
     /* Enhancement: Adjust View */
-    if (horizon_target != horizon_offset)
+    if (self->horizon_target != self->horizon_offset)
     {
-        if (horizon_offset > horizon_target)
+        if (self->horizon_offset > self->horizon_target)
         {
-            horizon_offset -= 16;
-            if (horizon_offset < horizon_target)
-                horizon_offset = horizon_target;
+            self->horizon_offset -= 16;
+            if (self->horizon_offset < self->horizon_target)
+                self->horizon_offset = self->horizon_target;
         }
-        else if (horizon_offset < horizon_target)
+        else if (self->horizon_offset < self->horizon_target)
         {
-            horizon_offset += 16;
-            if (horizon_offset > horizon_target)
-                horizon_offset = horizon_target;
+            self->horizon_offset += 16;
+            if (self->horizon_offset > self->horizon_target)
+                self->horizon_offset = self->horizon_target;
         }
     }
 
-    do_road();
+    ORoad_do_road(self);
 }
 
 /* Helper function */
-int16_t ORoad::get_road_y(uint16_t index)
+int16_t ORoad_get_road_y(ORoad* self, uint16_t index)
 {
-    return -(road_y[road_p0 + index] >> 4) + 223;
+    return -(self->road_y[self->road_p0 + index] >> 4) + 223;
 }
 
 /* Initialize Road Values */
@@ -75,80 +104,80 @@ int16_t ORoad::get_road_y(uint16_t index)
 /* Input:          None */
 /* Output:         None */
 
-void ORoad::init()
+void ORoad_init(ORoad* self)
 {
     /* Extra initalization code here */
-    set_view_mode(VIEW_ORIGINAL, true);
-    road_pos         = 0;
-    tilemap_h_target = 0;
-    stage_lookup_off = 0;
-    road_width_bak   = 0;
-    car_x_bak        = 0;
-    height_lookup    = 0;
-    road_pos_change  = 0;
-    road_load_end    = 0;
-    road_ctrl        = ROAD_OFF;
-    road_load_split  = 0;
-    road_width       = 0;  
-    horizon_y2       = 0;
-    horizon_y_bak    = 0;
-    pos_fine         = 0;
-    horizon_base     = 0;
+    ORoad_set_view_mode(self, VIEW_ORIGINAL, true);
+    self->road_pos         = 0;
+    self->tilemap_h_target = 0;
+    self->stage_lookup_off = 0;
+    self->road_width_bak   = 0;
+    self->car_x_bak        = 0;
+    self->height_lookup    = 0;
+    self->road_pos_change  = 0;
+    self->road_load_end    = 0;
+    self->road_ctrl        = ROAD_OFF;
+    self->road_load_split  = 0;
+    self->road_width       = 0;  
+    self->horizon_y2       = 0;
+    self->horizon_y_bak    = 0;
+    self->pos_fine         = 0;
+    self->horizon_base     = 0;
 
     { int i; for (i = 0; i < ARRAY_LENGTH; i++)
     {
-        road_x[i] = 0;
-        road0_h[i] = 0;
-        road1_h[i] = 0;
-        road_unk[i] = 0;
+        self->road_x[i] = 0;
+        self->road0_h[i] = 0;
+        self->road1_h[i] = 0;
+        self->road_unk[i] = 0;
     } }
 
      { int i; for (i = 0; i < 0x1000; i++)
-         road_y[i] = 0; }
+         self->road_y[i] = 0; }
 
-    road_pos_old = 0;
-    road_data_offset = 0;
-    height_start = 0;
-    height_ctrl = 0;
-    pos_fine_old = 0;
-    pos_fine_diff = 0;
-    counter = 0;
-    height_index = 0;
-    height_final = 0;
-    height_inc = 0;
-    height_step = 0;
-    height_ctrl2 = 0;
-    height_addr = 0;
-    elevation = 0;
-    height_lookup_wrk = 0;
-    height_delay = 0;
-    step_adjust = 0;
-    do_height_inc = 0;
-    height_end = 0;
-    up_mult = 0;
-    down_mult = 0;
-    horizon_mod = 0;
-    length_offset = 0;
-    a1_lookup = 0;
-    change_per_entry = 0;
-    d5_o = 0;
-    a3_o = 0;
-    y_addr = 0;
-    scanline = 0;
-    total_height = 0;
+    self->road_pos_old = 0;
+    self->road_data_offset = 0;
+    self->height_start = 0;
+    self->height_ctrl = 0;
+    self->pos_fine_old = 0;
+    self->pos_fine_diff = 0;
+    self->counter = 0;
+    self->height_index = 0;
+    self->height_final = 0;
+    self->height_inc = 0;
+    self->height_step = 0;
+    self->height_ctrl2 = 0;
+    self->height_addr = 0;
+    self->elevation = 0;
+    self->height_lookup_wrk = 0;
+    self->height_delay = 0;
+    self->step_adjust = 0;
+    self->do_height_inc = 0;
+    self->height_end = 0;
+    self->up_mult = 0;
+    self->down_mult = 0;
+    self->horizon_mod = 0;
+    self->length_offset = 0;
+    self->a1_lookup = 0;
+    self->change_per_entry = 0;
+    self->d5_o = 0;
+    self->a3_o = 0;
+    self->y_addr = 0;
+    self->scanline = 0;
+    self->total_height = 0;
     /* End of extra initialization code  */
 
-    stage_loaded = -1;
-    horizon_set  = 0;
+    self->stage_loaded = -1;
+    self->horizon_set  = 0;
 
-    road_p0 = 0;
-    road_p1 = road_p0 + 0x400;
-    road_p2 = road_p1 + 0x400;
-    road_p3 = road_p2 + 0x400;
+    self->road_p0 = 0;
+    self->road_p1 = self->road_p0 + 0x400;
+    self->road_p2 = self->road_p1 + 0x400;
+    self->road_p3 = self->road_p2 + 0x400;
 
-    set_default_hscroll();
-    clear_road_ram();
-    init_stage1();
+    ORoad_set_default_hscroll(self);
+    ORoad_clear_road_ram(self);
+    ORoad_init_stage1(self);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -159,49 +188,49 @@ void ORoad::init()
 /* In Car  : Lower viewpoint */
 /* ---------------------------------------------------------------------------- */
 
-uint8_t ORoad::get_view_mode()
+uint8_t ORoad_get_view_mode(ORoad* self)
 {
-    return view_mode;
+    return self->view_mode;
 }
 
-void ORoad::set_view_mode(uint8_t mode, bool snap)
+void ORoad_set_view_mode(ORoad* self, uint8_t mode, bool snap)
 {
-    view_mode = mode;
+    self->view_mode = mode;
 
     if (mode == VIEW_ORIGINAL)
     {
-        horizon_target = 0;
+        self->horizon_target = 0;
     }
     else if (mode == VIEW_ELEVATED)
     {
-        horizon_target = 0x280;
+        self->horizon_target = 0x280;
     }
     else if (mode == VIEW_INCAR)
     {
-        horizon_target = -0x70;
+        self->horizon_target = -0x70;
     }
 
     if (snap)
-        horizon_offset = horizon_target;
+        self->horizon_offset = self->horizon_target;
 }
 
 /* Main Loop */
 /*  */
 /* Source Address: 0x1044 */
 /* Input:          None */
-/* Output:         None */
-void ORoad::do_road()
+/* Output:         None */static 
+void ORoad_do_road(ORoad* self)
 {
-    rotate_values();
-    setup_road_x();
-    setup_road_y();
-    set_road_y();
-    set_horizon_y();
-    do_road_data();
-    blit_roads();
-    output_hscroll(&road0_h[0], HW_HSCROLL_TABLE0);
-    output_hscroll(&road1_h[0], HW_HSCROLL_TABLE1);
-    copy_bg_color();
+    ORoad_rotate_values(self);
+    ORoad_setup_road_x(self);
+    ORoad_setup_road_y(self);
+    ORoad_set_road_y(self);
+    ORoad_set_horizon_y(self);
+    ORoad_do_road_data(self);
+    ORoad_blit_roads(self);
+    ORoad_output_hscroll(self, &self->road0_h[0], HW_HSCROLL_TABLE0);
+    ORoad_output_hscroll(self, &self->road1_h[0], HW_HSCROLL_TABLE1);
+    ORoad_copy_bg_color(self);
 
     HWRoad_read_road_control(&hwroad); /* swap halves of road ram */
 }
@@ -210,9 +239,9 @@ void ORoad::do_road()
 /*  */
 /* Source Address: 0x1106 */
 /* Input:          None */
-/* Output:         None */
+/* Output:         None */static 
 
-void ORoad::set_default_hscroll()
+void ORoad_set_default_hscroll(ORoad* self)
 {
     uint32_t adr = HW_HSCROLL_TABLE0;
 
@@ -232,9 +261,9 @@ void ORoad::set_default_hscroll()
 /* */
 /* 0x80000 : 00 00 [scanline 0] */
 /* 0x80002 : 00 01 [scanline 1] */
-/* 0x80004 : 00 02 [scanline 2] */
+/* 0x80004 : 00 02 [scanline 2] */static 
 
-void ORoad::clear_road_ram()
+void ORoad_clear_road_ram(ORoad* self)
 {
     uint32_t adr = 0x80000; /* start of road ram */
 
@@ -248,13 +277,13 @@ void ORoad::clear_road_ram()
 /*  */
 /* Source Address: 0x10DE */
 /* Input:          None */
-/* Output:         None */
+/* Output:         None */static 
 
-void ORoad::init_stage1()
+void ORoad_init_stage1(ORoad* self)
 {
     trackloader.init_path(0); 
-    road_pos = 0;
-    road_ctrl = ROAD_BOTH_P0;
+    self->road_pos = 0;
+    self->road_ctrl = ROAD_BOTH_P0;
     /* ignore init counter stuff (move.b  #$A,$49(a5)) */
 }
 
@@ -262,50 +291,50 @@ void ORoad::init_stage1()
 /*  */
 /* Source Address: 0x119E */
 /* Input:          None */
-/* Output:         None */
+/* Output:         None */static 
 
-void ORoad::rotate_values()
+void ORoad_rotate_values(ORoad* self)
 {
-    uint16_t p0_copy = road_p0;
-    road_p0 = road_p1;
-    road_p1 = road_p2;
-    road_p2 = road_p3;
-    road_p3 = p0_copy;
+    uint16_t p0_copy = self->road_p0;
+    self->road_p0 = self->road_p1;
+    self->road_p1 = self->road_p2;
+    self->road_p2 = self->road_p3;
+    self->road_p3 = p0_copy;
 
-    road_pos_change = (road_pos >> 16) - road_pos_old;
-    road_pos_old = road_pos >> 16;
+    self->road_pos_change = (self->road_pos >> 16) - self->road_pos_old;
+    self->road_pos_old = self->road_pos >> 16;
 
-    check_load_road();
+    ORoad_check_load_road(self);
 }
 
 /* Check whether we need to load the next stage / road split / bonus data */
 /*  */
 /* Source Address: 0x11D0 */
 /* Input:          None */
-/* Output:         None */
+/* Output:         None */static 
 
-void ORoad::check_load_road()
+void ORoad_check_load_road(ORoad* self)
 {
     /* If stage is not loaded */
-    if (ostats.cur_stage != stage_loaded)
+    if (ostats.cur_stage != self->stage_loaded)
     {
-        stage_loaded = ostats.cur_stage; /* Denote loaded */
-        trackloader.init_path(stage_lookup_off);
+        self->stage_loaded = ostats.cur_stage; /* Denote loaded */
+        trackloader.init_path(self->stage_lookup_off);
         return;
     }
 
     /* Check Split */
-    if (road_load_split)
+    if (self->road_load_split)
     {
         trackloader.init_path_split();
-        road_load_split = 0;
+        self->road_load_split = 0;
     }
 
     /* Check End Section */
-    else if (road_load_end)
+    else if (self->road_load_end)
     {
         trackloader.init_path_end();
-        road_load_end = 0;
+        self->road_load_end = 0;
     }
 }
 
@@ -314,29 +343,29 @@ void ORoad::check_load_road()
 /*  */
 /* Source Address: 0x1590 */
 /* Input:          None */
-/* Output:         None */
+/* Output:         None */static 
 
-void ORoad::setup_road_x()
+void ORoad_setup_road_x(ORoad* self)
 {
     /* If moved to next chunk of road data, setup x positions */
-    if (road_pos_change != 0)
+    if (self->road_pos_change != 0)
     {
-        road_data_offset = (road_pos >> 16) << 2;
+        self->road_data_offset = (self->road_pos >> 16) << 2;
         /*uint32_t addr = stage_addr + road_data_offset; */
-        uint32_t addr = road_data_offset; /* temporary hack for custom data */
-        set_tilemap_x(addr);
-        setup_x_data(addr);
+        uint32_t addr = self->road_data_offset; /* temporary hack for custom data */
+        ORoad_set_tilemap_x(self, addr);
+        ORoad_setup_x_data(self, addr);
     }
-    setup_hscroll();
+    ORoad_setup_hscroll(self);
 }
 
 /* Setup Road Path */
 /* */
 /* Road Path is stored as a series of words representing x,y change */
 /* */
-/* Source Address: 0x15B0 */
+/* Source Address: 0x15B0 */static 
 
-void ORoad::setup_x_data(uint32_t addr)
+void ORoad_setup_x_data(ORoad* self, uint32_t addr)
 {
     const int16_t x = trackloader.readPath(addr)     + trackloader.readPath(addr + 4); /* Length 1 */
     const int16_t y = trackloader.readPath(addr + 2) + trackloader.readPath(addr + 6); /* Length 2 */
@@ -351,8 +380,8 @@ void ORoad::setup_x_data(uint32_t addr)
     { uint8_t i; for (i = 0; i < 0x80;)
     {
         /* Set marker to ignore current road position, and use last good value */
-        road_x[i++] = 0x3210;
-        road_x[i++] = 0x3210;
+        self->road_x[i++] = 0x3210;
+        self->road_x[i++] = 0x3210;
     } }
 
     /* Now We Setup The Real Road Data at 60800 */
@@ -378,7 +407,7 @@ void ORoad::setup_x_data(uint32_t addr)
         curve_y_total += y_next;
 
         /* Calculate curve increment and end position */
-        create_curve(curve_inc, curve_end, curve_x_total, curve_y_total, curve_x_dist, curve_y_dist);
+        ORoad_create_curve(self, curve_inc, curve_end, curve_x_total, curve_y_total, curve_x_dist, curve_y_dist);
         { int16_t curve_steps = curve_end - curve_start;
         if (curve_steps < 0) return;
         if (curve_steps == 0) continue; /* skip_pos */
@@ -391,7 +420,7 @@ void ORoad::setup_x_data(uint32_t addr)
         {
             x += xinc;              
             if (x < -0x3200 || x > 0x3200) return;
-            road_x[scanline] = x;           
+            self->road_x[scanline] = x;           
             if (--scanline < 0) return;
         } }
 
@@ -402,9 +431,9 @@ void ORoad::setup_x_data(uint32_t addr)
 
 /* Interpolates road data into a smooth curve. */
 /* */
-/* Source Address: 0x16B6 */
+/* Source Address: 0x16B6 */static 
 
-void ORoad::create_curve(
+void ORoad_create_curve(ORoad* self, 
        int16_t &curve_inc, int16_t &curve_end,
        int32_t curve_x_total, int32_t curve_y_total, int16_t curve_x_dist, int16_t curve_y_dist)
 {    
@@ -424,9 +453,9 @@ void ORoad::create_curve(
 /* Source Address: 0x16F6 */
 /* */
 /* Use Euclidean distance between a series of points. */
-/* This is essentially the standard distance that you'd measure with a ruler. */
+/* This is essentially the standard distance that you'd measure with a ruler. */static 
 
-void ORoad::set_tilemap_x(uint32_t addr)
+void ORoad_set_tilemap_x(ORoad* self, uint32_t addr)
 {    
     /* d0 = Word 0 + Word 2 + Word 4 + Word 6 [Next 4 x positions] */
     /* d1 = Word 1 + Word 3 + Word 5 + Word 7 [Next 4 y positions] */
@@ -474,43 +503,43 @@ void ORoad::set_tilemap_x(uint32_t addr)
             scroll_x += 0x200;
     }
 
-    tilemap_h_target = scroll_x;
+    self->tilemap_h_target = scroll_x;
  } }}
 
 /* Creates the bend in the next section of road. */
 /* */
-/* Source Address: 0x180C */
+/* Source Address: 0x180C */static 
 
-void ORoad::setup_hscroll()
+void ORoad_setup_hscroll(ORoad* self)
 {
-    switch (road_ctrl)
+    switch (self->road_ctrl)
     {
         case ROAD_OFF:
             return;
 
         case ROAD_R0:
         case ROAD_R0_SPLIT:
-            do_road_offset(road0_h, -road_width_bak, false);
+            ORoad_do_road_offset(self, self->road0_h, -self->road_width_bak, false);
             break;
 
         case ROAD_R1:
-            do_road_offset(road1_h, +road_width_bak, false);
+            ORoad_do_road_offset(self, self->road1_h, +self->road_width_bak, false);
             break;
 
         case ROAD_BOTH_P0:
         case ROAD_BOTH_P1:
-            do_road_offset(road0_h, -road_width_bak, false);
-            do_road_offset(road1_h, +road_width_bak, false);
+            ORoad_do_road_offset(self, self->road0_h, -self->road_width_bak, false);
+            ORoad_do_road_offset(self, self->road1_h, +self->road_width_bak, false);
             break;
 
         case ROAD_BOTH_P0_INV:
         case ROAD_BOTH_P1_INV:
-            do_road_offset(road0_h, -road_width_bak, false);
-            do_road_offset(road1_h, +road_width_bak, true);
+            ORoad_do_road_offset(self, self->road0_h, -self->road_width_bak, false);
+            ORoad_do_road_offset(self, self->road1_h, +self->road_width_bak, true);
             break;
 
         case ROAD_R1_SPLIT:
-            do_road_offset(road1_h, +road_width_bak, true);
+            ORoad_do_road_offset(self, self->road1_h, +self->road_width_bak, true);
             break;  
     }
 }
@@ -524,13 +553,13 @@ void ORoad::setup_hscroll()
 /* */
 /* The road data is adjusted per scanline. */
 /* It is adjusted a different amount depending on how far into the horizon it is.  */
-/* So lines closer to the player's car are adjusted more. */
+/* So lines closer to the player's car are adjusted more. */static 
 
-void ORoad::do_road_offset(int16_t* dst_x, int16_t width, bool invert)
+void ORoad_do_road_offset(ORoad* self, int16_t* dst_x, int16_t width, bool invert)
 {
-    int32_t car_offset = car_x_bak + width + oinitengine.camera_x_off; /* note extra debug of camera x */
+    int32_t car_offset = self->car_x_bak + width + oinitengine.camera_x_off; /* note extra debug of camera x */
     int32_t scanline_inc = 0; /* Total amount to increment scanline (increased every line) */
-    int16_t* src_x = road_x; /* a0 */
+    int16_t* src_x = self->road_x; /* a0 */
 
     /* --------------------------------------------------------------- */
     /* Process H-Scroll: Car not central on road 0 */
@@ -622,89 +651,89 @@ void ORoad::do_road_offset(int16_t* dst_x, int16_t width, bool invert)
 /* */
 /* etc. */
 /* */
-/* +xx [Word] 0xFFFF / -1 Signifies end of height data */
+/* +xx [Word] 0xFFFF / -1 Signifies end of height data */static 
 
-void ORoad::setup_road_y()
+void ORoad_setup_road_y(ORoad* self)
 {
-    pos_fine_diff = pos_fine - pos_fine_old;
-    pos_fine_old = pos_fine;
+    self->pos_fine_diff = self->pos_fine - self->pos_fine_old;
+    self->pos_fine_old = self->pos_fine;
 
     /* Setup horizon base value if necessary */
-    if (!horizon_set)
+    if (!self->horizon_set)
     {
-        horizon_base = 0x240;
-        horizon_set = 1;
+        self->horizon_base = 0x240;
+        self->horizon_set = 1;
     }
 
     /* Code omitted that doesn't seem to be used */
 
-    switch (height_ctrl)
+    switch (self->height_ctrl)
     {
         /* Clear Road Height Segment & Init Segment 0 */
         case 0:
-            height_lookup = 0;
-            init_height_seg();
+            self->height_lookup = 0;
+            ORoad_init_height_seg(self);
             break;
 
         /* Init Next Road Height Segment */
         case 1:
-            init_height_seg();
+            ORoad_init_height_seg(self);
             break;
 
         /* Segment Initialized: Use Elevation Flag */
         case 2:
-            do_elevation();
+            ORoad_do_elevation(self);
             break;
 
         /* Segment Initalized: Delayed Elevation Section */
         case 3:
-            do_elevation_delay();
+            ORoad_do_elevation_delay(self);
             break;
 
         /* Needed for stage 0x1b */
         case 4:
-            do_elevation_mixed();
+            ORoad_do_elevation_mixed(self);
             break;
 
         /* Segment Initalized: Ignore Elevation Flag */
         case 5:
-            do_horizon_adjust();
+            ORoad_do_horizon_adjust(self);
             break;
     }
 }
 
-/* Source Address: 0x1BCE */
-void ORoad::init_height_seg()
+/* Source Address: 0x1BCE */static 
+void ORoad_init_height_seg(ORoad* self)
 {
-    height_index = 0;         /* Set to first entry in height segment */
-    height_inc   = 0;         /* Do not increment to next segment */
-    elevation    = NO_CHANGE; /* No Change to begin with */
-    height_step  = 1;    /* Set to start of height segment */
+    self->height_index = 0;         /* Set to first entry in height segment */
+    self->height_inc   = 0;         /* Do not increment to next segment */
+    self->elevation    = ROAD_NO_CHANGE; /* No Change to begin with */
+    self->height_step  = 1;    /* Set to start of height segment */
 
     /* Get Address of actual road height data */
-    height_lookup_wrk = height_lookup;
-    { uint32_t h_addr = trackloader.read_heightmap_table(height_lookup_wrk);
+    self->height_lookup_wrk = self->height_lookup;
+    { uint32_t h_addr = trackloader.read_heightmap_table(self->height_lookup_wrk);
 
-    height_ctrl2 = trackloader.read8(trackloader.heightmap_data, &h_addr);
-    step_adjust  = trackloader.read8(trackloader.heightmap_data, &h_addr); /* Speed at which to move through height segment */
+    self->height_ctrl2 = trackloader.read8(trackloader.heightmap_data, &h_addr);
+    self->step_adjust  = trackloader.read8(trackloader.heightmap_data, &h_addr); /* Speed at which to move through height segment */
 
-    switch (height_ctrl2)
+    switch (self->height_ctrl2)
     {
         case 0:
-            init_elevation(h_addr);
+            ORoad_init_elevation(self, h_addr);
             break;
         
         case 1:
         case 2:
-            init_elevation_delay(h_addr);
+            ORoad_init_elevation_delay(self, h_addr);
             break;
         
         case 3:
-            init_elevation_mixed(h_addr);
+            ORoad_init_elevation_mixed(self, h_addr);
             break;
         
         case 4:
-            init_horizon_adjust(h_addr);
+            ORoad_init_horizon_adjust(self, h_addr);
             break;
     }
  }}
@@ -725,54 +754,54 @@ void ORoad::init_height_seg()
 /*  = 40 */
 /*  = 255 / 40 = 6.3 positions per height segment */
 /* */
-/* Source Address: 0x1C2C */
-void ORoad::init_elevation(uint32_t& addr)
+/* Source Address: 0x1C2C */static 
+void ORoad_init_elevation(ORoad* self, uint32_t& addr)
 {
-    down_mult   = trackloader.read8(trackloader.heightmap_data, &addr);
-    up_mult     = trackloader.read8(trackloader.heightmap_data, &addr);
-    height_addr = addr;
-    height_ctrl = 2; /* Use do_elevation() */
-    do_elevation();
-}
+    self->down_mult   = trackloader.read8(trackloader.heightmap_data, &addr);
+    self->up_mult     = trackloader.read8(trackloader.heightmap_data, &addr);
+    self->height_addr = addr;
+    self->height_ctrl = 2; /* Use do_elevation() */
+    ORoad_do_elevation(self);
+}static 
 
-void ORoad::do_elevation()
+void ORoad_do_elevation(ORoad* self)
 {
     /* By Default: One Height Entry Per Two Road Positions  */
     /* Potential advance stage of height map we're on  */
-    height_step += pos_fine_diff * 12;
+    self->height_step += self->pos_fine_diff * 12;
 
     /* Adjust the speed at which we transverse elevation sections of the height map */
-    uint16_t d3 = step_adjust;
-    if (elevation == UP)
-        d3 *= up_mult;
-    else if (elevation == DOWN)
-        d3 *= down_mult;
+    uint16_t d3 = self->step_adjust;
+    if (self->elevation == ROAD_UP)
+        d3 *= self->up_mult;
+    else if (self->elevation == ROAD_DOWN)
+        d3 *= self->down_mult;
 
-    { uint16_t d1 = (height_step / d3);
+    { uint16_t d1 = (self->height_step / d3);
     if (d1 > 0xFF) d1 = 0xFF;
     d1 += 0x100;
 
-    height_start = d1;
-    height_end   = d1;
+    self->height_start = d1;
+    self->height_end   = d1;
 
     /* Advance to next height entry if appropriate.  */
-    height_index += height_inc; 
-    height_inc = 0;
+    self->height_index += self->height_inc; 
+    self->height_inc = 0;
 
     /* Increment to next height entry in table. */
-    if (height_start == 0x1FF)
+    if (self->height_start == 0x1FF)
     {
-        height_start = 0x1FF;
-        height_end   = 0x1FF;
-        height_step  = 1; /* Start Of Height Segment */
-        height_inc   = 1;
-        elevation    = NO_CHANGE;
+        self->height_start = 0x1FF;
+        self->height_end   = 0x1FF;
+        self->height_step  = 1; /* Start Of Height Segment */
+        self->height_inc   = 1;
+        self->elevation    = ROAD_NO_CHANGE;
         return;
     }
-    if (height_lookup == 0 || height_lookup_wrk != 0)
+    if (self->height_lookup == 0 || self->height_lookup_wrk != 0)
         return;
     /* If working road height index is 0, then init next section */
-    height_ctrl = 1;
+    self->height_ctrl = 1;
  }}
 
 /* Hold Elevation For Specified Delay */
@@ -794,63 +823,63 @@ void ORoad::do_elevation()
 /*       are driving at. It's actually possible to elongate the length of hills by driving slower! */
 /* */
 /* Example Data: 0x29AA */
-/* Source      : 0x1CE4 (first used at the chicane at stage 1) */
+/* Source      : 0x1CE4 (first used at the chicane at stage 1) */static 
 
-void ORoad::init_elevation_delay(uint32_t& addr)
+void ORoad_init_elevation_delay(ORoad* self, uint32_t& addr)
 {
-    height_delay  = trackloader.read16(trackloader.heightmap_data, &addr);
-    height_addr   = addr;
-    do_height_inc = 1;     /* Set to Part 1 */
-    height_inc    = 0;
-    height_end    = 0x100; /* Remains constant */
-    height_ctrl   = 3;     /* Use do_elevation_delay() */
-    do_elevation_delay();
+    self->height_delay  = trackloader.read16(trackloader.heightmap_data, &addr);
+    self->height_addr   = addr;
+    self->do_height_inc = 1;     /* Set to Part 1 */
+    self->height_inc    = 0;
+    self->height_end    = 0x100; /* Remains constant */
+    self->height_ctrl   = 3;     /* Use do_elevation_delay() */
+    ORoad_do_elevation_delay(self);
 }
 
-/* Source: 1D04 */
-void ORoad::do_elevation_delay()
+/* Source: 1D04 */static 
+void ORoad_do_elevation_delay(ORoad* self)
 {
-    int16_t d1 = pos_fine_diff * 12;
-    height_index += height_inc; /* Next height entry */
-    height_inc = 0;
+    int16_t d1 = self->pos_fine_diff * 12;
+    self->height_index += self->height_inc; /* Next height entry */
+    self->height_inc = 0;
 
     /* Part 1             || Part 3 */
-    if (height_index == 0 || do_height_inc == 0)
+    if (self->height_index == 0 || self->do_height_inc == 0)
     {
         /* 1D50 inc_pos_in_seg: */
-        height_step += d1;
+        self->height_step += d1;
         /*d1 = 0; */
-        d1 = height_step / step_adjust;
+        d1 = self->height_step / self->step_adjust;
         if (d1 > 0xFF) d1 = 0xFF;
 
-        height_start = d1;
+        self->height_start = d1;
 
         /* Advance to Part 2. */
-        if (height_start > 0xFE)
+        if (self->height_start > 0xFE)
         {
-            height_start = 0xFF;
-            height_step  = 1;
-            height_inc   = 1;
-            elevation    = NO_CHANGE; /* Keep horizon at level for delayed section */
+            self->height_start = 0xFF;
+            self->height_step  = 1;
+            self->height_inc   = 1;
+            self->elevation    = ROAD_NO_CHANGE; /* Keep horizon at level for delayed section */
         }
 
         /* Part 3: Invert counter */
-        if (height_index != 0)
+        if (self->height_index != 0)
         {
-            d1 = 0xFF - height_start;
+            d1 = 0xFF - self->height_start;
         }
 
-        height_start = d1 + 0x100;
+        self->height_start = d1 + 0x100;
     }
     /* Part 2 */
     /* Source: 0x1D2E  */
     else
     {
-        height_delay -= (d1 / step_adjust);    
-        height_start = 0x1FF;
+        self->height_delay -= (d1 / self->step_adjust);    
+        self->height_start = 0x1FF;
 
-        if (height_delay < 0) /* Set flag so we inc next time */
-            do_height_inc = 0;
+        if (self->height_delay < 0) /* Set flag so we inc next time */
+            self->do_height_inc = 0;
     }
 }
 
@@ -867,75 +896,75 @@ void ORoad::do_elevation_delay()
 /* Part 3: [Height Index = 1]     Height Start Decrements from 511 to 256. Revert horizon to original height over this period. */
 /* */
 /* Source      : 0x1DAC */
-/* Example Data: 0x2A8E */
-void ORoad::init_elevation_mixed(uint32_t& addr)
+/* Example Data: 0x2A8E */static 
+void ORoad_init_elevation_mixed(ORoad* self, uint32_t& addr)
 {
-    height_delay  = trackloader.read16(trackloader.heightmap_data, &addr);
-    height_addr   = addr;
-    do_height_inc = 1;
-    height_inc    = 0;
-    height_ctrl   = 4;    /* Use do_elevation_mixed() function */
-    do_elevation_mixed();
+    self->height_delay  = trackloader.read16(trackloader.heightmap_data, &addr);
+    self->height_addr   = addr;
+    self->do_height_inc = 1;
+    self->height_inc    = 0;
+    self->height_ctrl   = 4;    /* Use do_elevation_mixed() function */
+    ORoad_do_elevation_mixed(self);
 }
 
-/* Source: 0x1DC6 */
-void ORoad::do_elevation_mixed()
+/* Source: 0x1DC6 */static 
+void ORoad_do_elevation_mixed(ORoad* self)
 {
-    uint16_t d1 = pos_fine_diff * 12;
-    height_index += height_inc;
-    height_inc = 0;
+    uint16_t d1 = self->pos_fine_diff * 12;
+    self->height_index += self->height_inc;
+    self->height_inc = 0;
     
     /* Parts 2 & 3 - Delayed Section. Source: 0x1E1C */
-    if (height_index >= 6)
+    if (self->height_index >= 6)
     {
-        uint16_t d3 = step_adjust;
+        uint16_t d3 = self->step_adjust;
 
         /* Part 2: Create a delay on the sixth entry */
-        if (do_height_inc != 0)
+        if (self->do_height_inc != 0)
         {
-            height_delay -= (d1 / d3);
-            height_start = 0x1FF;
-            height_end = 0x100;
+            self->height_delay -= (d1 / d3);
+            self->height_start = 0x1FF;
+            self->height_end = 0x100;
             /* Delay has expired. Advance to last entry. Source: 0x1E46 */
-            if (height_delay < 0)
+            if (self->height_delay < 0)
             {
-                height_addr += 12; /* Advance 6 words. */
-                do_height_inc = 0;
+                self->height_addr += 12; /* Advance 6 words. */
+                self->do_height_inc = 0;
             }
         }
         /* Part 3. Source: 0x1E58 */
         else
         {
-            height_step += d1;
-            d1 = height_step / d3;
+            self->height_step += d1;
+            d1 = self->height_step / d3;
             if (d1 > 0xFF) d1 = 0xFF;
-            height_start = 0x1FF - d1;
-            if (height_start != 0x100) return;
+            self->height_start = 0x1FF - d1;
+            if (self->height_start != 0x100) return;
             
-            height_step = 1; /* Set position on road segment to start */
-            height_inc  = 1;
-            elevation   = NO_CHANGE;
+            self->height_step = 1; /* Set position on road segment to start */
+            self->height_inc  = 1;
+            self->elevation   = ROAD_NO_CHANGE;
         }
     }
     /* Part 1. Source: 0x1DEA */
     /* Look ahead at next 6 entries in data as normal.  */
     else
     {
-        height_step += d1;
-        d1 = height_step / 4;
+        self->height_step += d1;
+        d1 = self->height_step / 4;
         if (d1 > 0xFF) d1 = 0xFF;
         d1 += 0x100;
-        height_start = d1;
-        height_end   = d1;
+        self->height_start = d1;
+        self->height_end   = d1;
 
-        if (height_start < 0x1FF) return;
+        if (self->height_start < 0x1FF) return;
         
         /* set_end2: */
-        height_start = 0x1FF;
-        height_end   = 0x1FF;
-        height_step  = 1; /* Set position on road segment to start */
-        height_inc   = 1;
-        elevation    = NO_CHANGE;
+        self->height_start = 0x1FF;
+        self->height_end   = 0x1FF;
+        self->height_step  = 1; /* Set position on road segment to start */
+        self->height_inc   = 1;
+        self->elevation    = ROAD_NO_CHANGE;
     }
 }
 
@@ -946,51 +975,51 @@ void ORoad::do_elevation_mixed()
 /* Part 2: Horizon is set and remains at this position until changed with another horizon data block.  */
 /* */
 /* Example Data  : 0x3672 */
-/* Source        : 0x1EB6 */
-void ORoad::init_horizon_adjust(uint32_t& addr)
+/* Source        : 0x1EB6 */static 
+void ORoad_init_horizon_adjust(ORoad* self, uint32_t& addr)
 {
-    height_addr = addr;
+    self->height_addr = addr;
 
     /* Set Horizon Modifier */
-    horizon_mod = trackloader.read16(trackloader.heightmap_data, addr) - horizon_base;
+    self->horizon_mod = trackloader.read16(trackloader.heightmap_data, addr) - self->horizon_base;
     
     /* Use do_horizon_adjust() function */
-    height_ctrl = 5;
-    do_horizon_adjust();
-}
+    self->height_ctrl = 5;
+    ORoad_do_horizon_adjust(self);
+}static 
 
-void ORoad::do_horizon_adjust()
+void ORoad_do_horizon_adjust(ORoad* self)
 {
-    height_step += pos_fine_diff * 12;
-    { uint16_t d1 = (height_step / step_adjust);
+    self->height_step += self->pos_fine_diff * 12;
+    { uint16_t d1 = (self->height_step / self->step_adjust);
 
     /* Scale height between 100 and 1FF */
     if (d1 > 0xFF) d1 = 0xFF;
     d1 += 0x100;
 
-    height_start = d1;
-    height_end   = d1;
+    self->height_start = d1;
+    self->height_end   = d1;
  }}
 
 /* ---------------------------------------------------------------------------- */
 /* END OF SETUP SECTION */
 /* ---------------------------------------------------------------------------- */
 
-/* Source Address: 0x1F00 */
-void ORoad::set_road_y()
+/* Source Address: 0x1F00 */static 
+void ORoad_set_road_y(ORoad* self)
 {
-    switch (height_ctrl2)
+    switch (self->height_ctrl2)
     {
         /* Set Normal Y Coordinate */
         case 0:
         case 1:
         case 2:
         case 3:
-            set_y_interpolate();
+            ORoad_set_y_interpolate(self);
             break;
         /* Set Y with Horizon Adjustment (Stage 2 - Gateway) */
         case 4:
-            set_y_horizon();
+            ORoad_set_y_horizon(self);
             break;
     }
 }
@@ -1002,87 +1031,87 @@ void ORoad::set_road_y()
 /* section_lengths stores the distance from the player to the horizon. */
 /* This essentially represents 7 track segments. */
 
-/* Source Address: 0x1F22 */
-void ORoad::set_y_interpolate()
+/* Source Address: 0x1F22 */static 
+void ORoad_set_y_interpolate(ORoad* self)
 {
     /* ------------------------------------------------------------------------ */
     /* Convert desired elevation of track into a series of section lengths */
     /* Each stored in 7 counters which will be used to output the track */
     /* ------------------------------------------------------------------------ */
 
-    uint16_t d2 = height_end;
+    uint16_t d2 = self->height_end;
     uint16_t d1 = 0x1FF - d2;
 
-    section_lengths[0] = d1;
+    self->section_lengths[0] = d1;
     d2 >>= 1;
-    section_lengths[1] = d2;    
+    self->section_lengths[1] = d2;    
     
     { uint16_t d3 = 0x200 - d1 - d2;
-    section_lengths[3] = d3;
+    self->section_lengths[3] = d3;
     d3 >>= 1;
-    section_lengths[2] = d3;
-    section_lengths[3] -= d3;
+    self->section_lengths[2] = d3;
+    self->section_lengths[3] -= d3;
     
-    d3 = section_lengths[3];
-    section_lengths[4] = d3;
+    d3 = self->section_lengths[3];
+    self->section_lengths[4] = d3;
     d3 >>= 1;
-    section_lengths[3] = d3;
-    section_lengths[4] -= d3;
+    self->section_lengths[3] = d3;
+    self->section_lengths[4] -= d3;
     
-    d3 = section_lengths[4];
-    section_lengths[5] = d3;
+    d3 = self->section_lengths[4];
+    self->section_lengths[5] = d3;
     d3 >>= 1;
-    section_lengths[4] = d3;
-    section_lengths[5] -= d3;
+    self->section_lengths[4] = d3;
+    self->section_lengths[5] -= d3;
 
-    d3 = section_lengths[5];
-    section_lengths[6] = d3;
+    d3 = self->section_lengths[5];
+    self->section_lengths[6] = d3;
     d3 >>= 1;
-    section_lengths[5] = d3;
-    section_lengths[6] -= d3;
+    self->section_lengths[5] = d3;
+    self->section_lengths[6] -= d3;
 
-    length_offset = 0;
+    self->length_offset = 0;
 
     /* Address of next entry in road height table data [rom so no need to scale] */
-    a1_lookup = (height_index * 2) + height_addr;
+    self->a1_lookup = (self->height_index * 2) + self->height_addr;
 
     /* Road Y Positions (references to this decrement) [Destination]     */
-    y_addr = 0x200 + road_p1;
+    self->y_addr = 0x200 + self->road_p1;
 
-    a3_o = 0;
-    road_unk[a3_o++] = 0x1FF;
-    road_unk[a3_o++] = 0;
-    counter = 0; /* Reset interpolated counter index to 0 */
+    self->a3_o = 0;
+    self->road_unk[self->a3_o++] = 0x1FF;
+    self->road_unk[self->a3_o++] = 0;
+    self->counter = 0; /* Reset interpolated self->counter index to 0 */
 
-    const int16_t next_height_value = trackloader.read16(trackloader.heightmap_data, a1_lookup);
-    height_final = (next_height_value * (height_start - 0x100)) >> 4;
+    const int16_t next_height_value = trackloader.read16(trackloader.heightmap_data, self->a1_lookup);
+    self->height_final = (next_height_value * (self->height_start - 0x100)) >> 4;
 
     /* 1faa  */
-    int32_t horizon_copy = (horizon_base + horizon_offset) << 4;
-    if (height_ctrl2 == 2)  /* hold state */
-        horizon_copy += height_final;
+    int32_t horizon_copy = (self->horizon_base + self->horizon_offset) << 4;
+    if (self->height_ctrl2 == 2)  /* hold state */
+        horizon_copy += self->height_final;
 
     /*set_y_2044(0x200, horizon_copy, 0, y_addr, 2); */
 
-    change_per_entry = horizon_copy;
-    scanline = 0x200; /* 200 (512 pixels) */
-    total_height = 0;
-    set_y_2044();  
+    self->change_per_entry = horizon_copy;
+    self->scanline = 0x200; /* 200 (512 pixels) */
+    self->total_height = 0;
+    ORoad_set_y_2044(self);  
  }}
 
-/* Source: 0x2044 */
-void ORoad::set_y_2044()
+/* Source: 0x2044 */static 
+void ORoad_set_y_2044(ORoad* self)
 {
-    if (change_per_entry > 0x10000)
-        change_per_entry = 0x10000;
+    if (self->change_per_entry > 0x10000)
+        self->change_per_entry = 0x10000;
 
-    d5_o = change_per_entry;
+    self->d5_o = self->change_per_entry;
 
     /* ------------------------------------------------------------------------ */
     /* Get length of this road section in scanlines */
     /* ------------------------------------------------------------------------ */
-    int16_t section_length = section_lengths[length_offset++] - 1;
-    scanline -= section_length;
+    int16_t section_length = self->section_lengths[self->length_offset++] - 1;
+    self->scanline -= section_length;
 
     /* ------------------------------------------------------------------------ */
     /* Write this section of road number of times dictated by length */
@@ -1092,8 +1121,8 @@ void ORoad::set_y_2044()
     {
         { uint16_t i; for (i = 0; i <= section_length; i++)
         {
-            total_height += change_per_entry; 
-            road_y[--y_addr] = (total_height << 4) >> 16;
+            self->total_height += self->change_per_entry; 
+            self->road_y[--self->y_addr] = (self->total_height << 4) >> 16;
         } }        
     }
 
@@ -1102,46 +1131,46 @@ void ORoad::set_y_2044()
     /* the upcoming section */
     /* Source: 0x216C */
     /* ------------------------------------------------------------------------ */
-    if (++counter != 7)
+    if (++self->counter != 7)
     {
-        read_next_height();
+        ORoad_read_next_height(self);
         return;
     }
 
     /* Writing last part of interpolated data */
-    road_unk[a3_o] = 0;
+    self->road_unk[self->a3_o] = 0;
 
-    { int16_t y = trackloader.read16(trackloader.heightmap_data, a1_lookup);
+    { int16_t y = trackloader.read16(trackloader.heightmap_data, self->a1_lookup);
 
     /* Return if not end at end of height section data */
     if (y != -1) return;
 
     /* At end of height section data, initalize next segmnet  */
-    if (height_lookup == height_lookup_wrk)
-        height_lookup = 0;
+    if (self->height_lookup == self->height_lookup_wrk)
+        self->height_lookup = 0;
 
-    height_ctrl = 1; /* init next road segment */
+    self->height_ctrl = 1; /* init next road segment */
  }}
 
-/* Source Address: 0x1FC6 */
-void ORoad::read_next_height()
+/* Source Address: 0x1FC6 */static 
+void ORoad_read_next_height(ORoad* self)
 {
-    switch (height_ctrl2)
+    switch (self->height_ctrl2)
     {
         case 0:
             /* set_elevation_flag */
             break;
 
         case 1:
-            change_per_entry += height_final;
+            self->change_per_entry += self->height_final;
         case 2:
-            set_elevation();
+            ORoad_set_elevation(self);
             return; /* Note we return */
         case 3:
-            if (height_index >= 6)
+            if (self->height_index >= 6)
             {
-                change_per_entry += height_final;
-                set_elevation();
+                self->change_per_entry += self->height_final;
+                ORoad_set_elevation(self);
                 return;
             }
             /* otherwise set_elevation_flag */
@@ -1151,74 +1180,74 @@ void ORoad::read_next_height()
     /* 1ff2: set_elevation_flag */
     /* Note the way this bug was fixed */
     /* Needed to read the signed value into an int16_t before assigning to a 32 bit value */
-    change_per_entry = trackloader.read16(trackloader.heightmap_data, &a1_lookup) << 4;
-    change_per_entry += d5_o;
-    if (counter != 1)
+    self->change_per_entry = trackloader.read16(trackloader.heightmap_data, &self->a1_lookup) << 4;
+    self->change_per_entry += self->d5_o;
+    if (self->counter != 1)
     {
-        set_elevation();
+        ORoad_set_elevation(self);
         return;
     }
 
     /* Writing first part of interpolated data */
-    change_per_entry -= height_final;
+    self->change_per_entry -= self->height_final;
 
-    { int32_t horizon_shift = (horizon_base + horizon_offset) << 4;
+    { int32_t horizon_shift = (self->horizon_base + self->horizon_offset) << 4;
 
-    if (horizon_shift == change_per_entry)
+    if (horizon_shift == self->change_per_entry)
     {
-        set_elevation();
+        ORoad_set_elevation(self);
     }
-    else if (change_per_entry > horizon_shift)
+    else if (self->change_per_entry > horizon_shift)
     {
-        elevation = UP;
-        set_elevation();
+        self->elevation = ROAD_UP;
+        ORoad_set_elevation(self);
     }
     else
     {
-        elevation = DOWN;
-        set_elevation();
+        self->elevation = ROAD_DOWN;
+        ORoad_set_elevation(self);
     }
  }}
 
-/* Source Address: 0x2028 */
-void ORoad::set_elevation()
+/* Source Address: 0x2028 */static 
+void ORoad_set_elevation(ORoad* self)
 {
     /* d2: h */
     /* d3: total_height */
     /* d4: scanline */
     /* d5: h_copy (global) */
-    d5_o -= change_per_entry;
+    self->d5_o -= self->change_per_entry;
 
-    if (d5_o == 0)
+    if (self->d5_o == 0)
     {
-        set_y_2044();
+        ORoad_set_y_2044(self);
         return;
     }
 
     /* should be 2400, 2400, 2400, ffffe764, ffffdc00 */
-    if (d5_o < 0)
-        d5_o = -d5_o;
+    if (self->d5_o < 0)
+        self->d5_o = -self->d5_o;
 
-    road_unk[a3_o++] = scanline;
-    { int32_t total_height_wrk = total_height;
+    self->road_unk[self->a3_o++] = self->scanline;
+    { int32_t total_height_wrk = self->total_height;
     if (total_height_wrk < 0)
         total_height_wrk = -total_height_wrk;
     total_height_wrk <<= 4;
 
-    road_unk[a3_o++] = total_height_wrk >> 16;
+    self->road_unk[self->a3_o++] = total_height_wrk >> 16;
 
-    set_y_2044();
+    ORoad_set_y_2044(self);
  }}
 
 /* Set Horizon Base Position. Used on Gateway. */
 /* */
-/* Source Address: 0x219E */
-void ORoad::set_y_horizon()
+/* Source Address: 0x219E */static 
+void ORoad_set_y_horizon(ORoad* self)
 {
-    uint32_t a0 = 0x200 + road_p1; /* a0 = Road Height Positions + Relevant Offset */
+    uint32_t a0 = 0x200 + self->road_p1; /* a0 = Road Height Positions + Relevant Offset */
     
-    int32_t d1 = (horizon_mod * (height_start - 0x100)) >> 4;
-    int32_t d2 = ((horizon_base + horizon_offset) << 4) + d1;
+    int32_t d1 = (self->horizon_mod * (self->height_start - 0x100)) >> 4;
+    int32_t d2 = ((self->horizon_base + self->horizon_offset) << 4) + d1;
     
     uint32_t total_height = 0;
 
@@ -1227,41 +1256,41 @@ void ORoad::set_y_horizon()
     {
         total_height += d2;
         { uint32_t d0 = (total_height << 4) >> 16;
-        road_y[--a0] = d0;
+        self->road_y[--a0] = d0;
      }}
 
-    road_unk[0] = 0; }
+    self->road_unk[0] = 0; }
     
     /* If not at end of section return. Otherwise, setup new horizon y-value */
-    if (height_start != 0x1FF) return;
+    if (self->height_start != 0x1FF) return;
 
     /* Read Up/Down Multiplier Word From Lookup Table and set new horizon base value */
-    horizon_base = (int32_t) (trackloader.read16(trackloader.heightmap_data, height_addr));
+    self->horizon_base = (int32_t) (trackloader.read16(trackloader.heightmap_data, self->height_addr));
 
-    if (height_lookup == height_lookup_wrk)
-        height_lookup = 0;
+    if (self->height_lookup == self->height_lookup_wrk)
+        self->height_lookup = 0;
 
     /* Set master switch control to init next road segment */
-    height_ctrl = 1;
+    self->height_ctrl = 1;
 }
 
 /* Aspect correct road inclines. */
 /* Set Horizon Tilemap Y Position */
 /* */
-/* Source Address: 0x13B8 */
-void ORoad::set_horizon_y()
+/* Source Address: 0x13B8 */static 
+void ORoad_set_horizon_y(ORoad* self)
 {
     /* ------------------------------------------------------------------------ */
     /* Aspect correct road inclines */
     /* ------------------------------------------------------------------------ */
 
     uint32_t road_int = 0; /* a0 */
-    uint32_t road_y_addr = (0 + road_p1); /* a1 */
+    uint32_t road_y_addr = (0 + self->road_p1); /* a1 */
 
     /* read_next */
     while (true)
     {
-        int16_t d0 = road_unk[road_int];
+        int16_t d0 = self->road_unk[road_int];
         if (d0 == 0) break;
         { int16_t d7 = d0 >> 3;
         int16_t d6 = (d7 + d0) - 0x1FF;
@@ -1286,11 +1315,11 @@ void ORoad::set_horizon_y()
         int16_t d5 = d0;
         uint16_t a2 = road_y_addr + d5;
         
-        d0 = road_y[road_y_addr + d0];
-        d1 = road_y[road_y_addr + d1];
-        d2 = road_y[road_y_addr + d2];
-        d3 = road_y[road_y_addr + d3];
-        d4 = road_y[road_y_addr + d4];
+        d0 = self->road_y[road_y_addr + d0];
+        d1 = self->road_y[road_y_addr + d1];
+        d2 = self->road_y[road_y_addr + d2];
+        d3 = self->road_y[road_y_addr + d3];
+        d4 = self->road_y[road_y_addr + d4];
 
         /* 1426: */
         d5 = d0;
@@ -1318,25 +1347,25 @@ void ORoad::set_horizon_y()
         /* loop 1: */
         { int16_t i; for (i = 0; i <= d6; i++)
         {
-            road_y[a2++] = d5 >> 2;
+            self->road_y[a2++] = d5 >> 2;
             d5 -= d0;
         } }
         /* loop 2: */
         { int16_t i; for (i = 0; i <= d6; i++)
         {
-            road_y[a2++] = d5 >> 2;
+            self->road_y[a2++] = d5 >> 2;
             d5 -= d1;
         } }
         /* loop 3: */
         { int16_t i; for (i = 0; i <= d6; i++)
         {
-            road_y[a2++] = d5 >> 2;
+            self->road_y[a2++] = d5 >> 2;
             d5 -= d2;
         } }
         /* loop 4: */
         { int16_t i; for (i = 0; i <= d6; i++)
         {
-            road_y[a2++] = d5 >> 2;
+            self->road_y[a2++] = d5 >> 2;
             d5 -= d3;
         } }
 
@@ -1347,8 +1376,8 @@ void ORoad::set_horizon_y()
     /* Set Horizon Y Position */
     /* ------------------------------------------------------------------------ */
 
-    int16_t y_pos = road_y[road_p3] >> 4;
-    horizon_y2 = -y_pos + 224;
+    int16_t y_pos = self->road_y[self->road_p3] >> 4;
+    self->horizon_y2 = -y_pos + 224;
 }
 
 /* Parse Road Scanline Data. */
@@ -1363,26 +1392,26 @@ void ORoad::set_horizon_y()
 /* -------- -ccccccc  Solid color (if solid fill) */
 /* -------i iiiiiiii  Index for other tables */
 /* */
-/* Source: 0x1318 */
+/* Source: 0x1318 */static 
 
-void ORoad::do_road_data()
+void ORoad_do_road_data(ORoad* self)
 {
     /* Road data in RAM #1 [Destination] (Solid fill/index fill etc) */
     /* This is the final block of data to be output to road hardware */
-    uint32_t addr_dst = 0x400 + road_p1;        /* [a0] */
+    uint32_t addr_dst = 0x400 + self->road_p1;        /* [a0] */
 
     /* Road data in RAM [Source] */
-    uint32_t addr_src = 0x200 + road_p1;        /* [a1] */
+    uint32_t addr_src = 0x200 + self->road_p1;        /* [a1] */
 
     /* Road Priority Elevation Data [Destination] */
-    uint32_t addr_priority = 0x280 + road_p1;
+    uint32_t addr_priority = 0x280 + self->road_p1;
 
     int16_t rom_line_select = 0x1FF;            /* This is the triangular road shape from ROM. Lines 0 - 512.  */
-    int16_t src_this = road_y[--addr_src] >> 4; /* source entry #1 / 16 [d0] */
+    int16_t src_this = self->road_y[--addr_src] >> 4; /* source entry #1 / 16 [d0] */
     int16_t src_next = 0;                       /* [d4] */
     int16_t write_priority = 0;                 /* [d5] */
 
-    road_y[--addr_dst] = rom_line_select; /* Write source entry counter to a0 / destination */
+    self->road_y[--addr_dst] = rom_line_select; /* Write source entry counter to a0 / destination */
     int16_t scanline = 254; /*  Loop counter #2 (Scanlines) - Start at bottom of screen */
 
     /* ------------------------------------------------------------------------ */
@@ -1390,7 +1419,7 @@ void ORoad::do_road_data()
     /* ------------------------------------------------------------------------ */
     while (--rom_line_select > 0) /* Read next line of road source data */
     {
-        src_next = road_y[--addr_src] >> 4;
+        src_next = self->road_y[--addr_src] >> 4;
         
         /* Plot next position of road using rom_line_select source */
         /* The speed at which we advance through the source data is controlled by the values in road_y,  */
@@ -1400,12 +1429,12 @@ void ORoad::do_road_data()
             /* Only draw if within screen area */
             if (--scanline <= 0)
             {
-                road_y[addr_priority] = 0; road_y[addr_priority + 1] = 0; /* Denote end of priority list */
+                self->road_y[addr_priority] = 0; self->road_y[addr_priority + 1] = 0; /* Denote end of priority list */
                 return;
             }
             src_this = src_next; /* d0 = source entry #1 / 16 */
          
-            road_y[--addr_dst] = rom_line_select; /* Set next line of road appearance info, from ROM */
+            self->road_y[--addr_dst] = rom_line_select; /* Set next line of road appearance info, from ROM */
             write_priority = -1;                  /* Denote that we need to write priority data */
         }
         else if (src_this == src_next) 
@@ -1415,8 +1444,8 @@ void ORoad::do_road_data()
         /* Note: This isn't needed to directly render the road. */
         else if (write_priority == -1)
         {
-            road_y[addr_priority++] = rom_line_select; /* Write rom line select value */
-            road_y[addr_priority++] = src_this; /* Write source entry value */
+            self->road_y[addr_priority++] = rom_line_select; /* Write rom line select value */
+            self->road_y[addr_priority++] = src_this; /* Write source entry value */
             write_priority = 0; /* Denote that values have been written */
         }
     } /* end loop */
@@ -1443,10 +1472,10 @@ void ORoad::do_road_data()
         else if (d7 > 0x3F)
         {
             while (scanline-- > 0)
-                road_y[--addr_dst] = TRANSPARENT; /* Copy transparent line to ram */
+                self->road_y[--addr_dst] = TRANSPARENT; /* Copy transparent line to ram */
             
             /* end */
-            road_y[addr_priority] = 0; road_y[addr_priority + 1] = 0;
+            self->road_y[addr_priority] = 0; self->road_y[addr_priority + 1] = 0;
             return;
         }
         else
@@ -1455,16 +1484,16 @@ void ORoad::do_road_data()
         /* 1392 */
         do /* Output solid colours while looping (compare with default solid fill d3) */
         {
-            road_y[--addr_dst] = d7; /* Output solid colour */
+            self->road_y[--addr_dst] = d7; /* Output solid colour */
             if (--scanline < 0) /* Check whether scanloop counter expired */
             {
-                road_y[addr_priority] = 0; road_y[addr_priority + 1] = 0;
+                self->road_y[addr_priority] = 0; self->road_y[addr_priority + 1] = 0;
                 return;
             }
-            road_y[--addr_dst] = d7; /* Output solid colour */
+            self->road_y[--addr_dst] = d7; /* Output solid colour */
             if (--scanline < 0) /* Check whether scanloop counter expired */
             {
-                road_y[addr_priority] = 0; road_y[addr_priority + 1] = 0;
+                self->road_y[addr_priority] = 0; self->road_y[addr_priority + 1] = 0;
                 return;
             }
             d7++; /* Increment solid colour */
@@ -1472,85 +1501,85 @@ void ORoad::do_road_data()
         while (d7 <= TRANSPARENT);
         
         while (scanline-- > 0)
-            road_y[--addr_dst] = TRANSPARENT; /* Copy transparent line to ram */
+            self->road_y[--addr_dst] = TRANSPARENT; /* Copy transparent line to ram */
     /* 1346 */
     }
 
     /* end: */
-    road_y[addr_priority] = 0; road_y[addr_priority + 1] = 0; /* Denote end of priority list */
+    self->road_y[addr_priority] = 0; self->road_y[addr_priority + 1] = 0; /* Denote end of priority list */
 }
 
 /* ------------------------------------------------------------------------------------------------ */
 /* ROUTINES FOLLOW TO BLIT RAM TO ROAD HARDWARE */
 /* ------------------------------------------------------------------------------------------------ */
 
-/* Source Address: 0x14C8 */
-void ORoad::blit_roads()
+/* Source Address: 0x14C8 */static 
+void ORoad_blit_roads(ORoad* self)
 {
     const uint32_t road0_adr = 0x801C0;
     const uint32_t road1_adr = 0x803C0;
 
-    switch (road_ctrl)
+    switch (self->road_ctrl)
     {
         case ROAD_OFF:         /* Both Roads Off */
             return;
 
         case ROAD_R0:          /* Road 0 */
         case ROAD_R0_SPLIT:    /* Road 0 (Road Split.) */
-            blit_road(road0_adr);
+            ORoad_blit_road(self, road0_adr);
             HWRoad_write_road_control(&hwroad, 0);
             break;
 
         case ROAD_R1:          /* Road 1 */
         case ROAD_R1_SPLIT:    /* Road 1 (Road Split. Invert Road 1) */
-            blit_road(road1_adr);
+            ORoad_blit_road(self, road1_adr);
             HWRoad_write_road_control(&hwroad, 3);
             break;
 
         case ROAD_BOTH_P0:     /* Both Roads (Road 0 Priority) [DEFAULT] */
         case ROAD_BOTH_P0_INV: /* Both Roads (Road 0 Priority) (Road Split. Invert Road 1) */
-            blit_road(road0_adr);
-            blit_road(road1_adr);
+            ORoad_blit_road(self, road0_adr);
+            ORoad_blit_road(self, road1_adr);
             HWRoad_write_road_control(&hwroad, 1);
             break;
 
         case ROAD_BOTH_P1:     /* Both Roads (Road 1 Priority)  */
         case ROAD_BOTH_P1_INV: /* Both Roads (Road 1 Priority) (Road Split. Invert Road 1) */
-            blit_road(road0_adr);
-            blit_road(road1_adr);
+            ORoad_blit_road(self, road0_adr);
+            ORoad_blit_road(self, road1_adr);
             HWRoad_write_road_control(&hwroad, 2);
             break;
     }
-}
+}static 
 
-void ORoad::blit_road(uint32_t a0)
+void ORoad_blit_road(ORoad* self, uint32_t a0)
 {
-    uint32_t a2 = 0x400 + road_p2;
+    uint32_t a2 = 0x400 + self->road_p2;
 
     /* Write 0x1A0 bytes total Src: (0x260 - 0x400) Dst: 0x1C0 */
     { int16_t i; for (i = 0; i <= 13; i++)
     {
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
 
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
-        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
     } }
-}
+}static 
 
-void ORoad::output_hscroll(int16_t* src, uint32_t dst)
+void ORoad_output_hscroll(ORoad* self, int16_t* src, uint32_t dst)
 {
     const int32_t d6 = 0x654;
     uint32_t src_addr = 0;
@@ -1593,12 +1622,12 @@ void ORoad::output_hscroll(int16_t* src, uint32_t dst)
 /*          -------- ----s---  Road 0: stripe color index */
 /*          -------- -----a--  Road 0: pixel value 2 color index */
 /*          -------- ------b-  Road 0: pixel value 1 color index */
-/*          -------- -------c  Road 0: pixel value 0 color index */
+/*          -------- -------c  Road 0: pixel value 0 color index */static 
  
-void ORoad::copy_bg_color()
+void ORoad_copy_bg_color(ORoad* self)
 {
     /* Scroll stripe data over road based on fine position */
-    uint32_t pos_fine_copy = (pos_fine & 0x1F) << 10;
+    uint32_t pos_fine_copy = (self->pos_fine & 0x1F) << 10;
     uint32_t src = ROAD_BGCOLOR + pos_fine_copy;
     uint32_t dst = HW_BGCOLOR;
 

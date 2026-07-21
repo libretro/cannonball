@@ -58,7 +58,7 @@ bool OMusic::load_widescreen_map(std::string path)
 void OMusic::enable()
 {
     oferrari.car_ctrl_active = false;
-    video.clear_text_ram();
+    Video_clear_text_ram(&video);
     OSprites_disable_sprites(&osprites);
     OTraffic_disable_traffic(&otraffic);
     /*edit jump table 3 */
@@ -66,8 +66,8 @@ void OMusic::enable()
     oferrari.car_inc_old      = 0;
     osprites.spr_cnt_main     = 0;
     osprites.spr_cnt_shadow   = 0;
-    oroad.road_ctrl           = ORoad::ROAD_BOTH_P0;
-    oroad.horizon_base        = ORoad::HORIZON_OFF;
+    oroad.road_ctrl           = ROAD_BOTH_P0;
+    oroad.horizon_base        = HORIZON_OFF;
     last_music_selected       = -1;
     preview_counter           = -20; /* Delay before playing music */
     ostats.time_counter       = config.sound.music_timer; /* Move 30 seconds to timer countdown (note on the original roms this is 15 seconds) */
@@ -304,8 +304,8 @@ void OMusic::tick_original(oentry* fm, oentry* dial, oentry* hand)
     {
         set_hand(HAND_LEFT, fm, dial, hand);
         OHud_blit_text2(&ohud, TEXT2_MAGICAL);
-        video.write_text32(0x1105C0, NOTE_TILES1);
-        video.write_text32(0x110640, NOTE_TILES2);
+        Video_write_text32(&video, 0x1105C0, NOTE_TILES1);
+        Video_write_text32(&video, 0x110640, NOTE_TILES2);
         music_selected = 0;
     }
     /* Centre */
@@ -313,8 +313,8 @@ void OMusic::tick_original(oentry* fm, oentry* dial, oentry* hand)
     {
         set_hand(HAND_CENTRE, fm, dial, hand);
         OHud_blit_text2(&ohud, TEXT2_BREEZE);
-        video.write_text32(0x1105C6, NOTE_TILES1);
-        video.write_text32(0x110646, NOTE_TILES2);
+        Video_write_text32(&video, 0x1105C6, NOTE_TILES1);
+        Video_write_text32(&video, 0x110646, NOTE_TILES2);
         music_selected = 1;
     }
     /* Steer Right */
@@ -322,8 +322,8 @@ void OMusic::tick_original(oentry* fm, oentry* dial, oentry* hand)
     {
         set_hand(HAND_RIGHT, fm, dial, hand);
         OHud_blit_text2(&ohud, TEXT2_SPLASH);
-        video.write_text32(0x1105C8, NOTE_TILES1);
-        video.write_text32(0x110648, NOTE_TILES2);
+        Video_write_text32(&video, 0x1105C8, NOTE_TILES1);
+        Video_write_text32(&video, 0x110648, NOTE_TILES2);
         music_selected = 2;
     }
 }
@@ -416,7 +416,7 @@ void OMusic::blit_music_select()
 
     /* Write 32 Palette Longs to Palette RAM */
     { int i; for (i = 0; i < 32; i++)
-        video.write_pal32(&dst_addr, roms.rom0.read32(&src_addr)); }
+        Video_write_pal32(&video, &dst_addr, roms.rom0.read32(&src_addr)); }
 
     /* Set Tilemap Scroll */
     otiles.set_scroll(config.s16_x_off, 0);
@@ -436,7 +436,7 @@ void OMusic::blit_music_select()
         {
             dst_addr = tilemap16;
             { int x; for (x = 0; x < cols; x++)
-                video.write_tile16(&dst_addr, tilemap->read16(&src_addr)); }
+                Video_write_tile16(&video, &dst_addr, tilemap->read16(&src_addr)); }
             tilemap16 += 0x80; /* next line of tiles */
         } }
      }}
@@ -458,7 +458,7 @@ void OMusic::blit_music_select()
                 /* No Compression: write tile directly to tile ram */
                 if (data != 0)
                 {
-                    video.write_tile16(&dst_addr, data);    
+                    Video_write_tile16(&video, &dst_addr, data);    
                     x++;
                 }
                 /* Compression */
@@ -469,7 +469,7 @@ void OMusic::blit_music_select()
 
                     { uint16_t i; for (i = 0; i <= count; i++)
                     {
-                        video.write_tile16(&dst_addr, value);
+                        Video_write_tile16(&video, &dst_addr, value);
                         x++;
                     } }
                 }
@@ -479,6 +479,6 @@ void OMusic::blit_music_select()
 
         /* Fix Misplaced tile on music select screen (above steering wheel) */
         if (config.engine.fix_bugs)
-            video.write_tile16(0x10F730, 0x0C80);
+            Video_write_tile16(&video, 0x10F730, 0x0C80);
     } 
 }

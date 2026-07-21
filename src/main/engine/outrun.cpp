@@ -70,7 +70,7 @@ void Outrun::init()
     freeze_timer = cannonball_mode == MODE_TTRIAL ? true : config.engine.freeze_timer;
     video.enabled = false;
     select_course(config.engine.jap != 0, config.engine.prototype != 0);
-    video.clear_text_ram();
+    Video_clear_text_ram(&video);
 
     tick_counter = 0;
 
@@ -111,11 +111,11 @@ void Outrun::tick(bool tick_frame)
         {
             if (Input_has_pressed(&input, VIEWPOINT))
             {
-                int mode = oroad.get_view_mode() + 1;
-                if (mode > ORoad::VIEW_INCAR)
-                    mode = ORoad::VIEW_ORIGINAL;
+                int mode = ORoad_get_view_mode(&oroad) + 1;
+                if (mode > VIEW_INCAR)
+                    mode = VIEW_ORIGINAL;
 
-                oroad.set_view_mode(mode, false);
+                ORoad_set_view_mode(&oroad, mode, false);
             }
         }
     }
@@ -131,7 +131,7 @@ void Outrun::tick(bool tick_frame)
     if (config.fps == 30 && config.tick_fps == 30)
     {
         jump_table();
-        oroad.tick();
+        ORoad_tick(&oroad);
         vint();
         vint();
     }
@@ -143,7 +143,7 @@ void Outrun::tick(bool tick_frame)
         if (tick_frame)
         {
             jump_table();
-            oroad.tick();
+            ORoad_tick(&oroad);
         }
         vint();
     }
@@ -153,7 +153,7 @@ void Outrun::tick(bool tick_frame)
     else
     {
         jump_table();
-        oroad.tick();
+        ORoad_tick(&oroad);
         vint();
     }
 
@@ -249,13 +249,13 @@ void Outrun::jump_table()
             if (!config.engine.disable_traffic)
                 OTraffic_tick(&otraffic);                            /* Spawn & Tick Traffic */
             if (tick_frame) OInitEngine_init_crash_bonus(&oinitengine); /* Initalize crash sequence or bonus code */
-            oferrari.tick();
-            if (oferrari.state != OFerrari::FERRARI_END_SEQ)
+            OFerrari_tick(&oferrari);
+            if (oferrari.state != FERRARI_END_SEQ)
             {
                 OAnimSeq_flag_seq(&oanimseq);
                 OCrash_tick(&ocrash);
                 OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[SPRITE_SMOKE1]); /* Do Left Hand Smoke */
-                oferrari.draw_shadow();                                                   /* (0xF1A2) - Draw Ferrari Shadow */
+                OFerrari_draw_shadow(&oferrari);                                                   /* (0xF1A2) - Draw Ferrari Shadow */
                 OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[SPRITE_SMOKE2]); /* Do Right Hand Smoke */
             }
             else
@@ -312,7 +312,7 @@ void Outrun::main_switch()
             break;
 
         case GS_INIT_LOGO:
-            video.clear_text_ram();
+            Video_clear_text_ram(&video);
             oferrari.car_ctrl_active = false;
             oinitengine.car_increment = 0;
             oferrari.car_inc_old = 0;
@@ -363,15 +363,15 @@ void Outrun::main_switch()
             /*ROM:0000B3E8                 move.w  #-1,(ingame_active1).l              ; Denote in-game engine is active */
             /*ROM:0000B3F0                 clr.l   (prev_game_time).l                  ; Reset overall game time */
             /*ROM:0000B3F6                 move.w  #-1,(ingame_active2).l */
-            video.clear_text_ram();
+            Video_clear_text_ram(&video);
             oferrari.car_ctrl_active = true;
             init_jump_table();
             OInitEngine_init(&oinitengine, cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
             /* Timing Hack to ensure horizon is correct */
             /* Note that the original code disables the screen, and waits for the second CPU's interrupt instead */
-            oroad.tick();
-            oroad.tick();
-            oroad.tick();
+            ORoad_tick(&oroad);
+            ORoad_tick(&oroad);
+            ORoad_tick(&oroad);
             OSoundInt_queue_sound(&osoundint, SOUND_STOP_CHEERS);
             OSoundInt_queue_sound(&osoundint, SOUND_VOICE_GETREADY);
             OSoundInt_queue_sound(&osoundint, SOUND_REVS);             /* Moved from Z80 Code for extra flexibility */
@@ -512,7 +512,7 @@ void Outrun::main_switch()
         /* Best OutRunners / Score Entry */
         /* ---------------------------------------------------------------------------------------- */
         case GS_INIT_BEST2:
-            oroad.set_view_mode(ORoad::VIEW_ORIGINAL, true);
+            ORoad_set_view_mode(&oroad, VIEW_ORIGINAL, true);
             /* bsr.w   EndGame */
             OSprites_disable_sprites(&osprites);
             OTraffic_disable_traffic(&otraffic);
@@ -556,7 +556,7 @@ void Outrun::main_switch()
         /* Reinitialize Game After High Score Entry */
         /* ---------------------------------------------------------------------------------------- */
         case GS_REINIT:
-            video.clear_text_ram();
+            Video_clear_text_ram(&video);
             game_state = GS_INIT;
             break;
     }
@@ -637,7 +637,7 @@ void Outrun::init_jump_table()
 
     OTraffic_init(&otraffic);
     OSmoke_init(&osmoke);
-    oroad.init();
+    ORoad_init(&oroad);
     otiles.init();
     OPalette_init(&opalette);
     OInputs_init(&oinputs);
@@ -708,19 +708,19 @@ void Outrun::init_motor_calibration()
     video.enabled        = true;
     osoundint.has_booted = true;
 
-    oroad.init();
+    ORoad_init(&oroad);
     oroad.horizon_set    = 1;
-    oroad.horizon_base   = ORoad::HORIZON_OFF;
+    oroad.horizon_base   = HORIZON_OFF;
     game_state           = GS_CALIBRATE_MOTOR;
 
 
     /* Write Palette To RAM */
     uint32_t dst = 0x120000;
     const static uint32_t PAL_SERVICE[] = {0xFF, 0xFF00FF, 0xFF00FF, 0xFF0000};
-    video.write_pal32(&dst, PAL_SERVICE[0]);
-    video.write_pal32(&dst, PAL_SERVICE[1]);
-    video.write_pal32(&dst, PAL_SERVICE[2]);
-    video.write_pal32(&dst, PAL_SERVICE[3]);
+    Video_write_pal32(&video, &dst, PAL_SERVICE[0]);
+    Video_write_pal32(&video, &dst, PAL_SERVICE[1]);
+    Video_write_pal32(&video, &dst, PAL_SERVICE[2]);
+    Video_write_pal32(&video, &dst, PAL_SERVICE[3]);
 }
 
 /* ------------------------------------------------------------------------------- */
@@ -753,13 +753,13 @@ void Outrun::tick_attract()
     {
         if (++attract_counter > 240)
         {
-            const static uint8_t VIEWS[] = {ORoad::VIEW_ORIGINAL, ORoad::VIEW_ELEVATED, ORoad::VIEW_INCAR};
+            const static uint8_t VIEWS[] = {VIEW_ORIGINAL, VIEW_ELEVATED, VIEW_INCAR};
 
             attract_counter = 0;
             if (++attract_view > 2)
                 attract_view = 0;
-            { bool snap = VIEWS[attract_view] == ORoad::VIEW_INCAR;
-            oroad.set_view_mode(VIEWS[attract_view], snap);
+            { bool snap = VIEWS[attract_view] == VIEW_INCAR;
+            ORoad_set_view_mode(&oroad, VIEWS[attract_view], snap);
          }}
     }
 

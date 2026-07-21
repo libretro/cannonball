@@ -127,7 +127,7 @@ void OCrash_clear_crash_state(OCrash* self)
 void OCrash_tick(OCrash* self)
 {
     if (!outrun.tick_frame &&
-        oroad.get_view_mode() == ORoad::VIEW_INCAR &&
+        ORoad_get_view_mode(&oroad) == VIEW_INCAR &&
         self->crash_type != CRASH_FLIP)
     {
         return;
@@ -208,7 +208,7 @@ void OCrash_do_crash(OCrash* self)
             /* In other modes render crashing ferrari if crash counter is set */
             if (self->crash_counter)
             {
-                if (oroad.get_view_mode() != ORoad::VIEW_INCAR || self->crash_type == CRASH_FLIP)
+                if (ORoad_get_view_mode(&oroad) != VIEW_INCAR || self->crash_type == CRASH_FLIP)
                     OSprites_do_spr_order_shadows(&osprites, self->spr_ferrari);
             }
             /* Set Distance Into Screen from crash counter */
@@ -339,7 +339,7 @@ void OCrash_crash_switch(OCrash* self)
 /* Source: 0x1962 */static 
 void OCrash_init_collision(OCrash* self)
 {
-    oferrari.car_state = OFerrari::CAR_ANIM_SEQ; /* Denote car animation sequence */
+    oferrari.car_state = CAR_ANIM_SEQ; /* Denote car animation sequence */
 
     /* Enable crash sprites */
     self->spr_shadow->control |= ENABLE;
@@ -522,14 +522,14 @@ void OCrash_end_collision(OCrash* self)
     oferrari.spr_ferrari->x = 0;
     oferrari.spr_ferrari->y = 221;
     oferrari.car_ctrl_active = true;
-    oferrari.car_state = OFerrari::CAR_NORMAL;
+    oferrari.car_state = CAR_NORMAL;
     olevelobjs.spray_counter = 0;
     self->crash_z = 0;
 
     if (self->spin_control1)
         oferrari.car_inc_old = oinitengine.car_increment >> 16;
     else
-        oferrari.reset_car();
+        OFerrari_reset_car(&oferrari);
 
     self->spin_control2 = 0;
     self->spin_control1 = 0;
@@ -714,7 +714,7 @@ void OCrash_do_car_flip(OCrash* self)
     if (self->frame >= 7)
         self->spr_ferrari->pal_src = oferrari.ferrari_pal;
     else
-        self->spr_ferrari->pal_src = oferrari.ferrari_pal == OFerrari::PAL_RED ? roms.rom0p->read8(4 + frames) : oferrari.ferrari_pal + 4;
+        self->spr_ferrari->pal_src = oferrari.ferrari_pal == PAL_RED ? roms.rom0p->read8(4 + frames) : oferrari.ferrari_pal + 4;
 
     if (--self->spinflipcount2 > 0)
     {
@@ -759,8 +759,8 @@ void OCrash_init_finger(OCrash* self, uint32_t frames)
     /* Do Delay whilst girl points finger */
     if (self->crash_type == CRASH_FLIP)
     {
-        oferrari.wheel_state = OFerrari::WHEELS_ON;
-        oferrari.car_state   = OFerrari::CAR_NORMAL;
+        oferrari.wheel_state = WHEELS_ON;
+        oferrari.car_state   = CAR_NORMAL;
         self->slide = 0;
         self->addr += frames;
         self->crash_delay = 30;
@@ -813,8 +813,8 @@ void OCrash_trigger_smoke(OCrash* self)
     if (oinitengine.car_increment >> 16 <= 0)
     {
         oinitengine.car_increment = 0;
-        oferrari.wheel_state = OFerrari::WHEELS_ON;
-        oferrari.car_state   = OFerrari::CAR_NORMAL;
+        oferrari.wheel_state = WHEELS_ON;
+        oferrari.car_state   = CAR_NORMAL;
         self->slide = 0;
         self->crash_delay = 30;
         self->crash_state = 5; /* post crash animation delay state */
@@ -1089,7 +1089,7 @@ void OCrash_done(OCrash* self, oentry* sprite)
 {
     OSprites_map_palette(&osprites, sprite);
 
-    if (oroad.get_view_mode() != ORoad::VIEW_INCAR || self->crash_type == CRASH_FLIP)
+    if (ORoad_get_view_mode(&oroad) != VIEW_INCAR || self->crash_type == CRASH_FLIP)
         OSprites_do_spr_order_shadows(&osprites, sprite);
 
     sprite->road_priority = sprite->counter;
@@ -1131,7 +1131,7 @@ void OCrash_do_shadow(OCrash* self, oentry* src_sprite, oentry* dst_sprite)
     uint16_t offset = src_sprite->counter > 0x1FF ? 0x1FF : src_sprite->counter;
     dst_sprite->y = -(oroad.road_y[oroad.road_p0 + offset] >> 4) + 223;
 
-    if (oroad.get_view_mode() != ORoad::VIEW_INCAR || self->crash_type == CRASH_FLIP)
+    if (ORoad_get_view_mode(&oroad) != VIEW_INCAR || self->crash_type == CRASH_FLIP)
         OSprites_do_spr_order_shadows(&osprites, dst_sprite);
 }
 
@@ -1170,7 +1170,7 @@ void OCrash_do_crash_passengers(OCrash* self, oentry* sprite)
     else
         OCrash_crash_pass2(self, sprite);
 
-    if (oroad.get_view_mode() != ORoad::VIEW_INCAR || self->crash_type == CRASH_FLIP)
+    if (ORoad_get_view_mode(&oroad) != VIEW_INCAR || self->crash_type == CRASH_FLIP)
     {
         OSprites_map_palette(&osprites, sprite);
         OSprites_do_spr_order_shadows(&osprites, sprite);

@@ -173,7 +173,7 @@ void OAnimSeq_flag_seq(OAnimSeq* self)
             /* Set Y Position */
             int16_t sprite_y      = (int8_t) roms.rom0p->read8(5 + index);
             { int16_t final_y       = (sprite_y * z16) >> 9;
-            self->anim_flag.sprite->y   = oroad.get_road_y(z16) - final_y;
+            self->anim_flag.sprite->y   = ORoad_get_road_y(&oroad, z16) - final_y;
 
             /* Set H-Flip */
             if (roms.rom0p->read8(7 + index) & BIT_6)
@@ -221,7 +221,7 @@ void OAnimSeq_ferrari_seq(OAnimSeq* self)
 
     if (outrun.game_state <= GS_LOGO)
     {
-        oferrari.init_ingame();
+        OFerrari_init_ingame(&oferrari);
         return;
     }
 
@@ -229,8 +229,8 @@ void OAnimSeq_ferrari_seq(OAnimSeq* self)
     self->anim_pass1.frame_delay   = roms.rom0p->read8(7 + self->anim_pass1.anim_addr_curr) & 0x3F;
     self->anim_pass2.frame_delay   = roms.rom0p->read8(7 + self->anim_pass2.anim_addr_curr) & 0x3F;
 
-    oferrari.car_state = OFerrari::CAR_NORMAL;
-    oferrari.state     = OFerrari::FERRARI_SEQ2;
+    oferrari.car_state = CAR_NORMAL;
+    oferrari.state     = FERRARI_SEQ2;
 
     OAnimSeq_anim_seq_intro(self, &self->anim_ferrari);
 }
@@ -242,14 +242,14 @@ void OAnimSeq_anim_seq_intro(OAnimSeq* self, oanimsprite* anim)
 {
     if (outrun.game_state <= GS_LOGO)
     {
-        oferrari.init_ingame();
+        OFerrari_init_ingame(&oferrari);
         return;
     }
 
     if (outrun.tick_frame)
     {
         if (anim->anim_frame >= 1)
-            oferrari.car_state = OFerrari::CAR_ANIM_SEQ;
+            oferrari.car_state = CAR_ANIM_SEQ;
 
         { uint32_t index              = anim->anim_addr_curr + (anim->anim_frame << 3);
 
@@ -285,12 +285,12 @@ void OAnimSeq_anim_seq_intro(OAnimSeq* self, oanimsprite* anim)
                 /* In this case, to exit the routine and setup the Ferrari on the last entry for passenger 2 */
                 if (anim == &self->anim_pass2)
                 {
-                    if (oroad.get_view_mode() != ORoad::VIEW_INCAR)
+                    if (ORoad_get_view_mode(&oroad) != VIEW_INCAR)
                     {
                         OSprites_map_palette(&osprites, anim->sprite);
                         OSprites_do_spr_order_shadows(&osprites, anim->sprite);
                     }
-                    oferrari.init_ingame();
+                    OFerrari_init_ingame(&oferrari);
                     return;
                 }
 
@@ -308,7 +308,7 @@ void OAnimSeq_anim_seq_intro(OAnimSeq* self, oanimsprite* anim)
      } }}
 
     /* Order sprites */
-    if (oroad.get_view_mode() != ORoad::VIEW_INCAR)
+    if (ORoad_get_view_mode(&oroad) != VIEW_INCAR)
     {
         OSprites_map_palette(&osprites, anim->sprite);
         OSprites_do_spr_order_shadows(&osprites, anim->sprite);
@@ -324,7 +324,7 @@ void OAnimSeq_anim_seq_intro(OAnimSeq* self, oanimsprite* anim)
 void OAnimSeq_init_end_seq(OAnimSeq* self)
 {
     /* Process animation sprites instead of normal routine */
-    oferrari.state = OFerrari::FERRARI_END_SEQ;
+    oferrari.state = FERRARI_END_SEQ;
 
     /* Setup Ferrari Sprite */
     self->anim_ferrari.sprite->control |= ENABLE; 
@@ -552,7 +552,7 @@ void OAnimSeq_anim_seq_outro(OAnimSeq* self, oanimsprite* anim, int pal_override
     /* Set Y Position */
     int16_t sprite_y = (int8_t) roms.rom0p->read8(5 + index);
     { int16_t final_y  = (sprite_y * anim->sprite->priority) >> 9;
-    anim->sprite->y  = oroad.get_road_y(anim->sprite->priority) - final_y;
+    anim->sprite->y  = ORoad_get_road_y(&oroad, anim->sprite->priority) - final_y;
 
     /* Set H-Flip */
     if (roms.rom0p->read8(7 + index) & BIT_6)
@@ -607,7 +607,7 @@ void OAnimSeq_anim_seq_shadow(OAnimSeq* self, oanimsprite* parent, oanimsprite* 
         anim->sprite->x    = parent->sprite->x;
         uint16_t priority  = parent->sprite->road_priority >> zoom_shift;
         anim->sprite->zoom = priority - (priority >> 2);
-        anim->sprite->y    = oroad.get_road_y(parent->sprite->road_priority);
+        anim->sprite->y    = ORoad_get_road_y(&oroad, parent->sprite->road_priority);
     
         /* Chris - The following extra line seems necessary due to the way I set the sprites up. */
         /* Actually, I think it's a bug in the original game, relying on this being setup by  */

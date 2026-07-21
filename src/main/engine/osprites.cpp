@@ -61,7 +61,7 @@ void OSprites_init(OSprites* self)
     self->jump_table[SPRITE_SMOKE1].init(SPRITE_SMOKE1);
     self->jump_table[SPRITE_SMOKE2].init(SPRITE_SMOKE2);
 
-    oferrari.init(&self->jump_table[SPRITE_FERRARI], &self->jump_table[SPRITE_PASS1], &self->jump_table[SPRITE_PASS2], &self->jump_table[SPRITE_SHADOW]);
+    OFerrari_init(&oferrari, &self->jump_table[SPRITE_FERRARI], &self->jump_table[SPRITE_PASS1], &self->jump_table[SPRITE_PASS2], &self->jump_table[SPRITE_SHADOW]);
     
     /* ------------------------------------------------------------------------ */
     /* Traffic in Right Hand Lane At Start of Stage 1 */
@@ -297,7 +297,7 @@ void OSprites_copy_palette_data(OSprites* self)
         uint32_t src_addr = self->pal_addresses[i++] << 3;
         uint32_t dst_addr = PAL_SPRITES + (self->pal_addresses[i++] << 5);
         { uint16_t j; for (j = 0; j < 8; j++)
-            video.write_pal32(&dst_addr, PALETTE_EXPANSION[src_addr++]); }
+            Video_write_pal32(&video, &dst_addr, PALETTE_EXPANSION[src_addr++]); }
     } }
     self->pal_copy_count = 0; /* All entries copied */
 }
@@ -528,13 +528,13 @@ void OSprites_blit_sprites(OSprites* self)
         uint16_t* data = self->sprite_entries[i].data;
 
         /* Write twelve bytes */
-        video.write_sprite16(&dst_addr, data[0]);
-        video.write_sprite16(&dst_addr, data[1]);
-        video.write_sprite16(&dst_addr, data[2]);
-        video.write_sprite16(&dst_addr, data[3]);
-        video.write_sprite16(&dst_addr, data[4]);
-        video.write_sprite16(&dst_addr, data[5]);
-        video.write_sprite16(&dst_addr, data[6]);
+        Video_write_sprite16(&video, &dst_addr, data[0]);
+        Video_write_sprite16(&video, &dst_addr, data[1]);
+        Video_write_sprite16(&video, &dst_addr, data[2]);
+        Video_write_sprite16(&video, &dst_addr, data[3]);
+        Video_write_sprite16(&video, &dst_addr, data[4]);
+        Video_write_sprite16(&video, &dst_addr, data[5]);
+        Video_write_sprite16(&video, &dst_addr, data[6]);
 
         /* Allign on correct boundary */
         dst_addr += 2;

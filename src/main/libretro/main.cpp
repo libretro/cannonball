@@ -817,8 +817,8 @@ static void update_variables(bool startup)
 end:
    if (geometry_update)
    {
-      video.disable();
-      video.init(&roms, &config.video);
+      Video_disable(&video);
+      Video_init(&video, &roms, &config.video);
       video.sprite_layer->set_x_clip(false);
       update_geometry();
    }
@@ -1055,7 +1055,7 @@ bool retro_load_game(const struct retro_game_info *info)
          log_cb(RETRO_LOG_WARN, "[Cannonball]: Unable to load widescreen tilemaps.\n");
    }
 
-   if (!video.init(&roms, &config.video))
+   if (!Video_init(&video, &roms, &config.video))
       return false;
 
    menu = new Menu();
@@ -1390,8 +1390,8 @@ void retro_run(void)
 
 
     /* Draw Video */
-    video.prepare_frame();
-    video.render_frame();
+    Video_prepare_frame(&video);
+    Video_render_frame(&video);
 
     /* Stop any haptic feedback effects if */
     /* duration timer has elapsed */

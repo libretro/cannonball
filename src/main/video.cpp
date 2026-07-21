@@ -17,6 +17,8 @@
 #include <libretro.h>
 #include "setup.hpp"
 
+static void Video_refresh_palette(Video* self, uint32_t);
+
 extern retro_video_refresh_t video_cb;
 
 #define Rshift 11
@@ -26,37 +28,37 @@ extern retro_video_refresh_t video_cb;
 
 Video video;
 
-Video::Video(void)
+void Video_ctor(Video* self)
 {
-    pixels       = NULL;
-    sprite_layer = new hwsprites();
-    tile_layer   = new hwtiles();
+    self->pixels       = NULL;
+    self->sprite_layer = new hwsprites();
+    self->tile_layer   = new hwtiles();
 
-    set_shadow_intensity(SHADOW_ORIGINAL);
-    enabled      = false;
+    Video_set_shadow_intensity(self, SHADOW_ORIGINAL);
+    self->enabled      = false;
 }
 
-Video::~Video(void)
+void Video_dtor(Video* self)
 {
-    delete sprite_layer;
-    delete tile_layer;
-    if (pixels) delete[] pixels;
+    delete self->sprite_layer;
+    delete self->tile_layer;
+    if (self->pixels) delete[] self->pixels;
 }
 
-int Video::init(Roms* roms, video_settings_t* settings)
+int Video_init(Video* self, Roms* roms, video_settings_t* settings)
 {
-    if (!set_video_mode(settings))
+    if (!Video_set_video_mode(self, settings))
         return 0;
 
     /* Internal pixel array. The size of this is always constant */
-    if (pixels) delete[] pixels;
-    pixels = new uint16_t[config.s16_width * config.s16_height];
+    if (self->pixels) delete[] self->pixels;
+    self->pixels = new uint16_t[config.s16_width * config.s16_height];
 
     /* Convert S16 tiles to a more useable format */
-    tile_layer->init(roms->tiles.rom, config.video.hires != 0);
+    self->tile_layer->init(roms->tiles.rom, config.video.hires != 0);
     
-    clear_tile_ram();
-    clear_text_ram();
+    Video_clear_tile_ram(self);
+    Video_clear_text_ram(self);
     if (roms->tiles.rom)
     {
         delete[] roms->tiles.rom;
@@ -64,7 +66,7 @@ int Video::init(Roms* roms, video_settings_t* settings)
     }
 
     /* Convert S16 sprites */
-    sprite_layer->init(roms->sprites.rom);
+    self->sprite_layer->init(roms->sprites.rom);
     if (roms->sprites.rom)
     {
         delete[] roms->sprites.rom;
@@ -79,20 +81,20 @@ int Video::init(Roms* roms, video_settings_t* settings)
         roms->road.rom = NULL;
     }
 
-    enabled = true;
+    self->enabled = true;
     return 1;
 }
 
-void Video::disable()
+void Video_disable(Video* self)
 {
-    enabled = false;
+    self->enabled = false;
 }
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Configure video settings from config file */
 /* ------------------------------------------------------------------------------------------------ */
 
-int Video::set_video_mode(video_settings_t* settings)
+int Video_set_video_mode(Video* self, video_settings_t* settings)
 {
     if (settings->widescreen)
     {
@@ -120,7 +122,7 @@ int Video::set_video_mode(video_settings_t* settings)
     if (settings->scale < 1)
         settings->scale = 1;
 
-    set_shadow_intensity(settings->shadow == 0 ? SHADOW_ORIGINAL : SHADOW_MAME);
+    Video_set_shadow_intensity(self, settings->shadow == 0 ? SHADOW_ORIGINAL : SHADOW_MAME);
 
     return 1;
 }
@@ -142,50 +144,50 @@ int Video::set_video_mode(video_settings_t* settings)
 /* (MAME uses an incorrect value which is closer to 78% Intensity) */
 /* -------------------------------------------------------------------------------------------- */
 
-void Video::set_shadow_intensity(float f)
+void Video_set_shadow_intensity(Video* self, float f)
 {
-    shadow_multi = (uint32_t) (255.0f * f + 0.5f);
+    self->shadow_multi = (uint32_t) (255.0f * f + 0.5f);
 }
 
-void Video::prepare_frame()
+void Video_prepare_frame(Video* self)
 {
-    if (!pixels)
+    if (!self->pixels)
         return;
 
-    if (!enabled)
+    if (!self->enabled)
     {
         /* Fill with black pixels */
         { int i; for (i = 0; i < config.s16_width * config.s16_height; i++)
-            pixels[i] = 0; }
+            self->pixels[i] = 0; }
     }
     else
     {
         /* OutRun Hardware Video Emulation */
-        tile_layer->update_tile_values();
+        self->tile_layer->update_tile_values();
 
-        (hwroad.render_background)(&hwroad, pixels);
-        tile_layer->render_tile_layer(pixels, 1, 0);      /* background layer */
-        tile_layer->render_tile_layer(pixels, 0, 0);      /* foreground layer */
+        (hwroad.render_background)(&hwroad, self->pixels);
+        self->tile_layer->render_tile_layer(self->pixels, 1, 0);      /* background layer */
+        self->tile_layer->render_tile_layer(self->pixels, 0, 0);      /* foreground layer */
 
-        if (!config.engine.fix_bugs || oroad.horizon_base != ORoad::HORIZON_OFF)
-            (hwroad.render_foreground)(&hwroad, pixels);
-        sprite_layer->render(8);
-        tile_layer->render_text_layer(pixels, 1);
+        if (!config.engine.fix_bugs || oroad.horizon_base != HORIZON_OFF)
+            (hwroad.render_foreground)(&hwroad, self->pixels);
+        self->sprite_layer->render(8);
+        self->tile_layer->render_text_layer(self->pixels, 1);
      }
 }
 
-void Video::render_frame()
+void Video_render_frame(Video* self)
 {
-    uint16_t* output = pixels;
+    uint16_t* output = self->pixels;
 
     { int i; for (i = 0;
          i < config.s16_width * config.s16_height;
          i++)
         output[i] = (uint16_t)
-            rgb[output[i] % (S16_PALETTE_ENTRIES * 3)]; }
+            self->rgb[output[i] % (S16_PALETTE_ENTRIES * 3)]; }
 
     video_cb(
-        pixels,
+        self->pixels,
         config.s16_width,
         config.s16_height,
         config.s16_width << 1
@@ -196,104 +198,104 @@ void Video::render_frame()
 /* Text Handling Code */
 /* --------------------------------------------------------------------------- */
 
-void Video::clear_text_ram()
+void Video_clear_text_ram(Video* self)
 {
     { uint32_t i; for (i = 0; i <= 0xFFF; i++)
-        tile_layer->text_ram[i] = 0; }
+        self->tile_layer->text_ram[i] = 0; }
 }
 
-void Video::write_text8(uint32_t addr, const uint8_t data)
+void Video_write_text8(Video* self, uint32_t addr, const uint8_t data)
 {
-    tile_layer->text_ram[addr & 0xFFF] = data;
+    self->tile_layer->text_ram[addr & 0xFFF] = data;
 }
 
-void Video::write_text16(uint32_t* addr, const uint16_t data)
+void Video_write_text16(Video* self, uint32_t* addr, const uint16_t data)
 {
-    tile_layer->text_ram[*addr & 0xFFF] = (data >> 8) & 0xFF;
-    tile_layer->text_ram[(*addr+1) & 0xFFF] = data & 0xFF;
+    self->tile_layer->text_ram[*addr & 0xFFF] = (data >> 8) & 0xFF;
+    self->tile_layer->text_ram[(*addr+1) & 0xFFF] = data & 0xFF;
 
     *addr += 2;
 }
 
-void Video::write_text16(uint32_t addr, const uint16_t data)
+void Video_write_text16(Video* self, uint32_t addr, const uint16_t data)
 {
-    tile_layer->text_ram[addr & 0xFFF] = (data >> 8) & 0xFF;
-    tile_layer->text_ram[(addr+1) & 0xFFF] = data & 0xFF;
+    self->tile_layer->text_ram[addr & 0xFFF] = (data >> 8) & 0xFF;
+    self->tile_layer->text_ram[(addr+1) & 0xFFF] = data & 0xFF;
 }
 
-void Video::write_text32(uint32_t* addr, const uint32_t data)
+void Video_write_text32(Video* self, uint32_t* addr, const uint32_t data)
 {
-    tile_layer->text_ram[*addr & 0xFFF] = (data >> 24) & 0xFF;
-    tile_layer->text_ram[(*addr+1) & 0xFFF] = (data >> 16) & 0xFF;
-    tile_layer->text_ram[(*addr+2) & 0xFFF] = (data >> 8) & 0xFF;
-    tile_layer->text_ram[(*addr+3) & 0xFFF] = data & 0xFF;
+    self->tile_layer->text_ram[*addr & 0xFFF] = (data >> 24) & 0xFF;
+    self->tile_layer->text_ram[(*addr+1) & 0xFFF] = (data >> 16) & 0xFF;
+    self->tile_layer->text_ram[(*addr+2) & 0xFFF] = (data >> 8) & 0xFF;
+    self->tile_layer->text_ram[(*addr+3) & 0xFFF] = data & 0xFF;
 
     *addr += 4;
 }
 
-void Video::write_text32(uint32_t addr, const uint32_t data)
+void Video_write_text32(Video* self, uint32_t addr, const uint32_t data)
 {
-    tile_layer->text_ram[addr & 0xFFF] = (data >> 24) & 0xFF;
-    tile_layer->text_ram[(addr+1) & 0xFFF] = (data >> 16) & 0xFF;
-    tile_layer->text_ram[(addr+2) & 0xFFF] = (data >> 8) & 0xFF;
-    tile_layer->text_ram[(addr+3) & 0xFFF] = data & 0xFF;
+    self->tile_layer->text_ram[addr & 0xFFF] = (data >> 24) & 0xFF;
+    self->tile_layer->text_ram[(addr+1) & 0xFFF] = (data >> 16) & 0xFF;
+    self->tile_layer->text_ram[(addr+2) & 0xFFF] = (data >> 8) & 0xFF;
+    self->tile_layer->text_ram[(addr+3) & 0xFFF] = data & 0xFF;
 }
 
-uint8_t Video::read_text8(uint32_t addr)
+uint8_t Video_read_text8(Video* self, uint32_t addr)
 {
-    return tile_layer->text_ram[addr & 0xFFF];
+    return self->tile_layer->text_ram[addr & 0xFFF];
 }
 
 /* --------------------------------------------------------------------------- */
 /* Tile Handling Code */
 /* --------------------------------------------------------------------------- */
 
-void Video::clear_tile_ram()
+void Video_clear_tile_ram(Video* self)
 {
     { uint32_t i; for (i = 0; i <= 0xFFFF; i++)
-        tile_layer->tile_ram[i] = 0; }
+        self->tile_layer->tile_ram[i] = 0; }
 }
 
-void Video::write_tile8(uint32_t addr, const uint8_t data)
+void Video_write_tile8(Video* self, uint32_t addr, const uint8_t data)
 {
-    tile_layer->tile_ram[addr & 0xFFFF] = data;
+    self->tile_layer->tile_ram[addr & 0xFFFF] = data;
 } 
 
-void Video::write_tile16(uint32_t* addr, const uint16_t data)
+void Video_write_tile16(Video* self, uint32_t* addr, const uint16_t data)
 {
-    tile_layer->tile_ram[*addr & 0xFFFF] = (data >> 8) & 0xFF;
-    tile_layer->tile_ram[(*addr+1) & 0xFFFF] = data & 0xFF;
+    self->tile_layer->tile_ram[*addr & 0xFFFF] = (data >> 8) & 0xFF;
+    self->tile_layer->tile_ram[(*addr+1) & 0xFFFF] = data & 0xFF;
 
     *addr += 2;
 }
 
-void Video::write_tile16(uint32_t addr, const uint16_t data)
+void Video_write_tile16(Video* self, uint32_t addr, const uint16_t data)
 {
-    tile_layer->tile_ram[addr & 0xFFFF] = (data >> 8) & 0xFF;
-    tile_layer->tile_ram[(addr+1) & 0xFFFF] = data & 0xFF;
+    self->tile_layer->tile_ram[addr & 0xFFFF] = (data >> 8) & 0xFF;
+    self->tile_layer->tile_ram[(addr+1) & 0xFFFF] = data & 0xFF;
 }   
 
-void Video::write_tile32(uint32_t* addr, const uint32_t data)
+void Video_write_tile32(Video* self, uint32_t* addr, const uint32_t data)
 {
-    tile_layer->tile_ram[*addr & 0xFFFF] = (data >> 24) & 0xFF;
-    tile_layer->tile_ram[(*addr+1) & 0xFFFF] = (data >> 16) & 0xFF;
-    tile_layer->tile_ram[(*addr+2) & 0xFFFF] = (data >> 8) & 0xFF;
-    tile_layer->tile_ram[(*addr+3) & 0xFFFF] = data & 0xFF;
+    self->tile_layer->tile_ram[*addr & 0xFFFF] = (data >> 24) & 0xFF;
+    self->tile_layer->tile_ram[(*addr+1) & 0xFFFF] = (data >> 16) & 0xFF;
+    self->tile_layer->tile_ram[(*addr+2) & 0xFFFF] = (data >> 8) & 0xFF;
+    self->tile_layer->tile_ram[(*addr+3) & 0xFFFF] = data & 0xFF;
 
     *addr += 4;
 }
 
-void Video::write_tile32(uint32_t addr, const uint32_t data)
+void Video_write_tile32(Video* self, uint32_t addr, const uint32_t data)
 {
-    tile_layer->tile_ram[addr & 0xFFFF] = (data >> 24) & 0xFF;
-    tile_layer->tile_ram[(addr+1) & 0xFFFF] = (data >> 16) & 0xFF;
-    tile_layer->tile_ram[(addr+2) & 0xFFFF] = (data >> 8) & 0xFF;
-    tile_layer->tile_ram[(addr+3) & 0xFFFF] = data & 0xFF;
+    self->tile_layer->tile_ram[addr & 0xFFFF] = (data >> 24) & 0xFF;
+    self->tile_layer->tile_ram[(addr+1) & 0xFFFF] = (data >> 16) & 0xFF;
+    self->tile_layer->tile_ram[(addr+2) & 0xFFFF] = (data >> 8) & 0xFF;
+    self->tile_layer->tile_ram[(addr+3) & 0xFFFF] = data & 0xFF;
 }
 
-uint8_t Video::read_tile8(uint32_t addr)
+uint8_t Video_read_tile8(Video* self, uint32_t addr)
 {
-    return tile_layer->tile_ram[addr & 0xFFFF];
+    return self->tile_layer->tile_ram[addr & 0xFFFF];
 }
 
 
@@ -301,9 +303,9 @@ uint8_t Video::read_tile8(uint32_t addr)
 /* Sprite Handling Code */
 /* --------------------------------------------------------------------------- */
 
-void Video::write_sprite16(uint32_t* addr, const uint16_t data)
+void Video_write_sprite16(Video* self, uint32_t* addr, const uint16_t data)
 {
-    sprite_layer->write(*addr & 0xfff, data);
+    self->sprite_layer->write(*addr & 0xfff, data);
     *addr += 2;
 }
 
@@ -311,79 +313,79 @@ void Video::write_sprite16(uint32_t* addr, const uint16_t data)
 /* Palette Handling Code */
 /* --------------------------------------------------------------------------- */
 
-void Video::write_pal8(uint32_t* palAddr, const uint8_t data)
+void Video_write_pal8(Video* self, uint32_t* palAddr, const uint8_t data)
 {
-    palette[*palAddr & 0x1fff] = data;
-    refresh_palette(*palAddr & 0x1fff);
+    self->palette[*palAddr & 0x1fff] = data;
+    Video_refresh_palette(self, *palAddr & 0x1fff);
     *palAddr += 1;
 }
 
-void Video::write_pal16(uint32_t* palAddr, const uint16_t data)
+void Video_write_pal16(Video* self, uint32_t* palAddr, const uint16_t data)
 {    
     uint32_t adr = *palAddr & 0x1fff;
-    palette[adr]   = (data >> 8) & 0xFF;
-    palette[adr+1] = data & 0xFF;
-    refresh_palette(adr);
+    self->palette[adr]   = (data >> 8) & 0xFF;
+    self->palette[adr+1] = data & 0xFF;
+    Video_refresh_palette(self, adr);
     *palAddr += 2;
 }
 
-void Video::write_pal32(uint32_t* palAddr, const uint32_t data)
+void Video_write_pal32(Video* self, uint32_t* palAddr, const uint32_t data)
 {    
     uint32_t adr = *palAddr & 0x1fff;
 
-    palette[adr]   = (data >> 24) & 0xFF;
-    palette[adr+1] = (data >> 16) & 0xFF;
-    palette[adr+2] = (data >> 8) & 0xFF;
-    palette[adr+3] = data & 0xFF;
+    self->palette[adr]   = (data >> 24) & 0xFF;
+    self->palette[adr+1] = (data >> 16) & 0xFF;
+    self->palette[adr+2] = (data >> 8) & 0xFF;
+    self->palette[adr+3] = data & 0xFF;
 
-    refresh_palette(adr);
-    refresh_palette(adr+2);
+    Video_refresh_palette(self, adr);
+    Video_refresh_palette(self, adr+2);
 
     *palAddr += 4;
 }
 
-void Video::write_pal32(uint32_t adr, const uint32_t data)
+void Video_write_pal32(Video* self, uint32_t adr, const uint32_t data)
 {    
     adr &= 0x1fff;
 
-    palette[adr]   = (data >> 24) & 0xFF;
-    palette[adr+1] = (data >> 16) & 0xFF;
-    palette[adr+2] = (data >> 8) & 0xFF;
-    palette[adr+3] = data & 0xFF;
-    refresh_palette(adr);
-    refresh_palette(adr+2);
+    self->palette[adr]   = (data >> 24) & 0xFF;
+    self->palette[adr+1] = (data >> 16) & 0xFF;
+    self->palette[adr+2] = (data >> 8) & 0xFF;
+    self->palette[adr+3] = data & 0xFF;
+    Video_refresh_palette(self, adr);
+    Video_refresh_palette(self, adr+2);
 }
 
-uint8_t Video::read_pal8(uint32_t palAddr)
+uint8_t Video_read_pal8(Video* self, uint32_t palAddr)
 {
-    return palette[palAddr & 0x1fff];
+    return self->palette[palAddr & 0x1fff];
 }
 
-uint16_t Video::read_pal16(uint32_t palAddr)
+uint16_t Video_read_pal16(Video* self, uint32_t palAddr)
 {
     uint32_t adr = palAddr & 0x1fff;
-    return (palette[adr] << 8) | palette[adr+1];
+    return (self->palette[adr] << 8) | self->palette[adr+1];
 }
 
-uint16_t Video::read_pal16(uint32_t* palAddr)
+uint16_t Video_read_pal16(Video* self, uint32_t* palAddr)
 {
     uint32_t adr = *palAddr & 0x1fff;
     *palAddr += 2;
-    return (palette[adr] << 8)| palette[adr+1];
+    return (self->palette[adr] << 8)| self->palette[adr+1];
 }
 
-uint32_t Video::read_pal32(uint32_t* palAddr)
+uint32_t Video_read_pal32(Video* self, uint32_t* palAddr)
 {
     uint32_t adr = *palAddr & 0x1fff;
     *palAddr += 4;
-    return (palette[adr] << 24) | (palette[adr+1] << 16) | (palette[adr+2] << 8) | palette[adr+3];
+    return (self->palette[adr] << 24) | (self->palette[adr+1] << 16) | (self->palette[adr+2] << 8) | self->palette[adr+3];
 }
 
-/* Convert internal System 16 RRRR GGGG BBBB format palette to renderer output format */
-void Video::refresh_palette(uint32_t palAddr)
+/* Convert internal System 16 RRRR GGGG BBBB format palette to renderer output format */static 
+void Video_refresh_palette(Video* self, uint32_t palAddr)
 {
     palAddr &= ~1;
-    { uint32_t a = (palette[palAddr] << 8) | palette[palAddr + 1];
+    { uint32_t a = (self->palette[palAddr] << 8) | self->palette[palAddr + 1];
     uint32_t r = (a & 0x000f) << 1; /* r rrr0 */
     uint32_t g = (a & 0x00f0) >> 3; /* g ggg0 */
     uint32_t b = (a & 0x0f00) >> 7; /* b bbb0 */
@@ -396,17 +398,17 @@ void Video::refresh_palette(uint32_t palAddr)
 
     palAddr >>= 1;
 
-    rgb[palAddr] = CURRENT_RGB();
+    self->rgb[palAddr] = CURRENT_RGB();
 
-    r = r * shadow_multi / 255;
-    g = g * shadow_multi / 255;
-    b = b * shadow_multi / 255;
+    r = r * self->shadow_multi / 255;
+    g = g * self->shadow_multi / 255;
+    b = b * self->shadow_multi / 255;
 
-    rgb[palAddr + S16_PALETTE_ENTRIES] =
+    self->rgb[palAddr + S16_PALETTE_ENTRIES] =
         CURRENT_RGB();
 
     /* Conserva il comportamento del core precedente */
     /* qualora venga usato il terzo banco della palette. */
-    rgb[palAddr + (S16_PALETTE_ENTRIES * 2)] =
+    self->rgb[palAddr + (S16_PALETTE_ENTRIES * 2)] =
         CURRENT_RGB();
  }}

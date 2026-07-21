@@ -21,64 +21,82 @@
 const static float SHADOW_ORIGINAL = 0.63f; /* Hardware Intensity (63%) */
 const static float SHADOW_MAME = 0.78f;     /* Mame Intensity (78%) */
 
-
 class hwsprites;
 class RenderBase;
 struct video_settings_t;
 
-class Video
+struct Video
 {
-public:
-	hwsprites* sprite_layer;
+    hwsprites* sprite_layer;
     hwtiles* tile_layer;
-	uint16_t *pixels;
-
+    uint16_t *pixels;
     bool enabled;
-
-	Video();
-    ~Video();
-    
-	int init(Roms* roms, video_settings_t* settings);
-    void disable();
-    int set_video_mode(video_settings_t* settings);
-    void set_shadow_intensity(float);
-    void prepare_frame();
-    void render_frame();
-
-    void clear_text_ram();
-    void write_text8(uint32_t, const uint8_t);
-	void write_text16(uint32_t*, const uint16_t);
-	void write_text16(uint32_t, const uint16_t);
-    void write_text32(uint32_t*, const uint32_t);
-    void write_text32(uint32_t, const uint32_t);
-    uint8_t read_text8(uint32_t);
-
-    void clear_tile_ram();    
-    void write_tile8(uint32_t, const uint8_t);
-	void write_tile16(uint32_t*, const uint16_t);
-	void write_tile16(uint32_t, const uint16_t);
-    void write_tile32(uint32_t*, const uint32_t);
-    void write_tile32(uint32_t, const uint32_t);
-    uint8_t read_tile8(uint32_t);
-
-	void write_sprite16(uint32_t*, const uint16_t);
-
-	void write_pal8(uint32_t*, const uint8_t);
-	void write_pal16(uint32_t*, const uint16_t);
-	void write_pal32(uint32_t*, const uint32_t);
-	void write_pal32(uint32_t, const uint32_t);
-	uint8_t read_pal8(uint32_t);
-	uint16_t read_pal16(uint32_t*);
-	uint16_t read_pal16(uint32_t);
-    uint32_t read_pal32(uint32_t*);
-
-private:
-    /* Palette lookup used by the Libretro RGB565 output. */
     uint32_t rgb[S16_PALETTE_ENTRIES * 3];
     uint32_t shadow_multi;
-    
-    uint8_t palette[S16_PALETTE_ENTRIES * 2]; /* 2 Bytes Per Palette Entry */
-    void refresh_palette(uint32_t);
+    uint8_t palette[S16_PALETTE_ENTRIES * 2];
 };
 
 extern Video video;
+
+void Video_ctor(Video* self);
+
+void Video_dtor(Video* self);
+
+int Video_init(Video* self, Roms* roms, video_settings_t* settings);
+
+void Video_disable(Video* self);
+
+int Video_set_video_mode(Video* self, video_settings_t* settings);
+
+void Video_set_shadow_intensity(Video* self, float);
+
+void Video_prepare_frame(Video* self);
+
+void Video_render_frame(Video* self);
+
+void Video_clear_text_ram(Video* self);
+
+void Video_write_text8(Video* self, uint32_t, const uint8_t);
+
+void Video_write_text16(Video* self, uint32_t*, const uint16_t);
+
+void Video_write_text16(Video* self, uint32_t, const uint16_t);
+
+void Video_write_text32(Video* self, uint32_t*, const uint32_t);
+
+void Video_write_text32(Video* self, uint32_t, const uint32_t);
+
+uint8_t Video_read_text8(Video* self, uint32_t);
+
+void Video_clear_tile_ram(Video* self);
+
+void Video_write_tile8(Video* self, uint32_t, const uint8_t);
+
+void Video_write_tile16(Video* self, uint32_t*, const uint16_t);
+
+void Video_write_tile16(Video* self, uint32_t, const uint16_t);
+
+void Video_write_tile32(Video* self, uint32_t*, const uint32_t);
+
+void Video_write_tile32(Video* self, uint32_t, const uint32_t);
+
+uint8_t Video_read_tile8(Video* self, uint32_t);
+
+void Video_write_sprite16(Video* self, uint32_t*, const uint16_t);
+
+void Video_write_pal8(Video* self, uint32_t*, const uint8_t);
+
+void Video_write_pal16(Video* self, uint32_t*, const uint16_t);
+
+void Video_write_pal32(Video* self, uint32_t*, const uint32_t);
+
+void Video_write_pal32(Video* self, uint32_t, const uint32_t);
+
+uint8_t Video_read_pal8(Video* self, uint32_t);
+
+uint16_t Video_read_pal16(Video* self, uint32_t*);
+
+uint16_t Video_read_pal16(Video* self, uint32_t);
+
+uint32_t Video_read_pal32(Video* self, uint32_t*);
+

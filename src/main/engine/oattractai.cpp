@@ -116,7 +116,7 @@ void OAttractAI_tick_ai_enhanced(OAttractAI* self)
         uint16_t road_width = oroad.road_width >> 16;
   
         /* Single Road */
-        if (oroad.road_ctrl == ORoad::ROAD_R0 || oroad.road_ctrl == ORoad::ROAD_R1)
+        if (oroad.road_ctrl == ROAD_R0 || oroad.road_ctrl == ROAD_R1)
         {
             x += road_width;
 
@@ -133,7 +133,7 @@ void OAttractAI_tick_ai_enhanced(OAttractAI* self)
             else if (x <= NEAR && x >= -FAR) oinputs.brake_adjust = BRAKE_THRESHOLD3;
         }
         /* Two Roads (But we only bother braking if they are joined) */
-        else if (oroad.road_ctrl == ORoad::ROAD_BOTH_P0 || oroad.road_ctrl == ORoad::ROAD_BOTH_P1)
+        else if (oroad.road_ctrl == ROAD_BOTH_P0 || oroad.road_ctrl == ROAD_BOTH_P1)
         {
             /* Roads are Joined */
             if (road_width <= 0xFF)
@@ -200,7 +200,7 @@ void OAttractAI_tick_ai(OAttractAI* self)
     }
   
     /* If either wheel of the car is off-road, set brake on */
-    else if (oferrari.wheel_state != OFerrari::WHEELS_ON)
+    else if (oferrari.wheel_state != WHEELS_ON)
     {
         oinputs.brake_adjust = BRAKE_THRESHOLD3;
     }
