@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <boolean.h>
+
 #include "romloader.hpp"
 
 static const bool VERBOSE = true;

@@ -11,6 +11,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <boolean.h>
 
 enum {NORMAL = 1, INTERLEAVE2 = 2, INTERLEAVE4 = 4};
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <boolean.h>
 
 /* ------------------------------------------------------------------------------------------------ */
 /* General useful stuff */
