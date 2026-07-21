@@ -60,11 +60,11 @@ struct LayOut
 
 struct RomLoader;
 
-int32_t TrackLoader_read32(uint8_t* data, uint32_t* addr);
+int32_t TrackLoader_read32_a(uint8_t* data, uint32_t* addr);
 int32_t TrackLoader_read32(uint8_t* data, uint32_t addr);
-int16_t TrackLoader_read16(uint8_t* data, uint32_t* addr);
+int16_t TrackLoader_read16_a(uint8_t* data, uint32_t* addr);
 int16_t TrackLoader_read16(uint8_t* data, uint32_t addr);
-int8_t TrackLoader_read8(uint8_t* data, uint32_t* addr);
+int8_t TrackLoader_read8_a(uint8_t* data, uint32_t* addr);
 int8_t TrackLoader_read8(uint8_t* data, uint32_t addr);
 
 static const int TL_MODE_ORIGINAL = 0;

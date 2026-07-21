@@ -714,8 +714,8 @@ void ORoad_init_height_seg(ORoad* self)
     self->height_lookup_wrk = self->height_lookup;
     { uint32_t h_addr = TrackLoader_read_heightmap_table(&trackloader, self->height_lookup_wrk);
 
-    self->height_ctrl2 = TrackLoader_read8(trackloader.heightmap_data, &h_addr);
-    self->step_adjust  = TrackLoader_read8(trackloader.heightmap_data, &h_addr); /* Speed at which to move through height segment */
+    self->height_ctrl2 = TrackLoader_read8_a(trackloader.heightmap_data, &h_addr);
+    self->step_adjust  = TrackLoader_read8_a(trackloader.heightmap_data, &h_addr); /* Speed at which to move through height segment */
 
     switch (self->height_ctrl2)
     {
@@ -757,8 +757,8 @@ void ORoad_init_height_seg(ORoad* self)
 /* Source Address: 0x1C2C */static 
 void ORoad_init_elevation(ORoad* self, uint32_t& addr)
 {
-    self->down_mult   = TrackLoader_read8(trackloader.heightmap_data, &addr);
-    self->up_mult     = TrackLoader_read8(trackloader.heightmap_data, &addr);
+    self->down_mult   = TrackLoader_read8_a(trackloader.heightmap_data, &addr);
+    self->up_mult     = TrackLoader_read8_a(trackloader.heightmap_data, &addr);
     self->height_addr = addr;
     self->height_ctrl = 2; /* Use do_elevation() */
     ORoad_do_elevation(self);
@@ -827,7 +827,7 @@ void ORoad_do_elevation(ORoad* self)
 
 void ORoad_init_elevation_delay(ORoad* self, uint32_t& addr)
 {
-    self->height_delay  = TrackLoader_read16(trackloader.heightmap_data, &addr);
+    self->height_delay  = TrackLoader_read16_a(trackloader.heightmap_data, &addr);
     self->height_addr   = addr;
     self->do_height_inc = 1;     /* Set to Part 1 */
     self->height_inc    = 0;
@@ -899,7 +899,7 @@ void ORoad_do_elevation_delay(ORoad* self)
 /* Example Data: 0x2A8E */static 
 void ORoad_init_elevation_mixed(ORoad* self, uint32_t& addr)
 {
-    self->height_delay  = TrackLoader_read16(trackloader.heightmap_data, &addr);
+    self->height_delay  = TrackLoader_read16_a(trackloader.heightmap_data, &addr);
     self->height_addr   = addr;
     self->do_height_inc = 1;
     self->height_inc    = 0;
@@ -1180,7 +1180,7 @@ void ORoad_read_next_height(ORoad* self)
     /* 1ff2: set_elevation_flag */
     /* Note the way this bug was fixed */
     /* Needed to read the signed value into an int16_t before assigning to a 32 bit value */
-    self->change_per_entry = TrackLoader_read16(trackloader.heightmap_data, &self->a1_lookup) << 4;
+    self->change_per_entry = TrackLoader_read16_a(trackloader.heightmap_data, &self->a1_lookup) << 4;
     self->change_per_entry += self->d5_o;
     if (self->counter != 1)
     {

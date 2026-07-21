@@ -22,21 +22,21 @@
 static void TrackLoader_setup_level(TrackLoader* self, Level* l, RomLoader* data, const int STAGE_ADR);
 static void TrackLoader_setup_section(TrackLoader* self, Level* l, RomLoader* data, const int STAGE_ADR);
 
-int32_t TrackLoader_read32(uint8_t* data, uint32_t* addr)
+int32_t TrackLoader_read32_a(uint8_t* data, uint32_t* addr)
 {    
     int32_t value = (data[*addr] << 24) | (data[*addr+1] << 16) | (data[*addr+2] << 8) | (data[*addr+3]);
     *addr += 4;
     return value;
 }
 
-int16_t TrackLoader_read16(uint8_t* data, uint32_t* addr)
+int16_t TrackLoader_read16_a(uint8_t* data, uint32_t* addr)
 {
     int16_t value = (data[*addr] << 8) | (data[*addr+1]);
     *addr += 2;
     return value;
 }
 
-int8_t TrackLoader_read8(uint8_t* data, uint32_t* addr)
+int8_t TrackLoader_read8_a(uint8_t* data, uint32_t* addr)
 {
     return data[(*addr)++]; 
 }

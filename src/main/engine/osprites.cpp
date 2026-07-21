@@ -219,8 +219,8 @@ void OSprites_sprite_control(OSprites* self)
         trackloader.scenery_offset += 4;                                        /* Advance to next scenery point */
         
         uint32_t a0 = TrackLoader_read_scenerymap_table(&trackloader, pattern_index);         /* Get Address of Scenery Pattern */
-        self->seg_sprite_freq = TrackLoader_read16(trackloader.scenerymap_data, &a0); /* Scenery Frequency */
-        self->seg_spr_offset2 = TrackLoader_read16(trackloader.scenerymap_data, &a0); /* Reload value for scenery pattern */
+        self->seg_sprite_freq = TrackLoader_read16_a(trackloader.scenerymap_data, &a0); /* Scenery Frequency */
+        self->seg_spr_offset2 = TrackLoader_read16_a(trackloader.scenerymap_data, &a0); /* Reload value for scenery pattern */
         self->seg_spr_addr = a0;                                                      /* Set ROM address for sprite info lookup (x, y, type) */
                                                                                 /* NOTE: Sets to value of a0 itself, not memory location */
         self->seg_spr_offset1 = 0;                                                    /* And Clear the offset into the above table */

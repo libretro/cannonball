@@ -44,7 +44,7 @@ void OPalette_setup_sky_palette(OPalette* self)
     uint32_t dst = 0x120F00; /* palette ram */
 
     { int16_t i; for (i = 0; i <= 0x1F; i++)
-        Video_write_pal32(&video, &dst, TrackLoader_read32(trackloader.pal_sky_data, &src)); }
+        Video_write_pal32(&video, &dst, TrackLoader_read32_a(trackloader.pal_sky_data, &src)); }
 }
 
 /* Setup data in RAM necessary for sky palette fade. */
@@ -72,7 +72,7 @@ void OPalette_setup_sky_change(OPalette* self)
     uint32_t src = TrackLoader_read_pal_sky_table(&trackloader, TrackLoader_get_level(&trackloader, stage_offset)->pal_sky);
 
     { int16_t i; for (i = 0; i <= 0x1F; i++)
-        self->pal_manip[i + 0x3E0] = TrackLoader_read32(trackloader.pal_sky_data, &src); }
+        self->pal_manip[i + 0x3E0] = TrackLoader_read32_a(trackloader.pal_sky_data, &src); }
 
     self->sky_palette_init |= BIT_0; /* Denote new sky palette setup */
 
@@ -418,7 +418,7 @@ void OPalette_write_next_pal_to_ram(OPalette* self)
 
     { int16_t i; for (i = 0; i <= 15; i++)
     {
-        self->pal_fade[dst] = TrackLoader_read16(trackloader.pal_gnd_data, &ground_pal_addr);
+        self->pal_fade[dst] = TrackLoader_read16_a(trackloader.pal_gnd_data, &ground_pal_addr);
         dst += 9;
     } }
 }
@@ -508,7 +508,7 @@ void OPalette_setup_ground_color(OPalette* self)
 
     { int16_t i; for (i = 0; i < 8; i++)
     {
-        uint32_t data = TrackLoader_read32(trackloader.pal_gnd_data, &src);
+        uint32_t data = TrackLoader_read32_a(trackloader.pal_gnd_data, &src);
         Video_write_pal32(&video, &dst_pal_ground1, data);
         Video_write_pal32(&video, &dst_pal_ground2, data);
     } }
