@@ -33,112 +33,105 @@
 /*       +A   hhhhhhhh --------  Height in scanlines - 1 */
 /*       +A   -------- -ccccccc  Sprite color palette */
 
-osprite::osprite(void)
-{
 
-}
 
-osprite::~osprite(void)
+void osprite_init(osprite* self)
 {
-}
-
-void osprite::init()
-{
-    data[0] = 0;
-    data[1] = 0;
-    data[2] = 0;
-    data[3] = 0;
-    data[4] = 0;
-    data[5] = 0;
-    data[6] = 0;
-    scratch = 0;
+    self->data[0] = 0;
+    self->data[1] = 0;
+    self->data[2] = 0;
+    self->data[3] = 0;
+    self->data[4] = 0;
+    self->data[5] = 0;
+    self->data[6] = 0;
+    self->scratch = 0;
 }
 
 /* X is now stored separately (not in the original data structure) */
 /* This is to support wide-screen mode */
-uint16_t osprite::get_x()
+uint16_t osprite_get_x(osprite* self)
 {
-    return data[0x6];
+    return self->data[0x6];
 }
 
-uint16_t osprite::get_y()
+uint16_t osprite_get_y(osprite* self)
 {
-    return data[0x0]; /* returning y uses whole value */
+    return self->data[0x0]; /* returning y uses whole value */
 }
 
-void osprite::set_x(uint16_t x)
+void osprite_set_x(osprite* self, uint16_t x)
 {
-    data[0x6] = x;
+    self->data[0x6] = x;
 }
 
-void osprite::set_pitch(uint8_t p)
+void osprite_set_pitch(osprite* self, uint8_t p)
 {
-    data[0x02] = (data[0x2] & 0x1FF) | ((p & 0xFE) << 8);
+    self->data[0x02] = (self->data[0x2] & 0x1FF) | ((p & 0xFE) << 8);
 }
 
-void osprite::inc_x(uint16_t v)
+void osprite_inc_x(osprite* self, uint16_t v)
 {
-    data[0x6] += v;
+    self->data[0x6] += v;
 }
 
-void osprite::set_y(uint16_t y)
+void osprite_set_y(osprite* self, uint16_t y)
 {
-    data[0x0] = y; /* setting y wipes entire value */
+    self->data[0x0] = y; /* setting y wipes entire value */
 }
 
-void osprite::set_vzoom(uint16_t z)
+void osprite_set_vzoom(osprite* self, uint16_t z)
 {
-    data[0x03] = z;
+    self->data[0x03] = z;
 }
 
-void osprite::set_hzoom(uint16_t z)
+void osprite_set_hzoom(osprite* self, uint16_t z)
 {
-    data[0x4] = z;
+    self->data[0x4] = z;
 }
 
-void osprite::set_priority(uint8_t p)
+void osprite_set_priority(osprite* self, uint8_t p)
 {
-    data[0x03] |= (p << 8);
+    self->data[0x03] |= (p << 8);
 }
 
-void osprite::set_offset(uint16_t o)
+void osprite_set_offset(osprite* self, uint16_t o)
 {
-    data[0x1] = o;
+    self->data[0x1] = o;
 }
 
-void osprite::inc_offset(uint16_t o)
+void osprite_inc_offset(osprite* self, uint16_t o)
 {
-    data[0x1] += o;
+    self->data[0x1] += o;
 }
 
-void osprite::set_render(uint8_t bits)
+void osprite_set_render(osprite* self, uint8_t bits)
 {
-    data[0x4] |= ((bits & 0xE0) << 8);
+    self->data[0x4] |= ((bits & 0xE0) << 8);
 }
 
-void osprite::set_pal(uint8_t pal)
+void osprite_set_pal(osprite* self, uint8_t pal)
 {
-    data[0x5] = (data[0x5] & 0xFF00) + pal;
+    self->data[0x5] = (self->data[0x5] & 0xFF00) + pal;
 }
 
-void osprite::set_height(uint8_t h)
+void osprite_set_height(osprite* self, uint8_t h)
 {
-    data[0x5] = (data[0x5] & 0xFF) + (h << 8);
+    self->data[0x5] = (self->data[0x5] & 0xFF) + (h << 8);
 }
 
-void osprite::sub_height(uint8_t h)
+void osprite_sub_height(osprite* self, uint8_t h)
 {
-    uint8_t height = ((data[0x05] >> 8) - h) & 0xFF;
-    data[0x5] = (data[0x5] & 0xFF) + (height << 8);
+    uint8_t height = ((self->data[0x05] >> 8) - h) & 0xFF;
+    self->data[0x5] = (self->data[0x5] & 0xFF) + (height << 8);
 }
 
-void osprite::set_bank(uint8_t bank)
+void osprite_set_bank(osprite* self, uint8_t bank)
 {
-    data[0x0] |= (bank << 8);
+    self->data[0x0] |= (bank << 8);
 }
 
-void osprite::hide(void)
+void osprite_hide(osprite* self)
 {
-    data[0x0] |= 0x4000;
-    data[0x0] &= ~0x8000; /* denote sprite list not ended */
+    self->data[0x0] |= 0x4000;
+    self->data[0x0] &= ~0x8000; /* denote sprite list not ended */
 }

@@ -47,7 +47,7 @@ void OSprites_init(OSprites* self)
 
     /* Reset hardware entries */
     { uint16_t i; for (i = 0; i < JUMP_ENTRIES_TOTAL; i++)
-        self->sprite_entries[i].init(); }
+        osprite_init(&(self->sprite_entries[i])); }
 
     { uint8_t i; for (i = 0; i < SPRITE_ENTRIES; i++)
         self->jump_table[i].init(i); }
@@ -589,8 +589,8 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
     
     /* Set real h/v zoom values */
     uint32_t index = (input->zoom * 4);
-    output->set_vzoom(ZOOM_LOOKUP[index]); /* note we don't increment src_rom here */
-    output->set_hzoom(ZOOM_LOOKUP[index++]);
+    osprite_set_vzoom(output, ZOOM_LOOKUP[index]); /* note we don't increment src_rom here */
+    osprite_set_hzoom(output, ZOOM_LOOKUP[index++]);
 
     /* ------------------------------------------------------------------------- */
     /* Set width & height values using lookup */
@@ -645,9 +645,9 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
     OSprites_set_sprite_xy(self, input, output, width, height);
     
     /* Here we need the entire value set by above routine, not just top 0x1FF mask! */
-    int16_t sprite_x1 = output->get_x();
+    int16_t sprite_x1 = osprite_get_x(output);
     { int16_t sprite_x2 = sprite_x1 + width;
-    int16_t sprite_y1 = output->get_y();
+    int16_t sprite_y1 = osprite_get_y(output);
     int16_t sprite_y2 = sprite_y1 + height;
 
     const uint16_t x1_bounds = 512 + config.s16_x_off;
@@ -667,9 +667,9 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
     /* ------------------------------------------------------------------------- */
     /* Set Palette & Sprite Bank Information */
     /* ------------------------------------------------------------------------- */
-    output->set_pal(input->pal_dst); /* Set Sprite Colour Palette */
-    output->set_offset(roms.rom0p->read16(src_offsets + 8)); /* Set Offset within selected sprite bank */
-    output->set_bank(roms.rom0p->read8(src_offsets + 7) << 1); /* Set Sprite Bank Value */
+    osprite_set_pal(output, input->pal_dst); /* Set Sprite Colour Palette */
+    osprite_set_offset(output, roms.rom0p->read16(src_offsets + 8)); /* Set Offset within selected sprite bank */
+    osprite_set_bank(output, roms.rom0p->read8(src_offsets + 7) << 1); /* Set Sprite Bank Value */
 
     /* ------------------------------------------------------------------------- */
     /* Set Sprite Height */
@@ -680,13 +680,13 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
         y_adj *= roms.rom0p->read16(src_offsets + 2); /* Width of line data (Unsigned multiply) */
         y_adj /= height; /* Unsigned divide */
         y_adj *= roms.rom0p->read16(src_offsets + 4); /* Length of line data (Unsigned multiply) */
-        output->inc_offset(y_adj);
+        osprite_inc_offset(output, y_adj);
         output->data[0x0] = (output->data[0x0] & 0xFF00) | 0x100; /* Mask on negative y index */
-        output->set_height((uint8_t) sprite_y2);
+        osprite_set_height(output, (uint8_t) sprite_y2);
     }
     else
     {
-        output->set_height((uint8_t) height);
+        osprite_set_height(output, (uint8_t) height);
     }
     
     /* ------------------------------------------------------------------------- */
@@ -706,7 +706,7 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
     {
         /* set_spr_height: */
         if (sprite_y2 > 0x1DF)
-            output->sub_height(sprite_y2 - 0x1DF);
+            osprite_sub_height(output, sprite_y2 - 0x1DF);
     }
     /* Priority List Populated (Elevated Section of road) */
     else
@@ -733,7 +733,7 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
         {
             /* set_spr_height: */
             if (sprite_y2 > 0x1DF)
-                output->sub_height(sprite_y2 - 0x1DF);
+                osprite_sub_height(output, sprite_y2 - 0x1DF);
         }
         /* Road has higher priority, clip sprite */
         else
@@ -748,11 +748,11 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
             else if (sprite_y2 <= road_elevation)
             {
                 if (sprite_y2 > 0x1DF)
-                    output->sub_height(sprite_y2 - 0x1DF);
+                    osprite_sub_height(output, sprite_y2 - 0x1DF);
             }
             else
             {
-                output->sub_height(sprite_y2 - road_elevation);
+                osprite_sub_height(output, sprite_y2 - road_elevation);
             }
         }
     }
@@ -763,15 +763,15 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
     /* ------------------------------------------------------------------------- */
     /* Set Sprite Pitch & Priority */
     /* ------------------------------------------------------------------------- */
-    output->set_pitch(roms.rom0p->read8(src_offsets + 5) << 1);
-    output->set_priority(input->shadow << 4); /* todo: where does this get set? */
+    osprite_set_pitch(output, roms.rom0p->read8(src_offsets + 5) << 1);
+    osprite_set_priority(output, input->shadow << 4); /* todo: where does this get set? */
  } } }}
 
 /* Hide Input And Output Entry */static 
 void OSprites_hide_hwsprite(OSprites* self, oentry* input, osprite* output)
 {
     input->control &= ~DRAW_SPRITE; /* Hide input sprite */
-    output->hide();
+    osprite_hide(output);
 }
 
 /* Sets Sprite Render Point */
@@ -798,18 +798,18 @@ void OSprites_set_sprite_xy(OSprites* self, oentry* input, osprite* output, uint
         case 3:
             height >>= 1;
             y -= height;
-            output->set_y(y + 256);
+            osprite_set_y(output, y + 256);
             break;
             
         /* Anchor Left */
         case 1:
-            output->set_y(y + 256);
+            osprite_set_y(output, y + 256);
             break;
 
         /* Anchor Right */
         case 2:
             y -= height;
-            output->set_y(y + 256);
+            osprite_set_y(output, y + 256);
             break;
     }
 
@@ -826,18 +826,18 @@ void OSprites_set_sprite_xy(OSprites* self, oentry* input, osprite* output, uint
         case 3:
             width >>= 1;
             x -= width;
-            output->set_x(x + 352);
+            osprite_set_x(output, x + 352);
             break;
             
         /* Anchor Left */
         case 1:
-            output->set_x(x + 352);
+            osprite_set_x(output, x + 352);
             break;
 
         /* Anchor Right */
         case 2:
             x -= width;
-            output->set_x(x + 352);
+            osprite_set_x(output, x + 352);
             break;
     }
 }
@@ -871,17 +871,17 @@ void OSprites_set_hrender(OSprites* self, oentry* input, osprite* output, uint16
     /* if reading forwards, increment the offset */
     if ((props & 0x40) == 0)
     {
-        output->inc_offset(offset - 1);
+        osprite_inc_offset(output, offset - 1);
     }
 
     /* if right to left, increment the x position */
     if ((props & 0x20) == 0)
     {
-        output->inc_x(width);
+        osprite_inc_x(output, width);
     }
 
     props |= 0x80; /* Set render top to bottom */
-    output->set_render(props);
+    osprite_set_render(output, props);
 }
 
 /* Helper function to vary the move distance, based on the current frame-rate. */
