@@ -30,6 +30,15 @@ SOURCES_C += \
 	       $(LIBRETRO_COMM_DIR)/streams/file_stream_transforms.c \
 	       $(LIBRETRO_COMM_DIR)/string/stdstring.c \
 	       $(CORE_DIR)/src/main/engine/osmoke.c \
+	       $(CORE_DIR)/src/main/roms.c \
+	       $(CORE_DIR)/src/main/romloader.c \
+	       $(CORE_DIR)/src/main/trackloader.c \
+	       $(CORE_DIR)/src/main/utils.c \
+	       $(CORE_DIR)/src/main/video.c \
+	       $(CORE_DIR)/src/main/frontend/menu.c \
+	       $(CORE_DIR)/src/main/frontend/config.c \
+	       $(CORE_DIR)/src/main/frontend/ttrial.c \
+	       $(CORE_DIR)/src/main/hwaudio/ym2151.c \
 	       $(CORE_DIR)/src/main/engine/oferrari.c \
 	       $(CORE_DIR)/src/main/engine/oroad.c \
 	       $(CORE_DIR)/src/main/engine/ohud.c \
@@ -69,18 +78,10 @@ SOURCES_CXX := \
 	       $(CORE_DIR)/src/main/libretro/ffeedback.cpp \
 	       $(CORE_DIR)/src/main/libretro/audio.cpp \
 	       $(CORE_DIR)/src/main/libretro/input.cpp \
-	       $(CORE_DIR)/src/main/roms.cpp \
-	       $(CORE_DIR)/src/main/romloader.cpp \
-	       $(CORE_DIR)/src/main/trackloader.cpp \
-	       $(CORE_DIR)/src/main/utils.cpp \
-	       $(CORE_DIR)/src/main/video.cpp \
 	       \
 
 	       SOURCES_CXX +=			      \
 			      \
-			      $(CORE_DIR)/src/main/hwaudio/ym2151.cpp \
 			      \
 			      \
-			      $(CORE_DIR)/src/main/frontend/config.cpp \
-			      $(CORE_DIR)/src/main/frontend/menu.cpp \
 			      $(CORE_DIR)/src/main/frontend/ttrial.cpp

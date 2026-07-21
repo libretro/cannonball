@@ -22,6 +22,10 @@ extern int cannonball_fps_counter;
 /* Engine Master State */
 extern int cannonball_state;
 
+/* Video geometry/timing refresh (defined in libretro/main.cpp) */
+void update_geometry(void);
+void update_timing(void);
+
 enum
 {
     STATE_BOOT,

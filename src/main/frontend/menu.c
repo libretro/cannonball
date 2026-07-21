@@ -39,8 +39,6 @@ static bool Menu_check_jap_roms(Menu* self);
 static void Menu_restart_video(Menu* self);
 static void Menu_start_game(Menu* self, int mode, int settings);
 
-extern void update_geometry();
-extern void update_timing(void);
 
 /* Logo Y Position */
 const static int16_t LOGO_Y = -60;
