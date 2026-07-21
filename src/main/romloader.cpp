@@ -10,9 +10,7 @@
 
 #include <stdlib.h>
 #include <stddef.h>
-#include <string>
-#include <map>
-#include <vector>
+#include <string.h>
 
 #include <encodings/crc32.h>
 #include <libretro.h>
@@ -27,21 +25,62 @@ static int RomLoader_create_map(RomLoader* self);
 extern retro_log_printf_t log_cb;
 extern char rom_path[1024];
 
-static std::map<uint32_t, std::string> crc_map;
-static bool map_created = false;
-static std::string mapped_path;
+typedef struct { uint32_t crc; char file[1024]; } crc_entry;
+static crc_entry* crc_map     = NULL;
+static int        crc_map_num = 0;
+static int        crc_map_cap = 0;
+static bool       map_created = false;
+static char       mapped_path[1024];
 
-static std::string join_path(const std::string& directory,
-                             const std::string& filename)
+static void crc_map_clear(void)
 {
-    if (directory.empty())
-        return filename;
+    free(crc_map);
+    crc_map     = NULL;
+    crc_map_num = 0;
+    crc_map_cap = 0;
+}
 
-    const char last = directory[directory.size() - 1];
-    if (last == '/' || last == '\\')
-        return directory + filename;
+static void crc_map_add(uint32_t crc, const char* file)
+{
+    if (crc_map_num >= crc_map_cap)
+    {
+        int ncap        = crc_map_cap ? crc_map_cap * 2 : 64;
+        crc_entry* grown = (crc_entry*)realloc(crc_map, (size_t)ncap * sizeof(crc_entry));
+        if (!grown)
+            return;
+        crc_map     = grown;
+        crc_map_cap = ncap;
+    }
+    crc_map[crc_map_num].crc = crc;
+    strncpy(crc_map[crc_map_num].file, file, sizeof(crc_map[0].file) - 1);
+    crc_map[crc_map_num].file[sizeof(crc_map[0].file) - 1] = 0;
+    crc_map_num++;
+}
 
-    return directory + "/" + filename;
+static const char* crc_map_find(uint32_t crc)
+{
+    int i;
+    for (i = 0; i < crc_map_num; i++)
+        if (crc_map[i].crc == crc)
+            return crc_map[i].file;
+    return NULL;
+}
+
+static void join_path(char* out, size_t n,
+                      const char* directory, const char* filename)
+{
+    size_t len;
+    if (!directory || !directory[0])
+    {
+        strncpy(out, filename, n - 1);
+        out[n - 1] = 0;
+        return;
+    }
+    len = strlen(directory);
+    if (directory[len - 1] == '/' || directory[len - 1] == '\\')
+        snprintf(out, n, "%s%s", directory, filename);
+    else
+        snprintf(out, n, "%s/%s", directory, filename);
 }
 
 static bool read_exact(RFILE* file, void* data, size_t size)
@@ -65,10 +104,10 @@ static bool read_exact(RFILE* file, void* data, size_t size)
     return true;
 }
 
-static bool calculate_crc32(const std::string& path, uint32_t& checksum)
+static bool calculate_crc32(const char* path, uint32_t* checksum)
 {
     RFILE* file = filestream_open(
-        path.c_str(),
+        path,
         RETRO_VFS_FILE_ACCESS_READ,
         RETRO_VFS_FILE_ACCESS_HINT_NONE);
 
@@ -98,7 +137,7 @@ static bool calculate_crc32(const std::string& path, uint32_t& checksum)
     }
 
     filestream_close(file);
-    checksum = crc;
+    *checksum = crc;
     return true;
 }
 
@@ -171,10 +210,11 @@ int RomLoader_load_rom(RomLoader* self, const char* filename,
                         const uint8_t interleave,
                         const bool verbose)
 {
-    const std::string path = join_path(rom_path, filename);
+    char path[1024];
+    join_path(path, sizeof(path), rom_path, filename);
 
     RFILE* source = filestream_open(
-        path.c_str(),
+        path,
         RETRO_VFS_FILE_ACCESS_READ,
         RETRO_VFS_FILE_ACCESS_HINT_NONE);
 
@@ -184,8 +224,8 @@ int RomLoader_load_rom(RomLoader* self, const char* filename,
         return 1;
     }
 
-    std::vector<uint8_t> buffer((size_t)(file_length));
-    const bool read_ok = read_exact(source, &buffer[0], buffer.size());
+    uint8_t* buffer = (uint8_t*)malloc((size_t)file_length);
+    const bool read_ok = read_exact(source, buffer, (size_t)file_length);
     filestream_close(source);
 
     if (!read_ok)
@@ -193,13 +233,13 @@ int RomLoader_load_rom(RomLoader* self, const char* filename,
         if (verbose && log_cb)
             log_cb(RETRO_LOG_ERROR,
                    "ROM has an unexpected size: %s\n",
-                   path.c_str());
+                   path);
 
         self->loaded = false;
         return 1;
     }
 
-    const uint32_t checksum = encoding_crc32(0, &buffer[0], buffer.size());
+    const uint32_t checksum = encoding_crc32(0, buffer, (size_t)file_length);
 
     /* Match the existing Libretro core: report checksum mismatches, but keep */
     /* loading the named ROM instead of rejecting a set that previously worked. */
@@ -213,7 +253,9 @@ int RomLoader_load_rom(RomLoader* self, const char* filename,
     }
 
     { int i; for (i = 0; i < file_length; i++)
-        self->rom[(i * interleave) + offset] = buffer[(size_t)(i)]; }
+        self->rom[(i * interleave) + offset] = buffer[i]; }
+
+    free(buffer);
 
     self->loaded = true;
     return 0;
@@ -221,23 +263,24 @@ int RomLoader_load_rom(RomLoader* self, const char* filename,
 
 int RomLoader_create_map(RomLoader* self)
 {
-    const std::string path = rom_path;
+    const char* path = rom_path;
 
-    crc_map.clear();
-    mapped_path = path;
+    crc_map_clear();
+    strncpy(mapped_path, path, sizeof(mapped_path) - 1);
+    mapped_path[sizeof(mapped_path) - 1] = 0;
 
     /* Mark the map as initialized even if directory enumeration fails, so a */
     /* frontend without directory VFS support does not trigger a full rescan */
     /* for every ROM before falling back to canonical filenames. */
     map_created = true;
 
-    RDIR* directory = retro_opendir(path.c_str());
+    RDIR* directory = retro_opendir(path);
     if (!directory)
     {
         if (log_cb)
             log_cb(RETRO_LOG_WARN,
                    "Could not open ROM directory for CRC32 fallback: %s\n",
-                   path.c_str());
+                   path);
 
         return 1;
     }
@@ -255,16 +298,17 @@ int RomLoader_create_map(RomLoader* self)
             continue;
         }
 
-        const std::string file = join_path(path, name);
+        char     file[1024];
         uint32_t checksum = 0;
+        join_path(file, sizeof(file), path, name);
 
-        if (calculate_crc32(file, checksum))
-            crc_map.insert(std::make_pair(checksum, file));
+        if (calculate_crc32(file, &checksum))
+            crc_map_add(checksum, file);
     }
 
     retro_closedir(directory);
 
-    if (crc_map.empty())
+    if (crc_map_num == 0)
         return 1;
 
     return 0;
@@ -277,16 +321,16 @@ int RomLoader_load_crc32(RomLoader* self, const char* debug,
                           const uint8_t interleave,
                           const bool verbose)
 {
-    if ((!map_created || mapped_path != rom_path) && RomLoader_create_map(self) != 0)
+    const char* match_file;
+    if ((!map_created || strcmp(mapped_path, rom_path) != 0) && RomLoader_create_map(self) != 0)
     {
         self->loaded = false;
         return 1;
     }
 
-    const std::map<uint32_t, std::string>::const_iterator match =
-        crc_map.find(expected_crc);
+    match_file = crc_map_find(expected_crc);
 
-    if (match == crc_map.end())
+    if (!match_file)
     {
         if (verbose && log_cb)
             log_cb(RETRO_LOG_ERROR,
@@ -299,7 +343,7 @@ int RomLoader_load_crc32(RomLoader* self, const char* debug,
     }
 
     RFILE* source = filestream_open(
-        match->second.c_str(),
+        match_file,
         RETRO_VFS_FILE_ACCESS_READ,
         RETRO_VFS_FILE_ACCESS_HINT_NONE);
 
@@ -309,8 +353,8 @@ int RomLoader_load_crc32(RomLoader* self, const char* debug,
         return 1;
     }
 
-    std::vector<uint8_t> buffer((size_t)(file_length));
-    const bool read_ok = read_exact(source, &buffer[0], buffer.size());
+    uint8_t* buffer = (uint8_t*)malloc((size_t)file_length);
+    const bool read_ok = read_exact(source, buffer, (size_t)file_length);
     filestream_close(source);
 
     if (!read_ok)
@@ -318,19 +362,20 @@ int RomLoader_load_crc32(RomLoader* self, const char* debug,
         if (verbose && log_cb)
             log_cb(RETRO_LOG_ERROR,
                    "ROM has an unexpected size: %s\n",
-                   match->second.c_str());
+                   match_file);
 
+        free(buffer);
         self->loaded = false;
         return 1;
     }
 
     { int i; for (i = 0; i < file_length; i++)
-        self->rom[(i * interleave) + offset] = buffer[(size_t)(i)]; }
+        self->rom[(i * interleave) + offset] = buffer[i]; }
 
     if (verbose && log_cb)
         log_cb(RETRO_LOG_INFO,
                "Loaded renamed ROM by CRC32: %s\n",
-               match->second.c_str());
+               match_file);
 
     self->loaded = true;
     return 0;
