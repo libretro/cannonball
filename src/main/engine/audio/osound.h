@@ -240,7 +240,7 @@ static const uint8_t PAN_LEFT  = 0x40;
 
 static const uint8_t PAN_RIGHT = 0x80;
 
-static const uint8_t PAN_CENTRE = PAN_LEFT | PAN_RIGHT;
+#define PAN_CENTRE (PAN_LEFT | PAN_RIGHT)
 
 typedef struct OSound
 {

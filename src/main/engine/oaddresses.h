@@ -211,19 +211,19 @@ static const uint32_t SPRITE_CRASH_FLIP_GIRL2   = 0x25D4; /* Post Flip: Girl */
 static const uint32_t SPRITE_CRASH_MAN2         = 0x2604;
 static const uint32_t SPRITE_CRASH_GIRL2        = 0x2660;
 
-static const uint32_t SPRITE_CRASH_SPIN1_J      = SPRITE_CRASH_SPIN1 - 12;
-static const uint32_t SPRITE_CRASH_SPIN2_J      = SPRITE_CRASH_SPIN2 - 12;
-static const uint32_t SPRITE_BUMP_DATA1_J       = SPRITE_BUMP_DATA1  - 12;
-static const uint32_t SPRITE_BUMP_DATA2_J       = SPRITE_BUMP_DATA2  - 12;
-static const uint32_t SPRITE_CRASH_MAN1_J       = SPRITE_CRASH_MAN1  - 12;
-static const uint32_t SPRITE_CRASH_GIRL1_J      = SPRITE_CRASH_GIRL1 - 12;
-static const uint32_t SPRITE_CRASH_FLIP_J       = SPRITE_CRASH_FLIP  - 12;      /* Flip: Car */
-static const uint32_t SPRITE_CRASH_FLIP_MAN1_J  = SPRITE_CRASH_FLIP_MAN1 - 12;  /* Flip: Man */
-static const uint32_t SPRITE_CRASH_FLIP_GIRL1_J = SPRITE_CRASH_FLIP_GIRL1 - 12; /* Flip: Girl */
-static const uint32_t SPRITE_CRASH_FLIP_MAN2_J  = SPRITE_CRASH_FLIP_MAN2 - 12;  /* Post Flip: Man */
-static const uint32_t SPRITE_CRASH_FLIP_GIRL2_J = SPRITE_CRASH_FLIP_GIRL2 - 12; /* Post Flip: Girl */
-static const uint32_t SPRITE_CRASH_MAN2_J       = SPRITE_CRASH_MAN2 - 12;
-static const uint32_t SPRITE_CRASH_GIRL2_J      = SPRITE_CRASH_GIRL2 - 12;
+#define SPRITE_CRASH_SPIN1_J (SPRITE_CRASH_SPIN1 - 12)
+#define SPRITE_CRASH_SPIN2_J (SPRITE_CRASH_SPIN2 - 12)
+#define SPRITE_BUMP_DATA1_J (SPRITE_BUMP_DATA1  - 12)
+#define SPRITE_BUMP_DATA2_J (SPRITE_BUMP_DATA2  - 12)
+#define SPRITE_CRASH_MAN1_J (SPRITE_CRASH_MAN1  - 12)
+#define SPRITE_CRASH_GIRL1_J (SPRITE_CRASH_GIRL1 - 12)
+#define SPRITE_CRASH_FLIP_J (SPRITE_CRASH_FLIP  - 12)      /* Flip: Car */
+#define SPRITE_CRASH_FLIP_MAN1_J (SPRITE_CRASH_FLIP_MAN1 - 12)  /* Flip: Man */
+#define SPRITE_CRASH_FLIP_GIRL1_J (SPRITE_CRASH_FLIP_GIRL1 - 12) /* Flip: Girl */
+#define SPRITE_CRASH_FLIP_MAN2_J (SPRITE_CRASH_FLIP_MAN2 - 12)  /* Post Flip: Man */
+#define SPRITE_CRASH_FLIP_GIRL2_J (SPRITE_CRASH_FLIP_GIRL2 - 12) /* Post Flip: Girl */
+#define SPRITE_CRASH_MAN2_J (SPRITE_CRASH_MAN2 - 12)
+#define SPRITE_CRASH_GIRL2_J (SPRITE_CRASH_GIRL2 - 12)
 
 /* Sprite Default Properties */
 /* */
@@ -329,15 +329,15 @@ static const uint32_t SPRITE_LOGO_TEXT    = 0x11194;
 static const uint32_t SPRITE_LOGO_PALM1   = 0x111C6;
 static const uint32_t SPRITE_LOGO_PALM2   = 0x111F8;
 static const uint32_t SPRITE_LOGO_PALM3   = 0x1122A;
-static const uint32_t SPRITE_LOGO_BG_J    = SPRITE_LOGO_BG - 0x5A0;
-static const uint32_t SPRITE_LOGO_CAR_J   = SPRITE_LOGO_CAR - 0x5A0;
-static const uint32_t SPRITE_LOGO_BIRD1_J = SPRITE_LOGO_BIRD1 - 0x5A0;
-static const uint32_t SPRITE_LOGO_BIRD2_J = SPRITE_LOGO_BIRD2 - 0x5A0;
-static const uint32_t SPRITE_LOGO_BASE_J  = SPRITE_LOGO_BASE - 0x5A0;
-static const uint32_t SPRITE_LOGO_TEXT_J  = SPRITE_LOGO_TEXT - 0x5A0;
-static const uint32_t SPRITE_LOGO_PALM1_J = SPRITE_LOGO_PALM1 - 0x5A0;
-static const uint32_t SPRITE_LOGO_PALM2_J = SPRITE_LOGO_PALM2 - 0x5A0;
-static const uint32_t SPRITE_LOGO_PALM3_J = SPRITE_LOGO_PALM3 - 0x5A0;
+#define SPRITE_LOGO_BG_J (SPRITE_LOGO_BG - 0x5A0)
+#define SPRITE_LOGO_CAR_J (SPRITE_LOGO_CAR - 0x5A0)
+#define SPRITE_LOGO_BIRD1_J (SPRITE_LOGO_BIRD1 - 0x5A0)
+#define SPRITE_LOGO_BIRD2_J (SPRITE_LOGO_BIRD2 - 0x5A0)
+#define SPRITE_LOGO_BASE_J (SPRITE_LOGO_BASE - 0x5A0)
+#define SPRITE_LOGO_TEXT_J (SPRITE_LOGO_TEXT - 0x5A0)
+#define SPRITE_LOGO_PALM1_J (SPRITE_LOGO_PALM1 - 0x5A0)
+#define SPRITE_LOGO_PALM2_J (SPRITE_LOGO_PALM2 - 0x5A0)
+#define SPRITE_LOGO_PALM3_J (SPRITE_LOGO_PALM3 - 0x5A0)
 
 /* Music Selection Screen - Sprite Data */
 static const uint32_t SPRITE_FM_LEFT       = 0x11892;
@@ -352,17 +352,17 @@ static const uint32_t SPRITE_HAND_LEFT     = 0x118E2;
 static const uint32_t SPRITE_HAND_CENTRE   = 0x118EC;
 static const uint32_t SPRITE_HAND_RIGHT    = 0x118F6;
 
-static const uint32_t SPRITE_FM_LEFT_J     = SPRITE_FM_LEFT - 0x5A0;
-static const uint32_t SPRITE_FM_CENTRE_J   = SPRITE_FM_CENTRE - 0x5A0;
-static const uint32_t SPRITE_FM_RIGHT_J    = SPRITE_FM_RIGHT - 0x5A0;
-static const uint32_t SPRITE_DIAL_LEFT_J   = SPRITE_DIAL_LEFT - 0x5A0;
-static const uint32_t SPRITE_DIAL_CENTRE_J = SPRITE_DIAL_CENTRE - 0x5A0;
-static const uint32_t SPRITE_DIAL_RIGHT_J  = SPRITE_DIAL_RIGHT - 0x5A0;
-static const uint32_t SPRITE_EQ_J          = SPRITE_EQ - 0x5A0;
-static const uint32_t SPRITE_RADIO_J       = SPRITE_RADIO - 0x5A0;
-static const uint32_t SPRITE_HAND_LEFT_J   = SPRITE_HAND_LEFT - 0x5A0;
-static const uint32_t SPRITE_HAND_CENTRE_J = SPRITE_HAND_CENTRE - 0x5A0;
-static const uint32_t SPRITE_HAND_RIGHT_J  = SPRITE_HAND_RIGHT - 0x5A0;
+#define SPRITE_FM_LEFT_J (SPRITE_FM_LEFT - 0x5A0)
+#define SPRITE_FM_CENTRE_J (SPRITE_FM_CENTRE - 0x5A0)
+#define SPRITE_FM_RIGHT_J (SPRITE_FM_RIGHT - 0x5A0)
+#define SPRITE_DIAL_LEFT_J (SPRITE_DIAL_LEFT - 0x5A0)
+#define SPRITE_DIAL_CENTRE_J (SPRITE_DIAL_CENTRE - 0x5A0)
+#define SPRITE_DIAL_RIGHT_J (SPRITE_DIAL_RIGHT - 0x5A0)
+#define SPRITE_EQ_J (SPRITE_EQ - 0x5A0)
+#define SPRITE_RADIO_J (SPRITE_RADIO - 0x5A0)
+#define SPRITE_HAND_LEFT_J (SPRITE_HAND_LEFT - 0x5A0)
+#define SPRITE_HAND_CENTRE_J (SPRITE_HAND_CENTRE - 0x5A0)
+#define SPRITE_HAND_RIGHT_J (SPRITE_HAND_RIGHT - 0x5A0)
 
 /* Shadow data */
 static const uint32_t SPRITE_SHDW_SMALL   = 0x1193C;
@@ -473,23 +473,23 @@ static const uint32_t SPRITE_PORSCHE_J = 0xED22;
 
 /* Flag Waver */
 static const uint32_t ANIM_SEQ_FLAG   = 0x12382;
-static const uint32_t ANIM_SEQ_FLAG_J = ANIM_SEQ_FLAG - 0x5A0;
+#define ANIM_SEQ_FLAG_J (ANIM_SEQ_FLAG - 0x5A0)
 
 /* Ferrari Drive-In Sequence */
 static const uint32_t ANIM_FERRARI_CURR   = 0x12970;
 static const uint32_t ANIM_FERRARI_NEXT   = 0x129C0;
-static const uint32_t ANIM_FERRARI_CURR_J = ANIM_FERRARI_CURR - 0x5A0;
-static const uint32_t ANIM_FERRARI_NEXT_J = ANIM_FERRARI_NEXT - 0x5A0;
+#define ANIM_FERRARI_CURR_J (ANIM_FERRARI_CURR - 0x5A0)
+#define ANIM_FERRARI_NEXT_J (ANIM_FERRARI_NEXT - 0x5A0)
 
 static const uint32_t ANIM_PASS1_CURR   = 0x129C8;
 static const uint32_t ANIM_PASS1_NEXT   = 0x12A18;
-static const uint32_t ANIM_PASS1_CURR_J = ANIM_PASS1_CURR - 0x5A0;
-static const uint32_t ANIM_PASS1_NEXT_J = ANIM_PASS1_NEXT - 0x5A0;
+#define ANIM_PASS1_CURR_J (ANIM_PASS1_CURR - 0x5A0)
+#define ANIM_PASS1_NEXT_J (ANIM_PASS1_NEXT - 0x5A0)
 
 static const uint32_t ANIM_PASS2_CURR   = 0x12A20;
 static const uint32_t ANIM_PASS2_NEXT   = 0x12A70;
-static const uint32_t ANIM_PASS2_CURR_J = ANIM_PASS2_CURR - 0x5A0;
-static const uint32_t ANIM_PASS2_NEXT_J = ANIM_PASS2_NEXT - 0x5A0;
+#define ANIM_PASS2_CURR_J (ANIM_PASS2_CURR - 0x5A0)
+#define ANIM_PASS2_NEXT_J (ANIM_PASS2_NEXT - 0x5A0)
 
 /* ---------------------------------------------------------------------------- */
 /* End Sequence / Bonus Mode */
@@ -518,17 +518,17 @@ static const uint32_t ANIM_ENDSEQ_OBJ8      = 0x125C8; /* Animation Data Sequenc
 static const uint32_t ANIM_ENDSEQ_OBJA      = 0x125F0;
 static const uint32_t ANIM_ENDSEQ_OBJB      = 0x12618;
 static const uint32_t ANIM_END_TABLE        = 0x123A2; /* Start/End Animation Sequence Markers (Only End Markers Appear To Be Used) */
-static const uint32_t ANIM_ENDSEQ_OBJ1_J    = ANIM_ENDSEQ_OBJ1 - 0x5A0;
-static const uint32_t ANIM_ENDSEQ_OBJ2_J    = ANIM_ENDSEQ_OBJ2 - 0x5A0;
-static const uint32_t ANIM_ENDSEQ_OBJ3_J    = ANIM_ENDSEQ_OBJ3 - 0x5A0;
-static const uint32_t ANIM_ENDSEQ_OBJ4_J    = ANIM_ENDSEQ_OBJ4 - 0x5A0;
-static const uint32_t ANIM_ENDSEQ_OBJ5_J    = ANIM_ENDSEQ_OBJ5 - 0x5A0;
-static const uint32_t ANIM_ENDSEQ_OBJ6_J    = ANIM_ENDSEQ_OBJ6 - 0x5A0;
-static const uint32_t ANIM_ENDSEQ_OBJ7_J    = ANIM_ENDSEQ_OBJ7 - 0x5A0;
-static const uint32_t ANIM_ENDSEQ_OBJ8_J    = ANIM_ENDSEQ_OBJ8 - 0x5A0;
-static const uint32_t ANIM_ENDSEQ_OBJA_J    = ANIM_ENDSEQ_OBJA - 0x5A0;
-static const uint32_t ANIM_ENDSEQ_OBJB_J    = ANIM_ENDSEQ_OBJB - 0x5A0;
-static const uint32_t ANIM_END_TABLE_J      = ANIM_END_TABLE   - 0x5A0;
+#define ANIM_ENDSEQ_OBJ1_J (ANIM_ENDSEQ_OBJ1 - 0x5A0)
+#define ANIM_ENDSEQ_OBJ2_J (ANIM_ENDSEQ_OBJ2 - 0x5A0)
+#define ANIM_ENDSEQ_OBJ3_J (ANIM_ENDSEQ_OBJ3 - 0x5A0)
+#define ANIM_ENDSEQ_OBJ4_J (ANIM_ENDSEQ_OBJ4 - 0x5A0)
+#define ANIM_ENDSEQ_OBJ5_J (ANIM_ENDSEQ_OBJ5 - 0x5A0)
+#define ANIM_ENDSEQ_OBJ6_J (ANIM_ENDSEQ_OBJ6 - 0x5A0)
+#define ANIM_ENDSEQ_OBJ7_J (ANIM_ENDSEQ_OBJ7 - 0x5A0)
+#define ANIM_ENDSEQ_OBJ8_J (ANIM_ENDSEQ_OBJ8 - 0x5A0)
+#define ANIM_ENDSEQ_OBJA_J (ANIM_ENDSEQ_OBJA - 0x5A0)
+#define ANIM_ENDSEQ_OBJB_J (ANIM_ENDSEQ_OBJB - 0x5A0)
+#define ANIM_END_TABLE_J (ANIM_END_TABLE   - 0x5A0)
 /* ---------------------------------------------------------------------------- */
 /* Course Map Data */
 /* ---------------------------------------------------------------------------- */
@@ -541,17 +541,17 @@ static const uint32_t SPRITE_COURSEMAP_J = 0x26B2; /* Japanese ROMs */
 static const uint32_t SPRITE_COURSEMAP_TOP   = 0x3784;
 static const uint32_t SPRITE_COURSEMAP_BOT   = 0x386C;
 static const uint32_t SPRITE_COURSEMAP_END   = 0x3954;
-static const uint32_t SPRITE_COURSEMAP_TOP_J = SPRITE_COURSEMAP_TOP - 12;
-static const uint32_t SPRITE_COURSEMAP_BOT_J = SPRITE_COURSEMAP_BOT - 12;
-static const uint32_t SPRITE_COURSEMAP_END_J = SPRITE_COURSEMAP_END - 12;
+#define SPRITE_COURSEMAP_TOP_J (SPRITE_COURSEMAP_TOP - 12)
+#define SPRITE_COURSEMAP_BOT_J (SPRITE_COURSEMAP_BOT - 12)
+#define SPRITE_COURSEMAP_END_J (SPRITE_COURSEMAP_END - 12)
 
 /* Minicar */
 static const uint32_t SPRITE_MINICAR_RIGHT   = 0x10C58;
 static const uint32_t SPRITE_MINICAR_UP      = 0x10C62;
 static const uint32_t SPRITE_MINICAR_DOWN    = 0x10C6C;
-static const uint32_t SPRITE_MINICAR_RIGHT_J = SPRITE_MINICAR_RIGHT - 0x5A0;
-static const uint32_t SPRITE_MINICAR_UP_J    = SPRITE_MINICAR_UP - 0x5A0;
-static const uint32_t SPRITE_MINICAR_DOWN_J  = SPRITE_MINICAR_DOWN - 0x5A0;
+#define SPRITE_MINICAR_RIGHT_J (SPRITE_MINICAR_RIGHT - 0x5A0)
+#define SPRITE_MINICAR_UP_J (SPRITE_MINICAR_UP - 0x5A0)
+#define SPRITE_MINICAR_DOWN_J (SPRITE_MINICAR_DOWN - 0x5A0)
 
 /* Convert route information to piece index to colour */
 static const uint32_t MAP_ROUTE_LOOKUP = 0x3636;
