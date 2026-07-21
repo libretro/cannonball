@@ -58,7 +58,7 @@ struct LayOut
     static const uint32_t HEIGHT_MAPS = SPRITE_MAPS + sizeof(uint32_t);
 };
 
-class RomLoader;
+struct RomLoader;
 
 int32_t TrackLoader_read32(uint8_t* data, uint32_t* addr);
 int32_t TrackLoader_read32(uint8_t* data, uint32_t addr);

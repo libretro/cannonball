@@ -21,8 +21,7 @@
 const static float SHADOW_ORIGINAL = 0.63f; /* Hardware Intensity (63%) */
 const static float SHADOW_MAME = 0.78f;     /* Mame Intensity (78%) */
 
-class hwsprites;
-class RenderBase;
+struct hwsprites;
 struct video_settings_t;
 
 struct Video

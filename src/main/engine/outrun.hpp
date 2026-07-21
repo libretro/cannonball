@@ -174,7 +174,7 @@ struct adr_t
     uint32_t road_height_lookup;
 };
 
-class OOutputs;
+struct OOutputs;
 
 static const uint8_t MODE_ORIGINAL = 0;
 

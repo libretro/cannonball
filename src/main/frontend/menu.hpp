@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-class TTrial;
+struct TTrial;
 
 enum {
         MENU_STATE_MENU,

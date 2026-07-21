@@ -11,7 +11,7 @@
 
 #include "outrun.hpp"
 
-class RomLoader;
+struct RomLoader;
 
 static const short HAND_LEFT = 0, HAND_CENTRE = 1, HAND_RIGHT = 2;
 

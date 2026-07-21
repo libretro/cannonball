@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-class video;
+struct video;
 
 enum { SPRITE_RAM_SIZE = 128 * 8 };
 

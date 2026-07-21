@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-class RomLoader;
+struct RomLoader;
 
 enum {
         CLAMP_LEFT,

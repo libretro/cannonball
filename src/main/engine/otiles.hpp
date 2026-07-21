@@ -16,7 +16,7 @@
 #include "outrun.hpp"
 
 /* Forward definition of video for cyclic dependency */
-class video;
+struct video;
 
 enum { TILEMAP_CLEAR, TILEMAP_SCROLL, TILEMAP_INIT, TILEMAP_SPLIT };
 
