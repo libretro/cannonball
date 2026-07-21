@@ -973,6 +973,7 @@ static void retro_build_save_paths(void)
 
 bool retro_load_game(const struct retro_game_info *info)
 {
+   bool loaded;
    enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_RGB565;
 
    struct retro_input_descriptor desc[] = {
@@ -1032,7 +1033,7 @@ bool retro_load_game(const struct retro_game_info *info)
    log_cb(RETRO_LOG_INFO, "Rom directory: %s\n", rom_path);
    retro_build_save_paths();
 
-   bool loaded = Roms_load_revb_roms(&roms, false);
+   loaded = Roms_load_revb_roms(&roms, false);
 
    if (!loaded)
    {
@@ -1131,6 +1132,8 @@ size_t retro_get_memory_size(unsigned id)
 
 void retro_init(void)
 {
+   unsigned level = 2;
+
    TrackLoader_ctor(&trackloader);
    Outrun_ctor(&outrun);
    Audio_ctor(&cannonball_audio);
@@ -1140,7 +1143,6 @@ void retro_init(void)
    Roms_ctor(&roms);
    OSoundInt_ctor(&osoundint);
    OAttractAI_ctor(&oattractai);
-   unsigned                  level = 2;
    environ_cb(RETRO_ENVIRONMENT_SET_PERFORMANCE_LEVEL, &level);
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))

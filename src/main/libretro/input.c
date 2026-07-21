@@ -104,6 +104,9 @@ void Input_handle_joy_axis(Input* self, int wheel_axis, int accel_axis, int brak
 {
    /* Analog Controls */
 
+   int adjusteda;
+   int adjustedb;
+
    /* Steering */
    /* OutRun requires values between 0x48 and 0xb8. */
    int percentage_adjust = ((self->wheel_zone) << 8) / 100;         
@@ -128,13 +131,13 @@ void Input_handle_joy_axis(Input* self, int wheel_axis, int accel_axis, int brak
 
    /* Accelerator [Single Axis] */
    /* Scale input to be in the range of 0 to 0x7F */
-   int adjusteda = accel_axis/256;          
+   adjusteda = accel_axis/256;          
    adjusteda += (adjusteda >> 2);
    self->a_accel = adjusteda;
 
    /* Brake [Single Axis] */
    /* Scale input to be in the range of 0 to 0x7F */
-   int adjustedb = 0x7F - ((-brake_axis + (1 << 15)) >> 9);
+   adjustedb = 0x7F - ((-brake_axis + (1 << 15)) >> 9);
    adjustedb += (adjustedb >> 2);
    self->a_brake = adjustedb;
 }
