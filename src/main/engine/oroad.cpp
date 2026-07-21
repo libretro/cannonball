@@ -371,7 +371,7 @@ void ORoad_setup_x_data(ORoad* self, uint32_t addr)
     const int16_t y = trackloader.readPath(addr + 2) + trackloader.readPath(addr + 6); /* Length 2 */
 
     /* Use Pythagorus' theorem to find the distance/length between x & y */
-    const uint16_t distance = outils::isqrt((x * x) + (y * y));
+    const uint16_t distance = outils_isqrt((x * x) + (y * y));
 
     { const int16_t curve_x_dist = (x << 14) / distance; /* Scale up is for fixed point division in create_curve */
     const int16_t curve_y_dist = (y << 14) / distance;

@@ -100,13 +100,13 @@ void OStats_inc_lap_timer(OStats* self)
     {
         /* Looped MS, so add a second */
         self->stage_times[self->cur_stage][2] = 0;
-        self->stage_times[self->cur_stage][1] = outils::bcd_add(self->stage_times[self->cur_stage][1], 1);
+        self->stage_times[self->cur_stage][1] = outils_bcd_add(self->stage_times[self->cur_stage][1], 1);
 
         /* Loop seconds, so add a minute */
         if (self->stage_times[self->cur_stage][1] == 0x60)
         {
             self->stage_times[self->cur_stage][1] = 0;
-            self->stage_times[self->cur_stage][0] = outils::bcd_add(self->stage_times[self->cur_stage][0], 1);
+            self->stage_times[self->cur_stage][0] = outils_bcd_add(self->stage_times[self->cur_stage][0], 1);
         }
     }
 
@@ -137,7 +137,7 @@ void OStats_update_score(OStats* self, uint32_t value)
     if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
         return;
 
-    self->score = outils::bcd_add(value, self->score);
+    self->score = outils_bcd_add(value, self->score);
 
     if (self->score > 0x99999999)
         self->score = 0x99999999;
@@ -203,9 +203,9 @@ void OStats_init_next_level(OStats* self)
         if (!outrun.freeze_timer)
         {
             if (outrun.cannonball_mode == outrun.MODE_ORIGINAL)
-                self->time_counter = outils::bcd_add(self->time_counter, TIME[time_lookup]);
+                self->time_counter = outils_bcd_add(self->time_counter, TIME[time_lookup]);
             else if (outrun.cannonball_mode == outrun.MODE_CONT)
-                self->time_counter = outils::bcd_add(self->time_counter, 0x55);
+                self->time_counter = outils_bcd_add(self->time_counter, 0x55);
 
             if (self->time_counter > 0x99) self->time_counter = 0x99;
         }

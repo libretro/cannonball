@@ -523,7 +523,7 @@ void OInitEngine_check_stage(OInitEngine* self)
         if ((ostats.cur_stage + 1) == 15)
         {
             if (outrun.game_state == GS_INGAME)
-                OInitEngine_init_bonus(self, outils::random() % 5);
+                OInitEngine_init_bonus(self, outils_random() % 5);
             else
                 OInitEngine_reload_stage1(self);
         }
@@ -933,7 +933,7 @@ void OInitEngine_init_crash_bonus(OInitEngine* self)
         if (otraffic.collision_traffic == 1)
         {   
             otraffic.collision_traffic = 2;
-            { uint8_t rnd = outils::random() & otraffic.collision_mask;
+            { uint8_t rnd = outils_random() & otraffic.collision_mask;
             if (rnd == otraffic.collision_mask)
             {
                 /* Try to launch crash code and perform a spin */

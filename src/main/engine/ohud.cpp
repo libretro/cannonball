@@ -325,7 +325,7 @@ void OHud_draw_stage_number(OHud* self, uint32_t addr, uint8_t digit, uint16_t c
     }
     else
     {
-        int hex = outils::convert16_dechex(digit);
+        int hex = outils_convert16_dechex(digit);
 
         Video_write_text16(&video, addr + 2, (hex & 0xF) + (col << 8) + DIGIT_BASE);
         Video_write_text16(&video, addr    , (hex >> 4)  + (col << 8) + DIGIT_BASE);
@@ -397,7 +397,7 @@ void OHud_blit_speed(OHud* self, uint32_t dst_addr, uint16_t speed)
     const uint16_t TILE_BASE = 0x8C60; /* Base tile number */
 
     /* Convert to human readable speed */
-    speed = outils::convert16_dechex(speed);
+    speed = outils_convert16_dechex(speed);
 
     { uint16_t digit1 = speed & 0xF;
     uint16_t digit2 = (speed & 0xF0) >> 4;

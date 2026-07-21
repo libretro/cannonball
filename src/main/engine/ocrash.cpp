@@ -902,7 +902,7 @@ void OCrash_init_spin1(OCrash* self)
     { uint16_t car_inc = oinitengine.car_increment >> 16;
     uint16_t spins = 1;
     if (car_inc > 0xB4)
-        spins += outils::random() & 1;
+        spins += outils_random() & 1;
 
     self->spinflipcount1 = spins;
     self->crash_spin_count = 2;

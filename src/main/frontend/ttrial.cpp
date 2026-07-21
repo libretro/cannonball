@@ -89,7 +89,7 @@ int TTrial::tick()
                 }
                 else if (Input_has_pressed(&input, START) || Input_has_pressed(&input, ACCEL) || OInputs_is_analog_select(&oinputs))
                 {
-                    outils::convert_counter_to_time(best_times[level_selected], best_converted);
+                    outils_convert_counter_to_time(best_times[level_selected], best_converted);
 
                     outrun.cannonball_mode         = Outrun::MODE_TTRIAL;
                     outrun.ttrial.level            = STAGE_LOOKUP[level_selected];
@@ -107,7 +107,7 @@ int TTrial::tick()
                     return INIT_GAME;
                 }
                 OMap_position_ferrari(&omap, FERRARI_POS[level_selected]);
-                outils::convert_counter_to_time(best_times[level_selected], best_converted);
+                outils_convert_counter_to_time(best_times[level_selected], best_converted);
                 OHud_draw_lap_timer(&ohud, OHud_translate(&ohud, 7, 26, 0x110030), best_converted, best_converted[2]);
                 OMap_blit(&omap);
                 ORoad_tick(&oroad);

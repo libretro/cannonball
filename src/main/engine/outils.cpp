@@ -15,14 +15,9 @@
 #define rand std::rand
 #endif
 
-outils::outils(void)
-{
 
-}
 
-outils::~outils(void)
-{
-}
+
 
 /* Generate long random */
 /* */
@@ -33,12 +28,12 @@ outils::~outils(void)
 /* Seed for random number generator */
 static uint32_t rnd_seed = 0;
 
-void outils::reset_random_seed()
+void outils_reset_random_seed()
 {
     rnd_seed = 0;
 }
 
-uint32_t outils::random()
+uint32_t outils_random()
 {
 	/* New seed value */
 	uint32_t seed = rnd_seed;
@@ -54,11 +49,11 @@ uint32_t outils::random()
 	seed <<= 3;
 	seed += rnd;
 
-	move16(seed, rnd);
-	swap32(seed);
-	add16(seed, rnd);
-	move16(rnd, seed);
-	swap32(seed);
+	outils_move16(seed, rnd);
+	outils_swap32(seed);
+	outils_add16(seed, rnd);
+	outils_move16(rnd, seed);
+	outils_swap32(seed);
 
 	rnd_seed = seed; /* Set new seed */
 
@@ -71,23 +66,23 @@ uint32_t outils::random()
 /* */
 /* To Do: Test this outputs identical results */
 
-int32_t outils::next(const int32_t n, const int32_t i) 
+int32_t outils_next(const int32_t n, const int32_t i) 
 {
     return (n + i/n) >> 1;
 }
 
-int32_t outils::isqrt(const int32_t number) 
+int32_t outils_isqrt(const int32_t number) 
 {
     if (number == 0)
         return 0;
 
     { int n  = 1;
-    int n1 = next(n, number);
+    int n1 = outils_next(n, number);
 
-    while(abs(n1 - n) > 1) 
+    while(outils_abs(n1 - n) > 1) 
     {
         n  = n1;
-        n1 = next(n, number);
+        n1 = outils_next(n, number);
     }
     while((n1*n1) > number) 
     {
@@ -96,13 +91,13 @@ int32_t outils::isqrt(const int32_t number)
     return n1;
  }}
 
-int32_t outils::abs(int32_t n)
+int32_t outils_abs(int32_t n)
 {
 	return n >= 0 ? n : -n;
 }
 
 /* Helper routine to BCD add two longs */
-uint32_t outils::bcd_add(uint32_t src, uint32_t dst)
+uint32_t outils_bcd_add(uint32_t src, uint32_t dst)
 {
     uint8_t carry = 0;
     uint32_t final = 0;
@@ -136,7 +131,7 @@ uint32_t outils::bcd_add(uint32_t src, uint32_t dst)
 }
 
 /* Helper routine to BCD subtract two longs */
-uint32_t outils::bcd_sub(uint32_t src, uint32_t dst)
+uint32_t outils_bcd_sub(uint32_t src, uint32_t dst)
 {
     uint8_t carry = 0;
     uint32_t final = 0;
@@ -170,7 +165,7 @@ uint32_t outils::bcd_sub(uint32_t src, uint32_t dst)
 }
 
 /* Convert incremented internal counter to actual laptime */
-void outils::convert_counter_to_time(uint16_t counter, uint8_t* converted)
+void outils_convert_counter_to_time(uint16_t counter, uint8_t* converted)
 {
     const uint16_t MINUTE = 3600;
 
@@ -199,11 +194,11 @@ void outils::convert_counter_to_time(uint16_t counter, uint8_t* converted)
     if (s1 > 9)
         seconds += 6;
 
-    s2 = outils::bcd_add(s2, s2);
+    s2 = outils_bcd_add(s2, s2);
     { int16_t d3 = s2;
-    s2 = outils::bcd_add(s2, s2);
-    s2 = outils::bcd_add(s2, d3);
-    seconds = outils::bcd_add(s2, seconds);
+    s2 = outils_bcd_add(s2, s2);
+    s2 = outils_bcd_add(s2, d3);
+    seconds = outils_bcd_add(s2, seconds);
 
     converted[0] = (uint8_t) minutes;
     converted[1] = seconds;
@@ -216,7 +211,7 @@ void outils::convert_counter_to_time(uint16_t counter, uint8_t* converted)
 /* So an output of 0x180 would be 180 kp/h directly. */
 /* */
 /* Source: 0x7126 */
-uint16_t outils::convert16_dechex(const uint16_t value)
+uint16_t outils_convert16_dechex(const uint16_t value)
 {
     int16_t top_byte = -1; /* [d3] */
     int16_t lookup   = value; /* [d2] */
@@ -232,7 +227,7 @@ uint16_t outils::convert16_dechex(const uint16_t value)
 }
 
 /* Lookup table to convert a decimal value to hex */
-const uint8_t outils::DEC_TO_HEX[] =
+const uint8_t DEC_TO_HEX[] =
 {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 

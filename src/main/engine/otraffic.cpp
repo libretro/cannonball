@@ -210,7 +210,7 @@ void OTraffic_spawn_car(OTraffic* self, oentry* sprite)
     sprite->traffic_proximity = 0;
     sprite->traffic_fx = 0;
     sprite->z = 0x10000;    /* Traffic starts on horizon in the distance */
-    int16_t rnd = outils::random();
+    int16_t rnd = outils_random();
     self->spawn_location++;
     
     /* Spawn On Left Hand Side Of Road */
@@ -439,7 +439,7 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
                 OStats_update_score(&ostats, 0x20000);
             else
             {
-                OHud_draw_score(&ohud, OHud_translate(&ohud, 3, 2, 0x110030), outils::convert16_dechex(++outrun.ttrial.overtakes), 2);
+                OHud_draw_score(&ohud, OHud_translate(&ohud, 3, 2, 0x110030), outils_convert16_dechex(++outrun.ttrial.overtakes), 2);
                 OHud_blit_text1(&ohud, 2, 1, HUD_SCORE1);
                 OHud_blit_text1(&ohud, 2, 2, HUD_SCORE2);
             }
@@ -789,7 +789,7 @@ void OTraffic_check_collision(OTraffic* self, oentry* sprite)
     {
         OSoundInt_queue_sound(&osoundint, sprite->traffic_fx);
         /* Set all proximity bits on */
-        if (outils::random() & 1)
+        if (outils_random() & 1)
             sprite->traffic_proximity = 0xFF;
     }
 }

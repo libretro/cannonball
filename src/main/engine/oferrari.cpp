@@ -1709,7 +1709,7 @@ void OFerrari_shake(OFerrari* self)
     if (self->wheel_traction == TRACTION_ON) return; /* Return if both wheels have traction */
 
     int8_t traction = self->wheel_traction - 1;
-    { int16_t rnd = outils::random();
+    { int16_t rnd = outils_random();
     self->spr_ferrari->counter++;
 
     { uint16_t car_inc = oinitengine.car_increment >> 16; /* [d5] */

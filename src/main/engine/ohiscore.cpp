@@ -485,8 +485,8 @@ void OHiScore_setup_minicars(OHiScore* self)
     {
         self->minicars[i].pos         = 0x100;
         self->minicars[i].dst_reached = 0;
-        self->minicars[i].speed       = (outils::random() & 0x180) | 0xF0;
-        self->minicars[i].base_speed  = (outils::random() & 0x7) | 0x01;
+        self->minicars[i].speed       = (outils_random() & 0x180) | 0xF0;
+        self->minicars[i].base_speed  = (outils_random() & 0x7) | 0x01;
     } }
 }
 
@@ -635,13 +635,13 @@ void OHiScore_blit_digit(OHiScore* self)
         if (!(tile & 0xFFFF))
         {
             tile = (tile & 0xFFFF0000) | 0x20;
-            outils::swap32(tile);
+            outils_swap32(tile);
             tile |= 0x30;
         }
         /* Draw tile */
         else
         {
-            outils::swap32(tile);
+            outils_swap32(tile);
             tile |= 0x300030;
         }
 
@@ -779,7 +779,7 @@ void OHiScore_convert_lap_time(OHiScore* self, uint16_t time)
     while (src_time >= 0);
     
     src_time += MINUTE;
-    minutes = outils::convert16_dechex(minutes);
+    minutes = outils_convert16_dechex(minutes);
 
     /* Store Millisecond Lookup */
     uint16_t ms_lookup = src_time & 0x3F; 
@@ -793,11 +793,11 @@ void OHiScore_convert_lap_time(OHiScore* self, uint16_t time)
     if (s1 > 9)
         seconds += 6;
 
-    s2 = outils::bcd_add(s2, s2);
+    s2 = outils_bcd_add(s2, s2);
     { int16_t d3 = s2;
-    s2 = outils::bcd_add(s2, s2);
-    s2 = outils::bcd_add(s2, d3);
-    seconds = outils::bcd_add(s2, seconds);
+    s2 = outils_bcd_add(s2, s2);
+    s2 = outils_bcd_add(s2, d3);
+    seconds = outils_bcd_add(s2, seconds);
 
     /* Output Milliseconds */
     self->laptime[5] = (ostats.lap_ms[ms_lookup] & 0xF) | TILE_PROPS;

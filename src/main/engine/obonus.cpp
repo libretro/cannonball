@@ -72,7 +72,7 @@ static void OBonus_init_bonus_text(OBonus* self)
         /* Add milliseconds remaining from previous stage times */
         { int i; for (i = 0; i < 5; i++)
         {
-            total_time = outils::bcd_add(outils::DEC_TO_HEX[ostats.stage_times[i][2]], total_time);
+            total_time = outils_bcd_add(DEC_TO_HEX[ostats.stage_times[i][2]], total_time);
         } }
     }
 

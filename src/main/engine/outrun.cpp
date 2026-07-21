@@ -96,7 +96,7 @@ void Outrun::boot()
     init_jump_table();
     OInitEngine_init(&oinitengine, cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
     OSoundInt_init(&osoundint);
-    outils::reset_random_seed(); /* Ensure we match the genuine boot up of the original game each time */
+    outils_reset_random_seed(); /* Ensure we match the genuine boot up of the original game each time */
 }
 
 void Outrun::tick(bool tick_frame)
@@ -670,7 +670,7 @@ bool Outrun::decrement_timers()
             return false;
 
         ostats.frame_counter = frame_reset;
-        ostats.time_counter  = outils::bcd_sub(1, ostats.time_counter);
+        ostats.time_counter  = outils_bcd_sub(1, ostats.time_counter);
 
         /* We need to manually refresh the HUD here to display '0' seconds */
         if (ostats.time_counter == 0)
@@ -684,7 +684,7 @@ bool Outrun::decrement_timers()
             return false;
 
         ostats.frame_counter = frame_reset;
-        ostats.time_counter  = outils::bcd_sub(1, ostats.time_counter);
+        ostats.time_counter  = outils_bcd_sub(1, ostats.time_counter);
         return (ostats.time_counter < 0);
     }
 }

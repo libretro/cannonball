@@ -197,7 +197,7 @@ void OLogo_sprite_logo_bg(OLogo* self)
     /* Map new palette */
     if (d1 & BIT_3)
     {
-        e->pal_src = bg_pal[outils::random() & 7];
+        e->pal_src = bg_pal[outils_random() & 7];
         OSprites_map_palette(&osprites, e);
     }
 
