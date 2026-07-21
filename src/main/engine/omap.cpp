@@ -49,7 +49,7 @@ void OMap_init(OMap* self)
     osprites.spr_cnt_shadow   = 0;
     oroad.road_ctrl           = ROAD_BOTH_P0;
     oroad.horizon_base        = HORIZON_OFF;
-    otiles.fill_tilemap_color(0xABD); /*  Paint pinkish colour on tilemap 16 */
+    OTiles_fill_tilemap_color(&otiles, 0xABD); /*  Paint pinkish colour on tilemap 16 */
     self->init_sprites = true;
 }
 

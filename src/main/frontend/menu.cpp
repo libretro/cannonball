@@ -262,7 +262,7 @@ void Menu::init()
     OPalette_setup_road_stripes(&opalette);
     OPalette_setup_road_side(&opalette);
     OPalette_setup_road_colour(&opalette);
-    otiles.setup_palette_hud();
+    OTiles_setup_palette_hud(&otiles);
 
     ORoad_init(&oroad);
     oroad.road_ctrl = ROAD_R0;

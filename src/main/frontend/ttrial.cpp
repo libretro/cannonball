@@ -109,8 +109,8 @@ int TTrial_tick(TTrial* self)
                 ORoad_tick(&oroad);
                 OSprites_sprite_copy(&osprites);
                 OSprites_update_sprites(&osprites);
-                otiles.write_tilemap_hw();
-                otiles.update_tilemaps(0);
+                OTiles_write_tilemap_hw(&otiles);
+                OTiles_update_tilemaps(&otiles, 0);
             }
             break;
     }

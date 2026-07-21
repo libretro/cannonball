@@ -175,9 +175,9 @@ void Outrun::tick(bool tick_frame)
 /* Vertical Interrupt */
 void Outrun::vint()
 {
-    otiles.write_tilemap_hw();
+    OTiles_write_tilemap_hw(&otiles);
     OSprites_update_sprites(&osprites);
-    otiles.update_tilemaps(cannonball_mode == MODE_ORIGINAL ? ostats.cur_stage : 0);
+    OTiles_update_tilemaps(&otiles, cannonball_mode == MODE_ORIGINAL ? ostats.cur_stage : 0);
     OPalette_cycle_sky_palette(&opalette);
     OPalette_fade_palette(&opalette);
     OStats_do_timers(&ostats);
@@ -208,13 +208,13 @@ void Outrun::jump_table()
 
 
         case GS_MUSIC:
-            if (tick_frame) omusic.check_start(); /* Check for start button */
+            if (tick_frame) OMusic_check_start(&omusic); /* Check for start button */
             OSprites_tick(&osprites);
             OLevelObjs_do_sprite_routine(&olevelobjs);
 
             if (!outrun.tick_frame)
             {
-                omusic.blit();
+                OMusic_blit(&omusic);
             }
             break;
 
@@ -344,16 +344,16 @@ void Outrun::main_switch()
         /* ---------------------------------------------------------------------------------------- */
 
         case GS_INIT_MUSIC:
-            omusic.enable();
+            OMusic_enable(&omusic);
             game_state = GS_MUSIC;
 
         case GS_MUSIC:
             OHud_draw_credits(&ohud);
             OHud_draw_insert_coin(&ohud);
-            omusic.tick();
+            OMusic_tick(&omusic);
             if (decrement_timers())
             {
-                omusic.disable();
+                OMusic_disable(&omusic);
                 game_state = GS_INIT_GAME;
             }
             break;
@@ -377,7 +377,7 @@ void Outrun::main_switch()
             OSoundInt_queue_sound(&osoundint, SOUND_STOP_CHEERS);
             OSoundInt_queue_sound(&osoundint, SOUND_VOICE_GETREADY);
             OSoundInt_queue_sound(&osoundint, SOUND_REVS);             /* Moved from Z80 Code for extra flexibility */
-            omusic.play_music(-1);
+            OMusic_play_music(&omusic, -1);
             
             if (!freeze_timer)
                 ostats.time_counter = TIME[config.engine.dip_time * 40]; /* Set time to begin level with */
@@ -640,7 +640,7 @@ void Outrun::init_jump_table()
     OTraffic_init(&otraffic);
     OSmoke_init(&osmoke);
     ORoad_init(&oroad);
-    otiles.init();
+    OTiles_init(&otiles);
     OPalette_init(&opalette);
     OInputs_init(&oinputs);
     OBonus_init(&obonus);
@@ -697,7 +697,7 @@ bool Outrun::decrement_timers()
 
 void Outrun::init_motor_calibration()
 {
-    otiles.init();
+    OTiles_init(&otiles);
     OPalette_init(&opalette);
     OInputs_init(&oinputs);
     OOutputs_init(outputs);
@@ -705,7 +705,7 @@ void Outrun::init_motor_calibration()
     video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);
     hwsprites_set_x_clip(video.sprite_layer, false);
 
-    otiles.fill_tilemap_color(0x4F60); /* Fill Tilemap Light Blue */
+    OTiles_fill_tilemap_color(&otiles, 0x4F60); /* Fill Tilemap Light Blue */
 
     video.enabled        = true;
     osoundint.has_booted = true;
@@ -794,7 +794,7 @@ void Outrun::init_best_outrunners()
 {
     video.enabled = false;
     hwsprites_set_x_clip(video.sprite_layer, false); /* Stop clipping in wide-screen mode. */
-    otiles.fill_tilemap_color(0); /* Fill Tilemap Black */
+    OTiles_fill_tilemap_color(&otiles, 0); /* Fill Tilemap Black */
     OSprites_disable_sprites(&osprites);
     oroad.horizon_base = 0x154;
     OHiScore_setup_pal_best(&ohiscore);    /* Setup Palettes */

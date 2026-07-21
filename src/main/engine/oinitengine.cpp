@@ -106,17 +106,17 @@ void OInitEngine_init(OInitEngine* self, int8_t level)
 	OPalette_setup_road_stripes(&opalette);
 	OPalette_setup_road_side(&opalette);
 	OPalette_setup_road_colour(&opalette);   
-    otiles.setup_palette_hud();                     /* Init Default Palette for HUD */
+    OTiles_setup_palette_hud(&otiles);                     /* Init Default Palette for HUD */
     OSprites_copy_palette_data(&osprites);                   /* Copy Palette Data to RAM */
-    otiles.setup_palette_tilemap();                 /* Setup Palette For Tilemap */
+    OTiles_setup_palette_tilemap(&otiles);                 /* Setup Palette For Tilemap */
     OInitEngine_setup_stage1(self);                                 /* Setup Misc stuff relating to Stage 1 */
-    otiles.reset_tiles_pal();                       /* Reset Tiles, Palette And Road Split Data */
+    OTiles_reset_tiles_pal(&otiles);                       /* Reset Tiles, Palette And Road Split Data */
     OCrash_clear_crash_state(&ocrash);
 
     /* The following is set up specifically for time trial mode */
     if (level)
     {  
-        otiles.init_tilemap_palette(level);
+        OTiles_init_tilemap_palette(&otiles, level);
         oroad.road_ctrl  = ROAD_BOTH_P0;
         oroad.road_width = RD_WIDTH_MERGE;        /* Setup a default road width */
     }
@@ -534,7 +534,7 @@ void OInitEngine_check_stage(OInitEngine* self)
             OSprites_clear_palette_data(&osprites);
 
             /* Init next tilemap */
-            otiles.set_vertical_swap(); /* Tell tilemap to v-scroll off/on */
+            OTiles_set_vertical_swap(&otiles); /* Tell tilemap to v-scroll off/on */
 
             /* Reload smoke data */
             OSmoke_setup_smoke_sprite(&osmoke, true);
@@ -552,7 +552,7 @@ void OInitEngine_check_stage(OInitEngine* self)
             if (outrun.game_state == GS_INGAME)
             {
                 if (ostats.cur_stage == 5 || ostats.cur_stage == 10)
-                    omusic.cycle_music();
+                    OMusic_cycle_music(&omusic);
             }              
         }
     }
