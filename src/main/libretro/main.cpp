@@ -831,7 +831,7 @@ end:
 
    /* Update menu to reflect any option changes */
    if (!startup && (cannonball_state == STATE_MENU))
-      menu->refresh_menu();
+      Menu_refresh_menu(menu);
 }
 
 void retro_get_system_info(struct retro_system_info *info) {
@@ -1058,7 +1058,8 @@ bool retro_load_game(const struct retro_game_info *info)
    if (!Video_init(&video, &roms, &config.video))
       return false;
 
-   menu = new Menu();
+   menu = (Menu*)malloc(sizeof(Menu));
+   Menu_ctor(menu);
 
    Audio_init(&cannonball_audio);
    cannonball_state = config.menu.enabled ? STATE_INIT_MENU : STATE_INIT_GAME;
@@ -1077,7 +1078,7 @@ bool retro_load_game(const struct retro_game_info *info)
 
 
    /* Populate menus */
-   menu->populate();
+   Menu_populate(menu);
 
    return true;
 }
@@ -1096,7 +1097,8 @@ void retro_unload_game(void)
     Audio_stop_audio(&cannonball_audio);
     Input_close(&input);
     forcefeedback_close();
-    delete menu;
+    Menu_dtor(menu);
+    free(menu);
 }
 
 unsigned retro_get_region(void)
@@ -1372,7 +1374,7 @@ void retro_run(void)
 
         case STATE_MENU:
         {
-            menu->tick();
+            Menu_tick(menu);
             Input_frame_done(&input);
             /* Tick audio program code */
             OSoundInt_tick(&osoundint);
@@ -1384,7 +1386,7 @@ void retro_run(void)
         case STATE_INIT_MENU:
             OInputs_init(&oinputs);
             OOutputs_init(outrun.outputs);
-            menu->init();
+            Menu_init(menu);
             cannonball_state = STATE_MENU;
             break;
 
