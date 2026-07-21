@@ -69,34 +69,23 @@ typedef struct
 
 } YM2151Operator;
 
-class YM2151
+struct YM2151
 {
-public:
     SoundChip sc;
     bool irq;
-
-    YM2151(float volume, uint32_t clock);
-    ~YM2151();
-    void init(int rate, int fps);
-    void stream_update();
-    void write_reg(int r, int v);
-    int read_status();
-
-private:
-    int clock;        /*chip clock in Hz (passed from 2151intf.c)*/
-    int sampfreq;     /*sampling frequency in Hz (passed from 2151intf.c)*/
+    int clock;
+    int sampfreq;
     float volume;
-
-    void init_tables();
-    void init_chip_tables();
-    inline void envelope_KONKOFF(YM2151Operator * op, int v);
-    inline void set_connect(YM2151Operator *om1, int cha, int v);
-    inline void refresh_EG(YM2151Operator * op);
-    void ym2151_reset_chip();
-    inline signed int op_calc(YM2151Operator * OP, unsigned int env, signed int pm);
-    inline signed int op_calc1(YM2151Operator * OP, unsigned int env, signed int pm);
-    inline void chan_calc(unsigned int chan);
-    inline void chan7_calc();
-    inline void advance_eg();
-    inline void advance();
 };
+
+void YM2151_ctor(YM2151* self, float volume, uint32_t clock);
+
+void YM2151_dtor(YM2151* self);
+
+void YM2151_init(YM2151* self, int rate, int fps);
+
+void YM2151_stream_update(YM2151* self);
+
+void YM2151_write_reg(YM2151* self, int r, int v);
+
+int YM2151_read_status(YM2151* self);

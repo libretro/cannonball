@@ -1046,11 +1046,11 @@ void OSound_fm_dotimera(OSound* self)
 {
     #ifdef TIMER_CODE
     /* Return if YM2151 is busy */
-    if (!(self->ym->read_status() & BIT_0))
+    if (!(YM2151_read_status(self->ym) & BIT_0))
         return;
     #endif
     /* Set Timer A, Enable its IRQ and also reset its IRQ */
-    self->ym->write_reg(0x14, 0x15); /* %10101 */
+    YM2151_write_reg(self->ym, 0x14, 0x15); /* %10101 */
 }
 
 /* Reset Yamaha YM2151 Chip. */
@@ -1082,10 +1082,10 @@ void OSound_fm_write_reg(OSound* self, uint8_t reg, uint8_t value)
 {
     #ifdef TIMER_CODE
     /* Return if YM2151 is busy */
-    if (self->ym->read_status() & BIT_7)
+    if (YM2151_read_status(self->ym) & BIT_7)
         return;
     #endif
-    self->ym->write_reg(reg, value);
+    YM2151_write_reg(self->ym, reg, value);
 }
 
 /* Write Block of FM Data From ROM */

@@ -16,6 +16,19 @@
 
 #include "hwaudio/ym2151.hpp"
 
+static void YM2151_init_tables(YM2151* self);
+static void YM2151_init_chip_tables(YM2151* self);
+static void YM2151_envelope_KONKOFF(YM2151* self, YM2151Operator * op, int v);
+static void YM2151_set_connect(YM2151* self, YM2151Operator *om1, int cha, int v);
+static void YM2151_refresh_EG(YM2151* self, YM2151Operator * op);
+static void YM2151_ym2151_reset_chip(YM2151* self);
+static signed int YM2151_op_calc(YM2151* self, YM2151Operator * OP, unsigned int env, signed int pm);
+static signed int YM2151_op_calc1(YM2151* self, YM2151Operator * OP, unsigned int env, signed int pm);
+static void YM2151_chan_calc(YM2151* self, unsigned int chan);
+static void YM2151_chan7_calc(YM2151* self);
+static void YM2151_advance_eg(YM2151* self);
+static void YM2151_advance(YM2151* self);
+
 #ifdef __PS3__
 #define memset std::memset
 #define pow std::pow
@@ -412,20 +425,20 @@ static const uint8_t lfo_noise_waveform[256] = {
 0xE2,0x4D,0x8A,0xA6,0x46,0x95,0x0F,0x8F,0xF5,0x15,0x97,0x32,0xD4,0x28,0x1E,0x55
 };
 
-YM2151::YM2151(float volume, uint32_t clock)
+void YM2151_ctor(YM2151* self, float volume, uint32_t clock)
 {
-    SoundChip_ctor(&sc);
-    this->volume = volume;
-    this->clock = clock;
+    SoundChip_ctor(&self->sc);
+    self->volume = volume;
+    self->clock = clock;
 }
 
-YM2151::~YM2151()
+void YM2151_dtor(YM2151* self)
 {
-    SoundChip_dtor(&sc);
+    SoundChip_dtor(&self->sc);
 }
 
 
-void YM2151::init_tables()
+static void YM2151_init_tables(YM2151* self)
 {
     signed int i,x,n;
     double o,m;
@@ -498,14 +511,14 @@ void YM2151::init_tables()
 }
 
 
-void YM2151::init_chip_tables()
+static void YM2151_init_chip_tables(YM2151* self)
 {
     int i,j;
     double mult,phaseinc,Hz;
     double scaler;
     double pom;
 
-    scaler = ( (double)clock / 64.0 ) / ( (double)sampfreq );
+    scaler = ( (double)self->clock / 64.0 ) / ( (double)self->sampfreq );
     /*logerror("scaler    = %20.15f\n", scaler);*/
 
     /* this loop calculates Hertz values for notes from c-0 to b-7 */
@@ -579,10 +592,10 @@ void YM2151::init_chip_tables()
     {
         for (i=0; i<32; i++)
         {
-            Hz = ( (double)dt1_tab[j*32+i] * ((double)clock/64.0) ) / (double)(1<<20);
+            Hz = ( (double)dt1_tab[j*32+i] * ((double)self->clock/64.0) ) / (double)(1<<20);
 
             /*calculate phase increment*/
-            phaseinc = (Hz*SIN_LEN) / (double)sampfreq;
+            phaseinc = (Hz*SIN_LEN) / (double)self->sampfreq;
 
             /*positive and negative values*/
             dt1_freq[ (j+0)*32 + i ] = (int32_t) (phaseinc * mult);
@@ -608,29 +621,29 @@ void YM2151::init_chip_tables()
     {
         /* ASG 980324: changed to compute both tim_A_tab and timer_A_time */
         /*pom= attotime::from_hz(clock) * (64 * (1024 - i)); */
-        pom= ( 64.0  *  (1024.0-i) / (double)clock );
+        pom= ( 64.0  *  (1024.0-i) / (double)self->clock );
         #ifdef USE_MAME_TIMERS
             timer_A_time[i] = pom;
         #else
             /*tim_A_tab[i] = pom.as_double() * (double)sampfreq * mult;  / * number of samples that timer period takes (fixed point) * / */
-            tim_A_tab[i] = (int)(pom * (double)sampfreq * mult); 
+            tim_A_tab[i] = (int)(pom * (double)self->sampfreq * mult); 
         #endif
     }
     for (i=0; i<256; i++)
     {
         /* ASG 980324: changed to compute both tim_B_tab and timer_B_time */
         /*pom= attotime::from_hz(clock) * (1024 * (256 - i)); */
-        pom= ( 1024.0 * (256.0-i)  / (double)clock );
+        pom= ( 1024.0 * (256.0-i)  / (double)self->clock );
         #ifdef USE_MAME_TIMERS
             timer_B_time[i] = pom;
         #else
             /*tim_B_tab[i] = pom.as_double() * (double)sampfreq * mult;  / * number of samples that timer period takes (fixed point) * / */
-            tim_B_tab[i] = (int)(pom * (double)sampfreq * mult); 
+            tim_B_tab[i] = (int)(pom * (double)self->sampfreq * mult); 
         #endif
     }
 
     /* calculate noise periods table */
-    scaler = ( (double)clock / 64.0 ) / ( (double)sampfreq );
+    scaler = ( (double)self->clock / 64.0 ) / ( (double)self->sampfreq );
     for (i=0; i<32; i++)
     {
         j = (i!=31 ? i : 30);                /* rate 30 and 31 are the same */
@@ -671,7 +684,7 @@ void YM2151::init_chip_tables()
         }                                                       \
 }
 
-void YM2151::envelope_KONKOFF(YM2151Operator * op, int v)
+static void YM2151_envelope_KONKOFF(YM2151* self, YM2151Operator * op, int v)
 {
     if (v&0x08)    /* M1 */
         KEY_ON (op+0, 1)
@@ -770,7 +783,7 @@ static TIMER_CALLBACK( timer_callback_chip_busy )
 #endif
 #endif
 
-void YM2151::set_connect(YM2151Operator *om1, int cha, int v)
+static void YM2151_set_connect(YM2151* self, YM2151Operator *om1, int cha, int v)
 {
     YM2151Operator *om2 = om1+1;
     YM2151Operator *oc1 = om1+2;
@@ -862,7 +875,7 @@ void YM2151::set_connect(YM2151Operator *om1, int cha, int v)
 }
 
 
-void YM2151::refresh_EG(YM2151Operator * op)
+static void YM2151_refresh_EG(YM2151* self, YM2151Operator * op)
 {
     uint32_t kc;
     uint32_t v;
@@ -953,7 +966,7 @@ void YM2151::refresh_EG(YM2151Operator * op)
 
 
 /* write a register on YM2151 chip number 'n' */
-void YM2151::write_reg(int r, int v)
+void YM2151_write_reg(YM2151* self, int r, int v)
 {
     YM2151Operator *op = &oper[ (r&0x07)*4+((r&0x18)>>3) ];
 
@@ -978,7 +991,7 @@ void YM2151::write_reg(int r, int v)
             break;
 
         case 0x08:
-            envelope_KONKOFF(&oper[ (v&7)*4 ], v );
+            YM2151_envelope_KONKOFF(self, &oper[ (v&7)*4 ], v );
             break;
 
         case 0x0f:    /* noise mode enable, noise period */
@@ -1118,7 +1131,7 @@ void YM2151::write_reg(int r, int v)
             pan[ (r&7)*2    ] = (v & 0x40) ? ~0 : 0;
             pan[ (r&7)*2 +1 ] = (v & 0x80) ? ~0 : 0;
             connects[r&7] = v&7;
-            set_connect(op, r&7, v&7);
+            YM2151_set_connect(self, op, r&7, v&7);
             break;
 
         case 0x08:    /* Key Code */
@@ -1154,7 +1167,7 @@ void YM2151::write_reg(int r, int v)
                 (op+3)->dt1 = dt1_freq[ (op+3)->dt1_i + kc ];
                 (op+3)->freq = ( (freq[ kc_channel + (op+3)->dt2 ] + (op+3)->dt1) * (op+3)->mul ) >> 1;
 
-                refresh_EG( op );
+                YM2151_refresh_EG(self,  op );
             }
             break;
 
@@ -1268,7 +1281,7 @@ void YM2151::write_reg(int r, int v)
     }
 }
 
-int YM2151::read_status()
+int YM2151_read_status(YM2151* self)
 {
     return status;
 }
@@ -1280,19 +1293,19 @@ int YM2151::read_status()
 *   'clock' is the chip clock in Hz
 *   'rate' is sampling rate
 */
-void YM2151::init(int rate, int fps)
+void YM2151_init(YM2151* self, int rate, int fps)
 {
-    SoundChip_init(&(sc), SNDCHIP_STEREO, rate, fps);
-    this->sampfreq = rate;
-    init_tables();
+    SoundChip_init(&(self->sc), SNDCHIP_STEREO, rate, fps);
+    self->sampfreq = rate;
+    YM2151_init_tables(self);
 
-    this->sampfreq = rate ? rate : 44100;    /* avoid division by 0 in init_chip_tables() */
+    self->sampfreq = rate ? rate : 44100;    /* avoid division by 0 in init_chip_tables() */
 
-    init_chip_tables();
+    YM2151_init_chip_tables(self);
 
-    lfo_timer_add = (uint32_t) ((1<<LFO_SH) * (clock/64.0) / sampfreq);
+    lfo_timer_add = (uint32_t) ((1<<LFO_SH) * (self->clock/64.0) / self->sampfreq);
 
-    eg_timer_add  = (uint32_t) ((1<<EG_SH)  * (clock/64.0) / sampfreq);
+    eg_timer_add  = (uint32_t) ((1<<EG_SH)  * (self->clock/64.0) / self->sampfreq);
     eg_timer_overflow = ( 3 ) * (1<<EG_SH);
     /*logerror("YM2151[init] eg_timer_add=%8x eg_timer_overflow=%8x\n", PSG->eg_timer_add, PSG->eg_timer_overflow);*/
 
@@ -1304,7 +1317,7 @@ void YM2151::init(int rate, int fps)
     tim_A      = 0;
     tim_B      = 0;
 #endif
-    ym2151_reset_chip();
+    YM2151_ym2151_reset_chip(self);
     /*logerror("YM2151[init] clock=%i sampfreq=%i\n", PSG->clock, PSG->sampfreq);*/
 }
 
@@ -1316,7 +1329,7 @@ void ym2151_shutdown()
 /*
 *   Reset chip number 'n'.
 */
-void YM2151::ym2151_reset_chip()
+static void YM2151_ym2151_reset_chip(YM2151* self)
 {
     int i;
     /* initialize hardware registers */
@@ -1374,15 +1387,15 @@ void YM2151::ym2151_reset_chip()
     csm_req    = 0;
     status    = 0;
 
-    write_reg(0x1b, 0);    /* only because of CT1, CT2 output pins */
-    write_reg(0x18, 0);    /* set LFO frequency */
+    YM2151_write_reg(self, 0x1b, 0);    /* only because of CT1, CT2 output pins */
+    YM2151_write_reg(self, 0x18, 0);    /* set LFO frequency */
     for (i=0x20; i<0x100; i++)        /* set the operators */
     {
-        write_reg(i, 0);
+        YM2151_write_reg(self, i, 0);
     }
 }
 
-signed int YM2151::op_calc(YM2151Operator * OP, unsigned int env, signed int pm)
+static signed int YM2151_op_calc(YM2151* self, YM2151Operator * OP, unsigned int env, signed int pm)
 {
     uint32_t p;
     p = (env<<3) + sin_tab[ ( ((signed int)((OP->phase & ~FREQ_MASK) + (pm<<15))) >> FREQ_SH ) & SIN_MASK ];
@@ -1393,7 +1406,7 @@ signed int YM2151::op_calc(YM2151Operator * OP, unsigned int env, signed int pm)
     return tl_tab[p];
 }
 
-signed int YM2151::op_calc1(YM2151Operator * OP, unsigned int env, signed int pm)
+static signed int YM2151_op_calc1(YM2151* self, YM2151Operator * OP, unsigned int env, signed int pm)
 {
     uint32_t p;
     int32_t  i;
@@ -1413,7 +1426,7 @@ signed int YM2151::op_calc1(YM2151Operator * OP, unsigned int env, signed int pm
 
 #define volume_calc(OP) ((OP)->tl + ((uint32_t)(OP)->volume) + (AM & (OP)->AMmask))
 
-void YM2151::chan_calc(unsigned int chan)
+static void YM2151_chan_calc(YM2151* self, unsigned int chan)
 {
     YM2151Operator *op;
     unsigned int env;
@@ -1443,27 +1456,27 @@ void YM2151::chan_calc(unsigned int chan)
         {
             if (!op->fb_shift)
                 out=0;
-            op->fb_out_curr = op_calc1(op, env, (out<<op->fb_shift) );
+            op->fb_out_curr = YM2151_op_calc1(self, op, env, (out<<op->fb_shift) );
         }
     }
 
     env = volume_calc(op+1);    /* M2 */
     if (env < ENV_QUIET)
-        *(op+1)->connects += op_calc(op+1, env, m2);
+        *(op+1)->connects += YM2151_op_calc(self, op+1, env, m2);
 
     env = volume_calc(op+2);    /* C1 */
     if (env < ENV_QUIET)
-        *(op+2)->connects += op_calc(op+2, env, c1);
+        *(op+2)->connects += YM2151_op_calc(self, op+2, env, c1);
 
     env = volume_calc(op+3);    /* C2 */
     if (env < ENV_QUIET)
-        chanout[chan]    += op_calc(op+3, env, c2);
+        chanout[chan]    += YM2151_op_calc(self, op+3, env, c2);
 
     /* M1 */
     op->mem_value = mem;
 }
 
-void YM2151::chan7_calc()
+static void YM2151_chan7_calc(YM2151* self)
 {
     YM2151Operator *op;
     unsigned int env;
@@ -1493,17 +1506,17 @@ void YM2151::chan7_calc()
         {
             if (!op->fb_shift)
                 out=0;
-            op->fb_out_curr = op_calc1(op, env, (out<<op->fb_shift) );
+            op->fb_out_curr = YM2151_op_calc1(self, op, env, (out<<op->fb_shift) );
         }
     }
 
     env = volume_calc(op+1);    /* M2 */
     if (env < ENV_QUIET)
-        *(op+1)->connects += op_calc(op+1, env, m2);
+        *(op+1)->connects += YM2151_op_calc(self, op+1, env, m2);
 
     env = volume_calc(op+2);    /* C1 */
     if (env < ENV_QUIET)
-        *(op+2)->connects += op_calc(op+2, env, c1);
+        *(op+2)->connects += YM2151_op_calc(self, op+2, env, c1);
 
     env = volume_calc(op+3);    /* C2 */
     if (noise & 0x80)
@@ -1518,7 +1531,7 @@ void YM2151::chan7_calc()
     else
     {
         if (env < ENV_QUIET)
-            chanout[7] += op_calc(op+3, env, c2);
+            chanout[7] += YM2151_op_calc(self, op+3, env, c2);
     }
     /* M1 */
     op->mem_value = mem;
@@ -1728,7 +1741,7 @@ rate 11 1         |
                                  --
 */
 
-void YM2151::advance_eg()
+static void YM2151_advance_eg(YM2151* self)
 {
     YM2151Operator *op;
     unsigned int i;
@@ -1810,7 +1823,7 @@ void YM2151::advance_eg()
 }
 
 
-void YM2151::advance()
+static void YM2151_advance(YM2151* self)
 {
     YM2151Operator *op;
     unsigned int i;
@@ -1999,12 +2012,12 @@ void YM2151::advance()
 *   '**buffers' is table of pointers to the buffers: left and right
 *   'length' is the number of samples that should be generated
 */
-void YM2151::stream_update()
+void YM2151_stream_update(YM2151* self)
 {
-    SoundChip_clear_buffer(&(sc));
+    SoundChip_clear_buffer(&(self->sc));
     uint32_t i;
     int32_t outl,outr;
-    uint32_t length = sc.frame_size;
+    uint32_t length = self->sc.frame_size;
 
 #ifdef USE_MAME_TIMERS
         /* ASG 980324 - handled by real timers now */
@@ -2020,7 +2033,7 @@ void YM2151::stream_update()
                 int oldstate = status & 3;
                 status |= 2;
                 /*if ((!oldstate) && (irqhandler)) (*irqhandler)(device, 1); */
-                if (oldstate==0) irq = true;
+                if (oldstate==0) self->irq = true;
             }
         }
     }
@@ -2028,7 +2041,7 @@ void YM2151::stream_update()
 
     for (i=0; i<length; i++)
     {
-        advance_eg();
+        YM2151_advance_eg(self);
 
         chanout[0] = 0;
         chanout[1] = 0;
@@ -2039,14 +2052,14 @@ void YM2151::stream_update()
         chanout[6] = 0;
         chanout[7] = 0;
 
-        chan_calc(0);
-        chan_calc(1);
-        chan_calc(2);
-        chan_calc(3);
-        chan_calc(4);
-        chan_calc(5);
-        chan_calc(6);
-        chan7_calc();
+        YM2151_chan_calc(self, 0);
+        YM2151_chan_calc(self, 1);
+        YM2151_chan_calc(self, 2);
+        YM2151_chan_calc(self, 3);
+        YM2151_chan_calc(self, 4);
+        YM2151_chan_calc(self, 5);
+        YM2151_chan_calc(self, 6);
+        YM2151_chan7_calc(self);
 
         outl = chanout[0] & pan[0];
         outr = chanout[0] & pan[1];
@@ -2072,8 +2085,8 @@ void YM2151::stream_update()
         if (outr > MAXOUT) outr = MAXOUT;
             else if (outr < MINOUT) outr = MINOUT;
         
-        SoundChip_write_buffer(&(sc), SNDCHIP_LEFT,  i, (int16_t) (outl * volume));
-        SoundChip_write_buffer(&(sc), SNDCHIP_RIGHT, i, (int16_t) (outr * volume));
+        SoundChip_write_buffer(&(self->sc), SNDCHIP_LEFT,  i, (int16_t) (outl * self->volume));
+        SoundChip_write_buffer(&(self->sc), SNDCHIP_RIGHT, i, (int16_t) (outr * self->volume));
 
 #ifdef USE_MAME_TIMERS
         /* ASG 980324 - handled by real timers now */
@@ -2090,13 +2103,13 @@ void YM2151::stream_update()
                     int oldstate = status & 3;
                     status |= 1;
                     /*if ((!oldstate) && (irqhandler)) (*irqhandler)(device, 1); */
-                    if (oldstate==0) irq = true;
+                    if (oldstate==0) self->irq = true;
                 }
                 if (irq_enable & 0x80)
                     csm_req = 2;    /* request KEY ON / KEY OFF sequence */
             }
         }
 #endif
-        advance();
+        YM2151_advance(self);
     }
 }

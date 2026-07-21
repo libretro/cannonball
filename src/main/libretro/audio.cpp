@@ -122,7 +122,7 @@ void Audio_tick(Audio* self)
         return;
 
     SegaPCM_stream_update(osoundint.pcm);
-    osoundint.ym->stream_update();
+    YM2151_stream_update(osoundint.ym);
 
     { int16_t* pcm_buffer = SoundChip_get_buffer(&(osoundint.pcm->sc));
     int16_t* ym_buffer  = SoundChip_get_buffer(&(osoundint.ym->sc));

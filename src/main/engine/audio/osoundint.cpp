@@ -37,10 +37,11 @@ void OSoundInt_init(OSoundInt* self)
         SegaPCM_ctor(self->pcm, SOUND_CLOCK, &roms.pcm, self->pcm_ram, BANK_512);       
 
     if (self->ym == NULL)
-        self->ym = new YM2151(0.5f, SOUND_CLOCK);
+        self->ym = (YM2151*)malloc(sizeof(YM2151));
+        YM2151_ctor(self->ym, 0.5f, SOUND_CLOCK);
 
     SegaPCM_init(self->pcm, config.sound.rate, config.fps);
-    self->ym->init(config.sound.rate, config.fps);
+    YM2151_init(self->ym, config.sound.rate, config.fps);
 
     OSoundInt_reset(self);
 
