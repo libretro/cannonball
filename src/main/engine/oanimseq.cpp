@@ -146,10 +146,10 @@ void OAnimSeq::flag_seq()
             anim_flag.sprite->addr    = roms.rom0p->read32(index) & 0xFFFFF;
             anim_flag.sprite->pal_src = roms.rom0p->read8(index);
 
-	        uint32_t addr = SPRITE_ZOOM_LOOKUP + (((anim_flag.sprite->z >> 16) << 2) | osprites.sprite_scroll_speed);
+	        { uint32_t addr = SPRITE_ZOOM_LOOKUP + (((anim_flag.sprite->z >> 16) << 2) | osprites.sprite_scroll_speed);
 	        uint32_t value = roms.rom0p->read32(addr);
 	        anim_flag.sprite->z += value;
-            uint16_t z16 = anim_flag.sprite->z >> 16;
+            { uint16_t z16 = anim_flag.sprite->z >> 16;
 	    
             if (z16 >= 0x200)
 	        {
@@ -162,7 +162,7 @@ void OAnimSeq::flag_seq()
             /* Set X Position */
             int16_t sprite_x = (int8_t) roms.rom0p->read8(4 + index);
             sprite_x -= oroad.road0_h[z16];
-            int32_t final_x = (sprite_x * z16) >> 9;
+            { int32_t final_x = (sprite_x * z16) >> 9;
 
             if (roms.rom0p->read8(1 + index) & BIT_7)
                 final_x = -final_x;
@@ -171,7 +171,7 @@ void OAnimSeq::flag_seq()
 
             /* Set Y Position */
             int16_t sprite_y      = (int8_t) roms.rom0p->read8(5 + index);
-            int16_t final_y       = (sprite_y * z16) >> 9;
+            { int16_t final_y       = (sprite_y * z16) >> 9;
             anim_flag.sprite->y   = oroad.get_road_y(z16) - final_y;
 
             /* Set H-Flip */
@@ -197,7 +197,7 @@ void OAnimSeq::flag_seq()
                     anim_flag.anim_frame++;
                 }
             }
-        }
+         } } } }}
     }
 
     /* Order sprites */
@@ -250,7 +250,7 @@ void OAnimSeq::anim_seq_intro(oanimsprite* anim)
         if (anim->anim_frame >= 1)
             oferrari.car_state = OFerrari::CAR_ANIM_SEQ;
 
-        uint32_t index              = anim->anim_addr_curr + (anim->anim_frame << 3);
+        { uint32_t index              = anim->anim_addr_curr + (anim->anim_frame << 3);
 
         anim->sprite->addr          = roms.rom0p->read32(index) & 0xFFFFF;
         anim->sprite->pal_src       = anim == &anim_ferrari ? oferrari.ferrari_pal : roms.rom0p->read8(index);
@@ -260,7 +260,7 @@ void OAnimSeq::anim_seq_intro(oanimsprite* anim)
 
         /* Set X */
         int16_t sprite_x = (int8_t) roms.rom0p->read8(4 + index);
-        int32_t final_x = (sprite_x * anim->sprite->priority) >> 9;
+        { int32_t final_x = (sprite_x * anim->sprite->priority) >> 9;
         if (roms.rom0p->read8(1 + index) & BIT_7)
             final_x = -final_x;
         anim->sprite->x = final_x;
@@ -304,7 +304,7 @@ void OAnimSeq::anim_seq_intro(oanimsprite* anim)
                 anim->anim_frame++;
             }
         }
-    }
+     } }}
 
     /* Order sprites */
     if (oroad.get_view_mode() != ORoad::VIEW_INCAR)
@@ -550,7 +550,7 @@ void OAnimSeq::anim_seq_outro(oanimsprite* anim, int pal_override)
 
     /* Set Y Position */
     int16_t sprite_y = (int8_t) roms.rom0p->read8(5 + index);
-    int16_t final_y  = (sprite_y * anim->sprite->priority) >> 9;
+    { int16_t final_y  = (sprite_y * anim->sprite->priority) >> 9;
     anim->sprite->y  = oroad.get_road_y(anim->sprite->priority) - final_y;
 
     /* Set H-Flip */
@@ -580,7 +580,7 @@ void OAnimSeq::anim_seq_outro(oanimsprite* anim, int pal_override)
     osprites.map_palette(anim->sprite);
     /* Order sprites */
     osprites.do_spr_order_shadows(anim->sprite);
-}
+ }}
 
 /* Render Sprite Shadow For End Sequence */
 /* Use parent sprite as basis to set this up */
@@ -656,7 +656,7 @@ bool OAnimSeq::read_anim_data(oanimsprite* anim)
     /* -------------------------------------------------------------------------------------------- */
 
     const bool DO_NOTHING = false;
-    const bool PROCESS    = true;
+    { const bool PROCESS    = true;
 
     /* check_seq_pos: */
     /* Sequence: Start Position */
@@ -706,4 +706,4 @@ bool OAnimSeq::read_anim_data(oanimsprite* anim)
         }
     }
     return PROCESS;
-}
+ }}

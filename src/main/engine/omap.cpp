@@ -95,7 +95,7 @@ void OMap::tick()
                 {   /*map_end_route */
                     map_pos = 0;
                     map_stage1++;
-                    uint16_t route_info = ostats.routes[1 + map_stage1];
+                    { uint16_t route_info = ostats.routes[1 + map_stage1];
                     if (route_info)
                     {
                         map_route = roms.rom0.read8(MAP_ROUTE_LOOKUP + route_info);                      
@@ -107,7 +107,7 @@ void OMap::tick()
 
                     map_state = MAP_ROUTE_FINAL;
                     do_route_final();
-                }
+                 }}
                 else
                 {
                     map_pos = 0;
@@ -369,11 +369,11 @@ void OMap::move_mini_car(oentry* sprite)
         /* Remember that the minimap is angled, so we still need to adjust both the x and y positions */
         uint32_t movement_table = (map_route & 1) ? MAP_MOVEMENT_RIGHT : MAP_MOVEMENT_LEFT;
         
-        int16_t pos = (map_stage1 < 4) ? map_pos : map_pos >> 1;
+        { int16_t pos = (map_stage1 < 4) ? map_pos : map_pos >> 1;
         pos <<= 1; /* do not try to merge with previous line */
 
         sprite->x += roms.rom0.read16(movement_table + pos);
-        int16_t y_change = roms.rom0.read16(movement_table + pos + 0x40);
+        { int16_t y_change = roms.rom0.read16(movement_table + pos + 0x40);
         sprite->y -= y_change;
 
         if (y_change == 0)
@@ -382,7 +382,7 @@ void OMap::move_mini_car(oentry* sprite)
             sprite->addr = outrun.adr.sprite_minicar_down;
         else
             sprite->addr = outrun.adr.sprite_minicar_up;
-    }
+     } }}
 
     osprites.do_spr_order_shadows(sprite);
 }

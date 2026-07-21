@@ -194,11 +194,11 @@ void OInputs::adjust_inputs()
     if (crash_input)
     {
         crash_input--;
-        int16_t d0 = ((input_steering - 0x80) * 0x100) / 0x70;
+        { int16_t d0 = ((input_steering - 0x80) * 0x100) / 0x70;
         if (d0 > 0x7F) d0 = 0x7F;
         else if (d0 < -0x7F) d0 = -0x7F;
         steering_adjust = ocrash.crash_counter ? 0 : d0;
-    }
+     }}
     else
     {
         /* no_crash1: */

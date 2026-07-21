@@ -66,10 +66,10 @@ void OBonus::init_bonus_text()
 {
     bonus_state = BONUS_TEXT_SECONDS;
     
-    int16_t time_counter_bak = ostats.time_counter << 8;
+    { int16_t time_counter_bak = ostats.time_counter << 8;
     ostats.time_counter = 0x30;
 
-    uint16_t total_time = 0;
+    { uint16_t total_time = 0;
 
     if (outrun.cannonball_mode == Outrun::MODE_ORIGINAL)
     {
@@ -91,7 +91,7 @@ void OBonus::init_bonus_text()
 
     /* Extract individual 3 digits */
     uint16_t digit_mid = (time_counter_bak >> 8  & 0x0F) * 10;
-    uint16_t digit_top = (time_counter_bak >> 12 & 0x0F) * 100;
+    { uint16_t digit_top = (time_counter_bak >> 12 & 0x0F) * 100;
     uint16_t digit_bot = (time_counter_bak & 0x0F);
 
     /* Write them back to final bonus seconds value */
@@ -113,7 +113,7 @@ void OBonus::init_bonus_text()
         ohud.blit_large_digit(&dst_addr, (roms.rom0.read8(&src_addr) - 0x30) << 1); }
 
     blit_bonus_secs();
-}
+ } } }}
 
 /* Decrement bonus seconds. Blit seconds remaining. */
 /* Source: 9A08 */
@@ -170,7 +170,7 @@ void OBonus::blit_bonus_secs()
     d2 = (d1 & 0xF0)  >> 3;
     d1 = (d1 & 0xF00) >> 7;
 
-    uint32_t text_addr = 0x110644;
+    { uint32_t text_addr = 0x110644;
 
     /* Blit Digit 1 */
     if (d1)
@@ -191,4 +191,4 @@ void OBonus::blit_bonus_secs()
     text_addr += 2;
     /* Blit Digit 3 */
     ohud.blit_large_digit(&text_addr, d3);
-}
+ }}

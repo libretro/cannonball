@@ -780,7 +780,7 @@ void OHiScore::convert_lap_time(uint16_t time)
         seconds += 6;
 
     s2 = outils::bcd_add(s2, s2);
-    int16_t d3 = s2;
+    { int16_t d3 = s2;
     s2 = outils::bcd_add(s2, s2);
     s2 = outils::bcd_add(s2, d3);
     seconds = outils::bcd_add(s2, seconds);
@@ -796,4 +796,4 @@ void OHiScore::convert_lap_time(uint16_t time)
     /* Output Minutes */
     laptime[1] = (minutes & 0xF) | TILE_PROPS;
     laptime[0] = ((minutes & 0xF0) >> 4) | TILE_PROPS;
-}
+ }}

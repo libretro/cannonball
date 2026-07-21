@@ -344,14 +344,14 @@ void OCrash::init_collision()
     else
     {
         skid_counter = 0;
-        uint16_t car_inc = oinitengine.car_increment >> 16;
+        { uint16_t car_inc = oinitengine.car_increment >> 16;
         if (car_inc < 0x64)
             collide_slow();
         else if (car_inc < 0xC8)
             collide_med();
         else
             collide_fast();
-    }
+     }}
 }
 
 /* This code also triggers a flip, if the crash_type is set correctly. */
@@ -532,14 +532,14 @@ void OCrash::do_bump()
     spr_ferrari->zoom = 0x80;           /* Set Entry Number For Zoom Lookup Table */
     spr_ferrari->priority = 0x1FD;
     
-    int16_t new_position = (int8_t) roms.rom0.read8(DATA_MOVEMENT + (lookup_index << 3));
+    { int16_t new_position = (int8_t) roms.rom0.read8(DATA_MOVEMENT + (lookup_index << 3));
 
     if (new_position)
         crash_z = spr_ferrari->counter;
 
     spr_ferrari->y = 221 - (new_position >> shift);
 
-    uint32_t frames = addr + (frame << 3);
+    { uint32_t frames = addr + (frame << 3);
     spr_ferrari->addr = roms.rom0p->read32(frames);
     
     if (roms.rom0p->read8(frames + 4))
@@ -561,7 +561,7 @@ void OCrash::do_bump()
     }
 
     done(spr_ferrari);
-}
+ } }}
 
 /* Source: 0x1562 */
 void OCrash::do_car_flip()
@@ -654,10 +654,10 @@ void OCrash::do_car_flip()
     /* use ferrari_crash_z to set priority */
     spr_ferrari->priority = spr_ferrari->counter > 0x1FD ? 0x1FD : spr_ferrari->counter;
 
-    int16_t x_diff = (slide * spr_ferrari->priority) >> 9;
+    { int16_t x_diff = (slide * spr_ferrari->priority) >> 9;
     oinitengine.car_x_pos -= x_diff;
 
-    int16_t passenger_frame = (int8_t) roms.rom0p->read8(6 + frames);
+    { int16_t passenger_frame = (int8_t) roms.rom0p->read8(6 + frames);
 
     /* Start of sequence */
     if (passenger_frame == 0)
@@ -726,7 +726,7 @@ void OCrash::do_car_flip()
         init_finger(frames);
     }
     done(spr_ferrari);
-}
+ } }}
 
 /* Init Delay/Girl Pointing Finger */
 /* Source: 0x175C */
@@ -760,7 +760,7 @@ void OCrash::init_finger(uint32_t frames)
 void OCrash::trigger_smoke()
 {
     crash_z = spr_ferrari->counter;
-    int16_t slide_copy = slide;
+    { int16_t slide_copy = slide;
 
     if (slide < 0)
         slide++;
@@ -799,7 +799,7 @@ void OCrash::trigger_smoke()
     }
 
     done(spr_ferrari);
-}
+ }}
 
 /* Source: 0x1870 */
 void OCrash::post_flip_anim()
@@ -815,7 +815,7 @@ void OCrash::post_flip_anim()
     crash_state = 6; /* Denote pan camera to track centre */
     
     int16_t road_width = oroad.road_width >> 16;
-    int16_t car_x_pos  = oinitengine.car_x_pos;
+    { int16_t car_x_pos  = oinitengine.car_x_pos;
     camera_xinc = 8;
     
     /* Double Road */
@@ -844,7 +844,7 @@ void OCrash::post_flip_anim()
     }
 
     done(spr_ferrari);
-}
+ }}
 
 /* Pan Camera Back To Centre After Flip */
 /* Source: 0x18EC */
@@ -854,7 +854,7 @@ void OCrash::pan_camera()
 
     oinitengine.car_x_pos += camera_xinc;
 
-    int16_t x_diff = (oferrari.car_x_diff * spr_ferrari->counter) >> 9;
+    { int16_t x_diff = (oferrari.car_x_diff * spr_ferrari->counter) >> 9;
     spr_ferrari->x += x_diff;
 
     /* Pan Right */
@@ -871,13 +871,13 @@ void OCrash::pan_camera()
     }
 
     done(spr_ferrari);
-}
+ }}
 
 /* Source: 0x1C7E */
 void OCrash::init_spin1()
 {
     osoundint.queue_sound(SOUND_INIT_SLIP);
-    uint16_t car_inc = oinitengine.car_increment >> 16;
+    { uint16_t car_inc = oinitengine.car_increment >> 16;
     uint16_t spins = 1;
     if (car_inc > 0xB4)
         spins += outils::random() & 1;
@@ -900,13 +900,13 @@ void OCrash::init_spin1()
     frame = 0;
     skid_counter = 0;
     spr_ferrari->road_priority = spr_ferrari->counter;
-}
+ }}
 
 /* Source: 0x1C10 */
 void OCrash::init_spin2()
 {
     osoundint.queue_sound(SOUND_INIT_SLIP);
-    uint16_t car_inc = oinitengine.car_increment >> 16;
+    { uint16_t car_inc = oinitengine.car_increment >> 16;
     spinflipcount1 = 1;
     crash_spin_count = 2;
     spinflipcount2 = 8;
@@ -927,7 +927,7 @@ void OCrash::init_spin2()
     frame = 0;
     skid_counter = 0;
     spr_ferrari->road_priority = spr_ferrari->counter;
-}
+ }}
 
 /* Collision: Slow  */
 /* Rebound and bounce car in air */
@@ -1007,7 +1007,7 @@ void OCrash::collide_fast()
 {
     osoundint.queue_sound(SOUND_CRASH1);
 
-    uint16_t car_inc = oinitengine.car_increment >> 16;
+    { uint16_t car_inc = oinitengine.car_increment >> 16;
     if (car_inc > 0xFA)
     {
         crash_zinc = 1;
@@ -1060,7 +1060,7 @@ void OCrash::collide_fast()
     frame = 0;
     crash_state = 1; /* collision with object */
     spr_ferrari->road_priority = spr_ferrari->counter;
-}
+ }}
 
 /* Source: 0x1556 */
 void OCrash::done(oentry* sprite)
@@ -1166,7 +1166,7 @@ void OCrash::crash_pass1(oentry* sprite)
     uint32_t frames = (sprite == spr_pass1 ? outrun.adr.sprite_crash_man1 : outrun.adr.sprite_crash_girl1) + (spin_pass_frame << 3);
     
     sprite->addr    = roms.rom0p->read32(frames);
-    uint8_t props   = roms.rom0p->read8(4 + frames);
+    { uint8_t props   = roms.rom0p->read8(4 + frames);
     sprite->pal_src = roms.rom0p->read8(5 + frames);
     sprite->x       = spr_ferrari->x + (int8_t) roms.rom0p->read8(6 + frames);
     sprite->y       = spr_ferrari->y + (int8_t) roms.rom0p->read8(7 + frames);
@@ -1184,7 +1184,7 @@ void OCrash::crash_pass1(oentry* sprite)
         sprite->priority = sprite->road_priority = 0x1FD;
 
     sprite->zoom = 0x7E;
-}
+ }}
 
 /* Passenger animations following the crash sequence i.e. when car is stationary */
 /* */
@@ -1207,7 +1207,7 @@ void OCrash::crash_pass2(oentry* sprite)
     frames += ((coll_count2 & 3) << 4) + (crash_delay & 8);
     
     sprite->addr    = roms.rom0p->read32(frames);
-    uint8_t props   = roms.rom0p->read8(4 + frames);
+    { uint8_t props   = roms.rom0p->read8(4 + frames);
     sprite->pal_src = roms.rom0p->read8(5 + frames);
     sprite->x       = spr_ferrari->x + (int8_t) roms.rom0p->read8(6 + frames);
     sprite->y       = spr_ferrari->y + (int8_t) roms.rom0p->read8(7 + frames);
@@ -1274,7 +1274,7 @@ void OCrash::crash_pass2(oentry* sprite)
         sprite->x += XY_OFF[spin_pass_frame << 1];
         sprite->y += XY_OFF[(spin_pass_frame << 1) + 1];
     }
-}
+ }}
 
 /* Handle passenger animation sequence during car flip */
 /* */
@@ -1371,11 +1371,11 @@ void OCrash::pass_flip(oentry* sprite)
     if (zoom < 0x40) zoom = 0x40;
     sprite->zoom = (uint8_t) zoom;
 
-    uint32_t frames = sprite->z + (sprite->xw1 << 3);
+    { uint32_t frames = sprite->z + (sprite->xw1 << 3);
     sprite->addr = roms.rom0p->read32(frames);
 
-    uint16_t offset = sprite->counter > 0x1FF ? 0x1FF : sprite->counter;
-    int16_t y_change = (((int8_t) roms.rom0p->read8(6 + frames)) * offset) >> 9; /* d1 */
+    { uint16_t offset = sprite->counter > 0x1FF ? 0x1FF : sprite->counter;
+    { int16_t y_change = (((int8_t) roms.rom0p->read8(6 + frames)) * offset) >> 9; /* d1 */
 
     sprite->y = -(oroad.road_y[oroad.road_p0 + offset] >> 4) + 223;
     sprite->y -= y_change;
@@ -1419,7 +1419,7 @@ void OCrash::pass_flip(oentry* sprite)
     sprite->x =  spr_ferrari->x;
     sprite->x += ((int8_t) roms.rom0p->read8(5 + frames));
     done(sprite);
-}
+ } } }}
 
 /* Passengers sit up on road after crash */
 /* Source: 0x205A */
@@ -1429,7 +1429,7 @@ void OCrash::pass_situp(oentry* sprite)
     int16_t x_diff = (oferrari.car_x_diff * sprite->counter) >> 9;
     sprite->x += x_diff;
 
-    uint32_t frames = sprite->z + (sprite->xw1 << 3);
+    { uint32_t frames = sprite->z + (sprite->xw1 << 3);
     sprite->addr    = roms.rom0p->read32(frames);
     sprite->pal_src = roms.rom0p->read8(4 + frames);
 
@@ -1453,7 +1453,7 @@ void OCrash::pass_situp(oentry* sprite)
         }
     }
     done(sprite);
-}
+ }}
 
 /* Passengers turn head and look at car (only if camera pan) */
 /* Source: 0x222C */
@@ -1463,7 +1463,7 @@ void OCrash::pass_turnhead(oentry* sprite)
     int16_t x_diff = (oferrari.car_x_diff * sprite->counter) >> 9;
     sprite->x += x_diff;
 
-    uint32_t frames = sprite->z + (sprite->xw1 << 3);
+    { uint32_t frames = sprite->z + (sprite->xw1 << 3);
     sprite->addr    = roms.rom0p->read32(frames);
     sprite->pal_src = roms.rom0p->read8(4 + frames);
 
@@ -1482,4 +1482,4 @@ void OCrash::pass_turnhead(oentry* sprite)
     }
 
     done(sprite);
-}
+ }}

@@ -154,7 +154,7 @@ void OInitEngine::update_road()
 {
     check_road_split(); /* Check/Process road split if necessary */
     uint32_t addr = 0;
-    uint16_t d0 = trackloader.read_width_height(&addr);
+    { uint16_t d0 = trackloader.read_width_height(&addr);
     /* Update next road section */
     if (d0 <= oroad.road_pos >> 16)
     {
@@ -245,7 +245,7 @@ void OInitEngine::update_road()
             road_curve_next = 0;
         }
     }
-}
+ }}
 
 /* Carries on from the above in the original code */
 void OInitEngine::update_engine()
@@ -616,7 +616,7 @@ void OInitEngine::init_split3()
 {
     rd_split_state = 4;
 
-    int16_t pos = (((oroad.road_pos >> 16) - 0x3F) << 3) + road_width_orig;
+    { int16_t pos = (((oroad.road_pos >> 16) - 0x3F) << 3) + road_width_orig;
     oroad.road_width = (pos << 16) | (oroad.road_width & 0xFFFF);
 
     if (route_updated & BIT_0 || pos <= 0x168)
@@ -633,7 +633,7 @@ void OInitEngine::init_split3()
     if (car_x_pos > 0)
     {
         route_selected = -1;
-        uint8_t inc = 1 << (3 - ostats.cur_stage);
+        { uint8_t inc = 1 << (3 - ostats.cur_stage);
 
         /* One of the following increment values */
 
@@ -645,7 +645,7 @@ void OInitEngine::init_split3()
 
         ostats.route_info += inc;
         oroad.stage_lookup_off++;
-    }
+     }}
     /* Go Right / Continue */
 
     end_stage_props |= BIT_0;                                 /* Set end of stage property (road splitting) */
@@ -655,7 +655,7 @@ void OInitEngine::init_split3()
 
     if (oroad.road_width >> 16 > 0x300)
         init_split4();
-}
+ }}
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Road Split 4: Road Fully Split, Remove Other Road */
@@ -917,7 +917,7 @@ void OInitEngine::init_crash_bonus()
         if (otraffic.collision_traffic == 1)
         {   
             otraffic.collision_traffic = 2;
-            uint8_t rnd = outils::random() & otraffic.collision_mask;
+            { uint8_t rnd = outils::random() & otraffic.collision_mask;
             if (rnd == otraffic.collision_mask)
             {
                 /* Try to launch crash code and perform a spin */
@@ -939,7 +939,7 @@ void OInitEngine::init_crash_bonus()
                     return;
                 }
             }
-        }
+         }}
     }
     else if (ocrash.spin_control2 == 1)
     {

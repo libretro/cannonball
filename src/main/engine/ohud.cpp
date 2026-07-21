@@ -91,9 +91,9 @@ void OHud::do_mini_map()
     if (outrun.game_state == GS_ATTRACT)
         return;
     
-    uint32_t tile_addr = setup_mini_map();
+    { uint32_t tile_addr = setup_mini_map();
     draw_mini_map(tile_addr);
-}
+ }}
 
 /* Setup Appropriate Tile Address For Minimap. */
 /* */
@@ -258,7 +258,7 @@ void OHud::draw_score(uint32_t addr, const uint32_t score, uint8_t font)
     digits[6] = (score & 0xF0) >> 4;
     digits[7] = (score & 0xF);
 
-    bool found = false;
+    { bool found = false;
 
     /* Draw blank digits until we find first digit */
     /* Then use zero for blank digits */
@@ -275,7 +275,7 @@ void OHud::draw_score(uint32_t addr, const uint32_t score, uint8_t font)
 
     video.write_text16(&addr, digits[7] + BASE); /* Always draw last digit */
     delete[] digits;
-}
+ }}
 
 /* Same as above function but writes to tile ram instead. */
 /* Not an ideal solution, really a workaround because text and tile ram are not one big lump in my implementation */
@@ -299,7 +299,7 @@ void OHud::draw_score_tile(uint32_t addr, const uint32_t score, uint8_t font)
     digits[6] = (score & 0xF0) >> 4;
     digits[7] = (score & 0xF);
 
-    bool found = false;
+    { bool found = false;
 
     /* Draw blank digits until we find first digit */
     /* Then use zero for blank digits */
@@ -316,7 +316,7 @@ void OHud::draw_score_tile(uint32_t addr, const uint32_t score, uint8_t font)
 
     video.write_tile16(&addr, digits[7] + BASE); /* Always draw last digit */
     delete[] digits;
-}
+ }}
 
 /* Modified Version Of Draw Digits */
 /* */
@@ -351,7 +351,7 @@ void OHud::draw_rev_counter()
 
     revs >>= 4;
 
-    uint32_t addr = 0x110DB4; /* Address of rev counter */
+    { uint32_t addr = 0x110DB4; /* Address of rev counter */
         
     const uint16_t REV_OFF = 0x8120; /* Rev counter: Off (Blank Tile) */
     const uint16_t REV_ON1 = 0x81FE; /* Rev counter: On (Single Digit) */
@@ -391,7 +391,7 @@ void OHud::draw_rev_counter()
             addr += 2;
     }
     oferrari.rev_pitch2 = oferrari.rev_pitch1;
-}
+ }}
 
 /* Convert & Blit car speed to screen */
 /* */
@@ -403,7 +403,7 @@ void OHud::blit_speed(uint32_t dst_addr, uint16_t speed)
     /* Convert to human readable speed */
     speed = outils::convert16_dechex(speed);
 
-    uint16_t digit1 = speed & 0xF;
+    { uint16_t digit1 = speed & 0xF;
     uint16_t digit2 = (speed & 0xF0) >> 4;
     uint16_t digit3 = (speed & 0xF00) >> 8;
 
@@ -436,7 +436,7 @@ void OHud::blit_speed(uint32_t dst_addr, uint16_t speed)
     video.write_text16(&dst_addr, digit3);
     video.write_text16(&dst_addr, digit2);
     video.write_text16(dst_addr, digit1);
-}
+ }}
 
 /* Blit large digit spanning two rows. */
 /* */
@@ -571,7 +571,7 @@ void OHud::blit_text1(uint8_t x, uint8_t y, uint32_t src_addr)
 {
     uint32_t dst_addr = translate(x, y, 0x110030);
     src_addr += 4;
-    uint16_t counter = roms.rom0.read16(&src_addr);  /* Number of tiles to blit */
+    { uint16_t counter = roms.rom0.read16(&src_addr);  /* Number of tiles to blit */
     uint16_t data = roms.rom0.read16(&src_addr);     /* Tile data to blit */
 
     /* Blit each tile */
@@ -580,7 +580,7 @@ void OHud::blit_text1(uint8_t x, uint8_t y, uint32_t src_addr)
         data = (data & 0xFF00) | roms.rom0.read8(&src_addr);
         video.write_text16(&dst_addr, data);
     } }
-}
+ }}
 
 /* Blit Tiles to text ram layer (Double Row) */
 /*  */
