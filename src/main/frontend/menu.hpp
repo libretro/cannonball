@@ -11,8 +11,6 @@
 #define MENU_MAX_ENTRIES 24
 
 #include <stdint.h>
-#include <string>
-#include <vector>
 
 struct TTrial;
 
@@ -28,7 +26,7 @@ static const int32_t MESSAGE_TIME = 5;
 typedef struct Menu
 {
     uint8_t state;
-    TTrial* ttrial;
+    struct TTrial* ttrial;
     uint8_t redef_state;
     uint32_t frame;
     int32_t message_counter;

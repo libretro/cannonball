@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <iterator>
 
 #include "main.hpp"
 #include "menu.hpp"
@@ -29,13 +28,13 @@
 
 static void Menu_tick_ui(Menu* self);
 static void Menu_draw_menu_options(Menu* self);
-static void Menu_draw_text(Menu* self, std::string);
+static void Menu_draw_text(Menu* self, const char* s);
 static void Menu_tick_menu(Menu* self);
 static void Menu_set_menu(Menu* self, const char** menu, uint8_t num);
-static void Menu_set_menu_text(Menu* self, std::string s1, std::string s2);
+static void Menu_set_menu_text(Menu* self, const char* s1, const char* s2);
 static void Menu_redefine_keyboard(Menu* self);
 static void Menu_redefine_joystick(Menu* self);
-static void Menu_display_message(Menu* self, std::string);
+static void Menu_display_message(Menu* self, const char* s);
 static bool Menu_check_jap_roms(Menu* self);
 static void Menu_restart_video(Menu* self);
 static void Menu_start_game(Menu* self, int mode, int settings);
@@ -426,11 +425,11 @@ static void Menu_draw_menu_options(Menu* self)
 
     { int i; for (i = 0; i < (int) self->menu_selected_num; i++)
     {
-        std::string s = self->menu_selected[i];
+        const char* s = self->menu_selected[i];
 
         /* Centre the menu option */
-        x = 20 - (s.length() >> 1);
-        OHud_blit_text_new(&ohud, x, y, s.c_str(), GREEN);
+        x = 20 - (strlen(s) >> 1);
+        OHud_blit_text_new(&ohud, x, y, s, GREEN);
 
         if (!self->is_text_menu)
         {
@@ -446,27 +445,22 @@ static void Menu_draw_menu_options(Menu* self)
 }
 
 /* Draw a single line of text */
-static void Menu_draw_text(Menu* self, std::string s)
+static void Menu_draw_text(Menu* self, const char* s)
 {
     /* Centre text */
-    int8_t x = 20 - (s.length() >> 1);
+    int8_t x = 20 - (strlen(s) >> 1);
 
     /* Find central column in screen.  */
     int8_t y = 13 + ((ROWS - 13) >> 1) - 1;
 
-    OHud_blit_text_new(&ohud, x, y, s.c_str(), GREEN);
+    OHud_blit_text_new(&ohud, x, y, s, GREEN);
 }
 
 static bool menu_starts_with(
-    const std::string& value,
-    const std::string& prefix)
+    const char* value,
+    const char* prefix)
 {
-    return
-        value.size() >= prefix.size() &&
-        value.compare(
-            0,
-            prefix.size(),
-            prefix) == 0;
+    return strncmp(value, prefix, strlen(prefix)) == 0;
 }
 
 
@@ -888,7 +882,7 @@ static void Menu_set_menu(Menu* self, const char** menu, uint8_t num)
 void Menu_refresh_menu(Menu* self)
 {
     int16_t cursor_backup = self->cursor;
-    std::string s;
+    const char* s = "";
 
     for (self->cursor = 0; self->cursor < (int) self->menu_selected_num; self->cursor++)
     {
@@ -1022,10 +1016,9 @@ void Menu_refresh_menu(Menu* self)
 }
 
 /* Append Menu Text For A Particular Menu Entry */
-static void Menu_set_menu_text(Menu* self, std::string s1, std::string s2)
+static void Menu_set_menu_text(Menu* self, const char* s1, const char* s2)
 {
-    s1.append(s2);
-    strncpy(self->menu_text[self->cursor], s1.c_str(), sizeof(self->menu_text[self->cursor]) - 1);
+    snprintf(self->menu_text[self->cursor], sizeof(self->menu_text[self->cursor]), "%s%s", s1, s2);
     self->menu_text[self->cursor][sizeof(self->menu_text[self->cursor]) - 1] = 0;
     self->menu_selected[self->cursor] = self->menu_text[self->cursor];
 }
@@ -1111,9 +1104,9 @@ static void Menu_redefine_joystick(Menu* self)
 }
 
 /* Display a contextual message in the top left of the screen */
-static void Menu_display_message(Menu* self, std::string s)
+static void Menu_display_message(Menu* self, const char* s)
 {
-    strncpy(self->msg, s.c_str(), sizeof(self->msg) - 1);
+    strncpy(self->msg, s, sizeof(self->msg) - 1);
     self->msg[sizeof(self->msg) - 1] = 0;
     self->message_counter = MESSAGE_TIME * config.fps;
 }
