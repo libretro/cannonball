@@ -131,8 +131,8 @@ void OInitEngine_setup_stage1(OInitEngine* self)
     ostats.score = 0;
     OStats_clear_stage_times(&ostats);
     OFerrari_reset_car(&oferrari);               /* Reset Car Speed/Rev Values */
-    outrun.outputs->set_digital(OOutputs::D_EXT_MUTE);
-    outrun.outputs->set_digital(OOutputs::D_SOUND);
+    OOutputs_set_digital(outrun.outputs, D_EXT_MUTE);
+    OOutputs_set_digital(outrun.outputs, D_SOUND);
     osoundint.engine_data[SOUND_ENGINE_VOL] = 0x3F;
     ostats.extend_play_timer = 0;
     self->checkpoint_marker = 0;              /* Denote not past checkpoint marker */

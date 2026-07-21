@@ -26,23 +26,7 @@ struct CoinChute
     uint8_t output_bit;
 };
 
-class OOutputs
-{
-public:
-    const static int MODE_DISABLED = 0; /* Disabled */
-    const static int MODE_FFEEDBACK = 2; /* Force Feedback for Wheels */
-    const static int MODE_RUMBLE = 3; /* Simple rumble for controllers */
-
-    /* Hardware Motor Control: */
-    /* 0 = Switch off */
-    /* 5 = Left */
-    /* 8 = Centre */
-    /* B = Right */
-    uint8_t hw_motor_control, hw_motor_control_old;
-
-    /* Digital Outputs */
-    enum
-    {
+enum {
         D_EXT_MUTE   = 0x01, /* bit 0 = External Amplifier Mute Control */
         D_BRAKE_LAMP = 0x02, /* bit 1 = brake lamp */
         D_START_LAMP = 0x04, /* bit 2 = start lamp */
@@ -53,112 +37,87 @@ public:
         D_SOUND      = 0x80 /* bit 7 = sound enable */
     };
 
+static const int MODE_DISABLED = 0;
+
+static const int MODE_FFEEDBACK = 2;
+
+static const int MODE_RUMBLE = 3;
+
+static const uint16_t OO_STATE_INIT   = 0;
+
+static const uint16_t OO_STATE_DELAY  = 1;
+
+static const uint16_t OO_STATE_LEFT   = 2;
+
+static const uint16_t OO_STATE_RIGHT  = 3;
+
+static const uint16_t OO_STATE_CENTRE = 4;
+
+static const uint16_t OO_STATE_DONE   = 5;
+
+static const uint16_t OO_STATE_EXIT   = 6;
+
+static const int COUNTER_RESET = 300;
+
+static const uint8_t MOTOR_OFF    = 0;
+
+static const uint8_t MOTOR_RIGHT  = 0x5;
+
+static const uint8_t MOTOR_CENTRE = 0x8;
+
+static const uint8_t MOTOR_LEFT   = 0xB;
+
+static const uint8_t CENTRE_POS    = 0x80;
+
+static const uint8_t LEFT_LIMIT    = 0xC1;
+
+static const uint8_t RIGHT_LIMIT   = 0x3C;
+
+struct OOutputs
+{
+    uint8_t hw_motor_control, hw_motor_control_old;
     CoinChute chute1, chute2;
-
-    OOutputs(void);
-    ~OOutputs(void);
-
-    void init();
-    void set_mode(int);
-    bool diag_motor(int16_t input_motor, uint8_t hw_motor_limit);
-    bool calibrate_motor(int16_t input_motor, uint8_t hw_motor_limit);
-    void tick(int16_t input_motor);
-    void writeDigitalToConsole();
-    void set_digital(uint8_t);
-    void clear_digital(uint8_t);
-    int is_set(uint8_t);
-    void coin_chute_out(CoinChute* chute, bool insert);
-
-private:
     int mode;
-
     uint8_t dig_out, dig_out_old;
-
-    const static uint16_t STATE_INIT   = 0;
-    const static uint16_t STATE_DELAY  = 1;
-    const static uint16_t STATE_LEFT   = 2;
-    const static uint16_t STATE_RIGHT  = 3;
-    const static uint16_t STATE_CENTRE = 4;
-    const static uint16_t STATE_DONE   = 5;
-    const static uint16_t STATE_EXIT   = 6;
-
-    /* Calibration Counter */
-    const static int COUNTER_RESET = 300;
-
-    const static uint8_t MOTOR_OFF    = 0;
-    const static uint8_t MOTOR_RIGHT  = 0x5;
-    const static uint8_t MOTOR_CENTRE = 0x8;
-    const static uint8_t MOTOR_LEFT   = 0xB;
-    
-
-    /* These are calculated during startup in the original game. */
-    /* Here we just hardcode them, as the motor init code isn't ported. */
-    const static uint8_t CENTRE_POS    = 0x80;
-    const static uint8_t LEFT_LIMIT    = 0xC1;
-    const static uint8_t RIGHT_LIMIT   = 0x3C;
-
-    /* Motor Limit Values. Calibrated during startup. */
     int16_t limit_left;
     int16_t limit_right;
-
-    /* Motor Centre Position. (We Fudge this for Force Feedback wheel mode.) */
     int16_t motor_centre_pos;
-
-    /* Difference between input_motor and input_motor_old */
     int16_t motor_x_change;
-
     uint16_t motor_state;
     bool motor_enabled;
-
-    /* 0x11: Motor Control Value */
     int8_t motor_control;
-    /* 0x12: Movement (1 = Left, -1 = Right, 0 = None) */
     int8_t motor_movement;
-    /* 0x14: Is Motor Centered */
     bool is_centered;
-    /* 0x16: Motor X Change Latch */
     int16_t motor_change_latch;
-    /* 0x18: Speed */
     int16_t speed;
-    /* 0x1A: Road Curve */
     int16_t curve;
-    /* 0x1E: Increment counter to index motor table for off-road/crash */
     int16_t vibrate_counter;
-    /* 0x20: Last Motor X_Change > 8. No need to adjust further. */
     bool was_small_change;
-    /* 0x22: Adjusted movement value based on steering 1 */
     int16_t movement_adjust1;
-    /* 0x24: Adjusted movement value based on steering 2 */
     int16_t movement_adjust2;
-    /* 0x26: Adjusted movement value based on steering 3 */
     int16_t movement_adjust3;
-
-    /* Counter control for motor tests */
     int16_t counter;
-
-    /* Columns for output */
     uint16_t col1, col2;
-
-    void diag_left(int16_t input_motor, uint8_t hw_motor_limit);
-    void diag_right(int16_t input_motor, uint8_t hw_motor_limit);
-    void diag_centre(int16_t input_motor, uint8_t hw_motor_limit);
-    void diag_done();
-
-    void calibrate_left(int16_t input_motor, uint8_t hw_motor_limit);
-    void calibrate_right(int16_t input_motor, uint8_t hw_motor_limit);
-    void calibrate_centre(int16_t input_motor, uint8_t hw_motor_limit);
-    void calibrate_done();
-
-    void do_motors(const int MODE, int16_t input_motor);
-    void car_moving(const int MODE);
-    void car_stationary();
-    void adjust_motor();
-    void do_motor_crash();
-    void do_motor_offroad();
-    void set_value(const uint8_t*, uint8_t);
-    void done();
-    void motor_output(uint8_t cmd);
-
-    void do_vibrate_upright();
-    void do_vibrate_mini();
 };
+
+void OOutputs_ctor(OOutputs* self);
+
+void OOutputs_init(OOutputs* self);
+
+void OOutputs_set_mode(OOutputs* self, int);
+
+bool OOutputs_diag_motor(OOutputs* self, int16_t input_motor, uint8_t hw_motor_limit);
+
+bool OOutputs_calibrate_motor(OOutputs* self, int16_t input_motor, uint8_t hw_motor_limit);
+
+void OOutputs_tick(OOutputs* self, int16_t input_motor);
+
+void OOutputs_writeDigitalToConsole(OOutputs* self);
+
+void OOutputs_set_digital(OOutputs* self, uint8_t);
+
+void OOutputs_clear_digital(OOutputs* self, uint8_t);
+
+int OOutputs_is_set(OOutputs* self, uint8_t);
+
+void OOutputs_coin_chute_out(OOutputs* self, CoinChute* chute, bool insert);

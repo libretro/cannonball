@@ -7,6 +7,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdlib.h>
 #include "../setup.hpp"
 #include "main.hpp"
 #include "trackloader.hpp"
@@ -57,12 +58,13 @@ Outrun outrun;
 
 Outrun::Outrun()
 {
-    outputs = new OOutputs();
+    outputs = (OOutputs*)malloc(sizeof(OOutputs));
+    OOutputs_ctor(outputs);
 }
 
 Outrun::~Outrun()
 {
-    delete outputs;
+    free(outputs);
 }
 
 void Outrun::init()
@@ -75,9 +77,9 @@ void Outrun::init()
     tick_counter = 0;
 
     if (config.controls.haptic)
-        outputs->set_mode(OOutputs::MODE_FFEEDBACK);
+        OOutputs_set_mode(outputs, MODE_FFEEDBACK);
     else
-        outputs->set_mode(OOutputs::MODE_DISABLED);
+        OOutputs_set_mode(outputs, MODE_DISABLED);
 
     boot();
 }
@@ -161,8 +163,8 @@ void Outrun::tick(bool tick_frame)
     if (tick_frame)
     {
         uint8_t coin = OInputs_do_credits(&oinputs);
-        outputs->coin_chute_out(&outputs->chute1, coin == 1);
-        outputs->coin_chute_out(&outputs->chute2, coin == 2);
+        OOutputs_coin_chute_out(outputs, &outputs->chute1, coin == 1);
+        OOutputs_coin_chute_out(outputs, &outputs->chute2, coin == 2);
     }
 
     /* Draw FPS */
@@ -270,7 +272,7 @@ void Outrun::jump_table()
 
     /* Libretro force feedback uses the current steering position. */
     if (tick_frame && config.controls.haptic)
-        outputs->tick(oinputs.input_steering);
+        OOutputs_tick(outputs, oinputs.input_steering);
 }
 
 /* Source: 0xB15E */
@@ -642,7 +644,7 @@ void Outrun::init_jump_table()
     OPalette_init(&opalette);
     OInputs_init(&oinputs);
     OBonus_init(&obonus);
-    outputs->init();
+    OOutputs_init(outputs);
 
     video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);
     hwsprites_set_x_clip(video.sprite_layer, false);
@@ -698,7 +700,7 @@ void Outrun::init_motor_calibration()
     otiles.init();
     OPalette_init(&opalette);
     OInputs_init(&oinputs);
-    outputs->init();
+    OOutputs_init(outputs);
 
     video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);
     hwsprites_set_x_clip(video.sprite_layer, false);

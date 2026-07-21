@@ -10,43 +10,34 @@
 
 #include <stdint.h>
 
-class TTrial
-{
-public:
-    /* Maximum number of laps to allow the player to race */
-    static const uint8_t MAX_LAPS = 5;
-
-    /* Maximum number of cars to spawn */
-    static const uint8_t MAX_TRAFFIC = 8;
-
-    enum
-    {
+enum {
         BACK_TO_MENU = -1,
         CONTINUE     = 0,
         INIT_GAME    = 1
     };
 
-    uint8_t state;
-    int8_t level_selected;
-
-    enum
-    {
+enum {
         INIT_COURSEMAP,
         TICK_COURSEMAP,
         TICK_GAME_ENGINE
     };
 
-    TTrial(uint16_t* best_times);
-    ~TTrial(void);
+static const uint8_t MAX_LAPS = 5;
 
-    void init();
-    int  tick();
-    void update_best_time();
+static const uint8_t MAX_TRAFFIC = 8;
 
-private:
-    /* Best lap times for all 15 tracks. */
+struct TTrial
+{
+    uint8_t state;
+    int8_t level_selected;
     uint16_t* best_times;
-
-    /* Counter converted to actual laptime */
     uint8_t best_converted[3];
 };
+
+void TTrial_ctor(TTrial* self, uint16_t* best_times);
+
+void TTrial_init(TTrial* self);
+
+int TTrial_tick(TTrial* self);
+
+void TTrial_update_best_time(TTrial* self);

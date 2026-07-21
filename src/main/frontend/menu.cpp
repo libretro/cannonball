@@ -6,6 +6,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdlib.h>
 #include <vector>
 #include <iterator>
 
@@ -126,13 +127,14 @@ const static char* ENTRY_MUSIC4     = "LAST WAVE";
 
 Menu::Menu()
 {
-    ttrial = new TTrial(config.ttrial.best_times);
+    ttrial = (TTrial*)malloc(sizeof(TTrial));
+    TTrial_ctor(ttrial, config.ttrial.best_times);
 }
 
 
 Menu::~Menu(void)
 {
-    delete ttrial;
+    free(ttrial);
 }
 
 void Menu::populate()
@@ -240,7 +242,7 @@ void Menu::init()
     if (outrun.ttrial.new_high_score)
     {
         outrun.ttrial.new_high_score = false;
-        ttrial->update_best_time();
+        TTrial_update_best_time(ttrial);
     }
 
     outrun.select_course(false, config.engine.prototype != 0);
@@ -298,14 +300,14 @@ void Menu::tick()
 
         case STATE_TTRIAL:
             {
-                int ttrial_state = ttrial->tick();
+                int ttrial_state = TTrial_tick(ttrial);
 
-                if (ttrial_state == TTrial::INIT_GAME)
+                if (ttrial_state == INIT_GAME)
                 {
                     cannonball_state = STATE_INIT_GAME;
                     OSoundInt_queue_clear(&osoundint);
                 }
-                else if (ttrial_state == TTrial::BACK_TO_MENU)
+                else if (ttrial_state == BACK_TO_MENU)
                 {
                     init();
                 }
@@ -504,7 +506,7 @@ void Menu::tick_menu()
             }
             else if (SELECTED(ENTRY_TRAFFIC))
             {
-                if (++config.cont_traffic > TTrial::MAX_TRAFFIC)
+                if (++config.cont_traffic > MAX_TRAFFIC)
                     config.cont_traffic = 0;
                 lr_options_set_frontend_variable_int(&config.cont_traffic);
             }
@@ -518,18 +520,18 @@ void Menu::tick_menu()
                 if (check_jap_roms())
                 {
                     state = STATE_TTRIAL;
-                    ttrial->init();
+                    TTrial_init(ttrial);
                 }
             }
             else if (SELECTED(ENTRY_LAPS))
             {
-                if (++config.ttrial.laps > TTrial::MAX_LAPS)
+                if (++config.ttrial.laps > MAX_LAPS)
                     config.ttrial.laps = 1;
                 lr_options_set_frontend_variable_int(&config.ttrial.laps);
             }
             else if (SELECTED(ENTRY_TRAFFIC))
             {
-                if (++config.ttrial.traffic > TTrial::MAX_TRAFFIC)
+                if (++config.ttrial.traffic > MAX_TRAFFIC)
                     config.ttrial.traffic = 0;
                 lr_options_set_frontend_variable_int(&config.ttrial.traffic);
             }

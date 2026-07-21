@@ -34,24 +34,20 @@ static const uint8_t STAGE_LOOKUP[] =
     0x24, 0x23, 0x22, 0x21, 0x20
 };
 
-TTrial::TTrial(uint16_t* best_times)
+void TTrial_ctor(TTrial* self, uint16_t* best_times)
 {
-    this->best_times = best_times;
+    self->best_times = best_times;
 }
 
-TTrial::~TTrial(void)
-{
 
+void TTrial_init(TTrial* self)
+{
+    self->state = INIT_COURSEMAP;
 }
 
-void TTrial::init()
+int TTrial_tick(TTrial* self)
 {
-    state = INIT_COURSEMAP;
-}
-
-int TTrial::tick()
-{
-    switch (state)
+    switch (self->state)
     {
         case INIT_COURSEMAP:
             outrun.select_course(config.engine.jap != 0, config.engine.prototype != 0); /* Need to setup correct course map graphics. */
@@ -62,14 +58,14 @@ int TTrial::tick()
             hwsprites_set_x_clip(video.sprite_layer, false);
             OMap_init(&omap);
             OMap_load_sprites(&omap);
-            OMap_position_ferrari(&omap, FERRARI_POS[level_selected = 0]);
+            OMap_position_ferrari(&omap, FERRARI_POS[self->level_selected = 0]);
             OHud_blit_text_big(&ohud, 1, "STEER TO SELECT TRACK", false);
             OHud_blit_text1(&ohud, 2, 25, TEXT1_LAPTIME1);
             OHud_blit_text1(&ohud, 2, 26, TEXT1_LAPTIME2);
             OSoundInt_queue_sound(&osoundint, SOUND_PCM_WAVE);
             outrun.ttrial.laps    = config.ttrial.laps;
             outrun.custom_traffic = config.ttrial.traffic;
-            state = TICK_COURSEMAP;
+            self->state = TICK_COURSEMAP;
 
         case TICK_COURSEMAP:
             {
@@ -79,26 +75,26 @@ int TTrial::tick()
                 }
                 else if (Input_has_pressed(&input, LEFT) || OInputs_is_analog_l(&oinputs))
                 {
-                    if (--level_selected < 0)
-                        level_selected = sizeof(FERRARI_POS) - 1;
+                    if (--self->level_selected < 0)
+                        self->level_selected = sizeof(FERRARI_POS) - 1;
                 }
                 else if (Input_has_pressed(&input, RIGHT)|| OInputs_is_analog_r(&oinputs))
                 {
-                    if (++level_selected > sizeof(FERRARI_POS) - 1)
-                        level_selected = 0;
+                    if (++self->level_selected > sizeof(FERRARI_POS) - 1)
+                        self->level_selected = 0;
                 }
                 else if (Input_has_pressed(&input, START) || Input_has_pressed(&input, ACCEL) || OInputs_is_analog_select(&oinputs))
                 {
-                    outils_convert_counter_to_time(best_times[level_selected], best_converted);
+                    outils_convert_counter_to_time(self->best_times[self->level_selected], self->best_converted);
 
                     outrun.cannonball_mode         = Outrun::MODE_TTRIAL;
-                    outrun.ttrial.level            = STAGE_LOOKUP[level_selected];
+                    outrun.ttrial.level            = STAGE_LOOKUP[self->level_selected];
                     outrun.ttrial.current_lap      = 0;
                     outrun.ttrial.best_lap_counter = 10000;
-                    outrun.ttrial.best_lap[0]      = best_converted[0];
-                    outrun.ttrial.best_lap[1]      = best_converted[1];
-                    outrun.ttrial.best_lap[2]      = best_converted[2];
-                    outrun.ttrial.best_lap_counter = best_times[level_selected];
+                    outrun.ttrial.best_lap[0]      = self->best_converted[0];
+                    outrun.ttrial.best_lap[1]      = self->best_converted[1];
+                    outrun.ttrial.best_lap[2]      = self->best_converted[2];
+                    outrun.ttrial.best_lap_counter = self->best_times[self->level_selected];
                     outrun.ttrial.new_high_score   = false;
                     outrun.ttrial.overtakes        = 0;
                     outrun.ttrial.crashes          = 0;
@@ -106,9 +102,9 @@ int TTrial::tick()
                     ostats.credits = 1;
                     return INIT_GAME;
                 }
-                OMap_position_ferrari(&omap, FERRARI_POS[level_selected]);
-                outils_convert_counter_to_time(best_times[level_selected], best_converted);
-                OHud_draw_lap_timer(&ohud, OHud_translate(&ohud, 7, 26, 0x110030), best_converted, best_converted[2]);
+                OMap_position_ferrari(&omap, FERRARI_POS[self->level_selected]);
+                outils_convert_counter_to_time(self->best_times[self->level_selected], self->best_converted);
+                OHud_draw_lap_timer(&ohud, OHud_translate(&ohud, 7, 26, 0x110030), self->best_converted, self->best_converted[2]);
                 OMap_blit(&omap);
                 ORoad_tick(&oroad);
                 OSprites_sprite_copy(&osprites);
@@ -122,8 +118,8 @@ int TTrial::tick()
     return CONTINUE;
 }
 
-void TTrial::update_best_time()
+void TTrial_update_best_time(TTrial* self)
 {
-    best_times[level_selected] = outrun.ttrial.best_lap_counter;
+    self->best_times[self->level_selected] = outrun.ttrial.best_lap_counter;
     Config_save_tiletrial_scores(&config);
 }

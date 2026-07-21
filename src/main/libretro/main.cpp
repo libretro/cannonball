@@ -1380,7 +1380,7 @@ void retro_run(void)
 
         case STATE_INIT_MENU:
             OInputs_init(&oinputs);
-            outrun.outputs->init();
+            OOutputs_init(outrun.outputs);
             menu->init();
             cannonball_state = STATE_MENU;
             break;
