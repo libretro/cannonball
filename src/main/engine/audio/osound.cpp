@@ -53,17 +53,17 @@ static void OSound_read_mod_table(OSound* self, uint8_t* chan);
 static void OSound_call_adr(OSound* self, uint8_t* chan);
 static void OSound_engine_process(OSound* self);
 static void OSound_engine_process_chan(OSound* self, uint8_t* chan, uint8_t* pcm);
-static void OSound_vol_thicken(OSound* self, uint16_t& pos, uint8_t* chan, uint8_t* pcm);
-static uint8_t OSound_get_adjusted_vol(OSound* self, uint16_t& pos, uint8_t* chan);
-static void OSound_engine_set_pitch(OSound* self, uint16_t& pos, uint8_t* pcm);
+static void OSound_vol_thicken(OSound* self, uint16_t* pos, uint8_t* chan, uint8_t* pcm);
+static uint8_t OSound_get_adjusted_vol(OSound* self, uint16_t* pos, uint8_t* chan);
+static void OSound_engine_set_pitch(OSound* self, uint16_t* pos, uint8_t* pcm);
 static void OSound_engine_mute_channel(OSound* self, uint8_t* chan, uint8_t* pcm, bool do_check);
 static void OSound_unk78c7(OSound* self, uint8_t* chan, uint8_t* pcm);
 static void OSound_ferrari_vol_pan(OSound* self, uint8_t* chan, uint8_t* pcm);
 static uint16_t OSound_engine_get_table_adr(OSound* self, uint8_t* chan, uint8_t* pcm);
 static void OSound_engine_adjust_volume(OSound* self, uint8_t* chan);
-static uint16_t OSound_engine_set_adr(OSound* self, uint16_t& pos, uint8_t* chan, uint8_t* pcm);
-static void OSound_engine_set_adr_end(OSound* self, uint16_t& pos, uint16_t loop_adr, uint8_t* chan, uint8_t* pcm);
-static void OSound_engine_set_pan(OSound* self, uint16_t& pos, uint8_t* chan, uint8_t* pcm);
+static uint16_t OSound_engine_set_adr(OSound* self, uint16_t* pos, uint8_t* chan, uint8_t* pcm);
+static void OSound_engine_set_adr_end(OSound* self, uint16_t* pos, uint16_t loop_adr, uint8_t* chan, uint8_t* pcm);
+static void OSound_engine_set_pan(OSound* self, uint16_t* pos, uint8_t* chan, uint8_t* pcm);
 static void OSound_engine_read_data(OSound* self, uint8_t* chan, uint8_t* pcm);
 static void OSound_traffic_process(OSound* self);
 static void OSound_traffic_process_chan(OSound* self, uint8_t* pcm);
@@ -1547,12 +1547,12 @@ void OSound_engine_process_chan(OSound* self, uint8_t* chan, uint8_t* pcm)
     }
     else
     {
-        uint16_t start_adr = OSound_engine_set_adr(self, engine_pos, chan, pcm); /* Set Start Address */
-        OSound_engine_set_adr_end(self, engine_pos, start_adr, chan, pcm);       /* Set End Address */
+        uint16_t start_adr = OSound_engine_set_adr(self, &engine_pos, chan, pcm); /* Set Start Address */
+        OSound_engine_set_adr_end(self, &engine_pos, start_adr, chan, pcm);       /* Set End Address */
     }
 
-    OSound_vol_thicken(self, engine_pos, chan, pcm); /* Thicken engine effect by panning left/right dependent on channel. */
-    OSound_engine_set_pitch(self, engine_pos, pcm);  /* Set Engine Pitch from lookup table specified by hl */
+    OSound_vol_thicken(self, &engine_pos, chan, pcm); /* Thicken engine effect by panning left/right dependent on channel. */
+    OSound_engine_set_pitch(self, &engine_pos, pcm);  /* Set Engine Pitch from lookup table specified by hl */
     pcm[0x86] = 0;                      /* Set Active & Loop Enabled */
 }
 
@@ -1615,13 +1615,13 @@ void OSound_ferrari_vol_pan(OSound* self, uint8_t* chan, uint8_t* pcm)
 
     /* Set PCM Sample Addresses */
     uint16_t pos = ENGINE_ADR_TABLE;
-    OSound_engine_set_adr(self, pos, chan, pcm);
+    OSound_engine_set_adr(self, &pos, chan, pcm);
 
     /* Set PCM Sample End Address */
     pcm[0x6] = RomLoader_read8(&(roms.z80), ++pos);
 
     /* Set Volume Pan */
-    OSound_engine_set_pan(self, pos, chan, pcm);
+    OSound_engine_set_pan(self, &pos, chan, pcm);
 
     /* Set Pitch */
     pos = ENGINE_ADR_TABLE + 4; /* Set position to pitch offset */
@@ -1668,9 +1668,9 @@ uint16_t OSound_engine_get_table_adr(OSound* self, uint8_t* chan, uint8_t* pcm)
 /* Source: 0x77AD */
 
 /*bpset 77b0,1,{printf "start adr:%02x pos:=%02x",bc, hl; g} */static 
-uint16_t OSound_engine_set_adr(OSound* self, uint16_t& pos, uint8_t* chan, uint8_t* pcm)
+uint16_t OSound_engine_set_adr(OSound* self, uint16_t* pos, uint8_t* chan, uint8_t* pcm)
 {
-    uint16_t start_adr = RomLoader_read16_16(&(roms.z80), pos++);
+    uint16_t start_adr = RomLoader_read16_16(&(roms.z80), (*pos)++);
     OSound_w16(self, pcm + 0x4, start_adr); /* Set Wave Start Address */
 
     /* TRAFFIC */
@@ -1702,10 +1702,10 @@ uint16_t OSound_engine_set_adr(OSound* self, uint16_t& pos, uint8_t* chan, uint8
 }
 
 /* Source: 0x7853 */static 
-void OSound_engine_set_adr_end(OSound* self, uint16_t& pos, uint16_t loop_adr, uint8_t* chan, uint8_t* pcm)
+void OSound_engine_set_adr_end(OSound* self, uint16_t* pos, uint16_t loop_adr, uint8_t* chan, uint8_t* pcm)
 {
     /* Set wave end address from table */
-    pcm[0x6] = RomLoader_read8(&(roms.z80), ++pos);
+    pcm[0x6] = RomLoader_read8(&(roms.z80), ++(*pos));
 
     /* Loop Disabled */
     if (chan[CH_ENGINES_FLAGS] & BIT_2)
@@ -1721,9 +1721,9 @@ void OSound_engine_set_adr_end(OSound* self, uint16_t& pos, uint16_t loop_adr, u
 
 /* Thicken engine effect by panning left/right dependent on channel. */
 /* Source: 0x77EA */static 
-void OSound_vol_thicken(OSound* self, uint16_t& pos, uint8_t* chan, uint8_t* pcm)
+void OSound_vol_thicken(OSound* self, uint16_t* pos, uint8_t* chan, uint8_t* pcm)
 {
-    pos++; /* Address of volume multiplier */
+    (*pos)++; /* Address of volume multiplier */
 
     /* Odd Channels: Pan Left */
     if (self->engine_channel & BIT_0)
@@ -1741,9 +1741,9 @@ void OSound_vol_thicken(OSound* self, uint16_t& pos, uint8_t* chan, uint8_t* pcm
 
 /* Get Adjusted Volume */
 /* Source: 0x78A7 */static 
-uint8_t OSound_get_adjusted_vol(OSound* self, uint16_t& pos, uint8_t* chan)
+uint8_t OSound_get_adjusted_vol(OSound* self, uint16_t* pos, uint8_t* chan)
 {
-    uint8_t multiply =  RomLoader_read8(&(roms.z80), pos);
+    uint8_t multiply =  RomLoader_read8(&(roms.z80), (*pos));
     uint16_t vol = (chan[CH_ENGINES_VOL1] * multiply) >> 6;
 
     if (vol > 0x3F)
@@ -1755,9 +1755,9 @@ uint8_t OSound_get_adjusted_vol(OSound* self, uint16_t& pos, uint8_t* chan)
 /* bpset 7877,1,{printf "bc=%02x hl=%02x",bc, hl; g} */
 /* Set Engine Pitch From Table */
 /* Source: 0x7870 */static 
-void OSound_engine_set_pitch(OSound* self, uint16_t& pos, uint8_t* pcm)
+void OSound_engine_set_pitch(OSound* self, uint16_t* pos, uint8_t* pcm)
 {
-    pos++; /* Increment to pitch entry in table */
+    (*pos)++; /* Increment to pitch entry in table */
 
     uint16_t bc = OSound_r16(self, pcm + 0x82);
     bc >>= 2;
@@ -1765,9 +1765,9 @@ void OSound_engine_set_pitch(OSound* self, uint16_t& pos, uint8_t* pcm)
     if (bc & 0xFF00)
         bc = (bc & 0xFF00) | 0xFF;
 
-    { uint16_t pitch = RomLoader_read8(&(roms.z80), pos);
+    { uint16_t pitch = RomLoader_read8(&(roms.z80), (*pos));
 
-    /*std::cout << std::hex << pos << std::endl; */
+    /*std::cout << std::hex << (*pos) << std::endl; */
 
     /* Read pitch from table */
     if (bc)
@@ -1825,10 +1825,10 @@ void OSound_engine_adjust_volume(OSound* self, uint8_t* chan)
 /* Adjust Volume and write to new memory area */
 /* Also write to ix (PCM Channel RAM) */
 /* Source: 0x76FD */static 
-void OSound_engine_set_pan(OSound* self, uint16_t& pos, uint8_t* chan, uint8_t* pcm)
+void OSound_engine_set_pan(OSound* self, uint16_t* pos, uint8_t* chan, uint8_t* pcm)
 {
     uint16_t pitch = OSound_r16(self, chan + CH_ENGINES_PITCH_L) >> 1;
-    pitch += RomLoader_read8(&(roms.z80), ++pos);
+    pitch += RomLoader_read8(&(roms.z80), ++(*pos));
 
     { uint16_t vol = (chan[CH_ENGINES_VOL1] * pitch) >> 6;
 
