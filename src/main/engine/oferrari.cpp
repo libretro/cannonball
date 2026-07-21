@@ -240,15 +240,15 @@ void OFerrari::logic()
     switch (obonus.bonus_control)
     {
         /* Not Bonus Mode */
-        case OBonus::BONUS_DISABLE:
+        case BONUS_DISABLE:
             ferrari_normal();
             break;
 
-        case OBonus::BONUS_INIT:
+        case BONUS_INIT:
             rev_shift = 2;          /* Set Double Rev Shift Value */
-            obonus.bonus_control = OBonus::BONUS_TICK;
+            obonus.bonus_control = BONUS_TICK;
 
-        case OBonus::BONUS_TICK:
+        case BONUS_TICK:
             oattractai.check_road_bonus();
             oattractai.set_steering_bonus();
 
@@ -263,36 +263,36 @@ void OFerrari::logic()
             else /* init_end_anim */
             {
                 rev_shift = 1;
-                obonus.bonus_control = OBonus::BONUS_SEQ0;
+                obonus.bonus_control = BONUS_SEQ0;
                 /* note fall through! */
             }
             
-        case OBonus::BONUS_SEQ0:
+        case BONUS_SEQ0:
             if ((oroad.road_pos >> 16) < 0x18E)
             {
                 init_end_seq();
                 return;
             }
-            obonus.bonus_control = OBonus::BONUS_SEQ1;
+            obonus.bonus_control = BONUS_SEQ1;
             /* fall through */
             
-        case OBonus::BONUS_SEQ1:
+        case BONUS_SEQ1:
             if ((oroad.road_pos >> 16) < 0x18F)
             {
                 init_end_seq();
                 return;
             }
-            obonus.bonus_control = OBonus::BONUS_SEQ2;
+            obonus.bonus_control = BONUS_SEQ2;
 
-        case OBonus::BONUS_SEQ2:
+        case BONUS_SEQ2:
             if ((oroad.road_pos >> 16) < 0x190)
             {
                 init_end_seq();
                 return;
             }
-            obonus.bonus_control = OBonus::BONUS_SEQ3;
+            obonus.bonus_control = BONUS_SEQ3;
             
-        case OBonus::BONUS_SEQ3:
+        case BONUS_SEQ3:
             if ((oroad.road_pos >> 16) < 0x191)
             {
                 init_end_seq();
@@ -302,10 +302,10 @@ void OFerrari::logic()
             {
                 oferrari.car_ctrl_active = false; /* -1 */
                 oinitengine.car_increment = 0;
-                obonus.bonus_control = OBonus::BONUS_END;
+                obonus.bonus_control = BONUS_END;
             }
 
-        case OBonus::BONUS_END:
+        case BONUS_END:
             oinputs.acc_adjust = 0;
             oinputs.brake_adjust = 0xFF;
             do_end_seq();

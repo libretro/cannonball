@@ -635,13 +635,13 @@ bool OAnimSeq::read_anim_data(oanimsprite* anim)
         seq_pos++;
 
     /* Test Whether Animation Sequence Is Over & Initalize Course Map */
-    if (obonus.bonus_control != OBonus::BONUS_DISABLE)
+    if (obonus.bonus_control != BONUS_DISABLE)
     {
         const static uint16_t END_SEQ_LENGTHS[] = {0x244, 0x244, 0x244, 0x190, 0x258};
 
         if (seq_pos == END_SEQ_LENGTHS[end_seq])
         {
-            obonus.bonus_control = OBonus::BONUS_DISABLE;
+            obonus.bonus_control = BONUS_DISABLE;
             /* we're missing all the code here to disable the animsprites, but probably not necessary? */
 
             if (outrun.cannonball_mode == Outrun::MODE_ORIGINAL)

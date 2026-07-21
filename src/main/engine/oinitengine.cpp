@@ -859,7 +859,7 @@ void OInitEngine::bonus5()
 /* This state simply checks for the end of bonus mode */
 void OInitEngine::bonus6()
 {
-    if (obonus.bonus_control >= OBonus::BONUS_END)
+    if (obonus.bonus_control >= BONUS_END)
         rd_split_state = 0;
 }
 
@@ -981,10 +981,10 @@ void OInitEngine::test_bonus_mode(bool do_bonus_check)
     {
         /* Do Bonus Text Display */
         if (outrun.cannonball_mode != Outrun::MODE_TTRIAL && obonus.bonus_state < 3)
-            obonus.do_bonus_text();
+            OBonus_do_bonus_text(&obonus);
 
         /* End Seq Animation Stage #0 */
-        if (obonus.bonus_control == OBonus::BONUS_SEQ0)
+        if (obonus.bonus_control == BONUS_SEQ0)
         {
             if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
                 outrun.game_state = GS_INIT_GAMEOVER;

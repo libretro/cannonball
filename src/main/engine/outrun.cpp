@@ -428,7 +428,7 @@ void Outrun::main_switch()
         /* ---------------------------------------------------------------------------------------- */
         case GS_INIT_BONUS:
             ostats.frame_counter = ostats.frame_reset;
-            obonus.bonus_control = OBonus::BONUS_INIT;  /* Initialize Bonus Mode Logic */
+            obonus.bonus_control = BONUS_INIT;  /* Initialize Bonus Mode Logic */
             oroad.road_load_end   |= BIT_0;             /* Instruct CPU 1 to load end road section */
             ostats.game_completed |= BIT_0;             /* Denote game completed */
             obonus.bonus_timer = 3600;                  /* Safety Timer Added in Rev. A Roms */
@@ -437,7 +437,7 @@ void Outrun::main_switch()
         case GS_BONUS:
             if (--obonus.bonus_timer < 0)
             {
-                obonus.bonus_control = OBonus::BONUS_DISABLE;
+                obonus.bonus_control = BONUS_DISABLE;
                 game_state = GS_INIT_GAMEOVER;
             }
             break;
@@ -641,7 +641,7 @@ void Outrun::init_jump_table()
     otiles.init();
     opalette.init();
     oinputs.init();
-    obonus.init();
+    OBonus_init(&obonus);
     outputs->init();
 
     video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);

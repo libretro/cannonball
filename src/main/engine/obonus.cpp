@@ -12,42 +12,38 @@
 #include "outils.hpp"
 #include "obonus.hpp"
 
+static void OBonus_init_bonus_text(OBonus* self);
+static void OBonus_decrement_bonus_secs(OBonus* self);
+static void OBonus_blit_bonus_secs(OBonus* self);
+
 OBonus obonus;
 
-OBonus::OBonus(void)
+void OBonus_init(OBonus* self)
 {
-}
+    self->bonus_control = BONUS_DISABLE;
+    self->bonus_state   = BONUS_TEXT_INIT;
 
-OBonus::~OBonus(void)
-{
-}
-
-void OBonus::init()
-{
-    bonus_control = BONUS_DISABLE;
-    bonus_state   = BONUS_TEXT_INIT;
-
-    bonus_counter = 0;
+    self->bonus_counter = 0;
 }
 
 /* Display Text and countdown time for bonus mode */
 /* Source: 0x99E0 */
-void OBonus::do_bonus_text()
+void OBonus_do_bonus_text(OBonus* self)
 {
-    switch (bonus_state)
+    switch (self->bonus_state)
     {
         case BONUS_TEXT_INIT:
-            init_bonus_text();
+            OBonus_init_bonus_text(self);
             break;
 
         case BONUS_TEXT_SECONDS:
-            decrement_bonus_secs();
+            OBonus_decrement_bonus_secs(self);
             break;
 
         case BONUS_TEXT_CLEAR:
         case BONUS_TEXT_DONE:
-            if (bonus_counter < 60)
-                bonus_counter++;
+            if (self->bonus_counter < 60)
+                self->bonus_counter++;
             else
             {
                 ohud.blit_text2(TEXT2_BONUS_CLEAR1);
@@ -62,9 +58,9 @@ void OBonus::do_bonus_text()
 /* Print stuff to text layer for bonus mode. */
 /* */
 /* Source: 0x9A9C */
-void OBonus::init_bonus_text()
+static void OBonus_init_bonus_text(OBonus* self)
 {
-    bonus_state = BONUS_TEXT_SECONDS;
+    self->bonus_state = BONUS_TEXT_SECONDS;
     
     { int16_t time_counter_bak = ostats.time_counter << 8;
     ostats.time_counter = 0x30;
@@ -95,7 +91,7 @@ void OBonus::init_bonus_text()
     uint16_t digit_bot = (time_counter_bak & 0x0F);
 
     /* Write them back to final bonus seconds value */
-    bonus_secs = digit_bot + digit_mid + digit_top;
+    self->bonus_secs = digit_bot + digit_mid + digit_top;
 
     /* Write to text layer */
     ohud.blit_text2(TEXT2_BONUS_POINTS); /* Print "BONUS POINTS" */
@@ -112,52 +108,52 @@ void OBonus::init_bonus_text()
     { int8_t i; for (i = 0; i <= count; i++)
         ohud.blit_large_digit(&dst_addr, (roms.rom0.read8(&src_addr) - 0x30) << 1); }
 
-    blit_bonus_secs();
+    OBonus_blit_bonus_secs(self);
  } } }}
 
 /* Decrement bonus seconds. Blit seconds remaining. */
 /* Source: 9A08 */
-void OBonus::decrement_bonus_secs()
+static void OBonus_decrement_bonus_secs(OBonus* self)
 {
-    if (bonus_counter < 60)
+    if (self->bonus_counter < 60)
     {
-        bonus_counter++;
+        self->bonus_counter++;
         return;
     }
 
     /* Play Signal 1 Sound In A Steady Fashion */
-    if ((((bonus_counter - 1) ^ bonus_counter) & BIT_2) == 0)
+    if ((((self->bonus_counter - 1) ^ self->bonus_counter) & BIT_2) == 0)
         osoundint.queue_sound(SOUND_SIGNAL1);
 
     /* Increment Score by 100K points */
     ostats.update_score(0x100000);
     
     /* Blit bonus seconds remaining */
-    blit_bonus_secs();
+    OBonus_blit_bonus_secs(self);
     
-    if (--bonus_secs < 0)
+    if (--self->bonus_secs < 0)
     {
-        bonus_counter = -1;
-        bonus_state = BONUS_TEXT_CLEAR;
+        self->bonus_counter = -1;
+        self->bonus_state = BONUS_TEXT_CLEAR;
     }
     else
-        bonus_counter++;
+        self->bonus_counter++;
 
 }
 
 /* Blit large yellow second remaining value e.g.: 23.3 */
 /* Source: 0x9B7C */
-void OBonus::blit_bonus_secs()
+static void OBonus_blit_bonus_secs(OBonus* self)
 {
     const uint8_t COL2 = 0x80;
     const uint16_t TILE_DOT = 0x8C2E;
     const uint16_t TILE_ZERO = 0x8420;
 
-    uint32_t d1 = (bonus_secs / 100) << 8;
-    uint32_t d4 = (bonus_secs / 100) * 100;
+    uint32_t d1 = (self->bonus_secs / 100) << 8;
+    uint32_t d4 = (self->bonus_secs / 100) * 100;
 
-    uint32_t d2 = (bonus_secs - d4) / 10;
-    uint32_t d3 = bonus_secs - d4;
+    uint32_t d2 = (self->bonus_secs - d4) / 10;
+    uint32_t d3 = self->bonus_secs - d4;
 
     d4 = d2;
     d2 <<= 4;
