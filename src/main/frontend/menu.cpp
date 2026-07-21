@@ -6,6 +6,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <string.h>
 #include <stdlib.h>
 #include <vector>
 #include <iterator>
@@ -30,7 +31,7 @@ static void Menu_tick_ui(Menu* self);
 static void Menu_draw_menu_options(Menu* self);
 static void Menu_draw_text(Menu* self, std::string);
 static void Menu_tick_menu(Menu* self);
-static void Menu_set_menu(Menu* self, std::vector<std::string>*);
+static void Menu_set_menu(Menu* self, const char** menu, uint8_t num);
 static void Menu_set_menu_text(Menu* self, std::string s1, std::string s2);
 static void Menu_redefine_keyboard(Menu* self);
 static void Menu_redefine_joystick(Menu* self);
@@ -152,101 +153,115 @@ void Menu_dtor(Menu* self)
 
 void Menu_populate(Menu* self)
 {
+    self->menu_main_num = 0;
+    self->menu_gamemodes_num = 0;
+    self->menu_cont_num = 0;
+    self->menu_timetrial_num = 0;
+    self->menu_about_num = 0;
+    self->menu_settings_num = 0;
+    self->menu_video_num = 0;
+    self->menu_sound_num = 0;
+    self->menu_controls_num = 0;
+    self->menu_engine_num = 0;
+    self->menu_enhancements_num = 0;
+    self->menu_handling_num = 0;
+    self->menu_musictest_num = 0;
+    self->text_redefine_num = 0;
     /* Create Menus */
-    self->menu_main.push_back(ENTRY_PLAYGAME);
-    self->menu_main.push_back(ENTRY_GAMEMODES);
-    self->menu_main.push_back(ENTRY_SETTINGS);
-    self->menu_main.push_back(ENTRY_ABOUT);
-    self->menu_main.push_back(ENTRY_EXIT);
+    self->menu_main[self->menu_main_num++] = ENTRY_PLAYGAME;
+    self->menu_main[self->menu_main_num++] = ENTRY_GAMEMODES;
+    self->menu_main[self->menu_main_num++] = ENTRY_SETTINGS;
+    self->menu_main[self->menu_main_num++] = ENTRY_ABOUT;
+    self->menu_main[self->menu_main_num++] = ENTRY_EXIT;
 
-    self->menu_gamemodes.push_back(ENTRY_ENHANCED);
-    self->menu_gamemodes.push_back(ENTRY_ORIGINAL);
-    self->menu_gamemodes.push_back(ENTRY_CONT);
-    self->menu_gamemodes.push_back(ENTRY_TIMETRIAL);
-    self->menu_gamemodes.push_back(ENTRY_BACK);
+    self->menu_gamemodes[self->menu_gamemodes_num++] = ENTRY_ENHANCED;
+    self->menu_gamemodes[self->menu_gamemodes_num++] = ENTRY_ORIGINAL;
+    self->menu_gamemodes[self->menu_gamemodes_num++] = ENTRY_CONT;
+    self->menu_gamemodes[self->menu_gamemodes_num++] = ENTRY_TIMETRIAL;
+    self->menu_gamemodes[self->menu_gamemodes_num++] = ENTRY_BACK;
 
-    self->menu_cont.push_back(ENTRY_START_CONT);
-    self->menu_cont.push_back(ENTRY_TRAFFIC);
-    self->menu_cont.push_back(ENTRY_BACK);
+    self->menu_cont[self->menu_cont_num++] = ENTRY_START_CONT;
+    self->menu_cont[self->menu_cont_num++] = ENTRY_TRAFFIC;
+    self->menu_cont[self->menu_cont_num++] = ENTRY_BACK;
 
-    self->menu_timetrial.push_back(ENTRY_START);
-    self->menu_timetrial.push_back(ENTRY_LAPS);
-    self->menu_timetrial.push_back(ENTRY_TRAFFIC);
-    self->menu_timetrial.push_back(ENTRY_BACK);
+    self->menu_timetrial[self->menu_timetrial_num++] = ENTRY_START;
+    self->menu_timetrial[self->menu_timetrial_num++] = ENTRY_LAPS;
+    self->menu_timetrial[self->menu_timetrial_num++] = ENTRY_TRAFFIC;
+    self->menu_timetrial[self->menu_timetrial_num++] = ENTRY_BACK;
 
-    self->menu_settings.push_back(ENTRY_VIDEO);
-    self->menu_settings.push_back(ENTRY_SOUND);
-    self->menu_settings.push_back(ENTRY_CONTROLS);
-    self->menu_settings.push_back(ENTRY_ENGINE);
-    self->menu_settings.push_back(ENTRY_SCORES);
-    self->menu_settings.push_back(ENTRY_SAVE);
+    self->menu_settings[self->menu_settings_num++] = ENTRY_VIDEO;
+    self->menu_settings[self->menu_settings_num++] = ENTRY_SOUND;
+    self->menu_settings[self->menu_settings_num++] = ENTRY_CONTROLS;
+    self->menu_settings[self->menu_settings_num++] = ENTRY_ENGINE;
+    self->menu_settings[self->menu_settings_num++] = ENTRY_SCORES;
+    self->menu_settings[self->menu_settings_num++] = ENTRY_SAVE;
 
-    self->menu_video.push_back(ENTRY_FPS);
-    self->menu_video.push_back(ENTRY_WIDESCREEN);
-    self->menu_video.push_back(ENTRY_HIRES);
-    self->menu_video.push_back(ENTRY_BACK);
+    self->menu_video[self->menu_video_num++] = ENTRY_FPS;
+    self->menu_video[self->menu_video_num++] = ENTRY_WIDESCREEN;
+    self->menu_video[self->menu_video_num++] = ENTRY_HIRES;
+    self->menu_video[self->menu_video_num++] = ENTRY_BACK;
 
-    self->menu_sound.push_back(ENTRY_MUTE);
+    self->menu_sound[self->menu_sound_num++] = ENTRY_MUTE;
     /*menu_sound.push_back(ENTRY_BGM); */
     /*menu_sound.push_back(ENTRY_SFX); */
-    self->menu_sound.push_back(ENTRY_ADVERTISE);
-    self->menu_sound.push_back(ENTRY_PREVIEWSND);
-    self->menu_sound.push_back(ENTRY_FIXSAMPLES);
-    self->menu_sound.push_back(ENTRY_MUSICTEST);
-    self->menu_sound.push_back(ENTRY_BACK);
+    self->menu_sound[self->menu_sound_num++] = ENTRY_ADVERTISE;
+    self->menu_sound[self->menu_sound_num++] = ENTRY_PREVIEWSND;
+    self->menu_sound[self->menu_sound_num++] = ENTRY_FIXSAMPLES;
+    self->menu_sound[self->menu_sound_num++] = ENTRY_MUSICTEST;
+    self->menu_sound[self->menu_sound_num++] = ENTRY_BACK;
 
-    self->menu_controls.push_back(ENTRY_GEAR);
-    if (input.gamepad) self->menu_controls.push_back(ENTRY_ANALOG);
-    self->menu_controls.push_back(ENTRY_DSTEER);
-    self->menu_controls.push_back(ENTRY_DPEDAL);
-    self->menu_controls.push_back(ENTRY_BACK);
+    self->menu_controls[self->menu_controls_num++] = ENTRY_GEAR;
+    if (input.gamepad) self->menu_controls[self->menu_controls_num++] = ENTRY_ANALOG;
+    self->menu_controls[self->menu_controls_num++] = ENTRY_DSTEER;
+    self->menu_controls[self->menu_controls_num++] = ENTRY_DPEDAL;
+    self->menu_controls[self->menu_controls_num++] = ENTRY_BACK;
 
-    self->menu_engine.push_back(ENTRY_TIME);
-    self->menu_engine.push_back(ENTRY_TRAFFIC);
-    self->menu_engine.push_back(ENTRY_TRACKS);
-    self->menu_engine.push_back(ENTRY_FREEPLAY);
-    self->menu_engine.push_back(ENTRY_FORCE_AI);
-    self->menu_engine.push_back(ENTRY_SUB_ENHANCEMENTS);
-    self->menu_engine.push_back(ENTRY_SUB_HANDLING);
-    self->menu_engine.push_back(ENTRY_BACK);
+    self->menu_engine[self->menu_engine_num++] = ENTRY_TIME;
+    self->menu_engine[self->menu_engine_num++] = ENTRY_TRAFFIC;
+    self->menu_engine[self->menu_engine_num++] = ENTRY_TRACKS;
+    self->menu_engine[self->menu_engine_num++] = ENTRY_FREEPLAY;
+    self->menu_engine[self->menu_engine_num++] = ENTRY_FORCE_AI;
+    self->menu_engine[self->menu_engine_num++] = ENTRY_SUB_ENHANCEMENTS;
+    self->menu_engine[self->menu_engine_num++] = ENTRY_SUB_HANDLING;
+    self->menu_engine[self->menu_engine_num++] = ENTRY_BACK;
 
-    self->menu_enhancements.push_back(ENTRY_TIMER);
-    self->menu_enhancements.push_back(ENTRY_ATTRACT);
-    self->menu_enhancements.push_back(ENTRY_OBJECTS);
-    self->menu_enhancements.push_back(ENTRY_PROTOTYPE);
-    self->menu_enhancements.push_back(ENTRY_BACK);
+    self->menu_enhancements[self->menu_enhancements_num++] = ENTRY_TIMER;
+    self->menu_enhancements[self->menu_enhancements_num++] = ENTRY_ATTRACT;
+    self->menu_enhancements[self->menu_enhancements_num++] = ENTRY_OBJECTS;
+    self->menu_enhancements[self->menu_enhancements_num++] = ENTRY_PROTOTYPE;
+    self->menu_enhancements[self->menu_enhancements_num++] = ENTRY_BACK;
 
-    self->menu_handling.push_back(ENTRY_GRIP);
-    self->menu_handling.push_back(ENTRY_OFFROAD);
-    self->menu_handling.push_back(ENTRY_BUMPER);
-    self->menu_handling.push_back(ENTRY_TURBO);
-    self->menu_handling.push_back(ENTRY_COLOR);
-    self->menu_handling.push_back(ENTRY_BACK);
+    self->menu_handling[self->menu_handling_num++] = ENTRY_GRIP;
+    self->menu_handling[self->menu_handling_num++] = ENTRY_OFFROAD;
+    self->menu_handling[self->menu_handling_num++] = ENTRY_BUMPER;
+    self->menu_handling[self->menu_handling_num++] = ENTRY_TURBO;
+    self->menu_handling[self->menu_handling_num++] = ENTRY_COLOR;
+    self->menu_handling[self->menu_handling_num++] = ENTRY_BACK;
 
-    self->menu_musictest.push_back(ENTRY_MUSIC1);
-    self->menu_musictest.push_back(ENTRY_MUSIC2);
-    self->menu_musictest.push_back(ENTRY_MUSIC3);
-    self->menu_musictest.push_back(ENTRY_MUSIC4);
-    self->menu_musictest.push_back(ENTRY_BACK);
+    self->menu_musictest[self->menu_musictest_num++] = ENTRY_MUSIC1;
+    self->menu_musictest[self->menu_musictest_num++] = ENTRY_MUSIC2;
+    self->menu_musictest[self->menu_musictest_num++] = ENTRY_MUSIC3;
+    self->menu_musictest[self->menu_musictest_num++] = ENTRY_MUSIC4;
+    self->menu_musictest[self->menu_musictest_num++] = ENTRY_BACK;
 
-    self->menu_about.push_back("CANNONBALL 0.3 \xA9 CHRIS WHITE 2014");
-    self->menu_about.push_back("REASSEMBLER.BLOGSPOT.COM");
-    self->menu_about.push_back(" ");
-    self->menu_about.push_back("CANNONBALL IS FREE AND MAY NOT BE SOLD.");
+    self->menu_about[self->menu_about_num++] = "CANNONBALL 0.3 \xA9 CHRIS WHITE 2014";
+    self->menu_about[self->menu_about_num++] = "REASSEMBLER.BLOGSPOT.COM";
+    self->menu_about[self->menu_about_num++] = " ";
+    self->menu_about[self->menu_about_num++] = "CANNONBALL IS FREE AND MAY NOT BE SOLD.";
 
     /* Redefine menu text */
-    self->text_redefine.push_back("PRESS UP");
-    self->text_redefine.push_back("PRESS DOWN");
-    self->text_redefine.push_back("PRESS LEFT");
-    self->text_redefine.push_back("PRESS RIGHT");
-    self->text_redefine.push_back("PRESS ACCELERATE");
-    self->text_redefine.push_back("PRESS BRAKE");
-    self->text_redefine.push_back("PRESS GEAR");
-    self->text_redefine.push_back("PRESS GEAR HIGH");
-    self->text_redefine.push_back("PRESS START");
-    self->text_redefine.push_back("PRESS COIN IN");
-    self->text_redefine.push_back("PRESS MENU");
-    self->text_redefine.push_back("PRESS VIEW CHANGE");
+    self->text_redefine[self->text_redefine_num++] = "PRESS UP";
+    self->text_redefine[self->text_redefine_num++] = "PRESS DOWN";
+    self->text_redefine[self->text_redefine_num++] = "PRESS LEFT";
+    self->text_redefine[self->text_redefine_num++] = "PRESS RIGHT";
+    self->text_redefine[self->text_redefine_num++] = "PRESS ACCELERATE";
+    self->text_redefine[self->text_redefine_num++] = "PRESS BRAKE";
+    self->text_redefine[self->text_redefine_num++] = "PRESS GEAR";
+    self->text_redefine[self->text_redefine_num++] = "PRESS GEAR HIGH";
+    self->text_redefine[self->text_redefine_num++] = "PRESS START";
+    self->text_redefine[self->text_redefine_num++] = "PRESS COIN IN";
+    self->text_redefine[self->text_redefine_num++] = "PRESS MENU";
+    self->text_redefine[self->text_redefine_num++] = "PRESS VIEW CHANGE";
 }
 
 void Menu_init(Menu* self)
@@ -287,7 +302,7 @@ void Menu_init(Menu* self)
 
     outrun.game_state = GS_INIT;
 
-    Menu_set_menu(self, &self->menu_main);
+    Menu_set_menu(self, self->menu_main, self->menu_main_num);
     Menu_refresh_menu(self);
 
     /* Reset audio, so we can play tones */
@@ -354,7 +369,7 @@ static void Menu_tick_ui(Menu* self)
     if (self->message_counter > 0)
     {
         self->message_counter--;
-        OHud_blit_text_new(&ohud, 0, 1, self->msg.c_str(), GREY);
+        OHud_blit_text_new(&ohud, 0, 1, self->msg, GREY);
     }
      
     /* Shift horizon */
@@ -407,11 +422,11 @@ static void Menu_draw_menu_options(Menu* self)
     int8_t x = 0;
 
     /* Find central column in screen.  */
-    int8_t y = 13 + ((ROWS - 13) >> 1) - ((self->menu_selected->size() * 2) >> 1);
+    int8_t y = 13 + ((ROWS - 13) >> 1) - ((self->menu_selected_num * 2) >> 1);
 
-    { int i; for (i = 0; i < (int) self->menu_selected->size(); i++)
+    { int i; for (i = 0; i < (int) self->menu_selected_num; i++)
     {
-        std::string s = self->menu_selected->at(i);
+        std::string s = self->menu_selected[i];
 
         /* Centre the menu option */
         x = 20 - (s.length() >> 1);
@@ -464,7 +479,7 @@ static void Menu_tick_menu(Menu* self)
     {
         OSoundInt_queue_sound(&osoundint, SOUND_BEEP1);
 
-        if (++self->cursor >= (int16_t) self->menu_selected->size())
+        if (++self->cursor >= (int16_t) self->menu_selected_num)
             self->cursor = 0;
     }
     else if (Input_has_pressed(&input, UP) || OInputs_is_analog_l(&oinputs))
@@ -472,14 +487,14 @@ static void Menu_tick_menu(Menu* self)
         OSoundInt_queue_sound(&osoundint, SOUND_BEEP1);
 
         if (--self->cursor < 0)
-            self->cursor = self->menu_selected->size() - 1;
+            self->cursor = self->menu_selected_num - 1;
     }
     else if (Input_has_pressed(&input, ACCEL) || Input_has_pressed(&input, START) || OInputs_is_analog_select(&oinputs))
     {
         /* Get option that was selected */
-        const char* OPTION = self->menu_selected->at(self->cursor).c_str();
+        const char* OPTION = self->menu_selected[self->cursor];
 
-        if (self->menu_selected == &self->menu_main)
+        if (self->menu_selected == self->menu_main)
         {
             if (SELECTED(ENTRY_PLAYGAME))
             {
@@ -487,30 +502,30 @@ static void Menu_tick_menu(Menu* self)
                 return;
             }
             else if (SELECTED(ENTRY_GAMEMODES))
-                Menu_set_menu(self, &self->menu_gamemodes);
+                Menu_set_menu(self, self->menu_gamemodes, self->menu_gamemodes_num);
             else if (SELECTED(ENTRY_SETTINGS))
-                Menu_set_menu(self, &self->menu_settings);
+                Menu_set_menu(self, self->menu_settings, self->menu_settings_num);
             else if (SELECTED(ENTRY_ABOUT))
-                Menu_set_menu(self, &self->menu_about);
+                Menu_set_menu(self, self->menu_about, self->menu_about_num);
             else if (SELECTED(ENTRY_EXIT))
             {
                 cannonball_state = STATE_QUIT;
             }
         }
-        else if (self->menu_selected == &self->menu_gamemodes)
+        else if (self->menu_selected == self->menu_gamemodes)
         {
             if (SELECTED(ENTRY_ENHANCED))
                 Menu_start_game(self, MODE_ORIGINAL, 1);
             else if (SELECTED(ENTRY_ORIGINAL))
                 Menu_start_game(self, MODE_ORIGINAL, 2);
             else if (SELECTED(ENTRY_CONT))
-                Menu_set_menu(self, &self->menu_cont);
+                Menu_set_menu(self, self->menu_cont, self->menu_cont_num);
             else if (SELECTED(ENTRY_TIMETRIAL))
-                Menu_set_menu(self, &self->menu_timetrial);
+                Menu_set_menu(self, self->menu_timetrial, self->menu_timetrial_num);
             else if (SELECTED(ENTRY_BACK))
-                Menu_set_menu(self, &self->menu_main);
+                Menu_set_menu(self, self->menu_main, self->menu_main_num);
         }
-        else if (self->menu_selected == &self->menu_cont)
+        else if (self->menu_selected == self->menu_cont)
         {
             if (SELECTED(ENTRY_START_CONT))
             {
@@ -524,9 +539,9 @@ static void Menu_tick_menu(Menu* self)
                 lr_options_set_frontend_variable_int(&config.cont_traffic);
             }
             else if (SELECTED(ENTRY_BACK))
-                Menu_set_menu(self, &self->menu_gamemodes);
+                Menu_set_menu(self, self->menu_gamemodes, self->menu_gamemodes_num);
         }
-        else if (self->menu_selected == &self->menu_timetrial)
+        else if (self->menu_selected == self->menu_timetrial)
         {
             if (SELECTED(ENTRY_START))
             {
@@ -549,22 +564,22 @@ static void Menu_tick_menu(Menu* self)
                 lr_options_set_frontend_variable_int(&config.ttrial.traffic);
             }
             else if (SELECTED(ENTRY_BACK))
-                Menu_set_menu(self, &self->menu_gamemodes);
+                Menu_set_menu(self, self->menu_gamemodes, self->menu_gamemodes_num);
         }
-        else if (self->menu_selected == &self->menu_settings)
+        else if (self->menu_selected == self->menu_settings)
         {
             if (SELECTED(ENTRY_VIDEO))
-                Menu_set_menu(self, &self->menu_video);
+                Menu_set_menu(self, self->menu_video, self->menu_video_num);
             else if (SELECTED(ENTRY_SOUND))
-                Menu_set_menu(self, &self->menu_sound);
+                Menu_set_menu(self, self->menu_sound, self->menu_sound_num);
             else if (SELECTED(ENTRY_CONTROLS))
             {
                 if (input.gamepad)
                     Menu_display_message(self, "GAMEPAD FOUND");
-                Menu_set_menu(self, &self->menu_controls);
+                Menu_set_menu(self, self->menu_controls, self->menu_controls_num);
             }
             else if (SELECTED(ENTRY_ENGINE))
-                Menu_set_menu(self, &self->menu_engine);
+                Menu_set_menu(self, self->menu_engine, self->menu_engine_num);
             else if (SELECTED(ENTRY_SCORES))
             {
                 if (Config_clear_scores(&config))
@@ -574,14 +589,14 @@ static void Menu_tick_menu(Menu* self)
             }
             else if (SELECTED(ENTRY_SAVE))
             {
-                Menu_set_menu(self, &self->menu_main);
+                Menu_set_menu(self, self->menu_main, self->menu_main_num);
             }
         }
-        else if (self->menu_selected == &self->menu_about)
+        else if (self->menu_selected == self->menu_about)
         {
-            Menu_set_menu(self, &self->menu_main);
+            Menu_set_menu(self, self->menu_main, self->menu_main_num);
         }
-        else if (self->menu_selected == &self->menu_video)
+        else if (self->menu_selected == self->menu_video)
         {
             if (SELECTED(ENTRY_FULLSCREEN))
             {
@@ -640,9 +655,9 @@ static void Menu_tick_menu(Menu* self)
                 lr_options_set_frontend_variable_int(&config.video.fps);
             }
             else if (SELECTED(ENTRY_BACK))
-                Menu_set_menu(self, &self->menu_settings);
+                Menu_set_menu(self, self->menu_settings, self->menu_settings_num);
         }
-        else if (self->menu_selected == &self->menu_sound)
+        else if (self->menu_selected == self->menu_sound)
         {
             if (SELECTED(ENTRY_MUTE))
             {
@@ -679,11 +694,11 @@ static void Menu_tick_menu(Menu* self)
                 lr_options_set_frontend_variable_int(&config.sound.fix_samples);
             }
             else if (SELECTED(ENTRY_MUSICTEST))
-                Menu_set_menu(self, &self->menu_musictest);
+                Menu_set_menu(self, self->menu_musictest, self->menu_musictest_num);
             else if (SELECTED(ENTRY_BACK))
-                Menu_set_menu(self, &self->menu_settings);
+                Menu_set_menu(self, self->menu_settings, self->menu_settings_num);
         }
-        else if (self->menu_selected == &self->menu_controls)
+        else if (self->menu_selected == self->menu_controls)
         {
             if (SELECTED(ENTRY_GEAR))
             {
@@ -725,9 +740,9 @@ static void Menu_tick_menu(Menu* self)
                 lr_options_set_frontend_variable_int(&config.controls.pedal_speed);
             }
             else if (SELECTED(ENTRY_BACK))
-                Menu_set_menu(self, &self->menu_settings);
+                Menu_set_menu(self, self->menu_settings, self->menu_settings_num);
         }
-        else if (self->menu_selected == &self->menu_engine)
+        else if (self->menu_selected == self->menu_engine)
         {
             if (SELECTED(ENTRY_TRACKS))
             {
@@ -773,13 +788,13 @@ static void Menu_tick_menu(Menu* self)
                 lr_options_set_frontend_variable_int(&config.engine.dip_traffic);
             }
             else if (SELECTED(ENTRY_SUB_ENHANCEMENTS))
-                Menu_set_menu(self, &self->menu_enhancements);
+                Menu_set_menu(self, self->menu_enhancements, self->menu_enhancements_num);
             else if (SELECTED(ENTRY_SUB_HANDLING))
-                Menu_set_menu(self, &self->menu_handling);
+                Menu_set_menu(self, self->menu_handling, self->menu_handling_num);
             else if (SELECTED(ENTRY_BACK))
-                Menu_set_menu(self, &self->menu_settings);
+                Menu_set_menu(self, self->menu_settings, self->menu_settings_num);
         }
-        else if (self->menu_selected == &self->menu_enhancements)
+        else if (self->menu_selected == self->menu_enhancements)
         {
             if (SELECTED(ENTRY_TIMER))
             {
@@ -802,9 +817,9 @@ static void Menu_tick_menu(Menu* self)
                 lr_options_set_frontend_variable_int(&config.engine.new_attract);
             }
             else if (SELECTED(ENTRY_BACK))
-                Menu_set_menu(self, &self->menu_engine);
+                Menu_set_menu(self, self->menu_engine, self->menu_engine_num);
         }
-        else if (self->menu_selected == &self->menu_handling)
+        else if (self->menu_selected == self->menu_handling)
         {
             if (SELECTED(ENTRY_GRIP))
             {
@@ -833,9 +848,9 @@ static void Menu_tick_menu(Menu* self)
                 lr_options_set_frontend_variable_int(&config.engine.car_pal);
             }
             else if (SELECTED(ENTRY_BACK))
-                Menu_set_menu(self, &self->menu_engine);
+                Menu_set_menu(self, self->menu_engine, self->menu_engine_num);
         }
-        else if (self->menu_selected == &self->menu_musictest)
+        else if (self->menu_selected == self->menu_musictest)
         {
             if (SELECTED(ENTRY_MUSIC1))
                 OSoundInt_queue_sound(&osoundint, SOUND_MUSIC_MAGICAL);
@@ -849,11 +864,11 @@ static void Menu_tick_menu(Menu* self)
             else if (SELECTED(ENTRY_BACK))
             {
                 OSoundInt_queue_sound(&osoundint, SOUND_FM_RESET);
-                Menu_set_menu(self, &self->menu_sound);
+                Menu_set_menu(self, self->menu_sound, self->menu_sound_num);
             }
         }
         else
-            Menu_set_menu(self, &self->menu_main);
+            Menu_set_menu(self, self->menu_main, self->menu_main_num);
 
         OSoundInt_queue_sound(&osoundint, SOUND_BEEP1);
         Menu_refresh_menu(self);
@@ -861,12 +876,12 @@ static void Menu_tick_menu(Menu* self)
 }
 
 /* Set Current Menu */
-static void Menu_set_menu(Menu* self, std::vector<std::string> *menu)
+static void Menu_set_menu(Menu* self, const char** menu, uint8_t num)
 {
-    self->menu_selected = menu;
-    self->cursor = 0;
-
-    self->is_text_menu = (menu == &self->menu_about);
+    self->menu_selected     = menu;
+    self->menu_selected_num = num;
+    self->cursor            = 0;
+    self->is_text_menu      = (menu == self->menu_about);
 }
 
 /* Refresh menu options with latest config data */
@@ -875,24 +890,24 @@ void Menu_refresh_menu(Menu* self)
     int16_t cursor_backup = self->cursor;
     std::string s;
 
-    for (self->cursor = 0; self->cursor < (int) self->menu_selected->size(); self->cursor++)
+    for (self->cursor = 0; self->cursor < (int) self->menu_selected_num; self->cursor++)
     {
         /* Get option that was selected */
-        const char* OPTION = self->menu_selected->at(self->cursor).c_str();
+        const char* OPTION = self->menu_selected[self->cursor];
 
-        if (self->menu_selected == &self->menu_timetrial)
+        if (self->menu_selected == self->menu_timetrial)
         {
             if (SELECTED(ENTRY_LAPS))
                 Menu_set_menu_text(self, ENTRY_LAPS, Utils_to_string(config.ttrial.laps));
             else if (SELECTED(ENTRY_TRAFFIC))
                 Menu_set_menu_text(self, ENTRY_TRAFFIC, config.ttrial.traffic == 0 ? "DISABLED" : Utils_to_string(config.ttrial.traffic));
         }
-        else if (self->menu_selected == &self->menu_cont)
+        else if (self->menu_selected == self->menu_cont)
         {
             if (SELECTED(ENTRY_TRAFFIC))
                 Menu_set_menu_text(self, ENTRY_TRAFFIC, config.cont_traffic == 0 ? "DISABLED" : Utils_to_string(config.cont_traffic));
         }
-        else if (self->menu_selected == &self->menu_video)
+        else if (self->menu_selected == self->menu_video)
         {
             if (SELECTED(ENTRY_FULLSCREEN))
             {
@@ -918,7 +933,7 @@ void Menu_refresh_menu(Menu* self)
             else if (SELECTED(ENTRY_SCANLINES))
                 Menu_set_menu_text(self, ENTRY_SCANLINES, config.video.scanlines ? Utils_to_string(config.video.scanlines) +"%": "OFF");
         }
-        else if (self->menu_selected == &self->menu_sound)
+        else if (self->menu_selected == self->menu_sound)
         {
             if (SELECTED(ENTRY_MUTE))
                 Menu_set_menu_text(self, ENTRY_MUTE, config.sound.enabled ? "ON" : "OFF");
@@ -929,7 +944,7 @@ void Menu_refresh_menu(Menu* self)
             else if (SELECTED(ENTRY_FIXSAMPLES))
                 Menu_set_menu_text(self, ENTRY_FIXSAMPLES, config.sound.fix_samples ? "ON" : "OFF");
         }
-        else if (self->menu_selected == &self->menu_controls)
+        else if (self->menu_selected == self->menu_controls)
         {
             if (SELECTED(ENTRY_GEAR))
             {
@@ -951,7 +966,7 @@ void Menu_refresh_menu(Menu* self)
             else if (SELECTED(ENTRY_DPEDAL))
                 Menu_set_menu_text(self, ENTRY_DPEDAL, Utils_to_string(config.controls.pedal_speed));
         }
-        else if (self->menu_selected == &self->menu_engine)
+        else if (self->menu_selected == self->menu_engine)
         {
             if (SELECTED(ENTRY_TRACKS))
                 Menu_set_menu_text(self, ENTRY_TRACKS, config.engine.jap ? "JAPAN" : "WORLD");
@@ -978,7 +993,7 @@ void Menu_refresh_menu(Menu* self)
                 Menu_set_menu_text(self, ENTRY_TRAFFIC, s);
             }
         }
-        else if (self->menu_selected == &self->menu_enhancements)
+        else if (self->menu_selected == self->menu_enhancements)
         {
             if (SELECTED(ENTRY_TIMER))
                 Menu_set_menu_text(self, ENTRY_TIMER, config.engine.fix_timer ? "ON" : "OFF");
@@ -989,7 +1004,7 @@ void Menu_refresh_menu(Menu* self)
             else if (SELECTED(ENTRY_ATTRACT))
                 Menu_set_menu_text(self, ENTRY_ATTRACT, config.engine.new_attract ? "ON" : "OFF");
         }
-        else if (self->menu_selected == &self->menu_handling)
+        else if (self->menu_selected == self->menu_handling)
         {
             if (SELECTED(ENTRY_GRIP))
                 Menu_set_menu_text(self, ENTRY_GRIP, config.engine.grippy_tyres ? "ON" : "OFF");
@@ -1010,8 +1025,9 @@ void Menu_refresh_menu(Menu* self)
 static void Menu_set_menu_text(Menu* self, std::string s1, std::string s2)
 {
     s1.append(s2);
-    self->menu_selected->erase(self->menu_selected->begin() + self->cursor);
-    self->menu_selected->insert(self->menu_selected->begin() + self->cursor, s1);
+    strncpy(self->menu_text[self->cursor], s1.c_str(), sizeof(self->menu_text[self->cursor]) - 1);
+    self->menu_text[self->cursor][sizeof(self->menu_text[self->cursor]) - 1] = 0;
+    self->menu_selected[self->cursor] = self->menu_text[self->cursor];
 }
 
 static void Menu_redefine_keyboard(Menu* self)
@@ -1040,7 +1056,7 @@ static void Menu_redefine_keyboard(Menu* self)
             }
             else
             {
-                Menu_draw_text(self, self->text_redefine.at(self->redef_state));
+                Menu_draw_text(self, self->text_redefine[self->redef_state]);
                 if (input.key_press != -1)
                 {
                     config.controls.keyconfig[self->redef_state] = input.key_press;
@@ -1078,7 +1094,7 @@ static void Menu_redefine_joystick(Menu* self)
             }
             else
             {
-                Menu_draw_text(self, self->text_redefine.at(self->redef_state + 4));
+                Menu_draw_text(self, self->text_redefine[self->redef_state + 4]);
                 if (input.joy_button != -1)
                 {
                     config.controls.padconfig[self->redef_state] = input.joy_button;
@@ -1097,7 +1113,8 @@ static void Menu_redefine_joystick(Menu* self)
 /* Display a contextual message in the top left of the screen */
 static void Menu_display_message(Menu* self, std::string s)
 {
-    self->msg = s;
+    strncpy(self->msg, s.c_str(), sizeof(self->msg) - 1);
+    self->msg[sizeof(self->msg) - 1] = 0;
     self->message_counter = MESSAGE_TIME * config.fps;
 }
 

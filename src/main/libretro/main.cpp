@@ -1058,7 +1058,7 @@ bool retro_load_game(const struct retro_game_info *info)
    if (!Video_init(&video, &roms, &config.video))
       return false;
 
-   menu = (Menu*)malloc(sizeof(Menu));
+   menu = (Menu*)calloc(1, sizeof(Menu));
    Menu_ctor(menu);
 
    Audio_init(&cannonball_audio);
