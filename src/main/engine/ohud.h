@@ -25,7 +25,7 @@ enum {
         GREEN = 0x92
     };
 
-static const uint16_t DIGIT_BASE = 0x30;
+#define DIGIT_BASE (0x30)
 
 typedef struct OHud
 {

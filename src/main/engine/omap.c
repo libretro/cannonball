@@ -31,7 +31,7 @@ static void OMap_move_mini_car(OMap* self, oentry*);
 OMap omap;
 
 /* Position of Ferrari in Jump Table */
-static const uint8_t MAP_FERRARI_SLOT = 25;
+#define MAP_FERRARI_SLOT (25)
 
 
 

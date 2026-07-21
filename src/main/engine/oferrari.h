@@ -71,11 +71,11 @@ enum {
 
 #define PAL_WHITE 281
 
-static const uint32_t MAX_SPEED = 0x1260000;
+#define MAX_SPEED (0x1260000)
 
-static const uint32_t CAR_BASE_INC = 0x12F;
+#define CAR_BASE_INC (0x12F)
 
-static const uint16_t OFFROAD_BOUNDS = 0x1F4;
+#define OFFROAD_BOUNDS (0x1F4)
 
 extern uint16_t torque_lookup[];
 

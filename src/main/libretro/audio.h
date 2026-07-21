@@ -27,7 +27,7 @@ typedef struct wav_t {
 } wav_t;
 
 
-static const uint32_t CHANNELS = 2;
+#define CHANNELS (2)
 
 
 

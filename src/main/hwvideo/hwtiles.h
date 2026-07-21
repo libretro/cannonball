@@ -16,9 +16,9 @@ enum {
 
 enum { TILES_LENGTH = 0x10000 };
 
-static const uint16_t NUM_TILES = 0x2000;
+#define NUM_TILES (0x2000)
 
-static const uint16_t TILEMAP_COLOUR_OFFSET = 0x1c00;
+#define TILEMAP_COLOUR_OFFSET (0x1c00)
 
 typedef struct hwtiles
 {

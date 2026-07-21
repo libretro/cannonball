@@ -17,7 +17,7 @@ extern "C" {
 
 struct RomLoader;
 
-static const short HAND_LEFT = 0, HAND_CENTRE = 1, HAND_RIGHT = 2;
+enum { HAND_LEFT = 0, HAND_CENTRE = 1, HAND_RIGHT = 2 };
 
 typedef struct OMusic
 {

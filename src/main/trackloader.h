@@ -70,9 +70,9 @@ int16_t TrackLoader_read16(uint8_t* data, uint32_t addr);
 int8_t TrackLoader_read8_a(uint8_t* data, uint32_t* addr);
 int8_t TrackLoader_read8(uint8_t* data, uint32_t addr);
 
-static const int TL_MODE_ORIGINAL = 0;
+#define TL_MODE_ORIGINAL (0)
 
-static const int TL_MODE_LAYOUT   = 1;
+#define TL_MODE_LAYOUT (1)
 
 typedef struct TrackLoader
 {

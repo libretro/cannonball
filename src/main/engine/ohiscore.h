@@ -44,7 +44,7 @@ enum {
 
 enum { NO_MINICARS = 7 };
 
-static const uint16_t TILE_PROPS = 0x8030;
+#define TILE_PROPS (0x8030)
 
 typedef struct OHiScore
 {

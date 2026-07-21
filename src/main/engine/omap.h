@@ -37,7 +37,7 @@ enum
         MAP_CLEAR = 0x18
     };
 
-static const uint8_t MAP_PIECES = 0x3C;
+#define MAP_PIECES (0x3C)
 
 typedef struct OMap
 {

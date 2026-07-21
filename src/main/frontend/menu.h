@@ -25,7 +25,7 @@ enum {
         MENU_STATE_TTRIAL
     };
 
-static const int32_t MESSAGE_TIME = 5;
+#define MESSAGE_TIME (5)
 
 typedef struct Menu
 {

@@ -23,7 +23,7 @@ enum {SPLIT_NONE, SPLIT_INIT, SPLIT_CHOICE1, SPLIT_CHOICE2};
 
 enum {ROAD_NOCHANGE, ROAD_STRAIGHT, ROAD_RIGHT, ROAD_LEFT};
 
-static const uint16_t RD_WIDTH_MERGE = 0xD4;
+#define RD_WIDTH_MERGE (0xD4)
 
 typedef struct OInitEngine
 {

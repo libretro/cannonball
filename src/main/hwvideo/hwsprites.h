@@ -12,7 +12,7 @@ enum { SPRITE_RAM_SIZE = 128 * 8 };
 
 enum { SPRITES_LENGTH = 0x100000 >> 2 };
 
-static const uint16_t COLOR_BASE = 0x800;
+#define COLOR_BASE (0x800)
 
 typedef struct hwsprites
 {

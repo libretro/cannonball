@@ -42,14 +42,14 @@ static void Menu_start_game(Menu* self, int mode, int settings);
 
 
 /* Logo Y Position */
-const static int16_t LOGO_Y = -60;
+#define LOGO_Y (-60)
 
 /* Columns and rows available */
-const static uint16_t COLS = 40;
-const static uint16_t ROWS = 28;
+#define COLS (40)
+#define ROWS (28)
 
 /* Horizon Destination Position */
-const static uint16_t HORIZON_DEST = 0x3A0;
+#define HORIZON_DEST (0x3A0)
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Text Labels for menus */

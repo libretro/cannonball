@@ -20,17 +20,17 @@ extern "C" {
 #include "romloader.h"
 #include "hwaudio/soundchip.h"
 
-static const uint32_t BANK_256    = (11);
+#define BANK_256 ((11))
 
-static const uint32_t BANK_512    = (12);
+#define BANK_512 ((12))
 
-static const uint32_t BANK_12M    = (13);
+#define BANK_12M ((13))
 
-static const uint32_t BANK_MASK7  = (0x70 << 16);
+#define BANK_MASK7 ((0x70 << 16))
 
-static const uint32_t BANK_MASKF  = (0xf0 << 16);
+#define BANK_MASKF ((0xf0 << 16))
 
-static const uint32_t BANK_MASKF8 = (0xf8 << 16);
+#define BANK_MASKF8 ((0xf8 << 16))
 
 typedef struct SegaPCM
 {

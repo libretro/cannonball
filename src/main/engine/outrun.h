@@ -180,11 +180,11 @@ typedef struct adr_t
 
 struct OOutputs;
 
-static const uint8_t MODE_ORIGINAL = 0;
+#define MODE_ORIGINAL (0)
 
-static const uint8_t MODE_TTRIAL   = 1;
+#define MODE_TTRIAL (1)
 
-static const uint8_t MODE_CONT     = 2;
+#define MODE_CONT (2)
 
 typedef struct Outrun
 {

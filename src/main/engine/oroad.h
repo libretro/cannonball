@@ -40,7 +40,7 @@ enum { ARRAY_LENGTH = 0x200 };
 
 enum {ROAD_DOWN = -1, ROAD_NO_CHANGE = 0, ROAD_UP = 1};
 
-static const int32_t HORIZON_OFF = -0x3FF;
+#define HORIZON_OFF (-0x3FF)
 
 #define VIEW_ORIGINAL 0
 
@@ -48,11 +48,11 @@ static const int32_t HORIZON_OFF = -0x3FF;
 
 #define VIEW_INCAR 2
 
-static const uint32_t HW_HSCROLL_TABLE0 = 0x80400;
+#define HW_HSCROLL_TABLE0 (0x80400)
 
-static const uint32_t HW_HSCROLL_TABLE1 = 0x80800;
+#define HW_HSCROLL_TABLE1 (0x80800)
 
-static const uint32_t HW_BGCOLOR = 0x80C00;
+#define HW_BGCOLOR (0x80C00)
 
 typedef struct ORoad
 {

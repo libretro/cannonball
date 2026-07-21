@@ -31,11 +31,11 @@ extern "C" {
 
 enum { CRASH_BUMP = 0, CRASH_SPIN = 1, CRASH_FLIP = 2 };
 
-static const uint8_t SKID_RESET = 20;
+#define SKID_RESET (20)
 
-static const uint8_t SKID_MAX = 30;
+#define SKID_MAX (30)
 
-static const uint8_t SKID_X_ADJ = 24;
+#define SKID_X_ADJ (24)
 
 typedef struct OCrash
 {

@@ -37,9 +37,9 @@ typedef enum presses {
         MENU  = 14
     } presses;
 
-static const int CENTRE = 0x80;
+#define CENTRE (0x80)
 
-static const int DIGITAL_DEAD = 3200;
+#define DIGITAL_DEAD (3200)
 
 typedef struct Input
 {

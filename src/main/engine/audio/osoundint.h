@@ -21,9 +21,9 @@ extern "C" {
 
 enum { QUEUE_LENGTH = 0x1F };
 
-static const uint16_t PCM_RAM_SIZE = 0x100;
+#define PCM_RAM_SIZE (0x100)
 
-static const uint32_t SOUND_CLOCK = 4000000;
+#define SOUND_CLOCK (4000000)
 
 typedef struct OSoundInt
 {

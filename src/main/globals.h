@@ -28,16 +28,16 @@ enum { S16_PALETTE_ENTRIES = 0x1000 };
 enum { STAGES = 15 };
 
 /* Hard Coded End Point of every level */
-const static uint16_t ROAD_END      = 0x79C;
+#define ROAD_END (0x79C)
 
 /* End Point of level for CPU1, including horizon */
-const static uint16_t ROAD_END_CPU1 = 0x904;
+#define ROAD_END_CPU1 (0x904)
 
 /* Default timer used for hi-score entry */
-const static uint8_t HIGHSCORE_TIMER = 0x30;
+#define HIGHSCORE_TIMER (0x30)
 
 /* Default timer used for music selection (was 15 seconds on original/old romset) */
-const static uint8_t MUSIC_TIMER = 0x30;
+#define MUSIC_TIMER (0x30)
 
 enum
 {

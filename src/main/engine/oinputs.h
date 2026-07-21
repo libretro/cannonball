@@ -18,25 +18,25 @@ extern "C" {
 
 #include "outrun.h"
 
-static const uint8_t BRAKE_THRESHOLD1 = 0x80;
+#define BRAKE_THRESHOLD1 (0x80)
 
-static const uint8_t BRAKE_THRESHOLD2 = 0xA0;
+#define BRAKE_THRESHOLD2 (0xA0)
 
-static const uint8_t BRAKE_THRESHOLD3 = 0xC0;
+#define BRAKE_THRESHOLD3 (0xC0)
 
-static const uint8_t BRAKE_THRESHOLD4 = 0xE0;
+#define BRAKE_THRESHOLD4 (0xE0)
 
-static const int DELAY_RESET = 40;
+#define DELAY_RESET (40)
 
-static const uint8_t STEERING_MIN = 0x48;
+#define STEERING_MIN (0x48)
 
-static const uint8_t STEERING_MAX = 0xB8;
+#define STEERING_MAX (0xB8)
 
-static const uint8_t STEERING_CENTRE = 0x80;
+#define STEERING_CENTRE (0x80)
 
-static const uint8_t PEDAL_MIN = 0x30;
+#define PEDAL_MIN (0x30)
 
-static const uint8_t PEDAL_MAX = 0x90;
+#define PEDAL_MAX (0x90)
 
 typedef struct OInputs
 {

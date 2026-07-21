@@ -38,52 +38,52 @@ enum
 
 /* Internal Channel Offsets in RAM */
 /* Channels 0-7: YM Channels */
-const static uint16_t CHANNEL_YM1 = 0x020; /* f820 */
-const static uint16_t CHANNEL_YM2 = 0x040;
-const static uint16_t CHANNEL_YM3 = 0x060;
-const static uint16_t CHANNEL_YM4 = 0x080;
-const static uint16_t CHANNEL_YM5 = 0x0A0;
-const static uint16_t CHANNEL_YM6 = 0x0C0;
-const static uint16_t CHANNEL_YM7 = 0x0E0;
-const static uint16_t CHANNEL_YM8 = 0x100; /* f900 */
+#define CHANNEL_YM1 (0x020) /* f820 */
+#define CHANNEL_YM2 (0x040)
+#define CHANNEL_YM3 (0x060)
+#define CHANNEL_YM4 (0x080)
+#define CHANNEL_YM5 (0x0A0)
+#define CHANNEL_YM6 (0x0C0)
+#define CHANNEL_YM7 (0x0E0)
+#define CHANNEL_YM8 (0x100) /* f900 */
 
 /* Channels 8-13: PCM Drum Channels for music */
-const static uint16_t CHANNEL_PCM_DRUM1 = 0x120;
-const static uint16_t CHANNEL_PCM_DRUM2 = 0x140;
-const static uint16_t CHANNEL_PCM_DRUM3 = 0x160;
-const static uint16_t CHANNEL_PCM_DRUM4 = 0x180;
-const static uint16_t CHANNEL_PCM_DRUM5 = 0x1A0;
-const static uint16_t CHANNEL_PCM_DRUM6 = 0x1C0;
+#define CHANNEL_PCM_DRUM1 (0x120)
+#define CHANNEL_PCM_DRUM2 (0x140)
+#define CHANNEL_PCM_DRUM3 (0x160)
+#define CHANNEL_PCM_DRUM4 (0x180)
+#define CHANNEL_PCM_DRUM5 (0x1A0)
+#define CHANNEL_PCM_DRUM6 (0x1C0)
 
 /* Channels 14-21: PCM Sound Effects */
-const static uint16_t CHANNEL_PCM_FX1 = 0x1E0; /* f9e0: Crowd, Cheers, Wave */
-const static uint16_t CHANNEL_PCM_FX2 = 0x200;
-const static uint16_t CHANNEL_PCM_FX3 = 0x220; /* fa20: Slip, Safety Zone */
-const static uint16_t CHANNEL_PCM_FX4 = 0x240;
-const static uint16_t CHANNEL_PCM_FX5 = 0x260; /* fa60: Crash 1, Rebound, Crash2 */
-const static uint16_t CHANNEL_PCM_FX6 = 0x280;
-const static uint16_t CHANNEL_PCM_FX7 = 0x2A0; /* faa0: Voices */
-const static uint16_t CHANNEL_PCM_FX8 = 0x2C0;
+#define CHANNEL_PCM_FX1 (0x1E0) /* f9e0: Crowd, Cheers, Wave */
+#define CHANNEL_PCM_FX2 (0x200)
+#define CHANNEL_PCM_FX3 (0x220) /* fa20: Slip, Safety Zone */
+#define CHANNEL_PCM_FX4 (0x240)
+#define CHANNEL_PCM_FX5 (0x260) /* fa60: Crash 1, Rebound, Crash2 */
+#define CHANNEL_PCM_FX6 (0x280)
+#define CHANNEL_PCM_FX7 (0x2A0) /* faa0: Voices */
+#define CHANNEL_PCM_FX8 (0x2C0)
 
 /* Channel Mapping Info. Used to play sound effects and music at the same time.  */
-const static uint16_t CHANNEL_MAP1 = 0x2E0;
-const static uint16_t CHANNEL_MAP2 = 0x300;
-const static uint16_t CHANNEL_MAP3 = 0x320;
-const static uint16_t CHANNEL_MAP4 = 0x340;
-const static uint16_t CHANNEL_MAP5 = 0x360;
-const static uint16_t CHANNEL_MAP6 = 0x380;
-const static uint16_t CHANNEL_MAP7 = 0x3A0;
+#define CHANNEL_MAP1 (0x2E0)
+#define CHANNEL_MAP2 (0x300)
+#define CHANNEL_MAP3 (0x320)
+#define CHANNEL_MAP4 (0x340)
+#define CHANNEL_MAP5 (0x360)
+#define CHANNEL_MAP6 (0x380)
+#define CHANNEL_MAP7 (0x3A0)
 
 /* Channels 22-23: YM Sound Effects */
-const static uint16_t CHANNEL_YM_FX1 = 0x3C0; /* fbc0: Signal 1, Signal 2 */
-const static uint16_t CHANNEL_YM_FX2 = 0x3E0;
+#define CHANNEL_YM_FX1 (0x3C0) /* fbc0: Signal 1, Signal 2 */
+#define CHANNEL_YM_FX2 (0x3E0)
 
 /* Engine Commands in RAM */
-const static int16_t CHANNEL_ENGINE_CH1 = 0x400; /* 0xFC00: Engine Channel - Player's Car */
-const static int16_t CHANNEL_ENGINE_CH2 = 0x420; /* 0xFC20: Engine Channel - Traffic 1 */
-const static int16_t CHANNEL_ENGINE_CH3 = 0x440; /* 0xFC40: Engine Channel - Traffic 2 */
-const static int16_t CHANNEL_ENGINE_CH4 = 0x460; /* 0xFC60: Engine Channel - Traffic 3 */
-const static int16_t CHANNEL_ENGINE_CH5 = 0x480; /* 0xFC80: Engine Channel - Traffic 4 */
+#define CHANNEL_ENGINE_CH1 (0x400) /* 0xFC00: Engine Channel - Player's Car */
+#define CHANNEL_ENGINE_CH2 (0x420) /* 0xFC20: Engine Channel - Traffic 1 */
+#define CHANNEL_ENGINE_CH3 (0x440) /* 0xFC40: Engine Channel - Traffic 2 */
+#define CHANNEL_ENGINE_CH4 (0x460) /* 0xFC60: Engine Channel - Traffic 3 */
+#define CHANNEL_ENGINE_CH5 (0x480) /* 0xFC80: Engine Channel - Traffic 4 */
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Internal Format of Sound Data in RAM before sending to hardware */
@@ -228,17 +228,17 @@ enum { CHAN_RAM_SIZE = 0x800 };
 
 static const uint8_t CHAN_SIZE = 0x20;
 
-static const uint16_t CH09_CMDS1 = 0x570;
+#define CH09_CMDS1 (0x570)
 
-static const uint16_t CH09_CMDS2 = 0x578;
+#define CH09_CMDS2 (0x578)
 
-static const uint16_t CH11_CMDS1 = 0x580;
+#define CH11_CMDS1 (0x580)
 
-static const uint16_t CH11_CMDS2 = 0x588;
+#define CH11_CMDS2 (0x588)
 
-static const uint8_t PAN_LEFT  = 0x40;
+#define PAN_LEFT (0x40)
 
-static const uint8_t PAN_RIGHT = 0x80;
+#define PAN_RIGHT (0x80)
 
 #define PAN_CENTRE (PAN_LEFT | PAN_RIGHT)
 

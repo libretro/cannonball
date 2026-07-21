@@ -26,9 +26,9 @@ enum {
         TICK_GAME_ENGINE
     };
 
-static const uint8_t MAX_LAPS = 5;
+#define MAX_LAPS (5)
 
-static const uint8_t MAX_TRAFFIC = 8;
+#define MAX_TRAFFIC (8)
 
 typedef struct TTrial
 {

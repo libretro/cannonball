@@ -16,13 +16,13 @@ extern "C" {
 
 #include <boolean.h>
 
-static const uint8_t SNDCHIP_MONO             = 1;
+#define SNDCHIP_MONO (1)
 
-static const uint8_t SNDCHIP_STEREO           = 2;
+#define SNDCHIP_STEREO (2)
 
-static const uint8_t SNDCHIP_LEFT             = 0;
+#define SNDCHIP_LEFT (0)
 
-static const uint8_t SNDCHIP_RIGHT            = 1;
+#define SNDCHIP_RIGHT (1)
 
 typedef struct SoundChip
 {

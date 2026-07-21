@@ -22,13 +22,13 @@ extern "C" {
 
 #include "outrun.h"
 
-static const uint8_t DEF_SPRITE_ENTRIES = 0x44;
+#define DEF_SPRITE_ENTRIES (0x44)
 
-static const uint8_t HISCORE_SPRITE_ENTRIES = 0x40;
+#define HISCORE_SPRITE_ENTRIES (0x40)
 
-static const uint8_t COLLISION_RESET = 4;
+#define COLLISION_RESET (4)
 
-static const uint16_t SPRAY_RESET = 0xC;
+#define SPRAY_RESET (0xC)
 
 typedef struct OLevelObjs
 {
