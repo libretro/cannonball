@@ -91,6 +91,7 @@ void OLevelObjs_init_entries(OLevelObjs* self, uint32_t a4, const uint8_t start_
         sprite->z = z;
 
         { int16_t road_x = oroad.road0_h[z_orig];
+            int16_t multiply;
         int16_t xw1 = sprite->xw1;
 
         if (xw1 >= 0 && (sprite->control & WIDE_ROAD) == 0)
@@ -99,7 +100,7 @@ void OLevelObjs_init_entries(OLevelObjs* self, uint32_t a4, const uint8_t start_
         }
 
         /* on_lhs */
-        int16_t multiply = (xw1 * z_orig) >> 9; /* only used as a 16 bit value so truncate here */
+        multiply = (xw1 * z_orig) >> 9;
         sprite->x = road_x + multiply;
 
         a4 += 4; /* Throw away */
@@ -162,12 +163,13 @@ void OLevelObjs_setup_sprites(OLevelObjs* self, uint32_t z)
 /* +7: [Byte] Sprite Palette */static 
 void OLevelObjs_setup_sprite(OLevelObjs* self, oentry* sprite, uint32_t z)
 {
+    uint32_t addr;
     #define READ8(x)  TrackLoader_read8(trackloader.scenerymap_data, x)
     #define READ16(x) TrackLoader_read16(trackloader.scenerymap_data, x)
     #define READ32(x) TrackLoader_read32(trackloader.scenerymap_data, x)
 
     sprite->control |= ENABLE; /* Turn sprite on */
-    uint32_t addr = osprites.seg_spr_addr + osprites.seg_spr_offset1;
+    addr = osprites.seg_spr_addr + osprites.seg_spr_offset1;
 
     /* Set sprite x,y (world coordinates) */
     sprite->xw1     = 
@@ -391,6 +393,9 @@ void OLevelObjs_do_sprite_routine(OLevelObjs* self)
 /* Source: 4048 */static 
 void OLevelObjs_sprite_normal(OLevelObjs* self, oentry *sprite, uint8_t zoom)
 {
+    int16_t x2;
+    int16_t x1;
+    uint32_t offset_addr;
     /* Omit collision check if we're already colliding with something */
     if (self->sprite_collision_counter != 0 || (sprite->z >> 16) < 0x1B0)
     {
@@ -400,9 +405,7 @@ void OLevelObjs_sprite_normal(OLevelObjs* self, oentry *sprite, uint8_t zoom)
     /* Check Collision with sprite */
 
     /* First read collision offsets from table */
-    uint32_t offset_addr = SPRITE_X_OFFS + sprite->type;
-    int16_t x1;
-    int16_t x2; 
+    offset_addr = SPRITE_X_OFFS + sprite->type;
 
     /* H-Flip - swap x co-ordinates */
     if (sprite->control & HFLIP)
@@ -435,6 +438,9 @@ void OLevelObjs_sprite_normal(OLevelObjs* self, oentry *sprite, uint8_t zoom)
 /* Source: 0x4658 */static 
 void OLevelObjs_sprite_lights(OLevelObjs* self, oentry *sprite)
 {
+    int16_t x2;
+    int16_t x1;
+    uint32_t offset_addr;
     /* Omit collision check if we're already colliding with something */
     if (self->sprite_collision_counter != 0 || (sprite->z >> 16) < 0x1B0)
     {
@@ -444,9 +450,7 @@ void OLevelObjs_sprite_lights(OLevelObjs* self, oentry *sprite)
     /* Check Collision with sprite */
 
     /* First read collision offsets from table */
-    uint32_t offset_addr = SPRITE_X_OFFS + sprite->type;
-    int16_t x1;
-    int16_t x2; 
+    offset_addr = SPRITE_X_OFFS + sprite->type;
 
     /* H-Flip - swap x co-ordinates */
     if (sprite->control & HFLIP)
@@ -499,6 +503,8 @@ void OLevelObjs_set_spr_zoom_priority(OLevelObjs* self, oentry *sprite, uint8_t 
 {
     OSprites_move_sprite(&osprites, sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
+        int16_t road_x;
+        int32_t road_y;
 
     if (z16 < 4) return;
     if (z16 >= 0x200)
@@ -514,7 +520,7 @@ void OLevelObjs_set_spr_zoom_priority(OLevelObjs* self, oentry *sprite, uint8_t 
     /* 1/ Use Y Offset From Road Position [Screen] */
     /* 2/ Use Sprite Y World Data if not 0, converted to a screen position [World] */
 
-    int32_t road_y = -(oroad.road_y[oroad.road_p0 + z16] >> 4) + 223;
+    road_y = -(oroad.road_y[oroad.road_p0 + z16] >> 4) + 223;
 
     if (sprite->yw != 0)
     {
@@ -528,7 +534,7 @@ void OLevelObjs_set_spr_zoom_priority(OLevelObjs* self, oentry *sprite, uint8_t 
     /*    1/ Use X Offset From Road Position [Screen] */
     /*    2/ Use Sprite X World Data */
     
-    int16_t road_x = oroad.road0_h[z16];
+    road_x = oroad.road0_h[z16];
     { int16_t xw1 = sprite->xw1;
    
     if (xw1 >= 0)
@@ -557,6 +563,9 @@ void OLevelObjs_set_spr_zoom_priority(OLevelObjs* self, oentry *sprite, uint8_t 
 /* - Test For Collision */static 
 void OLevelObjs_sprite_collision_z1c(OLevelObjs* self, oentry* sprite)
 {
+    int16_t x2;
+    int16_t x1;
+    uint32_t offset_addr;
     /* Omit collision check if we're already colliding with something */
     if (self->sprite_collision_counter != 0 || (sprite->z >> 16) < 0x1B0)
     {
@@ -566,9 +575,7 @@ void OLevelObjs_sprite_collision_z1c(OLevelObjs* self, oentry* sprite)
     /* Check Collision with sprite */
 
     /* First read collision offsets from table */
-    uint32_t offset_addr = SPRITE_X_OFFS + sprite->type;
-    int16_t x1;
-    int16_t x2; 
+    offset_addr = SPRITE_X_OFFS + sprite->type;
 
     /* H-Flip - swap x co-ordinates */
     if (sprite-> control & HFLIP)
@@ -613,6 +620,7 @@ void OLevelObjs_set_spr_zoom_priority2(OLevelObjs* self, oentry *sprite, uint8_t
 {
     OSprites_move_sprite(&osprites, sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
+        int16_t road_x;
 
     if (z16 < 4) return;
     if (z16 >= 0x200)
@@ -630,7 +638,7 @@ void OLevelObjs_set_spr_zoom_priority2(OLevelObjs* self, oentry *sprite, uint8_t
     /* 1/ Use X Offset From Road Position [Screen] */
     /* 2/ Use Sprite X World Data */
 
-    int16_t road_x = oroad.road0_h[z16];
+    road_x = oroad.road0_h[z16];
     { int16_t xw1 = sprite->xw1;
 
     if (xw1 >= 0 && (sprite->control & WIDE_ROAD) == 0)
@@ -712,6 +720,7 @@ void OLevelObjs_sprite_minitree(OLevelObjs* self, oentry* sprite)
 {
     OSprites_move_sprite(&osprites, sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
+        int16_t road_x;
 
     if (z16 < 4) return;
     if (z16 >= 0x200)
@@ -724,7 +733,7 @@ void OLevelObjs_sprite_minitree(OLevelObjs* self, oentry* sprite)
     sprite->priority = z16;    
 
     /* 44c4 */
-    int16_t road_x = oroad.road0_h[z16];
+    road_x = oroad.road0_h[z16];
     { int16_t xw1 = sprite->xw1;
 
     if (xw1 >= 0)
@@ -733,16 +742,18 @@ void OLevelObjs_sprite_minitree(OLevelObjs* self, oentry* sprite)
     }
 
     { int32_t multiply = (xw1 * z16) >> 9;
+        uint16_t z;
+        int32_t road_y;
     road_x += multiply;
 
     if (road_x >= (160 + config.s16_x_off) || road_x < -(160 + config.s16_x_off)) return;
     sprite->x = road_x;
 
     /* 44fc */
-    int32_t road_y = -(oroad.road_y[oroad.road_p0 + z16] >> 4) + 223;
+    road_y = -(oroad.road_y[oroad.road_p0 + z16] >> 4) + 223;
     sprite->y = road_y; /* Set Sprite Y (Screen/Camera) */
 
-    uint16_t z = z16 >> 1;
+    z = z16 >> 1;
 
     if (z >= 0x80) 
     {
@@ -759,8 +770,9 @@ void OLevelObjs_sprite_minitree(OLevelObjs* self, oentry* sprite)
     /* +2: Entry In Zoom Lookup Table */
     else
     {
+        uint8_t offset;
         z <<= 1; /* Note we can't use original z16, so don't try to optimize this */
-        uint8_t offset = RomLoader_read8(&(roms.rom0), MAP_Y_TO_FRAME + z);
+        offset = RomLoader_read8(&(roms.rom0), MAP_Y_TO_FRAME + z);
         sprite->zoom = RomLoader_read8(&(roms.rom0), MAP_Y_TO_FRAME + z + 1);
         sprite->addr = RomLoader_read32(roms.rom0p, outrun.adr.sprite_minitree + offset);
     }
@@ -771,6 +783,7 @@ void OLevelObjs_sprite_minitree(OLevelObjs* self, oentry* sprite)
 /* Source:  */static 
 void OLevelObjs_sprite_debris(OLevelObjs* self, oentry* sprite)
 {
+    uint32_t offset_addr;
     const uint8_t zoom = 2;
     if (self->spray_counter != 0 || (sprite->z >> 16) < 0x1B0)
     {
@@ -780,7 +793,7 @@ void OLevelObjs_sprite_debris(OLevelObjs* self, oentry* sprite)
     /* Check Collision with sprite */
 
     /* First read collision offsets from table */
-    uint32_t offset_addr = SPRITE_X_OFFS + sprite->type;
+    offset_addr = SPRITE_X_OFFS + sprite->type;
     { int16_t x1;
     int16_t x2; 
 
@@ -820,6 +833,8 @@ void OLevelObjs_sprite_clouds(OLevelObjs* self, oentry* sprite)
 {
     OSprites_move_sprite(&osprites, sprite, 1);
     { uint16_t z16 = sprite->z >> 16;
+        int16_t road_x;
+        uint16_t type;
 
     if (z16 < 4)
     {
@@ -837,8 +852,8 @@ void OLevelObjs_sprite_clouds(OLevelObjs* self, oentry* sprite)
     sprite->priority      = z16;
     sprite->y = -((z16 * oroad.horizon_y2) >> 9) + oroad.horizon_y2; /* muls (two 16 bit values, 32 bit result) */
 
-    uint16_t type = sprite->type; /* d1 */
-    int16_t road_x = oroad.road0_h[z16]; /* d0 */
+    type = sprite->type;
+    road_x = oroad.road0_h[z16];
     sprite->type = road_x;
     road_x -= type;
     type = (z16 >> 2);
@@ -885,9 +900,10 @@ void OLevelObjs_sprite_clouds(OLevelObjs* self, oentry* sprite)
     }
     else
     {
+        uint8_t lookup_z;
         /* 41f8 */
         z <<= 1;
-        uint8_t lookup_z = RomLoader_read8(&(roms.rom0), MOVEMENT_LOOKUP_Z + z);
+        lookup_z = RomLoader_read8(&(roms.rom0), MOVEMENT_LOOKUP_Z + z);
         sprite->addr = RomLoader_read32(roms.rom0p, outrun.adr.sprite_cloud + lookup_z);
         sprite->zoom = RomLoader_read8(&(roms.rom0), MOVEMENT_LOOKUP_Z + z + 1);
     }
@@ -900,6 +916,7 @@ void OLevelObjs_do_thickness_sprite(OLevelObjs* self, oentry* sprite, const uint
 {
     OSprites_move_sprite(&osprites, sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
+        int16_t road_x;
 
     if (z16 < 4) return;
     if (z16 >= 0x200)
@@ -912,7 +929,7 @@ void OLevelObjs_do_thickness_sprite(OLevelObjs* self, oentry* sprite, const uint
     sprite->priority = z16;    
 
     /* 44c4 */
-    int16_t road_x = oroad.road0_h[z16];
+    road_x = oroad.road0_h[z16];
     { int16_t xw1 = sprite->xw1;
 
     if (xw1 >= 0)
@@ -922,17 +939,19 @@ void OLevelObjs_do_thickness_sprite(OLevelObjs* self, oentry* sprite, const uint
     }
 
     { int32_t multiply = (xw1 * z16) >> 9;
+        uint16_t z;
+        int32_t road_y;
     road_x += multiply;
 
     if (road_x >= (160 + config.s16_x_off) || road_x < -(160 + config.s16_x_off)) return;
     sprite->x = road_x;
 
     /* 44fc */
-    int32_t road_y = -(oroad.road_y[oroad.road_p0 + z16] >> 4) + 223;
+    road_y = -(oroad.road_y[oroad.road_p0 + z16] >> 4) + 223;
     sprite->y = road_y; /* Set Sprite Y (Screen/Camera) */
     /* 4518 - Sprite thickness code */
 
-    uint16_t z = z16 >> 1;
+    z = z16 >> 1;
 
     if (z >= 0x80) 
     {
@@ -966,6 +985,9 @@ void OLevelObjs_do_thickness_sprite(OLevelObjs* self, oentry* sprite, const uint
 
 void OLevelObjs_sprite_rocks(OLevelObjs* self, oentry *sprite)
 {
+    int16_t x2;
+    int16_t x1;
+    uint32_t offset_addr;
     uint8_t zoom = 1;
     /* Omit collision check if we're already colliding with something */
     if (self->sprite_collision_counter != 0 || (sprite->z >> 16) < 0x1B0)
@@ -976,9 +998,7 @@ void OLevelObjs_sprite_rocks(OLevelObjs* self, oentry *sprite)
     /* Check Collision with sprite */
 
     /* First read collision offsets from table */
-    uint32_t offset_addr = SPRITE_X_OFFS + sprite->type;
-    int16_t x1;
-    int16_t x2; 
+    offset_addr = SPRITE_X_OFFS + sprite->type;
 
     /* H-Flip - swap x co-ordinates */
     if (sprite->control & HFLIP)
@@ -1015,6 +1035,8 @@ void OLevelObjs_set_spr_zoom_priority_rocks(OLevelObjs* self, oentry *sprite, ui
 {
     OSprites_move_sprite(&osprites, sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
+        int16_t road_x;
+        int32_t road_y;
 
     if (z16 < 4) return;
     if (z16 >= 0x200)
@@ -1030,14 +1052,14 @@ void OLevelObjs_set_spr_zoom_priority_rocks(OLevelObjs* self, oentry *sprite, ui
     /* 1/ Use Y Offset From Road Position [Screen] */
     /* 2/ Use Sprite Y World Data if not 0, converted to a screen position [World] */
 
-    int32_t road_y = -(oroad.road_y[oroad.road_p0 + z16] >> 4) + 223;
+    road_y = -(oroad.road_y[oroad.road_p0 + z16] >> 4) + 223;
     sprite->y = road_y;
 
     /*    Set Sprite X Position [SCREEN] */
     /*    1/ Use X Offset From Road Position [Screen] */
     /*    2/ Use Sprite X World Data */
     
-    int16_t road_x = oroad.road0_h[z16];
+    road_x = oroad.road0_h[z16];
     { int16_t xw1 = sprite->xw1;
    
     if (xw1 >= 0 && (sprite->control & WIDE_ROAD) == 0)
@@ -1046,12 +1068,13 @@ void OLevelObjs_set_spr_zoom_priority_rocks(OLevelObjs* self, oentry *sprite, ui
     }
 
     { int32_t multiply = (xw1 * z16) >> 9; /* only used as a 16 bit value so truncate here */
+        uint16_t width;
     sprite->x = road_x + multiply;
 
     /* Additional Draw Check Here, to prevent sprite from wrapping around screen and redrawing on left */
     /* Remember this routine is setup to draw from centre x */
 
-    uint16_t width = (sprite->width >> 1) + 160 + config.s16_x_off;
+    width = (sprite->width >> 1) + 160 + config.s16_x_off;
     if (sprite->x >= width || sprite->x + width < 0) return;
 
     OSprites_do_spr_order_shadows(&osprites, sprite);

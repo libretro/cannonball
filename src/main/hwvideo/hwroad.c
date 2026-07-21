@@ -304,18 +304,21 @@ void HWRoad_render_foreground_lores(HWRoad* self, uint16_t* pixels)
         };
 
         { const uint32_t data0 = roadram[0x000 + y];
+            uint16_t s16_x;
+            int32_t bgcolor;
+            uint8_t *src0, *src1;
+            int32_t control;
+            int32_t hpos0, hpos1, color0, color1;
+            uint16_t* pPixel;
         const uint32_t data1 = roadram[0x100 + y];
 
         /* if both roads are low priority, skip */
         if (((data0 & 0x800) != 0) && ((data1 & 0x800) != 0))
             continue;
 
-        uint16_t* pPixel = pixels + (y * config.s16_width);
-        int32_t hpos0, hpos1, color0, color1;
-        int32_t control = self->road_control & 3;
+        pPixel = pixels + (y * config.s16_width);
+        control = self->road_control & 3;
 
-        uint8_t *src0, *src1;
-        int32_t bgcolor; /* 8 bits */
 
         /* get road 0 data */
         src0   = ((data0 & 0x800) != 0) ? self->roads + 256 * 2 * 512 : (self->roads + (0x000 + ((data0 >> 1) & 0xff)) * 512);
@@ -344,7 +347,7 @@ void HWRoad_render_foreground_lores(HWRoad* self, uint16_t* pixels)
         color_table[0x17] = self->color_offset1 ^ 0x0e ^ ((color1 >> 7) & 1);
 
         /* Shift road dependent on whether we are in widescreen mode or not */
-        uint16_t s16_x = 0x5f8 + config.s16_x_off;
+        s16_x = 0x5f8 + config.s16_x_off;
 
         /* draw the road */
         switch (control) 
@@ -483,15 +486,20 @@ void HWRoad_render_foreground_hires(HWRoad* self, uint16_t* pixels)
 
     for (y = 0; y < config.s16_height; y++) 
     {
-        yy = y >> 1;
-       
         static const uint8_t priority_map[2][8] =
         {
             { 0x80,0x81,0x81,0x87,0,0,0,0x00 },
             { 0x81,0x81,0x81,0x8f,0,0,0,0x80 }
         };
+        yy = y >> 1;
+       
 
         { uint32_t data0 = roadram[0x000 + yy];
+            uint16_t* pPixel;
+            uint16_t s16_x;
+            int32_t hpos1;
+            int32_t hpos0;
+            uint8_t *src0 = NULL, *src1 = NULL;
         uint32_t data1 = roadram[0x100 + yy];
 
         /* if both roads are low priority, skip */
@@ -501,13 +509,12 @@ void HWRoad_render_foreground_hires(HWRoad* self, uint16_t* pixels)
             continue;
         }
 
-        uint8_t *src0 = NULL, *src1 = NULL;
 
         /* get road 0 data */
-        int32_t hpos0  = roadram[0x200 + (((self->road_control & 4) != 0) ? yy : (data0 & 0x1ff))] & 0xfff;
+        hpos0 = roadram[0x200 + (((self->road_control & 4) != 0) ? yy : (data0 & 0x1ff))] & 0xfff;
 
         /* get road 1 data        */
-        int32_t hpos1  = roadram[0x400 + (((self->road_control & 4) != 0) ? (0x100 + yy) : (data1 & 0x1ff))] & 0xfff;
+        hpos1 = roadram[0x400 + (((self->road_control & 4) != 0) ? (0x100 + yy) : (data1 & 0x1ff))] & 0xfff;
         
         /* ---------------------------------------------------------------------------------------- */
         /* Interpolate Scanlines when in hi-resolution mode. */
@@ -570,8 +577,8 @@ void HWRoad_render_foreground_hires(HWRoad* self, uint16_t* pixels)
             src1 = ((data1 & 0x800) != 0) ? self->roads + 256 * 2 * 512 : (self->roads + (0x100 + ((data1 >> 1) & 0xff)) * 512);
 
         /* Shift road dependent on whether we are in widescreen mode or not */
-        uint16_t s16_x = 0x5f8 + config.s16_x_off;
-        uint16_t* const pPixel = pixels + (y * config.s16_width);
+        s16_x = 0x5f8 + config.s16_x_off;
+        pPixel = pixels + (y * config.s16_width);
 
         /* draw the road */
         switch (self->road_control & 3)

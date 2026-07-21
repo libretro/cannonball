@@ -329,6 +329,7 @@ void OSound_process_command(OSound* self)
 /* Source: 0x833 */static 
 void OSound_new_command(OSound* self)
 {
+    uint16_t pcm_enable;
     /* ------------------------------------------------------------------------ */
     /* FM Sound Effects Only (Increase Volume) */
     /* ------------------------------------------------------------------------ */
@@ -352,7 +353,7 @@ void OSound_new_command(OSound* self)
         self->chan_ram[i] = 0; }
 
     /* PCM Channel Enable */
-    uint16_t pcm_enable = 0xF088 + 6;
+    pcm_enable = 0xF088 + 6;
 
     /* Disable 6 PCM Channels */
     { int16_t i; for (i = 0; i < 6; i++)
@@ -401,11 +402,12 @@ void OSound_check_fm_mapping(OSound* self)
 /* Source: 0xB3 */static 
 void OSound_process_channels(OSound* self)
 {
+    uint16_t chan_id;
     /* Allows FM Music & FM Effect to be played simultaneously */
     OSound_check_fm_mapping(self);
 
     /* Channel to process */
-    uint16_t chan_id = CHANNEL_YM1;
+    chan_id = CHANNEL_YM1;
 
     { uint8_t c; for (c = 0; c < 30; c++)
     {
@@ -425,17 +427,20 @@ void OSound_process_channels(OSound* self)
 /* Source: 0xCD */static 
 void OSound_process_channel(OSound* self, uint16_t chan_id)
 {
+    uint8_t reg;
+    uint16_t seq_end;
+    uint8_t* chan;
     self->chanid_prev = chan_id;
 
     /* Get correct offset in RAM */
-    uint8_t* chan = &self->chan_ram[chan_id];
+    chan = &self->chan_ram[chan_id];
 
     /* Increment sequence position */
     self->pos = OSound_r16(self, &chan[CH_SEQ_POS]) + 1;
     OSound_w16(self, &chan[CH_SEQ_POS], self->pos);
 
     /* Sequence end marker */
-    uint16_t seq_end = OSound_r16(self, &chan[CH_SEQ_END]);
+    seq_end = OSound_r16(self, &chan[CH_SEQ_END]);
 
     if (self->pos == seq_end)
     {
@@ -457,7 +462,6 @@ void OSound_process_channel(OSound* self, uint16_t chan_id)
     /* ------------------------------------------------------------------------ */
 
     /* 0xF9:   */
-    uint8_t reg;
     { uint8_t chan_index = chan[CH_FM_FLAGS] & 7;
 
     /* Use Phase and Amplitude Modulation Sensitivity Table? */
@@ -676,13 +680,14 @@ void OSound_setvol(OSound* self, uint8_t* chan)
     /* PCM Percussion Sample */
     if (chan[CH_FM_FLAGS] & BIT_6)
     {
+        uint8_t vol_r;
         const uint8_t VOL_MAX = 0x40;
 
         /* Set left volume */
         chan[CH_VOL_L] = vol_l > VOL_MAX ? 0 : vol_l;
 
         /* Set right volume */
-        uint8_t vol_r = RomLoader_read8(&(roms.z80), ++self->pos);
+        vol_r = RomLoader_read8(&(roms.z80), ++self->pos);
         chan[CH_VOL_R] = vol_r > VOL_MAX ? 0 : vol_r;
     }
     /* YM */
@@ -821,6 +826,7 @@ void OSound_play_pcm_index(OSound* self, uint8_t* chan, uint8_t cmd)
 /* Source: 0x9E8 */static 
 void OSound_init_sound(OSound* self, uint8_t cmd, uint16_t src, uint16_t dst)
 {
+    uint8_t channels;
     uint16_t dst_backup = dst;
 
     self->command_index = cmd - 0x81;
@@ -829,7 +835,7 @@ void OSound_init_sound(OSound* self, uint8_t cmd, uint16_t src, uint16_t dst)
     src = RomLoader_read16_16(&(roms.z80), src);
 
     /* Get number of channels */
-    uint8_t channels = RomLoader_read8_16a(&(roms.z80), &src);
+    channels = RomLoader_read8_16a(&(roms.z80), &src);
 
     /* next_channel */
     { uint8_t ch; for (ch = 0; ch < channels; ch++)
@@ -920,6 +926,7 @@ void OSound_process_pcm(OSound* self, uint8_t* chan)
     /* ------------------------------------------------------------------------ */
     else
     {
+        uint16_t pcm_adr;
         /* Mask on channel pair select */
         uint8_t channel_pair = chan[CH_CTRL] & 0xC;
         /* Channel selected [b] */
@@ -967,7 +974,7 @@ void OSound_process_pcm(OSound* self, uint8_t* chan)
         }
 
         /* Channel Address = Channel 1 Base Address  */
-        uint16_t pcm_adr = 0xF080 + (selected * 8);
+        pcm_adr = 0xF080 + (selected * 8);
 
         OSound_pcm_send_cmds(self, chan, pcm_adr, channel_pair);
     }
@@ -1071,12 +1078,13 @@ void OSound_fm_write_block(OSound* self, uint8_t ix0, uint16_t adr, uint8_t chan
 /* Source: 0x91A */static 
 void OSound_ym_set_levels(OSound* self)
 {
+    uint8_t entries;
     /* Clear YM & Drum Channels in RAM (0xF820 - 0xF9DF) */
     { uint16_t i; for (i = CHANNEL_YM1; i < CHANNEL_PCM_FX1; i++)
         self->chan_ram[i] = 0; }
 
     /* FM Sound Effects: Write fewer levels */
-    uint8_t entries = (self->chan_ram[CHANNEL_YM_FX1] & BIT_7) ? 28 : 32;
+    entries = (self->chan_ram[CHANNEL_YM_FX1] & BIT_7) ? 28 : 32;
     { uint16_t adr = YM_LEVEL_CMDS1;
 
     /* Write Level Info */
@@ -1147,10 +1155,11 @@ void OSound_ym_load_patch(OSound* self, uint8_t* chan)
 /* Source: 0xAAA */static 
 uint16_t OSound_ym_lookup_data(OSound* self, uint8_t cmd, uint8_t offset, uint8_t block)
 {
+    uint16_t adr;
     block = (block - 1) << 1;
     
     /* Address of data for FM routine */
-    uint16_t adr = RomLoader_read16_16(&(roms.z80), (uint16_t) (FM_DATA_TABLE[cmd] + (offset << 1)));
+    adr = RomLoader_read16_16(&(roms.z80), (uint16_t) (FM_DATA_TABLE[cmd] + (offset << 1)));
     return RomLoader_read16_16(&(roms.z80), (uint16_t) (adr + block));
 }
 
@@ -1158,15 +1167,17 @@ uint16_t OSound_ym_lookup_data(OSound* self, uint8_t cmd, uint8_t offset, uint8_
 /* Source: 0x534 */static 
 void OSound_ym_set_connect(OSound* self, uint8_t* chan, uint8_t pan)
 {
+    uint8_t reg_value;
+    uint8_t chan_ctrl_reg;
     uint8_t block = chan[CH_FM_BLOCK];                          /* FM Routine To Choose from Data Block */
     uint16_t adr = OSound_ym_lookup_data(self, chan[CH_COMMAND], 3, block);  /* Send Block of FM Commands */
     adr += 0x33;
 
     /* c = Channel Control Register (0x20 - 0x27) */
-    uint8_t chan_ctrl_reg = (chan[CH_FM_FLAGS] & 7) + 0x20;
+    chan_ctrl_reg = (chan[CH_FM_FLAGS] & 7) + 0x20;
 
     /* Register Value */
-    uint8_t reg_value = (RomLoader_read8(&(roms.z80), adr) & 0x3F) | pan;
+    reg_value = (RomLoader_read8(&(roms.z80), adr) & 0x3F) | pan;
 
     self->pos--;
 
@@ -1179,6 +1190,7 @@ void OSound_ym_set_connect(OSound* self, uint8_t* chan, uint8_t pan)
 /* Source: 0x4BF */static 
 void OSound_ym_end_track(OSound* self, uint8_t* chan)
 {
+    uint8_t block;
     /* Get channel number */
     uint8_t chan_index = chan[CH_FM_FLAGS] & 7;
 
@@ -1212,7 +1224,7 @@ void OSound_ym_end_track(OSound* self, uint8_t* chan)
     chan[CH_FLAGS] &= ~BIT_2;
 
     /* Write remaining FM Data block, if specified */
-    uint8_t block = chan[CH_FM_BLOCK];
+    block = chan[CH_FM_BLOCK];
 
     if (!block)
         return;
@@ -1294,6 +1306,8 @@ void OSound_call_adr(OSound* self, uint8_t* chan)
 /* Source: 0x7501 */static 
 void OSound_engine_process(OSound* self)
 {
+    uint16_t iy;
+    uint16_t ix;
     /* DEBUG */
     /* bpset 7501,1,{b@0xf801 = 0xe; b@0xf802 = 0xf1; b@f803 = 0x3f;} */
     /* engine_data[SOUND_ENGINE_PITCH_H] = 0xE; */
@@ -1305,8 +1319,8 @@ void OSound_engine_process(OSound* self)
     if ((++self->engine_counter & 1) == 0)
         return;
 
-    uint16_t ix = 0;                    /* PCM Channel RAM Address */
-    uint16_t iy = CHANNEL_ENGINE_CH1;  /* Internal Channel RAM Address */
+    ix = 0;
+    iy = CHANNEL_ENGINE_CH1;
 
     for (self->engine_channel = 6; self->engine_channel > 0; self->engine_channel--)
     {
@@ -1319,6 +1333,9 @@ void OSound_engine_process(OSound* self)
 /* Source: 0x7531 */static 
 void OSound_engine_process_chan(OSound* self, uint8_t* chan, uint8_t* pcm)
 {
+    uint16_t engine_pos;
+    uint16_t old_revs;
+    uint16_t revs;
     /* Return if PCM Sample Being Played On Channel */
     if (self->engine_channel < 3)
     {
@@ -1409,7 +1426,7 @@ void OSound_engine_process_chan(OSound* self, uint8_t* chan, uint8_t* pcm)
 
     /* 0x755C */
     /* Check we have some revs */
-    uint16_t revs = OSound_r16(self, pcm);
+    revs = OSound_r16(self, pcm);
     if (revs == 0)
     {
         OSound_engine_mute_channel(self, chan, pcm, true);
@@ -1418,7 +1435,7 @@ void OSound_engine_process_chan(OSound* self, uint8_t* chan, uint8_t* pcm)
 
     /* Rev Change Setup */
     /* 0x774E routine rolled in here */
-    uint16_t old_revs = OSound_r16(self, pcm + 0x80);
+    old_revs = OSound_r16(self, pcm + 0x80);
 
     /* Revs Unchanged */
     if (revs == old_revs)
@@ -1471,7 +1488,7 @@ void OSound_engine_process_chan(OSound* self, uint8_t* chan, uint8_t* pcm)
         }
     }
     /* 0x75B2 */
-    uint16_t engine_pos = OSound_engine_get_table_adr(self, chan, pcm); /* hl */
+    engine_pos = OSound_engine_get_table_adr(self, chan, pcm);
     
     /* Mute Engine Channel */
     if (chan[CH_ENGINES_FLAGS] & BIT_5)
@@ -1502,6 +1519,7 @@ void OSound_engine_process_chan(OSound* self, uint8_t* chan, uint8_t* pcm)
 /* Source: 0x78C7 */static 
 void OSound_unk78c7(OSound* self, uint8_t* chan, uint8_t* pcm)
 {
+    uint16_t adr_offset;
     uint16_t adr; /* Channel address in RAM */
 
     if (self->engine_channel == 1)
@@ -1518,7 +1536,7 @@ void OSound_unk78c7(OSound* self, uint8_t* chan, uint8_t* pcm)
     }
 
     /* STORE: Calculate offset into Channel Block To Store Data At */
-    uint16_t adr_offset = adr + (chan[CH_ENGINES_OFFSET] * 3);
+    adr_offset = adr + (chan[CH_ENGINES_OFFSET] * 3);
     adr_offset &= 0x7FF;
     self->chan_ram[adr_offset++] = pcm[0x0];               /* Copy Engine Pitch Low */
     self->chan_ram[adr_offset++] = pcm[0x1];               /* Copy Engine Pitch High */
@@ -1540,11 +1558,14 @@ void OSound_unk78c7(OSound* self, uint8_t* chan, uint8_t* pcm)
 /* Source: 0x75DA */static 
 void OSound_ferrari_vol_pan(OSound* self, uint8_t* chan, uint8_t* pcm)
 {
+    uint16_t pitch;
+    uint16_t pos;
+    int16_t pitch_table_index;
     /* Adjust Engine Volume and write to new memory area (0x6) */
     OSound_engine_adjust_volume(self, chan);
 
     /* Set Pitch Table Details */
-    int16_t pitch_table_index = OSound_r16(self, pcm + 0x80) - 0x30;
+    pitch_table_index = OSound_r16(self, pcm + 0x80) - 0x30;
 
     if (pitch_table_index < 0)
     {
@@ -1555,7 +1576,7 @@ void OSound_ferrari_vol_pan(OSound* self, uint8_t* chan, uint8_t* pcm)
     OSound_w16(self, chan + CH_ENGINES_PITCH_L, pitch_table_index);
 
     /* Set PCM Sample Addresses */
-    uint16_t pos = ENGINE_ADR_TABLE;
+    pos = ENGINE_ADR_TABLE;
     OSound_engine_set_adr(self, &pos, chan, pcm);
 
     /* Set PCM Sample End Address */
@@ -1566,7 +1587,7 @@ void OSound_ferrari_vol_pan(OSound* self, uint8_t* chan, uint8_t* pcm)
 
     /* Set Pitch */
     pos = ENGINE_ADR_TABLE + 4; /* Set position to pitch offset */
-    uint16_t pitch = RomLoader_read8(&(roms.z80), pos); /* bc */
+    pitch = RomLoader_read8(&(roms.z80), pos);
     pitch += OSound_r16(self, chan + CH_ENGINES_PITCH_L) >> 1;
     if (pitch > 0xFF) pitch = 0xFF;
 
@@ -1583,6 +1604,7 @@ void OSound_ferrari_vol_pan(OSound* self, uint8_t* chan, uint8_t* pcm)
 /* Source: 0x7819 */static 
 uint16_t OSound_engine_get_table_adr(OSound* self, uint8_t* chan, uint8_t* pcm)
 {
+    const static uint8_t ENTRY = 5; /* bytes per entry */
     int16_t off = OSound_r16(self, pcm + 0x80) - 0x52;
     int16_t table_offset;
 
@@ -1601,7 +1623,6 @@ uint16_t OSound_engine_get_table_adr(OSound* self, uint8_t* chan, uint8_t* pcm)
     /* get_adr: */
     table_offset--;
 
-    const static uint8_t ENTRY = 5; /* bytes per entry */
     return (ENGINE_ADR_TABLE + ENTRY) + (table_offset * ENTRY); /* table has 54 entries */
 }
 
@@ -1698,9 +1719,10 @@ uint8_t OSound_get_adjusted_vol(OSound* self, uint16_t* pos, uint8_t* chan)
 /* Source: 0x7870 */static 
 void OSound_engine_set_pitch(OSound* self, uint16_t* pos, uint8_t* pcm)
 {
+    uint16_t bc;
     (*pos)++; /* Increment to pitch entry in table */
 
-    uint16_t bc = OSound_r16(self, pcm + 0x82);
+    bc = OSound_r16(self, pcm + 0x82);
     bc >>= 2;
 
     if (bc & 0xFF00)
@@ -1838,15 +1860,17 @@ void OSound_traffic_process_chan(OSound* self, uint8_t* pcm)
     /* No slide/pitch reduction applied yet */
     if (!(pcm[0x82] & BIT_4))
     {
+        uint8_t vol;
         OSound_traffic_read_data(self, pcm); /* Read Traffic Data that has been sent by 68K CPU */
         
-        uint8_t vol = pcm[0x00];
+        vol = pcm[0x00];
         
         /* vol on */
         if (vol)
         {
+            uint8_t flags;
             OSound_traffic_note_changes(self, vol, pcm); /* Record changes to traffic volume and panning */
-            uint8_t flags = pcm[0x82];
+            flags = pcm[0x82];
 
             /* Change in Volume or Panning: Set volume, panning & pitch based on distance of traffic. */
             if (!(flags & BIT_0) || !(flags & BIT_1))
@@ -1901,6 +1925,8 @@ const uint8_t TRAFFIC_PITCH_H[] = { 0, 2, 4, 4, 0, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8,
 /* Source: 0x7B82 */static 
 void OSound_traffic_process_entry(OSound* self, uint8_t* pcm)
 {
+    uint8_t pitch;
+    int8_t vol_boost;
     /* Wave Start/End Address has not been setup yet */
     if (!(pcm[0x82] & BIT_2))
     {
@@ -1913,8 +1939,8 @@ void OSound_traffic_process_entry(OSound* self, uint8_t* pcm)
     OSound_traffic_set_vol(self, pcm); /* Set Traffic Volume Multiplier */
     OSound_traffic_set_pan(self, pcm); /* Set Traffic Volume / Panning on each channel */
 
-    int8_t vol_boost = pcm[0x80] - 0x16;  
-    uint8_t pitch = 0;
+    vol_boost = pcm[0x80] - 0x16;
+    pitch = 0;
 
     if (vol_boost >= 0)
         pitch = TRAFFIC_PITCH_H[vol_boost];

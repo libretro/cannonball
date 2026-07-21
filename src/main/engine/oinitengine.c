@@ -168,9 +168,11 @@ void OInitEngine_init_road_seg_master(OInitEngine* self)
 
 void OInitEngine_update_road(OInitEngine* self)
 {
+    uint32_t addr;
     OInitEngine_check_road_split(self); /* Check/Process road split if necessary */
-    uint32_t addr = 0;
+    addr = 0;
     { uint16_t d0 = TrackLoader_read_width_height(&trackloader, &addr);
+        int16_t segment_pos;
     /* Update next road section */
     if (d0 <= oroad.road_pos >> 16)
     {
@@ -240,7 +242,7 @@ void OInitEngine_update_road(OInitEngine* self)
 
     /* ROM:0000B91C set_road_type:  */
 
-    int16_t segment_pos = TrackLoader_read_curve(&trackloader, 0);
+    segment_pos = TrackLoader_read_curve(&trackloader, 0);
 
     if (segment_pos != -1)
     {
@@ -468,6 +470,7 @@ void OInitEngine_check_stage(OInitEngine* self)
     /* Time Trial Mode */
     if (outrun.cannonball_mode == MODE_TTRIAL)
     {
+        int16_t counter;
         /* Store laptime and reset */
         uint8_t* laptimes = outrun.ttrial.laptimes[outrun.ttrial.current_lap];
 
@@ -479,7 +482,7 @@ void OInitEngine_check_stage(OInitEngine* self)
         ostats.stage_times[0][2] = 0;
 
         /* Check for new best laptime */
-        int16_t counter = ostats.stage_counters[outrun.ttrial.current_lap];
+        counter = ostats.stage_counters[outrun.ttrial.current_lap];
         if (counter < outrun.ttrial.best_lap_counter)
         {
             outrun.ttrial.best_lap_counter = counter;
@@ -613,10 +616,11 @@ void OInitEngine_init_split1(OInitEngine* self)
 /* ------------------------------------------------------------------------------------------------ */static 
 void OInitEngine_init_split2(OInitEngine* self)
 {
+    int16_t pos;
     self->rd_split_state = SPLIT_CHOICE2;
 
     /* Manual adjustments to the road width, based on the current position */
-    int16_t pos = (((oroad.road_pos >> 16) - 0x3F) << 3) + self->road_width_orig;
+    pos = (((oroad.road_pos >> 16) - 0x3F) << 3) + self->road_width_orig;
     oroad.road_width = (pos << 16) | (oroad.road_width & 0xFFFF);
     if (pos > 0xFF)
     {
@@ -721,11 +725,12 @@ void OInitEngine_init_split6(OInitEngine* self)
 
 void OInitEngine_init_split7(OInitEngine* self)
 {
+    int16_t width2;
     self->rd_split_state = 8;
 
     oroad.road_ctrl = ROAD_BOTH_P0;
     self->route_selected = ~self->route_selected; /* invert bits */
-    int16_t width2 = (oroad.road_width >> 16) << 1;
+    width2 = (oroad.road_width >> 16) << 1;
     if (self->route_selected == 0) 
         width2 = -width2;
     self->car_x_pos += width2;
@@ -740,10 +745,11 @@ void OInitEngine_init_split7(OInitEngine* self)
 /* ------------------------------------------------------------------------------------------------ */static 
 void OInitEngine_init_split9(OInitEngine* self)
 {
+    uint16_t d0;
     self->rd_split_state = 10;
 
     /* Calculate narrower road width to merge roads */
-    uint16_t d0 = (self->road_width_merge - ((oroad.road_pos >> 16) - self->road_width_orig)) << 3;
+    d0 = (self->road_width_merge - ((oroad.road_pos >> 16) - self->road_width_orig)) << 3;
 
     if (d0 <= RD_WIDTH_MERGE)
     {

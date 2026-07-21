@@ -66,6 +66,7 @@ void OAttractAI_init(OAttractAI* self)
 
 void OAttractAI_tick_ai_enhanced(OAttractAI* self)
 {
+    int16_t future_x;
     /* -------------------------------------------------------------------------------------------- */
     /* Choose Route At Random */
     /* -------------------------------------------------------------------------------------------- */
@@ -79,7 +80,6 @@ void OAttractAI_tick_ai_enhanced(OAttractAI* self)
     /* -------------------------------------------------------------------------------------------- */
     /* Steering */
     /* -------------------------------------------------------------------------------------------- */
-    int16_t future_x; 
     
     /* Select road at road split */
     if (oinitengine.rd_split_state > 0 && oinitengine.rd_split_state < 8)
@@ -112,10 +112,10 @@ void OAttractAI_tick_ai_enhanced(OAttractAI* self)
         /* Single Road */
         if (oroad.road_ctrl == ROAD_R0 || oroad.road_ctrl == ROAD_R1)
         {
+            static int16_t FAR  = 0x104 - 0x4A;
+            static int16_t NEAR = 0xD4 - 0x4A;
             x += road_width;
 
-            static int16_t NEAR = 0xD4 - 0x4A;
-            static int16_t FAR  = 0x104 - 0x4A;
 
             /* Don't break */
             if (x > -NEAR && x <= NEAR)      oinputs.brake_adjust = 0;

@@ -189,14 +189,16 @@ void hwsprites_render(hwsprites* self, const uint8_t priority)
 
     { uint16_t data; for (data = 0; data < SPRITE_RAM_SIZE; data += 8) 
     {
+        int16_t hide;
+        uint32_t sprpri;
         /* stop when we hit the end of sprite list */
         if ((self->ramBuff[data+0] & 0x8000) != 0) break;
 
-        uint32_t sprpri  = 1 << ((self->ramBuff[data+3] >> 12) & 3);
+        sprpri = 1 << ((self->ramBuff[data+3] >> 12) & 3);
         if (sprpri != priority) continue;
 
         /* if hidden, or top greater than/equal to bottom, or invalid bank, punt */
-        int16_t hide    = (self->ramBuff[data+0] & 0x5000);
+        hide = (self->ramBuff[data+0] & 0x5000);
         { int32_t height  = (self->ramBuff[data+5] >> 8) + 1;       
         if (hide != 0 || height == 0) continue;
         

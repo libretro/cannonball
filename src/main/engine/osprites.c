@@ -208,17 +208,20 @@ void OSprites_tick(OSprites* self)
 
 void OSprites_sprite_control(OSprites* self)
 {
+    uint16_t carry;
     uint16_t pos = TrackLoader_read_scenery_pos(&trackloader);
 
     /* Populate next road segment */
     if (pos <= oroad.road_pos >> 16)
     {
+        uint32_t a0;
+        uint8_t pattern_index;
         self->seg_pos = pos;                                                          /* Position In Level Data [Word] */
         self->seg_total_sprites = TrackLoader_read_total_sprites(&trackloader);                   /* Number of Sprites In Segment */
-        uint8_t pattern_index = TrackLoader_read_sprite_pattern_index(&trackloader);        /* Block Of Sprites */
+        pattern_index = TrackLoader_read_sprite_pattern_index(&trackloader);
         trackloader.scenery_offset += 4;                                        /* Advance to next scenery point */
         
-        uint32_t a0 = TrackLoader_read_scenerymap_table(&trackloader, pattern_index);         /* Get Address of Scenery Pattern */
+        a0 = TrackLoader_read_scenerymap_table(&trackloader, pattern_index);
         self->seg_sprite_freq = TrackLoader_read16_a(trackloader.scenerymap_data, &a0); /* Scenery Frequency */
         self->seg_spr_offset2 = TrackLoader_read16_a(trackloader.scenerymap_data, &a0); /* Reload value for scenery pattern */
         self->seg_spr_addr = a0;                                                      /* Set ROM address for sprite info lookup (x, y, type) */
@@ -234,7 +237,7 @@ void OSprites_sprite_control(OSprites* self)
     /* Sprite 1 */
     /* ------------------------------------------------------------------------ */
     /* Rotate 16 bit value left. Stick top bit in low bit. */
-    uint16_t carry = self->seg_sprite_freq & 0x8000;
+    carry = self->seg_sprite_freq & 0x8000;
     self->seg_sprite_freq = ((self->seg_sprite_freq << 1) | ((self->seg_sprite_freq & 0x8000) >> 15)) & 0xFFFF;
 
     if (carry)
@@ -361,13 +364,19 @@ void OSprites_map_palette(OSprites* self, oentry* spr)
 
 void OSprites_do_spr_order_shadows(OSprites* self, oentry* input)
 {
+    uint32_t addr;
+    int16_t x;
+    uint8_t shadow;
+    uint8_t pal_dst;
+    uint8_t bytes_to_copy;
+    uint16_t priority;
     /* LayOut specific fix to avoid memory crash on over populated scenery segments */
     if (self->spr_cnt_main + self->spr_cnt_shadow >= JUMP_ENTRIES_TOTAL)
         return;
 
     /* Use priority as lookup into table. Assume we're on boundaries of 0x10 */
-    uint16_t priority = (input->priority & 0x1FF) << 4;
-    uint8_t bytes_to_copy = self->sprite_order[priority];
+    priority = (input->priority & 0x1FF) << 4;
+    bytes_to_copy = self->sprite_order[priority];
 
     /* Maximum number of bytes we want to copy is 0x10 */
     if (bytes_to_copy < 0xE)
@@ -389,10 +398,10 @@ void OSprites_do_spr_order_shadows(OSprites* self, oentry* input)
     input->dst_index = self->spr_cnt_shadow;
     self->spr_cnt_shadow++;                       /* Increment total shadow count */
     
-    uint8_t pal_dst = input->pal_dst;       /* Backup Sprite Colour Palette */
-    uint8_t shadow = input->shadow;         /* and priority and shadow settings */
-    int16_t x = input->x;                   /* and x position */
-    uint32_t addr = input->addr;            /* and original sprite data address */
+    pal_dst = input->pal_dst;
+    shadow = input->shadow;
+    x = input->x;
+    addr = input->addr;
     input->pal_dst = 0;                     /* clear colour palette */
     input->shadow = 7;                      /* Set NEW priority & shadow settings */
     
@@ -439,6 +448,7 @@ void OSprites_sprite_copy(OSprites* self)
     }
 
     { uint32_t spr_cnt_main_copy = self->spr_cnt_main;
+        uint16_t cnt_shadow_copy;
 
     /* look up in sprite_order */
     int32_t src_addr = -0x10;
@@ -472,7 +482,7 @@ void OSprites_sprite_copy(OSprites* self)
      }}
 
     /* cont2: */
-    uint16_t cnt_shadow_copy = self->spr_cnt_shadow;
+    cnt_shadow_copy = self->spr_cnt_shadow;
 
     /* next_sprite */
     { uint16_t i; for (i = 0; i < self->spr_cnt_main; i++)
@@ -567,10 +577,12 @@ void OSprites_blit_sprites(OSprites* self)
 
 void OSprites_do_sprite(OSprites* self, oentry* input)
 {
+    uint16_t width;
+    osprite* output;
     input->control |= DRAW_SPRITE; /* Display input sprite */
 
     /* Get Correct Output Entry */
-    osprite* output = &self->sprite_entries[input->dst_index];
+    output = &self->sprite_entries[input->dst_index];
 
     /* Copy address sprite was copied from. */
     /* todo: pass pointer? */
@@ -584,8 +596,10 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
     }
 
     /* Sprite Width/Height Settings */
-    uint16_t width = 0;
+    width = 0;
     { uint16_t height = 0;
+        uint32_t src_offsets;
+        uint16_t lookup_mask;
     
     /* Set real h/v zoom values */
     uint32_t index = (input->zoom * 4);
@@ -595,14 +609,15 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
     /* ------------------------------------------------------------------------- */
     /* Set width & height values using lookup */
     /* ------------------------------------------------------------------------- */
-    uint16_t lookup_mask = ZOOM_LOOKUP[index++]; /* Width/Height lookup helper */
+    lookup_mask = ZOOM_LOOKUP[index++];
     
     /* This is the address of the frame required for the level of zoom we're using */
     /* There are 5 unique frames that are typically used for zoomed sprites. */
     /* which correspond to different screen sizes */
-    uint32_t src_offsets = input->addr + ZOOM_LOOKUP[index];
+    src_offsets = input->addr + ZOOM_LOOKUP[index];
 
     { uint16_t d0 = input->draw_props | (input->zoom << 8);
+        int16_t sprite_x1;
     uint16_t top_bit = d0 & 0x8000;
     d0 &= 0x7FFF; /* Clear top bit */
     
@@ -645,8 +660,9 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
     OSprites_set_sprite_xy(self, input, output, width, height);
     
     /* Here we need the entire value set by above routine, not just top 0x1FF mask! */
-    int16_t sprite_x1 = osprite_get_x(output);
+    sprite_x1 = osprite_get_x(output);
     { int16_t sprite_x2 = sprite_x1 + width;
+        uint16_t road_y_index;
     int16_t sprite_y1 = osprite_get_y(output);
     int16_t sprite_y2 = sprite_y1 + height;
 
@@ -699,7 +715,7 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
     /* ------------------------------------------------------------------------- */
 
     /* Start of priority elevation data in road ram */
-    uint16_t road_y_index = oroad.road_p0 + 0x280;
+    road_y_index = oroad.road_p0 + 0x280;
     
     /* Priority List Not Populated (Flat Elevation) */
     if (oroad.road_y[road_y_index + 0] == 0 && oroad.road_y[road_y_index + 1] == 0)
@@ -783,6 +799,7 @@ void OSprites_hide_hwsprite(OSprites* self, oentry* input, osprite* output)
 
 void OSprites_set_sprite_xy(OSprites* self, oentry* input, osprite* output, uint16_t width, uint16_t height)
 {
+    int16_t x;
     uint8_t anchor = input->draw_props;
 
     /* ------------------------------------------------------------------------- */
@@ -817,7 +834,7 @@ void OSprites_set_sprite_xy(OSprites* self, oentry* input, osprite* output, uint
     /* Set X Render Point */
     /* ------------------------------------------------------------------------- */
 
-    int16_t x = input->x;
+    x = input->x;
 
     switch(anchor & 0x3)
     {

@@ -106,6 +106,8 @@ static bool read_exact(RFILE* file, void* data, size_t size)
 
 static bool calculate_crc32(const char* path, uint32_t* checksum)
 {
+    uint8_t buffer[64 * 1024];
+    uint32_t crc;
     RFILE* file = filestream_open(
         path,
         RETRO_VFS_FILE_ACCESS_READ,
@@ -114,8 +116,7 @@ static bool calculate_crc32(const char* path, uint32_t* checksum)
     if (!file)
         return false;
 
-    uint32_t crc = 0;
-    uint8_t buffer[64 * 1024];
+    crc = 0;
 
     for (;;)
     {
@@ -210,10 +211,14 @@ int RomLoader_load_rom(RomLoader* self, const char* filename,
                         const uint8_t interleave,
                         const bool verbose)
 {
+    uint32_t checksum;
+    bool read_ok;
+    uint8_t* buffer;
+    RFILE* source;
     char path[1024];
     join_path(path, sizeof(path), rom_path, filename);
 
-    RFILE* source = filestream_open(
+    source = filestream_open(
         path,
         RETRO_VFS_FILE_ACCESS_READ,
         RETRO_VFS_FILE_ACCESS_HINT_NONE);
@@ -224,8 +229,8 @@ int RomLoader_load_rom(RomLoader* self, const char* filename,
         return 1;
     }
 
-    uint8_t* buffer = (uint8_t*)malloc((size_t)file_length);
-    const bool read_ok = read_exact(source, buffer, (size_t)file_length);
+    buffer = (uint8_t*)malloc((size_t)file_length);
+    read_ok = read_exact(source, buffer, (size_t)file_length);
     filestream_close(source);
 
     if (!read_ok)
@@ -239,7 +244,7 @@ int RomLoader_load_rom(RomLoader* self, const char* filename,
         return 1;
     }
 
-    const uint32_t checksum = encoding_crc32(0, buffer, (size_t)file_length);
+    checksum = encoding_crc32(0, buffer, (size_t)file_length);
 
     /* Match the existing Libretro core: report checksum mismatches, but keep */
     /* loading the named ROM instead of rejecting a set that previously worked. */
@@ -263,6 +268,7 @@ int RomLoader_load_rom(RomLoader* self, const char* filename,
 
 int RomLoader_create_map(RomLoader* self)
 {
+    RDIR* directory;
     const char* path = rom_path;
 
     crc_map_clear();
@@ -274,7 +280,7 @@ int RomLoader_create_map(RomLoader* self)
     /* for every ROM before falling back to canonical filenames. */
     map_created = true;
 
-    RDIR* directory = retro_opendir(path);
+    directory = retro_opendir(path);
     if (!directory)
     {
         if (log_cb)
@@ -287,6 +293,8 @@ int RomLoader_create_map(RomLoader* self)
 
     while (retro_readdir(directory))
     {
+        uint32_t checksum;
+        char     file[1024];
         const char* name = retro_dirent_get_name(directory);
 
         if (!name || !*name ||
@@ -298,8 +306,7 @@ int RomLoader_create_map(RomLoader* self)
             continue;
         }
 
-        char     file[1024];
-        uint32_t checksum = 0;
+        checksum = 0;
         join_path(file, sizeof(file), path, name);
 
         if (calculate_crc32(file, &checksum))
@@ -321,6 +328,9 @@ int RomLoader_load_crc32(RomLoader* self, const char* debug,
                           const uint8_t interleave,
                           const bool verbose)
 {
+    bool read_ok;
+    uint8_t* buffer;
+    RFILE* source;
     const char* match_file;
     if ((!map_created || strcmp(mapped_path, rom_path) != 0) && RomLoader_create_map(self) != 0)
     {
@@ -342,7 +352,7 @@ int RomLoader_load_crc32(RomLoader* self, const char* debug,
         return 1;
     }
 
-    RFILE* source = filestream_open(
+    source = filestream_open(
         match_file,
         RETRO_VFS_FILE_ACCESS_READ,
         RETRO_VFS_FILE_ACCESS_HINT_NONE);
@@ -353,8 +363,8 @@ int RomLoader_load_crc32(RomLoader* self, const char* debug,
         return 1;
     }
 
-    uint8_t* buffer = (uint8_t*)malloc((size_t)file_length);
-    const bool read_ok = read_exact(source, buffer, (size_t)file_length);
+    buffer = (uint8_t*)malloc((size_t)file_length);
+    read_ok = read_exact(source, buffer, (size_t)file_length);
     filestream_close(source);
 
     if (!read_ok)
@@ -383,6 +393,8 @@ int RomLoader_load_crc32(RomLoader* self, const char* debug,
 
 int RomLoader_load_binary(RomLoader* self, const char* filename)
 {
+    bool read_ok;
+    int64_t file_length;
     RFILE* source = filestream_open(
         filename,
         RETRO_VFS_FILE_ACCESS_READ,
@@ -397,7 +409,7 @@ int RomLoader_load_binary(RomLoader* self, const char* filename)
         return 1;
     }
 
-    const int64_t file_length = filestream_get_size(source);
+    file_length = filestream_get_size(source);
     if (file_length <= 0)
     {
         filestream_close(source);
@@ -410,7 +422,7 @@ int RomLoader_load_binary(RomLoader* self, const char* filename)
     self->length = (uint32_t)(file_length);
     self->rom = (uint8_t*)malloc((self->length) * sizeof(uint8_t));
 
-    const bool read_ok = read_exact(source, self->rom, self->length);
+    read_ok = read_exact(source, self->rom, self->length);
     filestream_close(source);
 
     if (!read_ok)

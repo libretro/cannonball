@@ -195,11 +195,12 @@ void OStats_init_next_level(OStats* self)
     }
     else if (outrun.game_state == GS_INGAME && oinitengine.checkpoint_marker)
     {
+        uint16_t time_lookup;
         oinitengine.checkpoint_marker = 0;
         self->extend_play_timer             = 0x80;
         
         /* Calculate Time To Add */
-        uint16_t time_lookup = (config.engine.dip_time * 40) + oroad.stage_lookup_off;
+        time_lookup = (config.engine.dip_time * 40) + oroad.stage_lookup_off;
         if (!outrun.freeze_timer)
         {
             if (outrun.cannonball_mode == MODE_ORIGINAL)

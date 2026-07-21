@@ -27,6 +27,7 @@ void outils_reset_random_seed()
 
 uint32_t outils_random()
 {
+    uint32_t rnd;
 	/* New seed value */
 	uint32_t seed = rnd_seed;
 
@@ -34,7 +35,7 @@ uint32_t outils_random()
         seed = config.engine.randomgen ? 0x2A6D365A : rand();
 
 	/* Random Value To Return */
-	uint32_t rnd = seed;
+	rnd = seed;
 	
 	seed <<= 2;
 	seed += rnd;
@@ -159,6 +160,10 @@ uint32_t outils_bcd_sub(uint32_t src, uint32_t dst)
 /* Convert incremented internal counter to actual laptime */
 void outils_convert_counter_to_time(uint16_t counter, uint8_t* converted)
 {
+    uint8_t s2;
+    uint8_t s1;
+    uint8_t seconds;
+    uint8_t ms_lookup;
     const uint16_t MINUTE = 3600;
 
     int32_t src_time = counter; /* laptime copy [d0]  */
@@ -175,13 +180,13 @@ void outils_convert_counter_to_time(uint16_t counter, uint8_t* converted)
     src_time += MINUTE;
 
     /* Store Millisecond Lookup */
-    uint8_t ms_lookup = src_time & 0x3F; 
+    ms_lookup = src_time & 0x3F;
     
     /* Calculate Seconds */
-    uint8_t seconds = src_time >> 6;   /* Store Seconds */
+    seconds = src_time >> 6;
 
-    uint8_t s1 = seconds & 0xF; /* First digit [d1] */
-    uint8_t s2 = seconds >> 4;  /* Second digit [d2] */
+    s1 = seconds & 0xF;
+    s2 = seconds >> 4;
 
     if (s1 > 9)
         seconds += 6;

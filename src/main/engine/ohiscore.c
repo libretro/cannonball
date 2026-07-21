@@ -88,11 +88,12 @@ void OHiScore_init_def_scores(OHiScore* self)
 
     { int i; for (i = 0; i < NO_SCORES; i++)
     {
+        uint32_t initials;
         /* Read default score */
         self->scores[i].score = RomLoader_read32_a(&(roms.rom0), &adr);
 
         /* Read initials */
-        uint32_t initials = RomLoader_read32_a(&(roms.rom0), &adr);
+        initials = RomLoader_read32_a(&(roms.rom0), &adr);
         self->scores[i].initial1 = (initials >> 24) & 0xFF;
         self->scores[i].initial2 = (initials >> 16) & 0xFF;
         self->scores[i].initial3 = (initials >> 8) & 0xFF;
@@ -243,6 +244,7 @@ void OHiScore_check_name_entry(OHiScore* self)
     }
     else
     {
+        uint16_t BIG_RED_FONT;
         /* Get text ram address of score to blit */
         uint32_t score_adr = OHiScore_get_score_adr(self);
         /* Blit Alphabet. Highlight selected letter red. */
@@ -250,7 +252,7 @@ void OHiScore_check_name_entry(OHiScore* self)
         /* Flash current initial that is being entered */
         OHiScore_flash_entry(self, score_adr);   
         /* Draw big red countdown timer */
-        const uint16_t BIG_RED_FONT = 0x8080;
+        BIG_RED_FONT = 0x8080;
         OHud_draw_timer2(&ohud, ostats.time_counter, 0x1101EC, BIG_RED_FONT);
         /* Input from controls */
         OHiScore_do_input(self, score_adr);
@@ -280,11 +282,13 @@ uint32_t OHiScore_get_score_adr(OHiScore* self)
 /* Source: 0xD45A */static 
 void OHiScore_blit_alphabet(OHiScore* self)
 {
+    uint16_t RED;
+    uint32_t adr;
     /* Print Text: "ABCDEFGHIJK..." */
     OHud_blit_text2(&ohud, TEXT2_ALPHABET); 
 
     /* Address in text ram for characters */
-    uint32_t adr = 0x110BF0;
+    adr = 0x110BF0;
 
     Video_write_text16_a(&video, &adr,       0x8D00); /* Full Stop */
     Video_write_text16(&video, adr + 0x7E, 0x8D01);
@@ -294,7 +298,7 @@ void OHiScore_blit_alphabet(OHiScore* self)
     Video_write_text16(&video, adr + 0x7E, 0x8D03);
 
     /* Colour selected tile red */
-    const uint16_t RED = 0x80;
+    RED = 0x80;
     adr = 0x110BBC + (self->letter_selected << 1);
     Video_write_text8(&video, adr,        (Video_read_text8(&video, adr) & 1) | RED);
     Video_write_text8(&video, adr + 0x80, (Video_read_text8(&video, adr + 0x80) & 1) | RED);
@@ -404,6 +408,8 @@ void OHiScore_do_input(OHiScore* self, uint32_t adr)
 /* Source: 0xD4DA */static 
 int8_t OHiScore_read_controls(OHiScore* self)
 {
+    int16_t steering;
+    int8_t movement;
     /* Determine when accelerator has been pressed then depressed */
     if (oinputs.input_acc < 0x30)
     {
@@ -421,8 +427,8 @@ int8_t OHiScore_read_controls(OHiScore* self)
     }
 
     /* Check Steering Wheel */
-    int8_t movement = 1; /* default to right */
-    int16_t steering = (oinputs.input_steering & 0xFF) - 0x80;
+    movement = 1;
+    steering = (oinputs.input_steering & 0xFF) - 0x80;
     if (steering < 0)
     {
         steering = -steering;
@@ -508,6 +514,10 @@ void OHiScore_tick_minicars(OHiScore* self)
         /* Minicar is on-screen */
         if (!(minicar->dst_reached & BIT_0))
         {
+            uint16_t tile_bits;
+            uint32_t tiles_smoke_adr;
+            uint32_t textram_adr;
+            int16_t pos;
             /* Minicar has reached destination position (off-screen) */
             if ((minicar->pos >> 8) >= 0x5A)
             {
@@ -525,13 +535,13 @@ void OHiScore_tick_minicars(OHiScore* self)
             OHiScore_setup_minicars_pal(self, minicar);
 
             /* Masked off the lower bit */
-            int16_t pos = (minicar->pos >> 8) & 0xFFFE;
+            pos = (minicar->pos >> 8) & 0xFFFE;
 
             /* Get final address in text ram for minicar based on position */
-            uint32_t textram_adr = dst - pos;
+            textram_adr = dst - pos;
 
             /* Address for following smoke tiles */
-            uint32_t tiles_smoke_adr = TILES_MINICARS2;
+            tiles_smoke_adr = TILES_MINICARS2;
 
             /* The minicar is two tiles wide. */
             /* Two versions of routine, one that only blits the car in two tiles */
@@ -555,7 +565,7 @@ void OHiScore_tick_minicars(OHiScore* self)
             /* Reveal info from tile ram by copying to text ram */
 
             /* Bottom Line */
-            uint16_t tile_bits = Video_read_tile8(&video, textram_adr - 0x2000 + 1) | minicar->tile_props;
+            tile_bits = Video_read_tile8(&video, textram_adr - 0x2000 + 1) | minicar->tile_props;
             Video_write_text16(&video, textram_adr, tile_bits);
             /* Top Line */
             tile_bits = Video_read_tile8(&video, textram_adr - 0x2000 - 0x7F) | minicar->tile_props;
@@ -765,6 +775,10 @@ void OHiScore_blit_lap_time(OHiScore* self)
 /* Source: 0x806C */static 
 void OHiScore_convert_lap_time(OHiScore* self, uint16_t time)
 {
+    uint16_t s2;
+    uint16_t s1;
+    uint16_t seconds;
+    uint16_t ms_lookup;
     const uint16_t MINUTE = 3600;
 
     int32_t src_time = time; /* laptime copy [d0]  */
@@ -782,13 +796,13 @@ void OHiScore_convert_lap_time(OHiScore* self, uint16_t time)
     minutes = outils_convert16_dechex(minutes);
 
     /* Store Millisecond Lookup */
-    uint16_t ms_lookup = src_time & 0x3F; 
+    ms_lookup = src_time & 0x3F;
     
     /* Calculate Seconds */
-    uint16_t seconds   = src_time >> 6;   /* Store Seconds */
+    seconds = src_time >> 6;
 
-    uint16_t s1 = seconds & 0xF; /* First digit [d1] */
-    uint16_t s2 = seconds >> 4;  /* Second digit [d2] */
+    s1 = seconds & 0xF;
+    s2 = seconds >> 4;
 
     if (s1 > 9)
         seconds += 6;

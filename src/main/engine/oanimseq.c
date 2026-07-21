@@ -53,6 +53,9 @@ OAnimSeq oanimseq;
 
 void OAnimSeq_init(OAnimSeq* self, oentry* jump_table)
 {
+    oentry* sprite_pass2;
+    oentry* sprite_pass1;
+    oentry* sprite_ferrari;
     /* -------------------------------------------------------------------------------------------- */
     /* Flag Animation Setup */
     /* -------------------------------------------------------------------------------------------- */
@@ -71,20 +74,20 @@ void OAnimSeq_init(OAnimSeq* self, oentry* jump_table)
     /* -------------------------------------------------------------------------------------------- */
     /* Ferrari & Passenger Animation Setup For Intro */
     /* -------------------------------------------------------------------------------------------- */
-    oentry* sprite_ferrari = &jump_table[SPRITE_FERRARI];
+    sprite_ferrari = &jump_table[SPRITE_FERRARI];
     oanimsprite_init(&self->anim_ferrari, sprite_ferrari);
     self->anim_ferrari.anim_addr_curr = outrun.adr.anim_ferrari_curr;
     self->anim_ferrari.anim_addr_next = outrun.adr.anim_ferrari_next;
     sprite_ferrari->control |= ENABLE;
     sprite_ferrari->draw_props = ANCHOR_BOTTOM;
 
-    oentry* sprite_pass1 = &jump_table[SPRITE_PASS1];
+    sprite_pass1 = &jump_table[SPRITE_PASS1];
     oanimsprite_init(&self->anim_pass1, sprite_pass1);
     self->anim_pass1.anim_addr_curr = outrun.adr.anim_pass1_curr;
     self->anim_pass1.anim_addr_next = outrun.adr.anim_pass1_next;
     sprite_pass1->draw_props = ANCHOR_BOTTOM;
 
-    oentry* sprite_pass2 = &jump_table[SPRITE_PASS2];
+    sprite_pass2 = &jump_table[SPRITE_PASS2];
     oanimsprite_init(&self->anim_pass2, sprite_pass2);
     self->anim_pass2.anim_addr_curr = outrun.adr.anim_pass2_curr;
     self->anim_pass2.anim_addr_next = outrun.adr.anim_pass2_next;
@@ -127,10 +130,11 @@ void OAnimSeq_flag_seq(OAnimSeq* self)
         /* Init Flag Sequence */
         if (outrun.game_state < GS_INGAME && self->anim_flag.anim_state != outrun.game_state)
         {
+            uint32_t index;
             self->anim_flag.anim_state = outrun.game_state;
 
             /* Index of animation sequences */
-            uint32_t index = outrun.adr.anim_seq_flag + ((outrun.game_state - 9) << 3);
+            index = outrun.adr.anim_seq_flag + ((outrun.game_state - 9) << 3);
 
             self->anim_flag.anim_addr_curr = RomLoader_read32_a(roms.rom0p, &index);
             self->anim_flag.anim_addr_next = RomLoader_read32_a(roms.rom0p, &index);
@@ -151,6 +155,7 @@ void OAnimSeq_flag_seq(OAnimSeq* self)
 	        uint32_t value = RomLoader_read32(roms.rom0p, addr);
 	        self->anim_flag.sprite->z += value;
             { uint16_t z16 = self->anim_flag.sprite->z >> 16;
+                int16_t sprite_x;
 	    
             if (z16 >= 0x200)
 	        {
@@ -161,9 +166,10 @@ void OAnimSeq_flag_seq(OAnimSeq* self)
 	        self->anim_flag.sprite->zoom     = z16 >> 2;
 
             /* Set X Position */
-            int16_t sprite_x = (int8_t) RomLoader_read8(roms.rom0p, 4 + index);
+            sprite_x = (int8_t) RomLoader_read8(roms.rom0p, 4 + index);
             sprite_x -= oroad.road0_h[z16];
             { int32_t final_x = (sprite_x * z16) >> 9;
+                int16_t sprite_y;
 
             if (RomLoader_read8(roms.rom0p, 1 + index) & BIT_7)
                 final_x = -final_x;
@@ -171,7 +177,7 @@ void OAnimSeq_flag_seq(OAnimSeq* self)
             self->anim_flag.sprite->x = final_x;
 
             /* Set Y Position */
-            int16_t sprite_y      = (int8_t) RomLoader_read8(roms.rom0p, 5 + index);
+            sprite_y = (int8_t) RomLoader_read8(roms.rom0p, 5 + index);
             { int16_t final_y       = (sprite_y * z16) >> 9;
             self->anim_flag.sprite->y   = ORoad_get_road_y(&oroad, z16) - final_y;
 
@@ -252,6 +258,7 @@ void OAnimSeq_anim_seq_intro(OAnimSeq* self, oanimsprite* anim)
             oferrari.car_state = CAR_ANIM_SEQ;
 
         { uint32_t index              = anim->anim_addr_curr + (anim->anim_frame << 3);
+            int16_t sprite_x;
 
         anim->sprite->addr          = RomLoader_read32(roms.rom0p, index) & 0xFFFFF;
         anim->sprite->pal_src       = anim == &self->anim_ferrari ? oferrari.ferrari_pal : RomLoader_read8(roms.rom0p, index);
@@ -260,7 +267,7 @@ void OAnimSeq_anim_seq_intro(OAnimSeq* self, oanimsprite* anim)
         anim->sprite->priority      = 0x1FE - ((RomLoader_read16(roms.rom0p, index) & 0x70) >> 4);
 
         /* Set X */
-        int16_t sprite_x = (int8_t) RomLoader_read8(roms.rom0p, 4 + index);
+        sprite_x = (int8_t) RomLoader_read8(roms.rom0p, 4 + index);
         { int32_t final_x = (sprite_x * anim->sprite->priority) >> 9;
         if (RomLoader_read8(roms.rom0p, 1 + index) & BIT_7)
             final_x = -final_x;
@@ -527,6 +534,8 @@ void OAnimSeq_anim_seq_outro_ferrari(OAnimSeq* self)
 /* Source: 0x5B42 */static 
 void OAnimSeq_anim_seq_outro(OAnimSeq* self, oanimsprite* anim, int pal_override)
 {
+    int16_t sprite_y;
+    uint32_t index;
     oinputs.steering_adjust = 0;
 
     /* Return if no animation data to process */
@@ -534,7 +543,7 @@ void OAnimSeq_anim_seq_outro(OAnimSeq* self, oanimsprite* anim, int pal_override
         return;
 
     /* Process Animation Data */
-    uint32_t index = anim->anim_addr_curr + (anim->anim_frame << 3);
+    index = anim->anim_addr_curr + (anim->anim_frame << 3);
 
     anim->sprite->addr          = RomLoader_read32(roms.rom0p, index) & 0xFFFFF;
     /* Override palette to overcome bugs / recolour Ferrari */
@@ -550,7 +559,7 @@ void OAnimSeq_anim_seq_outro(OAnimSeq* self, oanimsprite* anim, int pal_override
     /* set_sprite_xy: (similar to flag code again) */
 
     /* Set Y Position */
-    int16_t sprite_y = (int8_t) RomLoader_read8(roms.rom0p, 5 + index);
+    sprite_y = (int8_t) RomLoader_read8(roms.rom0p, 5 + index);
     { int16_t final_y  = (sprite_y * anim->sprite->priority) >> 9;
     anim->sprite->y  = ORoad_get_road_y(&oroad, anim->sprite->priority) - final_y;
 
@@ -594,6 +603,7 @@ void OAnimSeq_anim_seq_shadow(OAnimSeq* self, oanimsprite* parent, oanimsprite* 
 
     if (outrun.tick_frame)
     {  
+        uint16_t priority;
         uint8_t zoom_shift = 3;
 
         /* Car Shadow */
@@ -605,7 +615,7 @@ void OAnimSeq_anim_seq_shadow(OAnimSeq* self, oanimsprite* parent, oanimsprite* 
         }
         /* 5C88 set_sprite_xy: */
         anim->sprite->x    = parent->sprite->x;
-        uint16_t priority  = parent->sprite->road_priority >> zoom_shift;
+        priority = parent->sprite->road_priority >> zoom_shift;
         anim->sprite->zoom = priority - (priority >> 2);
         anim->sprite->y    = ORoad_get_road_y(&oroad, parent->sprite->road_priority);
     
@@ -622,6 +632,7 @@ void OAnimSeq_anim_seq_shadow(OAnimSeq* self, oanimsprite* parent, oanimsprite* 
 /* Source: 0x5CC4 */static 
 bool OAnimSeq_read_anim_data(OAnimSeq* self, oanimsprite* anim)
 {
+    bool DO_NOTHING;
     uint32_t addr = outrun.adr.anim_end_table + (self->end_seq << 2) + (anim->sprite->id << 2) +  (anim->sprite->id << 4); /* a0 + d1 */
 
     /* Read start & end position in animation timeline for this object */
@@ -656,7 +667,7 @@ bool OAnimSeq_read_anim_data(OAnimSeq* self, oanimsprite* anim)
     /* Process Animation Sequence */
     /* -------------------------------------------------------------------------------------------- */
 
-    const bool DO_NOTHING = false;
+    DO_NOTHING = false;
     { const bool PROCESS    = true;
 
     /* check_seq_pos: */

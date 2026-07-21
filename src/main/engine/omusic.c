@@ -229,11 +229,14 @@ void OMusic_check_start(OMusic* self)
 /* Tick and Blit */
 void OMusic_tick(OMusic* self)
 {
+    oentry * hand;
+    oentry * dial;
+    oentry * e;
     /* Radio Sprite */
     OSprites_do_spr_order_shadows(&osprites, &osprites.jump_table[self->entry_start + 0]);
 
     /* Animated EQ Sprite (Cycle the graphical equalizer on the radio) */
-    oentry *e = &osprites.jump_table[self->entry_start + 1];
+    e = &osprites.jump_table[self->entry_start + 1];
     e->reload++; /* Increment palette entry */
     e->pal_src = RomLoader_read8(&(roms.rom0), (e->reload & 0x3E) >> 1 | MUSIC_EQ_PAL);
     OSprites_map_palette(&osprites, e);
@@ -242,8 +245,8 @@ void OMusic_tick(OMusic* self)
     /* Draw appropriate FM station on radio, depending on steering setting */
     /* Draw Dial on radio, depending on steering setting */
     e = &osprites.jump_table[self->entry_start + 2];
-    oentry *dial = &osprites.jump_table[self->entry_start + 3];
-    oentry *hand = &osprites.jump_table[self->entry_start + 4];
+    dial = &osprites.jump_table[self->entry_start + 3];
+    hand = &osprites.jump_table[self->entry_start + 4];
 
     /* Determine Track Selection Logic */
     if (self->total_tracks < 3) OMusic_tick_original(self, e, dial, hand);

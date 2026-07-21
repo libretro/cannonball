@@ -197,6 +197,7 @@ void OTiles_update_tilemaps(OTiles* self, int8_t p)
 /* Source: 0xD848 */
 static void OTiles_clear_tile_info(OTiles* self)
 {
+    uint32_t dst_addr;
     /* 1. Clear portion of RAM containing tilemap info (60F00 - 60F1F) */
     self->fg_h_scroll = 
     self->bg_h_scroll = 
@@ -213,7 +214,7 @@ static void OTiles_clear_tile_info(OTiles* self)
     self->bg_addr = 0;    /* +4 words */
 
     /* 2. Clear portion of TEXT RAM containing tilemap info (110E80 - 110FFF) */
-    uint32_t dst_addr = HW_FG_PSEL;
+    dst_addr = HW_FG_PSEL;
     { uint8_t i; for (i = 0; i <= 0x5F; i++)
         Video_write_text32_a(&video, &dst_addr, 0); }
 
@@ -532,10 +533,11 @@ static void OTiles_h_scroll_tilemaps(OTiles* self)
     /* Road Splitting */
     if (oinitengine.end_stage_props & BIT_0)
     {
+        int32_t tilemap_h_target;
         /* Road position is used as an offset into the table. (Note it's reset at beginning of road split) */
         self->h_scroll_lookup = RomLoader_read16(&(roms.rom0), H_SCROLL_TABLE + ((oroad.road_pos >> 16) << 1));
         
-        int32_t tilemap_h_target = self->h_scroll_lookup << 5;
+        tilemap_h_target = self->h_scroll_lookup << 5;
         tilemap_h_target <<= 16;
         { int32_t tilemap_x = tilemap_h_target - (self->tilemap_h_scr << 5);
         if (tilemap_x != 0) 
@@ -614,6 +616,7 @@ static void OTiles_v_scroll_tilemaps(OTiles* self)
 
 static void OTiles_update_fg_page(OTiles* self)
 {
+    int32_t rol7;
     int16_t h = self->tilemap_h_scr >> 16;
     if (oinitengine.rd_split_state == SPLIT_NONE)
         h = -h;
@@ -621,7 +624,7 @@ static void OTiles_update_fg_page(OTiles* self)
     self->fg_h_scroll = h;
     
     /* Choose Page 0 - 3 */
-    int32_t rol7 = h << 7;
+    rol7 = h << 7;
     h = ((rol7 >> 16) & 3) << 1;
     
     { uint8_t cur_stage = self->page_split ? self->page + 1 : self->page;
@@ -634,6 +637,7 @@ static void OTiles_update_fg_page(OTiles* self)
 
 static void OTiles_update_bg_page(OTiles* self)
 {
+    int32_t rol7;
     int16_t h = self->tilemap_h_scr >> 16;
 
     if (oinitengine.rd_split_state == SPLIT_NONE)
@@ -645,7 +649,7 @@ static void OTiles_update_bg_page(OTiles* self)
     self->bg_h_scroll = h;
 
     /* Choose Page 0 - 3 */
-    int32_t rol7 = h << 7;
+    rol7 = h << 7;
     h = ((rol7 >> 16) & 3) << 1;
 
     { uint8_t cur_stage = self->page_split ? self->page + 1 : self->page;

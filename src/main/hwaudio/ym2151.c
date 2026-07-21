@@ -1955,10 +1955,11 @@ static void YM2151_advance(YM2151* self)
 */
 void YM2151_stream_update(YM2151* self)
 {
-    SoundChip_clear_buffer(&(self->sc));
-    uint32_t i;
+    uint32_t length;
     int32_t outl,outr;
-    uint32_t length = self->sc.frame_size;
+    uint32_t i;
+    SoundChip_clear_buffer(&(self->sc));
+    length = self->sc.frame_size;
 
 #ifdef USE_MAME_TIMERS
         /* ASG 980324 - handled by real timers now */

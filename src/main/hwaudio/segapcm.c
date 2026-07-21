@@ -117,6 +117,7 @@ void SegaPCM_stream_update(SegaPCM* self)
             /* loop over samples on this channel */
             for (i = 0; i < self->sc.frame_size; i++) 
             {
+                double increment;
                 int8_t v = 0;
 
                 /* handle looping if we've hit the end */
@@ -142,7 +143,7 @@ void SegaPCM_stream_update(SegaPCM* self)
 
                 /* Advance. */
                 /* Cannonball Change: Output at a fixed 44,100Hz.  */
-                double increment = ((double)regs[7]) * self->downsample;
+                increment = ((double)regs[7]) * self->downsample;
                 addr = (addr + (int) increment) & 0xffffff;
             }
 

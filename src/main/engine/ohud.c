@@ -100,10 +100,6 @@ void OHud_do_mini_map(OHud* self)
 /* Source: 0x8B68 */
 uint32_t OHud_setup_mini_map(OHud* self)
 {
-    if (ostats.route_info > 0x4F)
-        ostats.route_info = 0x4F;
-
-    /* Map Route to appropriate tile */
     const uint8_t ROUTE_MAPPING[] =
     {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -112,6 +108,10 @@ uint32_t OHud_setup_mini_map(OHud* self)
         0x07, 0x07, 0x08, 0x08, 0x09, 0x09, 0x0A, 0x0A, 0x0B, 0x0B, 0x0C, 0x0C, 0x0D, 0x0D, 0x0E, 0x0E,
         0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E,
     };
+    if (ostats.route_info > 0x4F)
+        ostats.route_info = 0x4F;
+
+    /* Map Route to appropriate tile */
 
     return TILES_MINIMAP + (ROUTE_MAPPING[ostats.route_info] << 2);
 }static  
@@ -339,9 +339,10 @@ void OHud_draw_stage_number(OHud* self, uint32_t addr, uint8_t digit, uint16_t c
 /* Source: 0x6B08 */
 void OHud_draw_rev_counter(OHud* self)
 {
+    uint16_t revs;
     /* Return in attract mode and don't draw rev counter */
     if (outrun.game_state <= GS_INIT_GAME) return;
-    uint16_t revs = oferrari.rev_stop_flag ? oferrari.revs_post_stop : oferrari.revs >> 16;
+    revs = oferrari.rev_stop_flag ? oferrari.revs_post_stop : oferrari.revs >> 16;
     
     /* Boost revs during countdown phase, so the bar goes further into the red */
     if (oinitengine.car_increment >> 16 == 0)
@@ -597,12 +598,13 @@ void OHud_blit_text1_xy(OHud* self, uint8_t x, uint8_t y, uint32_t src_addr)
 
 void OHud_blit_text2(OHud* self, uint32_t src_addr)
 {
+    uint16_t counter;
     uint32_t dst_addr = 0x110000 + RomLoader_read16_a(&(roms.rom0), &src_addr); /* Text RAM destination address */
 
     uint16_t pal = RomLoader_read8_a(&(roms.rom0), &src_addr); 
     pal = 0x80A0 | ((pal << 9) | ((pal >> 7) & 1));
     /* same as ror 7 and extending to word */
-    uint16_t counter = RomLoader_read8_a(&(roms.rom0), &src_addr); /* Number of tiles to blit */
+    counter = RomLoader_read8_a(&(roms.rom0), &src_addr);
 
     /* Blit each tile */
     { uint16_t i; for (i = 0; i <= counter; i++)
@@ -648,6 +650,7 @@ void OHud_draw_debug_info(OHud* self, uint32_t pos, uint16_t height_pat, uint8_t
 /* Big Yellow Text. Always Centered.  */
 void OHud_blit_text_big(OHud* self, const uint8_t Y, const char* text, bool do_notes)
 {
+    uint32_t dst_addr;
     uint16_t length = (uint16_t) strlen(text);
 
     const uint16_t X = 20 - (length >> 1);
@@ -670,7 +673,7 @@ void OHud_blit_text_big(OHud* self, const uint8_t Y, const char* text, bool do_n
         Video_write_text32(&video, OHud_translate(self, X - 2, Y, 0x110030) + 0x110080, NOTE_TILES2);
     }
 
-    uint32_t dst_addr = OHud_translate(self, X, Y, 0x110030) + 0x110000;
+    dst_addr = OHud_translate(self, X, Y, 0x110030) + 0x110000;
 
     /* Blit each tile */
     { uint16_t i; for (i = 0; i < length; i++)

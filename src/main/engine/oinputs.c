@@ -184,6 +184,8 @@ void OInputs_do_gear(OInputs* self)
 
 void OInputs_adjust_inputs(OInputs* self)
 {
+    int16_t brake;
+    int16_t acc;
     /* Cap Steering Value */
     if (self->input_steering < STEERING_MIN) self->input_steering = STEERING_MIN;
     else if (self->input_steering > STEERING_MAX) self->input_steering = STEERING_MAX;
@@ -219,13 +221,13 @@ void OInputs_adjust_inputs(OInputs* self)
     }
 
     /* Cap & Adjust Acceleration Value */
-    int16_t acc = self->input_acc;
+    acc = self->input_acc;
     if (acc > PEDAL_MAX) acc = PEDAL_MAX;
     else if (acc < PEDAL_MIN) acc = PEDAL_MIN;
     self->acc_adjust = ((acc - 0x30) * 0x100) / 0x61;
 
     /* Cap & Adjust Brake Value */
-    int16_t brake = self->input_brake;
+    brake = self->input_brake;
     if (brake > PEDAL_MAX) brake = PEDAL_MAX;
     else if (brake < PEDAL_MIN) brake = PEDAL_MIN;
     self->brake_adjust = ((brake - 0x30) * 0x100) / 0x61;

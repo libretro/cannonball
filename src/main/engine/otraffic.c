@@ -203,6 +203,15 @@ void OTraffic_spawn_traffic(OTraffic* self)
 /* Source: 0x4BAC */static 
 void OTraffic_spawn_car(OTraffic* self, oentry* sprite)
 {
+    static const int8_t TYPE[] =
+    {
+        0x00, 0x01, 0x02, 0x03, 0x04, 0x00, 0x01, 0x02, 0x03, 0x06, 0x07, 0x05, 0x06, 0x07, 0x08, 0x09,
+        0x0A, 0x0B, 0x08, 0x09, 0x0A, 0x0B, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0C, 0x0D, 0x0C, 0x0D,
+        0x0C, 0x0D, 0x0C, 0x0D, 0x0E, 0x0F, 0x0E, 0x0F, 0x0E, 0x0F, 0x0E, 0x0F, 0x0E, 0x0F, 0x0E, 0x0F,
+        0x11, 0x11, 0x11, 0x10, 0x10, 0x10, 0x12, 0x12, 0x12, 0x13, 0x13, 0x13, 0x0F, 0x0F, 0x0F, 0x0F
+    };
+    uint8_t spawn_index;
+    int16_t rnd;
     sprite->control |= ENABLE | TRAFFIC_SPRITE;
     sprite->draw_props = ANCHOR_BOTTOM;
     sprite->shadow = 7;     /* Used as priority */
@@ -210,7 +219,7 @@ void OTraffic_spawn_car(OTraffic* self, oentry* sprite)
     sprite->traffic_proximity = 0;
     sprite->traffic_fx = 0;
     sprite->z = 0x10000;    /* Traffic starts on horizon in the distance */
-    int16_t rnd = outils_random();
+    rnd = outils_random();
     self->spawn_location++;
     
     /* Spawn On Left Hand Side Of Road */
@@ -243,15 +252,8 @@ void OTraffic_spawn_car(OTraffic* self, oentry* sprite)
     sprite->traffic_speed = self->traffic_speed_avg;
 
     /* Randomize Type of traffic to spawn */
-    uint8_t spawn_index = (rnd >> 2) + 0x20;
+    spawn_index = (rnd >> 2) + 0x20;
 
-    static const int8_t TYPE[] =
-    {
-        0x00, 0x01, 0x02, 0x03, 0x04, 0x00, 0x01, 0x02, 0x03, 0x06, 0x07, 0x05, 0x06, 0x07, 0x08, 0x09,
-        0x0A, 0x0B, 0x08, 0x09, 0x0A, 0x0B, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0C, 0x0D, 0x0C, 0x0D,
-        0x0C, 0x0D, 0x0C, 0x0D, 0x0E, 0x0F, 0x0E, 0x0F, 0x0E, 0x0F, 0x0E, 0x0F, 0x0E, 0x0F, 0x0E, 0x0F,
-        0x11, 0x11, 0x11, 0x10, 0x10, 0x10, 0x12, 0x12, 0x12, 0x13, 0x13, 0x13, 0x0F, 0x0F, 0x0F, 0x0F
-    };
 
     sprite->type = TYPE[spawn_index] << 3;
     sprite->function_holder = TRAFFIC_TICK;
@@ -345,6 +347,7 @@ void OTraffic_move_spawned_sprite(OTraffic* self, oentry* sprite)
 
     if (outrun.tick_frame)
     {
+        int16_t x_diff;
         /* Check closeness bits and setup approproiate lane movement plan for traffic. */
         uint8_t traffic_proximity = sprite->traffic_proximity & 3;
 
@@ -387,7 +390,7 @@ void OTraffic_move_spawned_sprite(OTraffic* self, oentry* sprite)
         }
 
         /* try_lane_change: */
-        int16_t x_diff = sprite->xw2 - sprite->xw1;
+        x_diff = sprite->xw2 - sprite->xw1;
 
         if (x_diff)
         {
@@ -421,6 +424,7 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
     sprite->z += z_adjust;
     
     { int16_t z16 = sprite->z >> 16;
+        int16_t* road_x;
 
     /* Disable Traffic Object */
     if (z16 <= 0)
@@ -456,8 +460,10 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
     OTraffic_set_zoom_lookup(self, sprite);
 
     /* Set Screen X */
-    int16_t* road_x = (sprite->control & TRAFFIC_RHS) ? oroad.road1_h : oroad.road0_h;
+    road_x = (sprite->control & TRAFFIC_RHS) ? oroad.road1_h : oroad.road0_h;
     { int32_t x = (sprite->xw1 * z16) >> 9;
+        int8_t incline;
+        int16_t y;
     sprite->x = x + road_x[z16];
 
     if (z16 <= 8)
@@ -469,10 +475,10 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
     }
 
     /* Calculate change in road y, so we can determine incline frame for traffic */
-    int16_t y = oroad.road_y[oroad.road_p0 - (0x10 / 2)] - oroad.road_y[oroad.road_p0];
+    y = oroad.road_y[oroad.road_p0 - (0x10 / 2)] - oroad.road_y[oroad.road_p0];
 
     /* 0 = No Incline, 10 = Flat Road/Incline */
-    int8_t incline = (y < 0x12) ? 0x10 : 0; /* d1 */
+    incline = (y < 0x12) ? 0x10 : 0;
 
     /* ------------------------------------------------------------------------ */
     /* Cap Player X Position  */
@@ -533,6 +539,7 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
 
 void OTraffic_set_zoom_lookup(OTraffic* self, oentry* sprite)
 {
+    uint8_t zoom_lookup;
     uint16_t road_priority = (sprite->road_priority >> 2) + 4;
     if (road_priority > 0x7F)
         road_priority = 0x7F;
@@ -545,7 +552,7 @@ void OTraffic_set_zoom_lookup(OTraffic* self, oentry* sprite)
     /* +6 [Byte] Zoom Lookup Value for Width/Height */
     /* +7 [Byte] Traffic Type */
 
-    uint8_t zoom_lookup = RomLoader_read8(roms.rom0p, outrun.adr.traffic_props + sprite->type + 6);
+    zoom_lookup = RomLoader_read8(roms.rom0p, outrun.adr.traffic_props + sprite->type + 6);
 
     switch (zoom_lookup)
     {
@@ -630,6 +637,7 @@ void OTraffic_set_max_traffic(OTraffic* self)
 /* Source: 0x7990 */
 void OTraffic_traffic_logic(OTraffic* self)
 {
+    oentry* first;
     uint16_t sprite_count = osprites.sprite_count - osprites.spr_cnt_shadow;
     uint16_t spawned = 0; /* d5 */
     
@@ -639,8 +647,9 @@ void OTraffic_traffic_logic(OTraffic* self)
         return;
     }
        
-    oentry* first = 0;
+    first = 0;
     { uint8_t index = 0;
+        oentry* next;
     uint16_t spr_index = osprites.spr_cnt_shadow;
 
     /* Find First Traffic Entry. Note we use the hardware sprite list here to extract the original object. */
@@ -663,7 +672,7 @@ void OTraffic_traffic_logic(OTraffic* self)
         return;
     }
 
-    oentry* next = 0;
+    next = 0;
 
     /* Compare Current Traffic Entry With Previous One */
     { uint8_t index2; for (index2 = index + 1; index2 < sprite_count; index2++)
@@ -676,6 +685,8 @@ void OTraffic_traffic_logic(OTraffic* self)
             next->traffic_proximity = 0;
 
             { uint16_t z16 = first->z >> 16;
+                int16_t x_diff_abs;
+                int16_t x_diff;
 
             if (z16 < 0x40)
             {
@@ -693,8 +704,8 @@ void OTraffic_traffic_logic(OTraffic* self)
 
             next->traffic_proximity |= BIT_2; /* Denote entry2 is close to other traffic (z axis) */
 
-            int16_t x_diff = first->xw1 - next->xw1; /* d1 */
-            int16_t x_diff_abs = x_diff < 0 ? -x_diff : x_diff; /* d0 */
+            x_diff = first->xw1 - next->xw1;
+            x_diff_abs = x_diff < 0 ? -x_diff : x_diff;
 
             if (x_diff_abs - 0x80 >= 0)
             {
@@ -741,6 +752,7 @@ void OTraffic_calculate_avg_speed(OTraffic* self, uint16_t c)
 
 void OTraffic_check_collision(OTraffic* self, oentry* sprite)
 {
+    uint8_t traffic_fx_old;
     int16_t d0 = 0;
 
     /* Check for collision */
@@ -781,7 +793,7 @@ void OTraffic_check_collision(OTraffic* self, oentry* sprite)
     }
 
     /* try_sound: */
-    uint8_t traffic_fx_old = sprite->traffic_fx;
+    traffic_fx_old = sprite->traffic_fx;
     sprite->traffic_fx = d0 & 0xFF;
 
     /* New sound effect triggered */
@@ -799,6 +811,7 @@ void OTraffic_check_collision(OTraffic* self, oentry* sprite)
 /* Source: 0x7A8C */
 void OTraffic_traffic_sound(OTraffic* self)
 {
+    int16_t sounds;
     /* Clear traffic data */
     osoundint.engine_data[SOUND_TRAFFIC1] = 0;
     osoundint.engine_data[SOUND_TRAFFIC2] = 0;
@@ -817,11 +830,12 @@ void OTraffic_traffic_sound(OTraffic* self)
         return;
 
     /* Max number of sounds we can do is 4 */
-    int16_t sounds = self->traffic_count <= 4 ? self->traffic_count : 4;
+    sounds = self->traffic_count <= 4 ? self->traffic_count : 4;
 
     /* Loop through traffic objects that are on screen */
     { int16_t i; for (i = 0; i < sounds; i++)
     {
+        uint8_t vol;
         oentry* t = self->traffic_adr[self->traffic_count - i - 1];
         /* Used to set panning of sound as car moves left and right in front of the player */
         int16_t pan = t->x >> 5; 
@@ -829,7 +843,7 @@ void OTraffic_traffic_sound(OTraffic* self)
         if (pan >  3) pan =  3;
         pan &= 7;
         /* Position into screen is used to set volume */
-        uint8_t vol = (t->road_priority & 0x1F0) >> 1;
+        vol = (t->road_priority & 0x1F0) >> 1;
         osoundint.engine_data[SOUND_TRAFFIC1 + i] = pan | vol;
     } }
 }

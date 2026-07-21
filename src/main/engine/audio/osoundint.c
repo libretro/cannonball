@@ -73,11 +73,12 @@ void OSoundInt_reset(OSoundInt* self)
 
 void OSoundInt_tick(OSoundInt* self)
 {
+    int max_ticks;
     /* The audio code is updated 125 times per second */
     self->audio_ticks += (125.0 / config.fps);
 
     /* Ticks per frame will vary between 2 and 3 at 60fps. */
-    const int max_ticks = (int) self->audio_ticks;
+    max_ticks = (int) self->audio_ticks;
 
     { int i; for (i = 0; i < max_ticks; i++)
     {

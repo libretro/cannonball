@@ -216,11 +216,12 @@ void OLogo_sprite_logo_car(OLogo* self)
 
 void OLogo_sprite_logo_bird1(OLogo* self)
 {
+    uint16_t index;
     oentry *e = &osprites.jump_table[self->entry_start + 2];
     e->counter++;
 
     /* Set Bird X Value */
-    uint16_t index = (e->counter << 1) & 0xFF;
+    index = (e->counter << 1) & 0xFF;
     { int8_t bird_x = RomLoader_read8(&(roms.rom0), DATA_MOVEMENT + index); /* Note we sign the value here */
     int8_t zoom = bird_x >> 3;
     e->x = (bird_x >> 3) + 8;
@@ -231,22 +232,24 @@ void OLogo_sprite_logo_bird1(OLogo* self)
     /* Set Bird Y Value */
     index = (index << 1) & 0xFF;
     { int8_t bird_y = RomLoader_read8(&(roms.rom0), DATA_MOVEMENT + index); /* Note we sign the value here */
+        uint16_t frame;
     e->y = (bird_y >> 5) + 0x4E - self->y_off;
 
     /* Set Frame */
     e->reload++;
-    uint16_t frame = (e->reload & 4) >> 2;
+    frame = (e->reload & 4) >> 2;
     e->addr = frame ? outrun.adr.sprite_logo_bird2 : outrun.adr.sprite_logo_bird1;
     OSprites_do_spr_order_shadows(&osprites, e);
  } }}static 
 
 void OLogo_sprite_logo_bird2(OLogo* self)
 {
+    uint16_t index;
     oentry *e = &osprites.jump_table[self->entry_start + 3];
     e->counter++;
 
     /* Set Bird X Value */
-    uint16_t index = (e->counter << 1) & 0xFF;
+    index = (e->counter << 1) & 0xFF;
     { int8_t bird_x = RomLoader_read8(&(roms.rom0), DATA_MOVEMENT + index); /* Note we sign the value here */
     int8_t zoom = bird_x >> 3;
     e->x = (bird_x >> 3) - 2; /* Different from sprite_logo_bird1 */
@@ -257,11 +260,12 @@ void OLogo_sprite_logo_bird2(OLogo* self)
     /* Set Bird Y Value */
     index = (index << 1) & 0xFF;
     { int8_t bird_y = RomLoader_read8(&(roms.rom0), DATA_MOVEMENT + index); /* Note we sign the value here */
+        uint16_t frame;
     e->y = (bird_y >> 5) + 0x52 - self->y_off; /* Different from sprite_logo_bird1 */
 
     /* Set Frame */
     e->reload++;
-    uint16_t frame = (e->reload & 4) >> 2;
+    frame = (e->reload & 4) >> 2;
     e->addr = frame ? outrun.adr.sprite_logo_bird2 : outrun.adr.sprite_logo_bird1;
     OSprites_do_spr_order_shadows(&osprites, e);
  } }}static 

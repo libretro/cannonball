@@ -387,6 +387,8 @@ void OFerrari_ferrari_normal(OFerrari* self)
 /* Source: 0x9D30 */static 
 void OFerrari_setup_ferrari_sprite(OFerrari* self)
 {
+    int16_t x_off;
+    int16_t d4;
     self->spr_ferrari->y = 221; /* Set Default Ferrari Y */
     
     /* Test Collision With Other Sprite Object */
@@ -409,7 +411,7 @@ void OFerrari_setup_ferrari_sprite(OFerrari* self)
     self->spr_ferrari->priority = self->spr_ferrari->road_priority = 0x1FD;
 
     /* Set Ferrari H-Flip Based On Steering & Speed */
-    int16_t d4 = oinputs.steering_adjust;
+    d4 = oinputs.steering_adjust;
 
     /* If steering close to centre clear d4 to ignore h-flip of Ferrari */
     if (d4 >= -8 && d4 <= 7)
@@ -421,13 +423,16 @@ void OFerrari_setup_ferrari_sprite(OFerrari* self)
     /* cont2: */
     d4 >>= 2; /* increase change of being close to zero and no h-flip occurring */
     
-    int16_t x_off = 0;
+    x_off = 0;
 
     /* ------------------------------------------------------------------------ */
     /* Not Skidding */
     /* ------------------------------------------------------------------------ */
     if (!ocrash.skid_counter)
     {
+        int16_t turn_frame_offset;
+        int16_t incline_frame_offset;
+        int16_t y;
         if (d4 >= 0)
             self->spr_ferrari->control &= ~HFLIP;
         else
@@ -436,22 +441,23 @@ void OFerrari_setup_ferrari_sprite(OFerrari* self)
         /* 0x9E4E not_skidding: */
 
         /* Calculate change in road y, so we can determine incline frame for ferrari */
-        int16_t y = oroad.road_y[oroad.road_p0 + (0x3D0 / 2)] - oroad.road_y[oroad.road_p0 + (0x3E0 / 2)];
+        y = oroad.road_y[oroad.road_p0 + (0x3D0 / 2)] - oroad.road_y[oroad.road_p0 + (0x3E0 / 2)];
 
         /* Converts y difference to a frame value (this is for when on an incline) */
-        int16_t incline_frame_offset = 0;
+        incline_frame_offset = 0;
         if (y >= 0x12) incline_frame_offset += 8;
         if (y >= 0x13) incline_frame_offset += 8;
 
         /* Get abs version of ferrari turn */
-        int16_t turn_frame_offset = 0;
+        turn_frame_offset = 0;
         { int16_t d2 = d4;
+            uint32_t offset;
         if (d2 < 0) d2 = -d2;
         if (d2 >= 0x12) turn_frame_offset += 0x18;
         if (d2 >= 0x1E) turn_frame_offset += 0x18;
 
         /* Set Ferrari Sprite Properties */
-        uint32_t offset = outrun.adr.sprite_ferrari_frames + turn_frame_offset + incline_frame_offset;
+        offset = outrun.adr.sprite_ferrari_frames + turn_frame_offset + incline_frame_offset;
         self->spr_ferrari->addr = RomLoader_read32(roms.rom0p, offset);     /* Set Ferrari Frame Address */
         self->sprite_pass_y = RomLoader_read16(roms.rom0p, offset + 4); /* Set Passenger Y Offset */
         x_off = RomLoader_read16(roms.rom0p, offset + 6); /* Set Ferrari Sprite X Offset */
@@ -474,13 +480,14 @@ void OFerrari_setup_ferrari_sprite(OFerrari* self)
             self->spr_ferrari->control &= ~HFLIP;
 
         { int16_t frame = 0;
+            int16_t y;
 
         if (skid_counter >= 3)  frame += 8;
         if (skid_counter >= 6)  frame += 8;
         if (skid_counter >= 12) frame += 8;
 
         /* Calculate incline */
-        int16_t y = oroad.road_y[oroad.road_p0 + (0x3D0 / 2)] - oroad.road_y[oroad.road_p0 + (0x3E0 / 2)];
+        y = oroad.road_y[oroad.road_p0 + (0x3D0 / 2)] - oroad.road_y[oroad.road_p0 + (0x3E0 / 2)];
 
         { int16_t incline_frame_offset = 0;
         if (y >= 0x12) incline_frame_offset += 0x20;
@@ -507,6 +514,7 @@ void OFerrari_setup_ferrari_sprite(OFerrari* self)
 /* Source: 0xA212 */static 
 void OFerrari_setup_ferrari_bonus_sprite(OFerrari* self)
 {
+    int16_t turn_frame_offset;
     /* Setup Default Ferrari Properties */
     self->spr_ferrari->y = 221;
     /*spr_ferrari->x = 0; not really needed as set below */
@@ -518,17 +526,19 @@ void OFerrari_setup_ferrari_bonus_sprite(OFerrari* self)
         self->spr_ferrari->control |= HFLIP;
 
     /* Get abs version of ferrari turn */
-    int16_t turn_frame_offset = 0;
+    turn_frame_offset = 0;
     { int16_t d2 = oinputs.steering_adjust >> 2;
+        int16_t x_off;
+        uint32_t offset;
     if (d2 < 0) d2 = -d2;
     if (d2 >= 0x4) turn_frame_offset += 0x18;
     if (d2 >= 0x8) turn_frame_offset += 0x18;
 
     /* Set Ferrari Sprite Properties */
-    uint32_t offset   = outrun.adr.sprite_ferrari_frames + turn_frame_offset + 8; /* 8 denotes the 'level' frames, no slope. */
+    offset = outrun.adr.sprite_ferrari_frames + turn_frame_offset + 8;
     self->spr_ferrari->addr = RomLoader_read32(roms.rom0p, offset);     /* Set Ferrari Frame Address */
     self->sprite_pass_y     = RomLoader_read16(roms.rom0p, offset + 4); /* Set Passenger Y Offset */
-    int16_t x_off     = RomLoader_read16(roms.rom0p, offset + 6); /* Set Ferrari Sprite X Offset */
+    x_off = RomLoader_read16(roms.rom0p, offset + 6);
 
     if (oinputs.steering_adjust < 0) x_off = -x_off;
     self->spr_ferrari->x = x_off;
@@ -554,6 +564,7 @@ void OFerrari_init_end_seq(OFerrari* self)
 /* Source: 0xA298 */static 
 void OFerrari_do_end_seq(OFerrari* self)
 {
+    uint32_t addr;
     self->spr_ferrari->y = 221;
     self->spr_ferrari->priority = self->spr_ferrari->road_priority = 0x1FD;
 
@@ -564,7 +575,7 @@ void OFerrari_do_end_seq(OFerrari* self)
     /* +6 [Byte]: Sprite Colour Palette */
     /* +7 [Byte]: H-Flip */
 
-    uint32_t addr = outrun.adr.anim_ferrari_frames + ((obonus.bonus_control - 0xC) << 1);
+    addr = outrun.adr.anim_ferrari_frames + ((obonus.bonus_control - 0xC) << 1);
 
     self->spr_ferrari->addr    = RomLoader_read32(roms.rom0p, addr);
     self->sprite_pass_y        = RomLoader_read8(roms.rom0p, 4 + addr);  /* Set Passenger Y Offset */
@@ -629,6 +640,7 @@ void OFerrari_set_ferrari_palette(OFerrari* self)
 
 void OFerrari_set_ferrari_x(OFerrari* self)
 {
+    int16_t road_curve;
     int16_t steering = oinputs.steering_adjust;
 
     /* Hack to reduce the amount you can steer left and right at the start of Stage 1 */
@@ -653,7 +665,7 @@ void OFerrari_set_ferrari_x(OFerrari* self)
 
     /* Check Road Curve And Adjust X Value Accordingly */
     /* This effectively makes it harder to steer into sharp corners */
-    int16_t road_curve = oinitengine.road_curve;
+    road_curve = oinitengine.road_curve;
     if (road_curve)
     {
         road_curve -= 0x40;
@@ -904,6 +916,7 @@ void OFerrari_set_passenger_sprite(OFerrari* self, oentry* sprite)
     sprite->road_priority = self->spr_ferrari->road_priority;
     sprite->priority = self->spr_ferrari->priority + 1;
     { uint16_t frame = self->sprite_pass_y << 3;
+        uint8_t pal;
 
     /* Is this a bug in the original? Note that by negating HFLIP check the passengers */
     /* shift right a few pixels on acceleration. */
@@ -913,7 +926,7 @@ void OFerrari_set_passenger_sprite(OFerrari* self, oentry* sprite)
     /* -------------------------------------------------------------------------------------------- */
     /* Set Palette */
     /* -------------------------------------------------------------------------------------------- */
-    uint8_t pal = 0;
+    pal = 0;
 
     /* Test for car collision frame */
     if (self->sprite_pass_y == 9)
@@ -956,9 +969,10 @@ void OFerrari_set_passenger_sprite(OFerrari* self, oentry* sprite)
 
 void OFerrari_set_passenger_frame(OFerrari* self, oentry* sprite)
 {
+    uint16_t inc;
     uint32_t addr = outrun.adr.sprite_pass_frames;
     if (sprite == self->spr_pass2) addr += 4; /* Female frames */
-    uint16_t inc = oinitengine.car_increment >> 16;
+    inc = oinitengine.car_increment >> 16;
 
     /* Car is moving */
     /* Use adjusted increment/speed of car as reload value for sprite counter (to ultimately set hair frame) */
@@ -1059,6 +1073,8 @@ void OFerrari_move(OFerrari* self)
             OFerrari_car_acc_brake(self);
 
             { int32_t d2 = self->revs / self->torque;
+                int32_t accel_copy;
+                int16_t new_torque;
 
             if (!oinitengine.ingame_engine)
             {
@@ -1073,10 +1089,10 @@ void OFerrari_move(OFerrari* self)
             }
 
             /* set_torque: */
-            int16_t new_torque = torque_lookup[self->torque_index];
+            new_torque = torque_lookup[self->torque_index];
             self->torque = new_torque;
             d2 = (int32_t) (d2 & 0xFFFF) * new_torque; /* unsigned multiply */
-            int32_t accel_copy = self->accel_value << 16;
+            accel_copy = self->accel_value << 16;
             { int32_t rev_adjust_new = 0;
 
             if (self->gear_counter != 0)
@@ -1187,6 +1203,7 @@ void OFerrari_move(OFerrari* self)
 /* Source: 0x6694 */static 
 void OFerrari_tick_engine_disabled(OFerrari* self, int32_t*d2)
 {
+    int16_t lookup;
     self->torque_index = 0;
     
     /* Crash taking place - do counter and set game engine when expired */
@@ -1205,7 +1222,7 @@ void OFerrari_tick_engine_disabled(OFerrari* self, int32_t*d2)
     self->torque = 0x1000;
 
     /* Use top word of revs for lookup */
-    int16_t lookup = (self->revs >> 16);
+    lookup = (self->revs >> 16);
     if (lookup > 0xFF) lookup = 0xFF;
 
     self->torque_index = (0x30 - rev_inc_lookup[lookup]) >> 2;
@@ -1230,6 +1247,7 @@ void OFerrari_tick_engine_disabled(OFerrari* self, int32_t*d2)
 /* Source: 0x6524 */static 
 void OFerrari_car_acc_brake(OFerrari* self)
 {
+    int16_t brake1;
     /* ------------------------------------------------------------------------ */
     /* Acceleration */
     /* ------------------------------------------------------------------------ */
@@ -1278,7 +1296,7 @@ void OFerrari_car_acc_brake(OFerrari* self)
     /* ------------------------------------------------------------------------ */
     /* Brake */
     /* ------------------------------------------------------------------------ */
-    int16_t brake1 = oinputs.brake_adjust;
+    brake1 = oinputs.brake_adjust;
     { int16_t brake2 = oinputs.brake_adjust;
     brake1 += self->brake_adjust1 + self->brake_adjust2 + self->brake_adjust3;
     brake1 >>= 2;
@@ -1496,6 +1514,7 @@ void OFerrari_convert_revs_speed(OFerrari* self, int32_t new_torque, int32_t*d2)
     if (d3 < 0x1F0000) d3 = 0x1F0000;
 
     { int16_t revs_top = d3 >> 16;
+        int max_speed;
     
     /* Check whether we're switching back to ingame engine (after disabling user control of car) */
     if (self->rev_stop_flag)
@@ -1506,11 +1525,12 @@ void OFerrari_convert_revs_speed(OFerrari* self, int32_t new_torque, int32_t*d2)
         }
         else
         {
+            int16_t d5;
             if (self->accel_value < self->acc_post_stop)
                 self->revs_post_stop -= self->rev_stop_flag;
 
             /* cont1: */
-            int16_t d5 = self->revs_post_stop >> 1;
+            d5 = self->revs_post_stop >> 1;
             { int16_t d4 = self->rev_stop_flag;
             if (revs_top >= d5)
             {
@@ -1538,7 +1558,7 @@ void OFerrari_convert_revs_speed(OFerrari* self, int32_t new_torque, int32_t*d2)
         fprintf(stderr, "convert_revs_speed error!\n");
     }*/
 
-    const int max_speed = !config.engine.turbo ? MAX_SPEED : (int) (MAX_SPEED * 1.2f);
+    max_speed = !config.engine.turbo ? MAX_SPEED : (int) (MAX_SPEED * 1.2f);
     (*d2) = ((*d2) / new_torque) * 0x480;
     /*std::cout << std::hex << "(*d2): " << (int)(*d2) << " new_torque: " << new_torque << " torque index: " << std::hex << (int) torque_index << std::endl; */
     if ((*d2) < 0) (*d2) = 0;
@@ -1705,11 +1725,12 @@ void OFerrari_do_sound_score_slip(OFerrari* self)
 /* Source: 0x9FEE */
 void OFerrari_shake(OFerrari* self)
 {
+    int8_t traction;
     if (outrun.game_state != GS_INGAME && outrun.game_state != GS_ATTRACT) return;
 
     if (self->wheel_traction == TRACTION_ON) return; /* Return if both wheels have traction */
 
-    int8_t traction = self->wheel_traction - 1;
+    traction = self->wheel_traction - 1;
     { int16_t rnd = outils_random();
     self->spr_ferrari->counter++;
 

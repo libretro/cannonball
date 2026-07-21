@@ -707,6 +707,8 @@ static bool Outrun_decrement_timers(Outrun* self)
 
 static void Outrun_init_motor_calibration(Outrun* self)
 {
+    const static uint32_t PAL_SERVICE[] = {0xFF, 0xFF00FF, 0xFF00FF, 0xFF0000};
+    uint32_t dst;
     OTiles_init(&otiles);
     OPalette_init(&opalette);
     OInputs_init(&oinputs);
@@ -727,8 +729,7 @@ static void Outrun_init_motor_calibration(Outrun* self)
 
 
     /* Write Palette To RAM */
-    uint32_t dst = 0x120000;
-    const static uint32_t PAL_SERVICE[] = {0xFF, 0xFF00FF, 0xFF00FF, 0xFF0000};
+    dst = 0x120000;
     Video_write_pal32_a(&video, &dst, PAL_SERVICE[0]);
     Video_write_pal32_a(&video, &dst, PAL_SERVICE[1]);
     Video_write_pal32_a(&video, &dst, PAL_SERVICE[2]);
