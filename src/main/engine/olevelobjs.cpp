@@ -74,17 +74,17 @@ void OLevelObjs_init_entries(OLevelObjs* self, uint32_t a4, const uint8_t start_
     {
         oentry *sprite = &osprites.jump_table[i];
 
-        sprite->control    = RomLoader_read8(roms.rom0p, &a4);
-        sprite->draw_props = RomLoader_read8(roms.rom0p, &a4);
-        sprite->shadow     = RomLoader_read8(roms.rom0p, &a4);
-        sprite->pal_src    = RomLoader_read8(roms.rom0p, &a4);
-        sprite->type       = RomLoader_read16(roms.rom0p, &a4);
+        sprite->control    = RomLoader_read8_a(roms.rom0p, &a4);
+        sprite->draw_props = RomLoader_read8_a(roms.rom0p, &a4);
+        sprite->shadow     = RomLoader_read8_a(roms.rom0p, &a4);
+        sprite->pal_src    = RomLoader_read8_a(roms.rom0p, &a4);
+        sprite->type       = RomLoader_read16_a(roms.rom0p, &a4);
         sprite->addr       = RomLoader_read32(roms.rom0p, outrun.adr.sprite_type_table + sprite->type);
         sprite->xw1        = 
-        sprite->xw2        = RomLoader_read16(roms.rom0p, &a4);
-        sprite->yw         = RomLoader_read16(roms.rom0p, &a4);
+        sprite->xw2        = RomLoader_read16_a(roms.rom0p, &a4);
+        sprite->yw         = RomLoader_read16_a(roms.rom0p, &a4);
 
-        { uint16_t z_orig    = RomLoader_read16(roms.rom0p, &a4);
+        { uint16_t z_orig    = RomLoader_read16_a(roms.rom0p, &a4);
 
         uint32_t z = z_orig;
         outils_swap32(z);
@@ -407,15 +407,15 @@ void OLevelObjs_sprite_normal(OLevelObjs* self, oentry *sprite, uint8_t zoom)
     /* H-Flip - swap x co-ordinates */
     if (sprite->control & HFLIP)
     {
-        x2 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
-        x1 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
+        x2 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
+        x1 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
         x2 = -x2;
         x1 = -x1;
     }
     else
     {
-        x1 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
-        x2 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
+        x1 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
+        x2 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
     }
 
     /* If off left hand side or off right hand side of screen */
@@ -451,15 +451,15 @@ void OLevelObjs_sprite_lights(OLevelObjs* self, oentry *sprite)
     /* H-Flip - swap x co-ordinates */
     if (sprite->control & HFLIP)
     {
-        x2 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
-        x1 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
+        x2 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
+        x1 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
         x2 = -x2;
         x1 = -x1;
     }
     else
     {
-        x1 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
-        x2 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
+        x1 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
+        x2 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
     }
 
     /* If off left hand side or off right hand side of screen */
@@ -573,15 +573,15 @@ void OLevelObjs_sprite_collision_z1c(OLevelObjs* self, oentry* sprite)
     /* H-Flip - swap x co-ordinates */
     if (sprite-> control & HFLIP)
     {
-        x2 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
-        x1 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
+        x2 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
+        x1 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
         x2 = -x2;
         x1 = -x1;
     }
     else
     {
-        x1 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
-        x2 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
+        x1 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
+        x2 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
     }
 
     { int16_t centre = (x2 - x1) >> 1; /* d0 */
@@ -787,15 +787,15 @@ void OLevelObjs_sprite_debris(OLevelObjs* self, oentry* sprite)
     /* H-Flip - swap x co-ordinates */
     if (sprite->control & HFLIP)
     {
-        x2 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
-        x1 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
+        x2 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
+        x1 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
         x2 = -x2;
         x1 = -x1;
     }
     else
     {
-        x1 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
-        x2 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
+        x1 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
+        x2 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
     }
 
     /* If off left hand side or off right hand side of screen */
@@ -983,15 +983,15 @@ void OLevelObjs_sprite_rocks(OLevelObjs* self, oentry *sprite)
     /* H-Flip - swap x co-ordinates */
     if (sprite->control & HFLIP)
     {
-        x2 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
-        x1 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
+        x2 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
+        x1 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
         x2 = -x2;
         x1 = -x1;
     }
     else
     {
-        x1 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
-        x2 = (int16_t) RomLoader_read16(&(roms.rom0), &offset_addr);
+        x1 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
+        x2 = (int16_t) RomLoader_read16_a(&(roms.rom0), &offset_addr);
     }
 
     /* If off left hand side or off right hand side of screen */

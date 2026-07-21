@@ -260,19 +260,19 @@ static void TrackLoader_setup_level(TrackLoader* self, Level* l, RomLoader* data
 
     /* Load Road Pallete */
     adr = RomLoader_read32(data, STAGE_ADR + 4);
-    l->palr1.stripe_centre = RomLoader_read32(data, &adr);
+    l->palr1.stripe_centre = RomLoader_read32_a(data, &adr);
     l->palr2.stripe_centre = RomLoader_read32(data, adr);
 
     adr = RomLoader_read32(data, STAGE_ADR + 8);
-    l->palr1.stripe = RomLoader_read32(data, &adr);
+    l->palr1.stripe = RomLoader_read32_a(data, &adr);
     l->palr2.stripe = RomLoader_read32(data, adr);
 
     adr = RomLoader_read32(data, STAGE_ADR + 12);
-    l->palr1.side = RomLoader_read32(data, &adr);
+    l->palr1.side = RomLoader_read32_a(data, &adr);
     l->palr2.side = RomLoader_read32(data, adr);
 
     adr = RomLoader_read32(data, STAGE_ADR + 16);
-    l->palr1.road = RomLoader_read32(data, &adr);
+    l->palr1.road = RomLoader_read32_a(data, &adr);
     l->palr2.road = RomLoader_read32(data, adr);
 
     /* Ground Palette */

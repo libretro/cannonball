@@ -132,8 +132,8 @@ void OAnimSeq_flag_seq(OAnimSeq* self)
             /* Index of animation sequences */
             uint32_t index = outrun.adr.anim_seq_flag + ((outrun.game_state - 9) << 3);
 
-            self->anim_flag.anim_addr_curr = RomLoader_read32(roms.rom0p, &index);
-            self->anim_flag.anim_addr_next = RomLoader_read32(roms.rom0p, &index);
+            self->anim_flag.anim_addr_curr = RomLoader_read32_a(roms.rom0p, &index);
+            self->anim_flag.anim_addr_next = RomLoader_read32_a(roms.rom0p, &index);
 
             self->anim_flag.frame_delay = RomLoader_read8(roms.rom0p, 7 + self->anim_flag.anim_addr_curr) & 0x3F;
             self->anim_flag.anim_frame  = 0;
@@ -377,8 +377,8 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
 {
     /* Ferrari Object [0x5B12 entry point] */
     uint32_t addr = outrun.adr.anim_endseq_obj1 + (self->end_seq << 3);
-    self->anim_ferrari.anim_addr_curr = RomLoader_read32(roms.rom0p, &addr);
-    self->anim_ferrari.anim_addr_next = RomLoader_read32(roms.rom0p, &addr);
+    self->anim_ferrari.anim_addr_curr = RomLoader_read32_a(roms.rom0p, &addr);
+    self->anim_ferrari.anim_addr_next = RomLoader_read32_a(roms.rom0p, &addr);
     self->ferrari_stopped = false;
     
     /* 0x58A4: Car Door Opening Animation [seq_sprite_entry] */
@@ -390,8 +390,8 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     self->anim_obj1.frame_delay = 0;
     self->anim_obj1.anim_props = 0;
     addr = outrun.adr.anim_endseq_obj2 + (self->end_seq << 3);
-    self->anim_obj1.anim_addr_curr = RomLoader_read32(roms.rom0p, &addr);
-    self->anim_obj1.anim_addr_next = RomLoader_read32(roms.rom0p, &addr);
+    self->anim_obj1.anim_addr_curr = RomLoader_read32_a(roms.rom0p, &addr);
+    self->anim_obj1.anim_addr_next = RomLoader_read32_a(roms.rom0p, &addr);
     
     /* 0x58EC: Interior of Ferrari (Note this wobbles a little when passengers exit) [seq_sprite_entry] */
     self->anim_obj2.sprite->control |= ENABLE;
@@ -401,8 +401,8 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     self->anim_obj2.frame_delay = 0;
     self->anim_obj2.anim_props = 0;
     addr = outrun.adr.anim_endseq_obj3 + (self->end_seq << 3);
-    self->anim_obj2.anim_addr_curr = RomLoader_read32(roms.rom0p, &addr);
-    self->anim_obj2.anim_addr_next = RomLoader_read32(roms.rom0p, &addr);
+    self->anim_obj2.anim_addr_curr = RomLoader_read32_a(roms.rom0p, &addr);
+    self->anim_obj2.anim_addr_next = RomLoader_read32_a(roms.rom0p, &addr);
 
     /* 0x592A: Car Shadow [SeqSpriteShadow] */
     self->anim_obj3.sprite->control |= ENABLE;
@@ -421,8 +421,8 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     self->anim_pass1.frame_delay = 0;
     self->anim_pass1.anim_props = 0;
     addr = outrun.adr.anim_endseq_obj4 + (self->end_seq << 3);
-    self->anim_pass1.anim_addr_curr = RomLoader_read32(roms.rom0p, &addr);
-    self->anim_pass1.anim_addr_next = RomLoader_read32(roms.rom0p, &addr);
+    self->anim_pass1.anim_addr_curr = RomLoader_read32_a(roms.rom0p, &addr);
+    self->anim_pass1.anim_addr_next = RomLoader_read32_a(roms.rom0p, &addr);
 
     /* 0x5998: Man Shadow [SeqSpriteShadow] */
     self->anim_obj4.sprite->control = ENABLE;
@@ -442,8 +442,8 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     self->anim_pass2.frame_delay = 0;
     self->anim_pass2.anim_props = 0;
     addr = outrun.adr.anim_endseq_obj5 + (self->end_seq << 3);
-    self->anim_pass2.anim_addr_curr = RomLoader_read32(roms.rom0p, &addr);
-    self->anim_pass2.anim_addr_next = RomLoader_read32(roms.rom0p, &addr);
+    self->anim_pass2.anim_addr_curr = RomLoader_read32_a(roms.rom0p, &addr);
+    self->anim_pass2.anim_addr_next = RomLoader_read32_a(roms.rom0p, &addr);
 
     /* 0x59F6: Female Shadow [SeqSpriteShadow] */
     self->anim_obj5.sprite->control = ENABLE;
@@ -463,8 +463,8 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     self->anim_obj6.frame_delay = 0;
     self->anim_obj6.anim_props = 0;
     addr = outrun.adr.anim_endseq_obj6 + (self->end_seq << 3);
-    self->anim_obj6.anim_addr_curr = RomLoader_read32(roms.rom0p, &addr);
-    self->anim_obj6.anim_addr_next = RomLoader_read32(roms.rom0p, &addr);
+    self->anim_obj6.anim_addr_curr = RomLoader_read32_a(roms.rom0p, &addr);
+    self->anim_obj6.anim_addr_next = RomLoader_read32_a(roms.rom0p, &addr);
 
     /* Alternate Use Based On End Sequence */
     self->anim_obj7.sprite->control |= ENABLE;
@@ -478,8 +478,8 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     if (self->end_seq == 4)
     {
         addr = outrun.adr.anim_endseq_objB + (self->end_seq << 3);
-        self->anim_obj7.anim_addr_curr = RomLoader_read32(roms.rom0p, &addr);
-        self->anim_obj7.anim_addr_next = RomLoader_read32(roms.rom0p, &addr);
+        self->anim_obj7.anim_addr_curr = RomLoader_read32_a(roms.rom0p, &addr);
+        self->anim_obj7.anim_addr_next = RomLoader_read32_a(roms.rom0p, &addr);
     }
     /* Trophy Shadow */
     else
@@ -496,8 +496,8 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     self->anim_obj8.frame_delay = 0;
     self->anim_obj8.anim_props = 0xFF00;
     addr = outrun.adr.anim_endseq_obj7 + (self->end_seq << 3);
-    self->anim_obj8.anim_addr_curr = RomLoader_read32(roms.rom0p, &addr);
-    self->anim_obj8.anim_addr_next = RomLoader_read32(roms.rom0p, &addr);
+    self->anim_obj8.anim_addr_curr = RomLoader_read32_a(roms.rom0p, &addr);
+    self->anim_obj8.anim_addr_next = RomLoader_read32_a(roms.rom0p, &addr);
     
     self->end_seq_state = 1;
 }

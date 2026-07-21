@@ -164,15 +164,15 @@ void hwtiles_patch_tiles(hwtiles* self, RomLoader* patch)
 
     { uint32_t i; for (i = 0; i < patch->length;)
     {
-        uint32_t tile_index = RomLoader_read16(patch, &i) << 3;
-        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
-        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
-        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
-        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
-        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
-        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
-        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
-        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
+        uint32_t tile_index = RomLoader_read16_a(patch, &i) << 3;
+        self->tiles[tile_index++] = RomLoader_read32_a(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32_a(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32_a(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32_a(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32_a(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32_a(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32_a(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32_a(patch, &i);
     } }
 }
 

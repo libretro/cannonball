@@ -427,7 +427,7 @@ static void OMusic_blit_music_select(OMusic* self)
 
     /* Write 32 Palette Longs to Palette RAM */
     { int i; for (i = 0; i < 32; i++)
-        Video_write_pal32(&video, &dst_addr, RomLoader_read32(&(roms.rom0), &src_addr)); }
+        Video_write_pal32(&video, &dst_addr, RomLoader_read32_a(&(roms.rom0), &src_addr)); }
 
     /* Set Tilemap Scroll */
     OTiles_set_scroll(&otiles, config.s16_x_off, 0);
@@ -440,14 +440,14 @@ static void OMusic_blit_music_select(OMusic* self)
         uint32_t tilemap16 = TILEMAP_RAM_16 - 20;
         src_addr = 0;
 
-        { const uint16_t rows = RomLoader_read16(self->tilemap, &src_addr);
-        const uint16_t cols = RomLoader_read16(self->tilemap, &src_addr);
+        { const uint16_t rows = RomLoader_read16_a(self->tilemap, &src_addr);
+        const uint16_t cols = RomLoader_read16_a(self->tilemap, &src_addr);
 
         { int y; for (y = 0; y < rows; y++)
         {
             dst_addr = tilemap16;
             { int x; for (x = 0; x < cols; x++)
-                Video_write_tile16(&video, &dst_addr, RomLoader_read16(self->tilemap, &src_addr)); }
+                Video_write_tile16(&video, &dst_addr, RomLoader_read16_a(self->tilemap, &src_addr)); }
             tilemap16 += 0x80; /* next line of tiles */
         } }
      }}
@@ -465,7 +465,7 @@ static void OMusic_blit_music_select(OMusic* self)
             { int x; for (x = 0; x < 40;)
             {
                 /* get next tile */
-                uint32_t data = RomLoader_read16(&(roms.rom0), &src_addr);
+                uint32_t data = RomLoader_read16_a(&(roms.rom0), &src_addr);
                 /* No Compression: write tile directly to tile ram */
                 if (data != 0)
                 {
@@ -475,8 +475,8 @@ static void OMusic_blit_music_select(OMusic* self)
                 /* Compression */
                 else
                 {
-                    uint16_t value = RomLoader_read16(&(roms.rom0), &src_addr); /* tile index to copy */
-                    uint16_t count = RomLoader_read16(&(roms.rom0), &src_addr); /* number of times to copy value */
+                    uint16_t value = RomLoader_read16_a(&(roms.rom0), &src_addr); /* tile index to copy */
+                    uint16_t count = RomLoader_read16_a(&(roms.rom0), &src_addr); /* number of times to copy value */
 
                     { uint16_t i; for (i = 0; i <= count; i++)
                     {

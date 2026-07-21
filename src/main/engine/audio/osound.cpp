@@ -362,8 +362,8 @@ void OSound_new_command(OSound* self)
         /* Send four level commands */
         { uint8_t i; for (i = 0; i < 4; i++)
         {
-            uint8_t reg = RomLoader_read8(&(roms.z80), &adr);
-            uint8_t val = RomLoader_read8(&(roms.z80), &adr);
+            uint8_t reg = RomLoader_read8_16a(&(roms.z80), &adr);
+            uint8_t val = RomLoader_read8_16a(&(roms.z80), &adr);
             OSound_fm_write_reg(self, reg, val);
         } }
      }}
@@ -536,7 +536,7 @@ void OSound_process_channel(OSound* self, uint16_t chan_id)
 /* Source: 0x2E1 */static 
 void OSound_process_section(OSound* self, uint8_t* chan)
 {
-    uint8_t cmd = RomLoader_read8(&(roms.z80), &self->pos);
+    uint8_t cmd = RomLoader_read8_16a(&(roms.z80), &self->pos);
     self->cmd_prev = cmd;
     if (cmd >= 0x80)
     {
@@ -757,7 +757,7 @@ void OSound_pcm_setpitch(OSound* self, uint8_t* chan)
 /* Source: 0x446 */static 
 void OSound_set_loop_adr(OSound* self)
 {
-    self->pos = RomLoader_read16(&(roms.z80), self->pos) - 1;
+    self->pos = RomLoader_read16_16(&(roms.z80), self->pos) - 1;
 }
 
 /* Set Loop Counter For FM & PCM Data */
@@ -844,10 +844,10 @@ void OSound_play_pcm_index(OSound* self, uint8_t* chan, uint8_t cmd)
         /* First sample is at index 0xD0, so reset to 0 */
         uint16_t pcm_index = PCM_INFO + ((cmd - 0xD0) << 2);
 
-        chan[CH_PCM_ADR1L] = RomLoader_read8(&(roms.z80), &pcm_index);           /* Wave Start Address */
-        chan[CH_PCM_ADR1H] = RomLoader_read8(&(roms.z80), &pcm_index);
-        chan[CH_PCM_ADR2]  = RomLoader_read8(&(roms.z80), &pcm_index);           /* Wave End Address */
-        chan[CH_CTRL]      = RomLoader_read8(&(roms.z80), &pcm_index);           /* Sample Flags */
+        chan[CH_PCM_ADR1L] = RomLoader_read8_16a(&(roms.z80), &pcm_index);           /* Wave Start Address */
+        chan[CH_PCM_ADR1H] = RomLoader_read8_16a(&(roms.z80), &pcm_index);
+        chan[CH_PCM_ADR2]  = RomLoader_read8_16a(&(roms.z80), &pcm_index);           /* Wave End Address */
+        chan[CH_CTRL]      = RomLoader_read8_16a(&(roms.z80), &pcm_index);           /* Sample Flags */
     }
     /* ------------------------------------------------------------------------ */
     /* Initalize PCM Percussion Samples */
@@ -877,20 +877,20 @@ void OSound_init_sound(OSound* self, uint8_t cmd, uint16_t src, uint16_t dst)
     self->command_index = cmd - 0x81;
     
     /* Get offset to channel setup */
-    src = RomLoader_read16(&(roms.z80), src);
+    src = RomLoader_read16_16(&(roms.z80), src);
 
     /* Get number of channels */
-    uint8_t channels = RomLoader_read8(&(roms.z80), &src);
+    uint8_t channels = RomLoader_read8_16a(&(roms.z80), &src);
 
     /* next_channel */
     { uint8_t ch; for (ch = 0; ch < channels; ch++)
     {
         /* Address of default channel setup data */
-        uint16_t adr = RomLoader_read16(&(roms.z80), &src);
+        uint16_t adr = RomLoader_read16_16a(&(roms.z80), &src);
 
         /* Copy default setup code for block of sound (14 bytes) */
         { int i; for (i = 0; i < 0xE; i++)
-            self->chan_ram[dst++] = RomLoader_read8(&(roms.z80), &adr); }
+            self->chan_ram[dst++] = RomLoader_read8_16a(&(roms.z80), &adr); }
 
         /* Write command byte (at position 0xE) */
         self->chan_ram[dst++] = self->command_index;
@@ -1102,7 +1102,7 @@ void OSound_fm_write_reg(OSound* self, uint8_t reg, uint8_t value)
 /* Source: 0xA84 */static 
 void OSound_fm_write_block(OSound* self, uint8_t ix0, uint16_t adr, uint8_t chan)
 {
-    uint8_t cmd = RomLoader_read8(&(roms.z80), &adr);
+    uint8_t cmd = RomLoader_read8_16a(&(roms.z80), &adr);
 
     /* Return if end of data block */
     if (cmd == 2) return;
@@ -1110,12 +1110,12 @@ void OSound_fm_write_block(OSound* self, uint8_t ix0, uint16_t adr, uint8_t chan
     /* Next word specifies next address in memory */
     if (cmd == 3)
     {
-        adr = RomLoader_read16(&(roms.z80), adr);
+        adr = RomLoader_read16_16(&(roms.z80), adr);
     }
     else
     {
         uint8_t reg = cmd + chan;
-        uint8_t val = RomLoader_read8(&(roms.z80), &adr);
+        uint8_t val = RomLoader_read8_16a(&(roms.z80), &adr);
         OSound_fm_write_reg_c(self, 0, reg, val);
     }
 
@@ -1137,8 +1137,8 @@ void OSound_ym_set_levels(OSound* self)
     /* Write Level Info */
     { uint8_t i; for (i = 0; i < entries; i++)
     {
-        uint8_t reg = RomLoader_read8(&(roms.z80), &adr);
-        uint8_t val = RomLoader_read8(&(roms.z80), &adr);
+        uint8_t reg = RomLoader_read8_16a(&(roms.z80), &adr);
+        uint8_t val = RomLoader_read8_16a(&(roms.z80), &adr);
         OSound_fm_write_reg(self, reg, val);
     } }
  }}
@@ -1205,8 +1205,8 @@ uint16_t OSound_ym_lookup_data(OSound* self, uint8_t cmd, uint8_t offset, uint8_
     block = (block - 1) << 1;
     
     /* Address of data for FM routine */
-    uint16_t adr = RomLoader_read16(&(roms.z80), (uint16_t) (FM_DATA_TABLE[cmd] + (offset << 1)));
-    return RomLoader_read16(&(roms.z80), (uint16_t) (adr + block));
+    uint16_t adr = RomLoader_read16_16(&(roms.z80), (uint16_t) (FM_DATA_TABLE[cmd] + (offset << 1)));
+    return RomLoader_read16_16(&(roms.z80), (uint16_t) (adr + block));
 }
 
 /* "Connect" Channels To Play Out of Left/Right Speakers. */
@@ -1322,7 +1322,7 @@ void OSound_read_mod_table(OSound* self, uint8_t* chan)
 /* Source: 0x418 */static 
 void OSound_call_adr(OSound* self, uint8_t* chan)
 {
-    uint16_t value = RomLoader_read16(&(roms.z80), self->pos);
+    uint16_t value = RomLoader_read16_16(&(roms.z80), self->pos);
     self->pos++;
 
     chan[CH_MEM_OFFSET]--;
@@ -1670,7 +1670,7 @@ uint16_t OSound_engine_get_table_adr(OSound* self, uint8_t* chan, uint8_t* pcm)
 /*bpset 77b0,1,{printf "start adr:%02x pos:=%02x",bc, hl; g} */static 
 uint16_t OSound_engine_set_adr(OSound* self, uint16_t& pos, uint8_t* chan, uint8_t* pcm)
 {
-    uint16_t start_adr = RomLoader_read16(&(roms.z80), pos++);
+    uint16_t start_adr = RomLoader_read16_16(&(roms.z80), pos++);
     OSound_w16(self, pcm + 0x4, start_adr); /* Set Wave Start Address */
 
     /* TRAFFIC */

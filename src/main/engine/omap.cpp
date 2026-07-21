@@ -235,15 +235,15 @@ void OMap_load_sprites(OMap* self)
     {
         oentry* sprite     = &osprites.jump_table[i];
         sprite->id         = i+1;
-        sprite->control    = RomLoader_read8(roms.rom0p, &adr);
-        sprite->draw_props = RomLoader_read8(roms.rom0p, &adr);
-        sprite->shadow     = RomLoader_read8(roms.rom0p, &adr);
-        sprite->zoom       = RomLoader_read8(roms.rom0p, &adr);
-        sprite->pal_src    = (uint8_t) RomLoader_read16(roms.rom0p, &adr);
-        sprite->priority   = sprite->road_priority = RomLoader_read16(roms.rom0p, &adr);
-        sprite->x          = RomLoader_read16(roms.rom0p, &adr);
-        sprite->y          = RomLoader_read16(roms.rom0p, &adr);
-        sprite->addr       = RomLoader_read32(roms.rom0p, &adr);
+        sprite->control    = RomLoader_read8_a(roms.rom0p, &adr);
+        sprite->draw_props = RomLoader_read8_a(roms.rom0p, &adr);
+        sprite->shadow     = RomLoader_read8_a(roms.rom0p, &adr);
+        sprite->zoom       = RomLoader_read8_a(roms.rom0p, &adr);
+        sprite->pal_src    = (uint8_t) RomLoader_read16_a(roms.rom0p, &adr);
+        sprite->priority   = sprite->road_priority = RomLoader_read16_a(roms.rom0p, &adr);
+        sprite->x          = RomLoader_read16_a(roms.rom0p, &adr);
+        sprite->y          = RomLoader_read16_a(roms.rom0p, &adr);
+        sprite->addr       = RomLoader_read32_a(roms.rom0p, &adr);
         sprite->counter    = 0;  
         
         adr += 4; /* throw this address away */
