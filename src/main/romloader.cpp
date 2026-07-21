@@ -101,7 +101,6 @@ static bool calculate_crc32(const std::string& path, uint32_t& checksum)
 RomLoader::RomLoader()
     : rom(NULL), length(0), loaded(false)
 {
-    load = &RomLoader::load_auto;
 }
 
 RomLoader::~RomLoader()
@@ -116,7 +115,6 @@ void RomLoader::init(const uint32_t new_length)
     length = new_length;
     rom = new uint8_t[length];
     loaded = false;
-    load = &RomLoader::load_auto;
 }
 
 void RomLoader::unload(void)

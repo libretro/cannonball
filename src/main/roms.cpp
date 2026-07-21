@@ -20,9 +20,8 @@ void Roms_ctor(Roms* self)
 }
 
 
-/* Tidier way to address pointer to member function */
-/* Expanded example: (rom0.*(rom0.load))("epr-10380b.133", 0x00000, 0x10000, 0x1f6cadad, RomLoader::INTERLEAVE2); */
-#define LOAD(rom, args) (rom.*(rom.load)) args
+/* Expanded example: rom0.load_auto("epr-10380b.133", 0x00000, 0x10000, 0x1f6cadad, RomLoader::INTERLEAVE2); */
+#define LOAD(rom, args) (rom).load_auto args
 
 bool Roms_load_revb_roms(Roms* self, bool fixed_rom)
 {
