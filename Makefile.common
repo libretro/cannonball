@@ -30,6 +30,16 @@ SOURCES_C += \
 	       $(LIBRETRO_COMM_DIR)/streams/file_stream_transforms.c \
 	       $(LIBRETRO_COMM_DIR)/string/stdstring.c \
 	       $(CORE_DIR)/src/main/engine/osmoke.c \
+	       $(CORE_DIR)/src/main/engine/ologo.c \
+	       $(CORE_DIR)/src/main/engine/ostats.c \
+	       $(CORE_DIR)/src/main/engine/otiles.c \
+	       $(CORE_DIR)/src/main/engine/opalette.c \
+	       $(CORE_DIR)/src/main/engine/osprite.c \
+	       $(CORE_DIR)/src/main/engine/oanimseq.c \
+	       $(CORE_DIR)/src/main/engine/obonus.c \
+	       $(CORE_DIR)/src/main/engine/ocrash.c \
+	       $(CORE_DIR)/src/main/engine/otraffic.c \
+	       $(CORE_DIR)/src/main/engine/omap.c \
 	       $(LIBRETRO_COMM_DIR)/time/rtime.c
 endif
 
@@ -46,27 +56,17 @@ SOURCES_CXX := \
 	       $(CORE_DIR)/src/main/video.cpp \
 	       \
 
-	       SOURCES_CXX += $(CORE_DIR)/src/main/engine/oanimseq.cpp \
-			      $(CORE_DIR)/src/main/engine/oattractai.cpp \
-			      $(CORE_DIR)/src/main/engine/obonus.cpp \
-			      $(CORE_DIR)/src/main/engine/ocrash.cpp \
+	       SOURCES_CXX +=			      $(CORE_DIR)/src/main/engine/oattractai.cpp \
 			      $(CORE_DIR)/src/main/engine/oferrari.cpp \
 			      $(CORE_DIR)/src/main/engine/ohiscore.cpp \
 			      $(CORE_DIR)/src/main/engine/ohud.cpp \
 			      $(CORE_DIR)/src/main/engine/oinitengine.cpp \
 			      $(CORE_DIR)/src/main/engine/oinputs.cpp \
 			      $(CORE_DIR)/src/main/engine/olevelobjs.cpp \
-			      $(CORE_DIR)/src/main/engine/ologo.cpp \
-			      $(CORE_DIR)/src/main/engine/omap.cpp \
 			      $(CORE_DIR)/src/main/engine/omusic.cpp \
 			      $(CORE_DIR)/src/main/engine/ooutputs.cpp \
-			      $(CORE_DIR)/src/main/engine/opalette.cpp \
 			      $(CORE_DIR)/src/main/engine/oroad.cpp \
-			      $(CORE_DIR)/src/main/engine/osprite.cpp \
 			      $(CORE_DIR)/src/main/engine/osprites.cpp \
-			      $(CORE_DIR)/src/main/engine/ostats.cpp \
-			      $(CORE_DIR)/src/main/engine/otiles.cpp \
-			      $(CORE_DIR)/src/main/engine/otraffic.cpp \
 			      $(CORE_DIR)/src/main/engine/outils.cpp \
 			      $(CORE_DIR)/src/main/engine/outrun.cpp \
 			      \

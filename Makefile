@@ -592,7 +592,7 @@ else
 	$(LD) $(LINKOUT)$@ $^ $(LDFLAGS) $(LIBS)
 endif
 
-src/main/engine/osmoke.o: src/main/engine/osmoke.c
+$(CORE_DIR)/src/main/%.o: $(CORE_DIR)/src/main/%.c
 	$(CC) -c $(OBJOUT)$@ $< $(CPPFLAGS) $(CFLAGS) -std=c89
 
 %.o: %.cpp
