@@ -39,19 +39,19 @@ static void ORoad_check_load_road(ORoad* self);
 static void ORoad_setup_road_x(ORoad* self);
 static void ORoad_setup_x_data(ORoad* self, uint32_t);
 static void ORoad_set_tilemap_x(ORoad* self, uint32_t);
-static void ORoad_create_curve(ORoad* self, int16_t&, int16_t&,
+static void ORoad_create_curve(ORoad* self, int16_t*, int16_t*,
                       const int32_t, const int32_t, const int16_t, const int16_t);
 static void ORoad_setup_hscroll(ORoad* self);
 static void ORoad_do_road_offset(ORoad* self, int16_t*, int16_t, bool);
 static void ORoad_setup_road_y(ORoad* self);
 static void ORoad_init_height_seg(ORoad* self);
-static void ORoad_init_elevation(ORoad* self, uint32_t&);
+static void ORoad_init_elevation(ORoad* self, uint32_t*);
 static void ORoad_do_elevation(ORoad* self);
-static void ORoad_init_elevation_delay(ORoad* self, uint32_t&);
+static void ORoad_init_elevation_delay(ORoad* self, uint32_t*);
 static void ORoad_do_elevation_delay(ORoad* self);
-static void ORoad_init_elevation_mixed(ORoad* self, uint32_t&);
+static void ORoad_init_elevation_mixed(ORoad* self, uint32_t*);
 static void ORoad_do_elevation_mixed(ORoad* self);
-static void ORoad_init_horizon_adjust(ORoad* self, uint32_t&);
+static void ORoad_init_horizon_adjust(ORoad* self, uint32_t*);
 static void ORoad_do_horizon_adjust(ORoad* self);
 static void ORoad_set_road_y(ORoad* self);
 static void ORoad_set_y_interpolate(ORoad* self);
@@ -407,7 +407,7 @@ void ORoad_setup_x_data(ORoad* self, uint32_t addr)
         curve_y_total += y_next;
 
         /* Calculate curve increment and end position */
-        ORoad_create_curve(self, curve_inc, curve_end, curve_x_total, curve_y_total, curve_x_dist, curve_y_dist);
+        ORoad_create_curve(self, &curve_inc, &curve_end, curve_x_total, curve_y_total, curve_x_dist, curve_y_dist);
         { int16_t curve_steps = curve_end - curve_start;
         if (curve_steps < 0) return;
         if (curve_steps == 0) continue; /* skip_pos */
@@ -434,7 +434,7 @@ void ORoad_setup_x_data(ORoad* self, uint32_t addr)
 /* Source Address: 0x16B6 */static 
 
 void ORoad_create_curve(ORoad* self, 
-       int16_t &curve_inc, int16_t &curve_end,
+       int16_t*curve_inc, int16_t*curve_end,
        int32_t curve_x_total, int32_t curve_y_total, int16_t curve_x_dist, int16_t curve_y_dist)
 {    
     /* Note multiplication result should be 32bit, inputs 16 bit */
@@ -444,8 +444,8 @@ void ORoad_create_curve(ORoad* self,
     d2 >>= 7;        
     { int32_t d1 = (d2 >> 7) + 0x410;     
 
-    curve_inc = d0 / d1;        /* Total amount to increment x by */
-    curve_end = (d2 / d1) * 4;
+    (*curve_inc) = d0 / d1;        /* Total amount to increment x by */
+    (*curve_end) = (d2 / d1) * 4;
  }}
 
 /* Set The Correct Tilemap X *target* Position From The Road Data */
@@ -720,20 +720,20 @@ void ORoad_init_height_seg(ORoad* self)
     switch (self->height_ctrl2)
     {
         case 0:
-            ORoad_init_elevation(self, h_addr);
+            ORoad_init_elevation(self, &h_addr);
             break;
         
         case 1:
         case 2:
-            ORoad_init_elevation_delay(self, h_addr);
+            ORoad_init_elevation_delay(self, &h_addr);
             break;
         
         case 3:
-            ORoad_init_elevation_mixed(self, h_addr);
+            ORoad_init_elevation_mixed(self, &h_addr);
             break;
         
         case 4:
-            ORoad_init_horizon_adjust(self, h_addr);
+            ORoad_init_horizon_adjust(self, &h_addr);
             break;
     }
  }}
@@ -755,14 +755,16 @@ void ORoad_init_height_seg(ORoad* self)
 /*  = 255 / 40 = 6.3 positions per height segment */
 /* */
 /* Source Address: 0x1C2C */static 
-void ORoad_init_elevation(ORoad* self, uint32_t& addr)
+void ORoad_init_elevation(ORoad* self, uint32_t* addr)
 {
-    self->down_mult   = TrackLoader_read8_a(trackloader.heightmap_data, &addr);
-    self->up_mult     = TrackLoader_read8_a(trackloader.heightmap_data, &addr);
-    self->height_addr = addr;
+    self->down_mult   = TrackLoader_read8_a(trackloader.heightmap_data, &(*addr));
+    self->up_mult     = TrackLoader_read8_a(trackloader.heightmap_data, &(*addr));
+    self->height_addr = (*addr);
     self->height_ctrl = 2; /* Use do_elevation() */
     ORoad_do_elevation(self);
-}static 
+}
+
+static 
 
 void ORoad_do_elevation(ORoad* self)
 {
@@ -825,10 +827,10 @@ void ORoad_do_elevation(ORoad* self)
 /* Example Data: 0x29AA */
 /* Source      : 0x1CE4 (first used at the chicane at stage 1) */static 
 
-void ORoad_init_elevation_delay(ORoad* self, uint32_t& addr)
+void ORoad_init_elevation_delay(ORoad* self, uint32_t* addr)
 {
-    self->height_delay  = TrackLoader_read16_a(trackloader.heightmap_data, &addr);
-    self->height_addr   = addr;
+    self->height_delay  = TrackLoader_read16_a(trackloader.heightmap_data, &(*addr));
+    self->height_addr   = (*addr);
     self->do_height_inc = 1;     /* Set to Part 1 */
     self->height_inc    = 0;
     self->height_end    = 0x100; /* Remains constant */
@@ -897,10 +899,10 @@ void ORoad_do_elevation_delay(ORoad* self)
 /* */
 /* Source      : 0x1DAC */
 /* Example Data: 0x2A8E */static 
-void ORoad_init_elevation_mixed(ORoad* self, uint32_t& addr)
+void ORoad_init_elevation_mixed(ORoad* self, uint32_t* addr)
 {
-    self->height_delay  = TrackLoader_read16_a(trackloader.heightmap_data, &addr);
-    self->height_addr   = addr;
+    self->height_delay  = TrackLoader_read16_a(trackloader.heightmap_data, &(*addr));
+    self->height_addr   = (*addr);
     self->do_height_inc = 1;
     self->height_inc    = 0;
     self->height_ctrl   = 4;    /* Use do_elevation_mixed() function */
@@ -976,17 +978,19 @@ void ORoad_do_elevation_mixed(ORoad* self)
 /* */
 /* Example Data  : 0x3672 */
 /* Source        : 0x1EB6 */static 
-void ORoad_init_horizon_adjust(ORoad* self, uint32_t& addr)
+void ORoad_init_horizon_adjust(ORoad* self, uint32_t* addr)
 {
-    self->height_addr = addr;
+    self->height_addr = (*addr);
 
     /* Set Horizon Modifier */
-    self->horizon_mod = TrackLoader_read16(trackloader.heightmap_data, addr) - self->horizon_base;
+    self->horizon_mod = TrackLoader_read16(trackloader.heightmap_data, (*addr)) - self->horizon_base;
     
     /* Use do_horizon_adjust() function */
     self->height_ctrl = 5;
     ORoad_do_horizon_adjust(self);
-}static 
+}
+
+static 
 
 void ORoad_do_horizon_adjust(ORoad* self)
 {
@@ -1550,7 +1554,9 @@ void ORoad_blit_roads(ORoad* self)
             HWRoad_write_road_control(&hwroad, 2);
             break;
     }
-}static 
+}
+
+static 
 
 void ORoad_blit_road(ORoad* self, uint32_t a0)
 {
@@ -1577,7 +1583,9 @@ void ORoad_blit_road(ORoad* self, uint32_t a0)
         a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
         a0 -= 2; HWRoad_write16(&hwroad, a0, self->road_y[--a2]);
     } }
-}static 
+}
+
+static 
 
 void ORoad_output_hscroll(ORoad* self, int16_t* src, uint32_t dst)
 {

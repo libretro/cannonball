@@ -36,20 +36,20 @@ static void OFerrari_setup_ferrari_sprite(OFerrari* self);
 static void OFerrari_setup_ferrari_bonus_sprite(OFerrari* self);
 static void OFerrari_init_end_seq(OFerrari* self);
 static void OFerrari_do_end_seq(OFerrari* self);
-static void OFerrari_tick_engine_disabled(OFerrari* self, int32_t&);
+static void OFerrari_tick_engine_disabled(OFerrari* self, int32_t*);
 static void OFerrari_set_ferrari_palette(OFerrari* self);
 static void OFerrari_set_passenger_sprite(OFerrari* self, oentry*);
 static void OFerrari_set_passenger_frame(OFerrari* self, oentry*);
 static void OFerrari_car_acc_brake(OFerrari* self);
-static void OFerrari_do_gear_torque(OFerrari* self, int16_t&);
-static void OFerrari_do_gear_low(OFerrari* self, int16_t&);
-static void OFerrari_do_gear_high(OFerrari* self, int16_t&);
+static void OFerrari_do_gear_torque(OFerrari* self, int16_t*);
+static void OFerrari_do_gear_low(OFerrari* self, int16_t*);
+static void OFerrari_do_gear_high(OFerrari* self, int16_t*);
 static int32_t OFerrari_tick_gear_change(OFerrari* self, int16_t);
 static int32_t OFerrari_get_speed_inc_value(OFerrari* self, uint16_t, uint32_t);
 static int32_t OFerrari_get_speed_dec_value(OFerrari* self, uint16_t);
 static void OFerrari_set_brake_subtract(OFerrari* self);
-static void OFerrari_finalise_revs(OFerrari* self, int32_t&, int32_t);
-static void OFerrari_convert_revs_speed(OFerrari* self, int32_t, int32_t&);
+static void OFerrari_finalise_revs(OFerrari* self, int32_t*, int32_t);
+static void OFerrari_convert_revs_speed(OFerrari* self, int32_t, int32_t*);
 static void OFerrari_update_road_pos(OFerrari* self);
 static int32_t OFerrari_tick_smoke(OFerrari* self);
 static void OFerrari_set_wheels(OFerrari* self, uint8_t);
@@ -1062,14 +1062,14 @@ void OFerrari_move(OFerrari* self)
 
             if (!oinitengine.ingame_engine)
             {
-                OFerrari_tick_engine_disabled(self, d2);
+                OFerrari_tick_engine_disabled(self, &d2);
             }
             else
             {      
                 int16_t d1 = self->torque_index;
 
                 if (self->gear_counter == 0)
-                    OFerrari_do_gear_torque(self, d1);
+                    OFerrari_do_gear_torque(self, &d1);
             }
 
             /* set_torque: */
@@ -1102,8 +1102,8 @@ void OFerrari_move(OFerrari* self)
 
             /* cont2: */
             OFerrari_set_brake_subtract(self);               /* Calculate brake value to subtract from revs */
-            OFerrari_finalise_revs(self, d2, rev_adjust_new);  /* Subtract calculated value from revs */
-            OFerrari_convert_revs_speed(self, new_torque, d2); /* d2 is converted from revs to speed */
+            OFerrari_finalise_revs(self, &d2, rev_adjust_new);  /* Subtract calculated value from revs */
+            OFerrari_convert_revs_speed(self, new_torque, &d2); /* d2 is converted from revs to speed */
 
             /* Ingame Control Not Active. Clear Car Speed */
             if (!oinitengine.ingame_engine)
@@ -1185,7 +1185,7 @@ void OFerrari_move(OFerrari* self)
 /* Handle revs/torque when in-game engine disabled */
 /* */
 /* Source: 0x6694 */static 
-void OFerrari_tick_engine_disabled(OFerrari* self, int32_t &d2)
+void OFerrari_tick_engine_disabled(OFerrari* self, int32_t*d2)
 {
     self->torque_index = 0;
     
@@ -1215,8 +1215,8 @@ void OFerrari_tick_engine_disabled(OFerrari* self, int32_t &d2)
     self->acc_post_stop = acc;
     self->revs_post_stop = lookup;
 
-    /* Clear bottom word of d2 and swap */
-    d2 = d2 << 16;
+    /* Clear bottom word of (*d2) and swap */
+    (*d2) = (*d2) << 16;
 
     /*lookup -= 0x10; */
     /*if (lookup < 0) lookup = 0; */
@@ -1297,22 +1297,24 @@ void OFerrari_car_acc_brake(OFerrari* self)
 /* Do Gear Changes & Torque Index Settings */
 /* */
 /* Source: 0x6948 */static 
-void OFerrari_do_gear_torque(OFerrari* self, int16_t &d1)
+void OFerrari_do_gear_torque(OFerrari* self, int16_t*d1)
 {
     if (oinitengine.ingame_engine)
     {
-        d1 = self->torque_index;
+        (*d1) = self->torque_index;
         if (self->gear_value)
-            OFerrari_do_gear_high(self, d1);
+            OFerrari_do_gear_high(self, (&*d1));
         else
-            OFerrari_do_gear_low(self, d1);
+            OFerrari_do_gear_low(self, (&*d1));
     }
-    self->torque_index = (uint8_t) d1;
+    self->torque_index = (uint8_t) (*d1);
     /* Backup gear value for next iteration (so we can tell when gear has recently changed) */
     self->gear_bak = self->gear_value;
-}static 
+}
 
-void OFerrari_do_gear_low(OFerrari* self, int16_t &d1)
+static 
+
+void OFerrari_do_gear_low(OFerrari* self, int16_t*d1)
 {
     /* Recent Shift from high to low */
     if (self->gear_bak)
@@ -1327,18 +1329,20 @@ void OFerrari_do_gear_low(OFerrari* self, int16_t &d1)
         self->gfx_smoke++;
 
     /* Adjust Torque Index */
-    if (d1 == 0x10) return;
-    else if (d1 < 0x10)
+    if ((*d1) == 0x10) return;
+    else if ((*d1) < 0x10)
     {
-        d1++;
+        (*d1)++;
         return;
     }
-    d1 -= 4;
-    if (d1 < 0x10)
-        d1 = 0x10;
-}static 
+    (*d1) -= 4;
+    if ((*d1) < 0x10)
+        (*d1) = 0x10;
+}
 
-void OFerrari_do_gear_high(OFerrari* self, int16_t &d1)
+static 
+
+void OFerrari_do_gear_high(OFerrari* self, int16_t*d1)
 {
     /* Change from Low Gear to High Gear */
     if (!self->gear_bak)
@@ -1349,8 +1353,8 @@ void OFerrari_do_gear_high(OFerrari* self, int16_t &d1)
     }
 
     /* Increment torque until it reaches 0x1F */
-    if (d1 == 0x1f) return;
-    d1++;
+    if ((*d1) == 0x1f) return;
+    (*d1)++;
 }
 
 /* Source: 0x6752 */static 
@@ -1471,15 +1475,15 @@ void OFerrari_set_brake_subtract(OFerrari* self)
 /* */
 /* Source: 0x67FC */static 
 
-void OFerrari_finalise_revs(OFerrari* self, int32_t &d2, int32_t rev_adjust_new)
+void OFerrari_finalise_revs(OFerrari* self, int32_t*d2, int32_t rev_adjust_new)
 {
     rev_adjust_new += self->brake_subtract;
     if (rev_adjust_new < -0x44000) rev_adjust_new = -0x44000;
-    d2 += rev_adjust_new;
+    (*d2) += rev_adjust_new;
     self->rev_adjust = rev_adjust_new;
     
-    if (d2 > 0x13C0000) d2 = 0x13C0000;
-    else if (d2 < 0) d2 = 0;
+    if ((*d2) > 0x13C0000) (*d2) = 0x13C0000;
+    else if ((*d2) < 0) (*d2) = 0;
 }
 
 /* Convert revs to final speed value */
@@ -1489,10 +1493,10 @@ void OFerrari_finalise_revs(OFerrari* self, int32_t &d2, int32_t rev_adjust_new)
 /* rev_stop_flag, revs_post_stop, accel_value and acc_post_stop seem ok? */
 /* */
 /* Source: 0x6838 */static 
-void OFerrari_convert_revs_speed(OFerrari* self, int32_t new_torque, int32_t &d2)
+void OFerrari_convert_revs_speed(OFerrari* self, int32_t new_torque, int32_t*d2)
 {
-    self->revs = d2;
-    { int32_t d3 = d2;
+    self->revs = (*d2);
+    { int32_t d3 = (*d2);
     if (d3 < 0x1F0000) d3 = 0x1F0000;
 
     { int16_t revs_top = d3 >> 16;
@@ -1530,8 +1534,8 @@ void OFerrari_convert_revs_speed(OFerrari* self, int32_t new_torque, int32_t &d2
     self->rev_pitch1 = (revs_top * 0x1A90) >> 8;
 
     /* Setup New Car Increment Speed */
-    d2 = ((d2 >> 16) * 0x1A90) >> 8;
-    d2 = (d2 << 16) >> 4;
+    (*d2) = (((*d2) >> 16) * 0x1A90) >> 8;
+    (*d2) = ((*d2) << 16) >> 4;
     
     /*if (!new_torque)
     {
@@ -1539,10 +1543,10 @@ void OFerrari_convert_revs_speed(OFerrari* self, int32_t new_torque, int32_t &d2
     }*/
 
     const int max_speed = !config.engine.turbo ? MAX_SPEED : (int) (MAX_SPEED * 1.2f);
-    d2 = (d2 / new_torque) * 0x480;
-    /*std::cout << std::hex << "d2: " << (int)d2 << " new_torque: " << new_torque << " torque index: " << std::hex << (int) torque_index << std::endl; */
-    if (d2 < 0) d2 = 0;
-    else if (d2 > max_speed) d2 = max_speed;
+    (*d2) = ((*d2) / new_torque) * 0x480;
+    /*std::cout << std::hex << "(*d2): " << (int)(*d2) << " new_torque: " << new_torque << " torque index: " << std::hex << (int) torque_index << std::endl; */
+    if ((*d2) < 0) (*d2) = 0;
+    else if ((*d2) > max_speed) (*d2) = max_speed;
  } }}
 
 /* Update road_pos, taking road_curve into account */
@@ -1756,7 +1760,9 @@ void OFerrari_do_skid(OFerrari* self)
         ocrash.skid_counter++;
         oinitengine.car_x_pos -= SKID_X_ADJ;
     }
-}static 
+}
+
+static 
 
 void OFerrari_draw_sprite(OFerrari* self, oentry* sprite)
 {
