@@ -656,7 +656,7 @@ static void Outrun_init_jump_table(Outrun* self)
     OBonus_init(&obonus);
     OOutputs_init(self->outputs);
 
-    video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);
+    hwtiles_set_x_clamp(video.tile_layer, CLAMP_RIGHT);
     hwsprites_set_x_clip(video.sprite_layer, false);
 }
 
@@ -712,7 +712,7 @@ static void Outrun_init_motor_calibration(Outrun* self)
     OInputs_init(&oinputs);
     OOutputs_init(self->outputs);
 
-    video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);
+    hwtiles_set_x_clamp(video.tile_layer, CLAMP_RIGHT);
     hwsprites_set_x_clip(video.sprite_layer, false);
 
     OTiles_fill_tilemap_color(&otiles, 0x4F60); /* Fill Tilemap Light Blue */

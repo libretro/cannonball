@@ -5,6 +5,40 @@
 #include "frontend/config.hpp"
 #include <cstring>
 
+static void hwtiles_render8x8_tile_mask_lores(hwtiles* self, uint16_t *buf,
+        uint16_t nTileNumber, 
+        uint16_t StartX, 
+        uint16_t StartY, 
+        uint16_t nTilePalette, 
+        uint16_t nColourDepth, 
+        uint16_t nMaskColour, 
+        uint16_t nPaletteOffset);
+static void hwtiles_render8x8_tile_mask_clip_lores(hwtiles* self, uint16_t *buf,
+        uint16_t nTileNumber, 
+        int16_t StartX, 
+        int16_t StartY, 
+        uint16_t nTilePalette, 
+        uint16_t nColourDepth, 
+        uint16_t nMaskColour, 
+        uint16_t nPaletteOffset);
+static void hwtiles_render8x8_tile_mask_hires(hwtiles* self, uint16_t *buf,
+        uint16_t nTileNumber, 
+        uint16_t StartX, 
+        uint16_t StartY, 
+        uint16_t nTilePalette, 
+        uint16_t nColourDepth, 
+        uint16_t nMaskColour, 
+        uint16_t nPaletteOffset);
+static void hwtiles_render8x8_tile_mask_clip_hires(hwtiles* self, uint16_t *buf,
+        uint16_t nTileNumber, 
+        int16_t StartX, 
+        int16_t StartY, 
+        uint16_t nTilePalette, 
+        uint16_t nColourDepth, 
+        uint16_t nMaskColour, 
+        uint16_t nPaletteOffset);
+static void hwtiles_set_pixel_x4(hwtiles* self, uint16_t *buf, uint32_t data);
+
 /***************************************************************************
     Video Emulation: OutRun Tilemap Hardware.
     Based on MAME source code.
@@ -76,21 +110,17 @@
  *
  *******************************************************************************************/
 
-hwtiles::hwtiles(void)
+void hwtiles_ctor(hwtiles* self)
 {
     { int i; for (i = 0; i < 2; i++)
-        tile_banks[i] = i; }
+        self->tile_banks[i] = i; }
 
-    set_x_clamp(CENTRE);
+    hwtiles_set_x_clamp(self, CLAMP_CENTRE);
 }
 
-hwtiles::~hwtiles(void)
-{
-
-}
 
 /* Convert S16 tiles to a more useable format */
-void hwtiles::init(uint8_t* src_tiles, const bool hires)
+void hwtiles_init(hwtiles* self, uint8_t* src_tiles, const bool hires)
 {
     if (src_tiles)
     {
@@ -108,47 +138,47 @@ void hwtiles::init(uint8_t* src_tiles, const bool hires)
                 uint8_t pix = ((((p0 >> bit)) & 1) | (((p1 >> bit) << 1) & 2) | (((p2 >> bit) << 2) & 4));
                 val = (val << 4) | pix;
             } }
-            tiles[i] = val; /* Store converted value */
+            self->tiles[i] = val; /* Store converted value */
         } }
-        memcpy(tiles_backup, tiles, TILES_LENGTH * sizeof(uint32_t));
+        memcpy(self->tiles_backup, self->tiles, TILES_LENGTH * sizeof(uint32_t));
     }
     
     if (hires)
     {
-        s16_width_noscale = config.s16_width >> 1;
-        render8x8_tile_mask      = &hwtiles::render8x8_tile_mask_hires;
-        render8x8_tile_mask_clip = &hwtiles::render8x8_tile_mask_clip_hires;
+        self->s16_width_noscale = config.s16_width >> 1;
+        self->render8x8_tile_mask      = hwtiles_render8x8_tile_mask_hires;
+        self->render8x8_tile_mask_clip = hwtiles_render8x8_tile_mask_clip_hires;
     }
     else
     {
-        s16_width_noscale = config.s16_width;
-        render8x8_tile_mask      = &hwtiles::render8x8_tile_mask_lores;
-        render8x8_tile_mask_clip = &hwtiles::render8x8_tile_mask_clip_lores;
+        self->s16_width_noscale = config.s16_width;
+        self->render8x8_tile_mask      = hwtiles_render8x8_tile_mask_lores;
+        self->render8x8_tile_mask_clip = hwtiles_render8x8_tile_mask_clip_lores;
     }
 }
 
 /* Patch Tileset with new data */
-void hwtiles::patch_tiles(RomLoader* patch)
+void hwtiles_patch_tiles(hwtiles* self, RomLoader* patch)
 {
-    memcpy(tiles_backup, tiles, TILES_LENGTH * sizeof(uint32_t));
+    memcpy(self->tiles_backup, self->tiles, TILES_LENGTH * sizeof(uint32_t));
 
     { uint32_t i; for (i = 0; i < patch->length;)
     {
         uint32_t tile_index = RomLoader_read16(patch, &i) << 3;
-        tiles[tile_index++] = RomLoader_read32(patch, &i);
-        tiles[tile_index++] = RomLoader_read32(patch, &i);
-        tiles[tile_index++] = RomLoader_read32(patch, &i);
-        tiles[tile_index++] = RomLoader_read32(patch, &i);
-        tiles[tile_index++] = RomLoader_read32(patch, &i);
-        tiles[tile_index++] = RomLoader_read32(patch, &i);
-        tiles[tile_index++] = RomLoader_read32(patch, &i);
-        tiles[tile_index++] = RomLoader_read32(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
+        self->tiles[tile_index++] = RomLoader_read32(patch, &i);
     } }
 }
 
-void hwtiles::restore_tiles()
+void hwtiles_restore_tiles(hwtiles* self)
 {
-    memcpy(tiles, tiles_backup, TILES_LENGTH * sizeof(uint32_t));
+    memcpy(self->tiles, self->tiles_backup, TILES_LENGTH * sizeof(uint32_t));
 }
 
 /* Set Tilemap X Clamp */
@@ -159,61 +189,61 @@ void hwtiles::restore_tiles()
 /* In-Game we must clamp right to avoid page scrolling issues. */
 /* */
 /* The clamp will always be 192 for the non-widescreen mode. */
-void hwtiles::set_x_clamp(const uint16_t props)
+void hwtiles_set_x_clamp(hwtiles* self, const uint16_t props)
 {
-    if (props == LEFT)
+    if (props == CLAMP_LEFT)
     {
-        x_clamp = 192;
+        self->x_clamp = 192;
     }
-    else if (props == RIGHT)
+    else if (props == CLAMP_RIGHT)
     {
-        x_clamp = (512 - s16_width_noscale);
+        self->x_clamp = (512 - self->s16_width_noscale);
     }
-    else if (props == CENTRE)
+    else if (props == CLAMP_CENTRE)
     {
-        x_clamp = 192 - config.s16_x_off;
+        self->x_clamp = 192 - config.s16_x_off;
     }
 }
 
-void hwtiles::update_tile_values()
+void hwtiles_update_tile_values(hwtiles* self)
 {
     { int i; for (i = 0; i < 4; i++)
     {
-        page[i] = ((text_ram[0xe80 + (i * 2) + 0] << 8) | text_ram[0xe80 + (i * 2) + 1]);
+        self->page[i] = ((self->text_ram[0xe80 + (i * 2) + 0] << 8) | self->text_ram[0xe80 + (i * 2) + 1]);
 
-        scroll_x[i] = ((text_ram[0xe98 + (i * 2) + 0] << 8) | text_ram[0xe98 + (i * 2) + 1]);
-        scroll_y[i] = ((text_ram[0xe90 + (i * 2) + 0] << 8) | text_ram[0xe90 + (i * 2) + 1]);
+        self->scroll_x[i] = ((self->text_ram[0xe98 + (i * 2) + 0] << 8) | self->text_ram[0xe98 + (i * 2) + 1]);
+        self->scroll_y[i] = ((self->text_ram[0xe90 + (i * 2) + 0] << 8) | self->text_ram[0xe90 + (i * 2) + 1]);
     } }
 }
 
 /* A quick and dirty debug function to display the contents of tile memory. */
-void hwtiles::render_all_tiles(uint16_t* buf)
+void hwtiles_render_all_tiles(hwtiles* self, uint16_t* buf)
 {
     uint32_t Code = 0, Colour = 5, x, y;
     for (y = 0; y < 224; y += 8) 
     {
         for (x = 0; x < 320; x += 8) 
         {
-            (this->*render8x8_tile_mask)(buf, Code, x, y, Colour, 3, 0, TILEMAP_COLOUR_OFFSET);
+            self->render8x8_tile_mask(self, buf, Code, x, y, Colour, 3, 0, TILEMAP_COLOUR_OFFSET);
             Code++;
         }
     }
 }
 
-void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t priority_draw)
+void hwtiles_render_tile_layer(hwtiles* self, uint16_t* buf, uint8_t page_index, uint8_t priority_draw)
 {
     int16_t Colour, x, y, Priority = 0;
 
     uint16_t ActPage = 0;
-    uint16_t EffPage = page[page_index];
-    uint16_t xScroll = scroll_x[page_index];
-    uint16_t yScroll = scroll_y[page_index];
+    uint16_t EffPage = self->page[page_index];
+    uint16_t xScroll = self->scroll_x[page_index];
+    uint16_t yScroll = self->scroll_y[page_index];
 
     /* Need to support this at each row/column */
     if ((xScroll & 0x8000) != 0)
-        xScroll = (text_ram[0xf80 + (0x40 * page_index) + 0] << 8) | text_ram[0xf80 + (0x40 * page_index) + 1];
+        xScroll = (self->text_ram[0xf80 + (0x40 * page_index) + 0] << 8) | self->text_ram[0xf80 + (0x40 * page_index) + 1];
     if ((yScroll & 0x8000) != 0)
-        yScroll = (text_ram[0xf16 + (0x40 * page_index) + 0] << 8) | text_ram[0xf16 + (0x40 * page_index) + 1];
+        yScroll = (self->text_ram[0xf16 + (0x40 * page_index) + 0] << 8) | self->text_ram[0xf16 + (0x40 * page_index) + 1];
 
     { int my; for (my = 0; my < 64; my++) 
     {
@@ -230,14 +260,14 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
 
             { uint32_t TileIndex = 64 * 32 * 2 * ActPage + ((2 * 64 * my) & 0xfff) + ((2 * mx) & 0x7f);
 
-            uint16_t Data = (tile_ram[TileIndex + 0] << 8) | tile_ram[TileIndex + 1];
+            uint16_t Data = (self->tile_ram[TileIndex + 0] << 8) | self->tile_ram[TileIndex + 1];
 
             Priority = (Data >> 15) & 1;
 
             if (Priority == priority_draw) 
             {
                 uint32_t Code = Data & 0x1fff;
-                Code = tile_banks[Code / 0x1000] * 0x1000 + Code % 0x1000;
+                Code = self->tile_banks[Code / 0x1000] * 0x1000 + Code % 0x1000;
                 Code &= (NUM_TILES - 1);
 
                 if (Code == 0) continue;
@@ -249,9 +279,9 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
 
                 /* We take into account the internal screen resolution here */
                 /* to account for widescreen mode. */
-                x -= (x_clamp - xScroll) & 0x3ff;
+                x -= (self->x_clamp - xScroll) & 0x3ff;
 
-                if (x < -x_clamp)
+                if (x < -self->x_clamp)
                     x += 1024;
 
                 y -= yScroll & 0x1ff;
@@ -267,16 +297,16 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
                 if (Colour >= 0x60)
 					ColourOff = 0x300 | TILEMAP_COLOUR_OFFSET;
 
-                if (x > 7 && x < (s16_width_noscale - 8) && y > 7 && y <= (S16_HEIGHT - 8))
-                    (this->*render8x8_tile_mask)(buf, Code, x, y, Colour, 3, 0, ColourOff);
-                else if (x > -8 && x < s16_width_noscale && y > -8 && y < S16_HEIGHT)
-					(this->*render8x8_tile_mask_clip)(buf, Code, x, y, Colour, 3, 0, ColourOff);
+                if (x > 7 && x < (self->s16_width_noscale - 8) && y > 7 && y <= (S16_HEIGHT - 8))
+                    self->render8x8_tile_mask(self, buf, Code, x, y, Colour, 3, 0, ColourOff);
+                else if (x > -8 && x < self->s16_width_noscale && y > -8 && y < S16_HEIGHT)
+					self->render8x8_tile_mask_clip(self, buf, Code, x, y, Colour, 3, 0, ColourOff);
              }} /* end priority check */
          }} }
     } } /* end for loop */
 }
 
-void hwtiles::render_text_layer(uint16_t* buf, uint8_t priority_draw)
+void hwtiles_render_text_layer(hwtiles* self, uint16_t* buf, uint8_t priority_draw)
 {
     uint16_t mx, my, Code, Colour, Priority, TileIndex = 0;
     int16_t x, y;
@@ -285,14 +315,14 @@ void hwtiles::render_text_layer(uint16_t* buf, uint8_t priority_draw)
     {
         for (mx = 0; mx < 64; mx++) 
         {
-            Code = (text_ram[TileIndex + 0] << 8) | text_ram[TileIndex + 1];
+            Code = (self->text_ram[TileIndex + 0] << 8) | self->text_ram[TileIndex + 1];
             Priority = (Code >> 15) & 1;
 
             if (Priority == priority_draw) 
             {
                 Colour = (Code >> 9) & 0x07;
                 Code &= 0x1ff;
-                Code += tile_banks[0] * 0x1000;
+                Code += self->tile_banks[0] * 0x1000;
                 Code &= (NUM_TILES - 1);
 
                 if (Code != 0) 
@@ -304,10 +334,10 @@ void hwtiles::render_text_layer(uint16_t* buf, uint8_t priority_draw)
 
                     /* We also adjust the text layer for wide-screen below. But don't allow painting in the  */
                     /* wide-screen areas to avoid graphical glitches. */
-                    if (x > 7 && x < (s16_width_noscale - 8) && y > 7 && y <= (S16_HEIGHT - 8))
-                        (this->*render8x8_tile_mask)(buf, Code, x + config.s16_x_off, y, Colour, 3, 0, TILEMAP_COLOUR_OFFSET);
-                    else if (x > -8 && x < s16_width_noscale && y >= 0 && y < S16_HEIGHT) 
-                        (this->*render8x8_tile_mask_clip)(buf, Code, x + config.s16_x_off, y, Colour, 3, 0, TILEMAP_COLOUR_OFFSET);
+                    if (x > 7 && x < (self->s16_width_noscale - 8) && y > 7 && y <= (S16_HEIGHT - 8))
+                        self->render8x8_tile_mask(self, buf, Code, x + config.s16_x_off, y, Colour, 3, 0, TILEMAP_COLOUR_OFFSET);
+                    else if (x > -8 && x < self->s16_width_noscale && y >= 0 && y < S16_HEIGHT) 
+                        self->render8x8_tile_mask_clip(self, buf, Code, x + config.s16_x_off, y, Colour, 3, 0, TILEMAP_COLOUR_OFFSET);
                 }
             }
             TileIndex += 2;
@@ -315,7 +345,7 @@ void hwtiles::render_text_layer(uint16_t* buf, uint8_t priority_draw)
     }
 }
 
-void hwtiles::render8x8_tile_mask_lores(
+static void hwtiles_render8x8_tile_mask_lores(hwtiles* self, 
     uint16_t *buf,
     uint16_t nTileNumber, 
     uint16_t StartX, 
@@ -326,7 +356,7 @@ void hwtiles::render8x8_tile_mask_lores(
     uint16_t nPaletteOffset) 
 {
     uint32_t nPalette = (nTilePalette << nColourDepth) | nMaskColour;
-    uint32_t* pTileData = tiles + (nTileNumber << 3);
+    uint32_t* pTileData = self->tiles + (nTileNumber << 3);
     buf += (StartY * config.s16_width) + StartX;
 
     { int y; for (y = 0; y < 8; y++) 
@@ -358,7 +388,7 @@ void hwtiles::render8x8_tile_mask_lores(
     } }
 }
 
-void hwtiles::render8x8_tile_mask_clip_lores(
+static void hwtiles_render8x8_tile_mask_clip_lores(hwtiles* self, 
     uint16_t *buf,
     uint16_t nTileNumber, 
     int16_t StartX, 
@@ -369,7 +399,7 @@ void hwtiles::render8x8_tile_mask_clip_lores(
     uint16_t nPaletteOffset) 
 {
     uint32_t nPalette = (nTilePalette << nColourDepth) | nMaskColour;
-    uint32_t* pTileData = tiles + (nTileNumber << 3);
+    uint32_t* pTileData = self->tiles + (nTileNumber << 3);
     buf += (StartY * config.s16_width) + StartX;
 
     { int y; for (y = 0; y < 8; y++) 
@@ -409,7 +439,7 @@ void hwtiles::render8x8_tile_mask_clip_lores(
 /* Note that the tilemaps are displayed at the same resolution, we just want everything to be */
 /* proportional. */
 /* ------------------------------------------------------------------------------------------------ */
-void hwtiles::render8x8_tile_mask_hires(
+static void hwtiles_render8x8_tile_mask_hires(hwtiles* self, 
     uint16_t *buf,
     uint16_t nTileNumber, 
     uint16_t StartX, 
@@ -420,7 +450,7 @@ void hwtiles::render8x8_tile_mask_hires(
     uint16_t nPaletteOffset) 
 {
     uint32_t nPalette = (nTilePalette << nColourDepth) | nMaskColour;
-    uint32_t* pTileData = tiles + (nTileNumber << 3);
+    uint32_t* pTileData = self->tiles + (nTileNumber << 3);
     buf += ((StartY << 1) * config.s16_width) + (StartX << 1);
 
     { int y; for (y = 0; y < 8; y++) 
@@ -438,21 +468,21 @@ void hwtiles::render8x8_tile_mask_hires(
             uint32_t c1 = (p0 >> 24) & 0xf;
             uint32_t c0 = (p0 >> 28);
 
-            if (c0) set_pixel_x4(&buf[0],  nPalette + c0);
-            if (c1) set_pixel_x4(&buf[2],  nPalette + c1);
-            if (c2) set_pixel_x4(&buf[4],  nPalette + c2);
-            if (c3) set_pixel_x4(&buf[6],  nPalette + c3);
-            if (c4) set_pixel_x4(&buf[8],  nPalette + c4);
-            if (c5) set_pixel_x4(&buf[10], nPalette + c5);
-            if (c6) set_pixel_x4(&buf[12], nPalette + c6);
-            if (c7) set_pixel_x4(&buf[14], nPalette + c7);
+            if (c0) hwtiles_set_pixel_x4(self, &buf[0],  nPalette + c0);
+            if (c1) hwtiles_set_pixel_x4(self, &buf[2],  nPalette + c1);
+            if (c2) hwtiles_set_pixel_x4(self, &buf[4],  nPalette + c2);
+            if (c3) hwtiles_set_pixel_x4(self, &buf[6],  nPalette + c3);
+            if (c4) hwtiles_set_pixel_x4(self, &buf[8],  nPalette + c4);
+            if (c5) hwtiles_set_pixel_x4(self, &buf[10], nPalette + c5);
+            if (c6) hwtiles_set_pixel_x4(self, &buf[12], nPalette + c6);
+            if (c7) hwtiles_set_pixel_x4(self, &buf[14], nPalette + c7);
         }
         buf += (config.s16_width << 1);
         pTileData++;
     } }
 }
 
-void hwtiles::render8x8_tile_mask_clip_hires(
+static void hwtiles_render8x8_tile_mask_clip_hires(hwtiles* self, 
     uint16_t *buf,
     uint16_t nTileNumber, 
     int16_t StartX, 
@@ -463,7 +493,7 @@ void hwtiles::render8x8_tile_mask_clip_hires(
     uint16_t nPaletteOffset) 
 {
     uint32_t nPalette = (nTilePalette << nColourDepth) | nMaskColour;
-    uint32_t* pTileData = tiles + (nTileNumber << 3);
+    uint32_t* pTileData = self->tiles + (nTileNumber << 3);
     buf += ((StartY << 1) * config.s16_width) + (StartX << 1);
 
     { int y; for (y = 0; y < 8; y++) 
@@ -483,14 +513,14 @@ void hwtiles::render8x8_tile_mask_clip_hires(
                 uint32_t c1 = (p0 >> 24) & 0xf;
                 uint32_t c0 = (p0 >> 28);
 
-                if (c0 && 0 + StartX >= 0 && 0 + StartX < s16_width_noscale) set_pixel_x4(&buf[0],  nPalette + c0);
-                if (c1 && 1 + StartX >= 0 && 1 + StartX < s16_width_noscale) set_pixel_x4(&buf[2],  nPalette + c1);
-                if (c2 && 2 + StartX >= 0 && 2 + StartX < s16_width_noscale) set_pixel_x4(&buf[4],  nPalette + c2);
-                if (c3 && 3 + StartX >= 0 && 3 + StartX < s16_width_noscale) set_pixel_x4(&buf[6],  nPalette + c3);
-                if (c4 && 4 + StartX >= 0 && 4 + StartX < s16_width_noscale) set_pixel_x4(&buf[8],  nPalette + c4);
-                if (c5 && 5 + StartX >= 0 && 5 + StartX < s16_width_noscale) set_pixel_x4(&buf[10], nPalette + c5);
-                if (c6 && 6 + StartX >= 0 && 6 + StartX < s16_width_noscale) set_pixel_x4(&buf[12], nPalette + c6);
-                if (c7 && 7 + StartX >= 0 && 7 + StartX < s16_width_noscale) set_pixel_x4(&buf[14], nPalette + c7);
+                if (c0 && 0 + StartX >= 0 && 0 + StartX < self->s16_width_noscale) hwtiles_set_pixel_x4(self, &buf[0],  nPalette + c0);
+                if (c1 && 1 + StartX >= 0 && 1 + StartX < self->s16_width_noscale) hwtiles_set_pixel_x4(self, &buf[2],  nPalette + c1);
+                if (c2 && 2 + StartX >= 0 && 2 + StartX < self->s16_width_noscale) hwtiles_set_pixel_x4(self, &buf[4],  nPalette + c2);
+                if (c3 && 3 + StartX >= 0 && 3 + StartX < self->s16_width_noscale) hwtiles_set_pixel_x4(self, &buf[6],  nPalette + c3);
+                if (c4 && 4 + StartX >= 0 && 4 + StartX < self->s16_width_noscale) hwtiles_set_pixel_x4(self, &buf[8],  nPalette + c4);
+                if (c5 && 5 + StartX >= 0 && 5 + StartX < self->s16_width_noscale) hwtiles_set_pixel_x4(self, &buf[10], nPalette + c5);
+                if (c6 && 6 + StartX >= 0 && 6 + StartX < self->s16_width_noscale) hwtiles_set_pixel_x4(self, &buf[12], nPalette + c6);
+                if (c7 && 7 + StartX >= 0 && 7 + StartX < self->s16_width_noscale) hwtiles_set_pixel_x4(self, &buf[14], nPalette + c7);
             }
         }
         buf += (config.s16_width << 1);
@@ -499,7 +529,7 @@ void hwtiles::render8x8_tile_mask_clip_hires(
 }
 
 /* Hires Mode: Set 4 pixels instead of one. */
-void hwtiles::set_pixel_x4(uint16_t *buf, uint32_t data)
+static void hwtiles_set_pixel_x4(hwtiles* self, uint16_t *buf, uint32_t data)
 {
     buf[0] = buf[1] = buf[0  + config.s16_width] = buf[1 + config.s16_width] = data;
 }

@@ -107,11 +107,11 @@ void OMusic_enable(OMusic* self)
     /* Widescreen tiles need additional palette information copied over */
     if (self->tile_patch->loaded && config.s16_x_off > 0)
     {
-        video.tile_layer->patch_tiles(self->tile_patch);
+        hwtiles_patch_tiles(video.tile_layer, self->tile_patch);
         OTiles_setup_palette_widescreen(&otiles);
     }
 
-    video.tile_layer->set_x_clamp(video.tile_layer->CENTRE);
+    hwtiles_set_x_clamp(video.tile_layer, CLAMP_CENTRE);
     self->cursor_pos = 1;
     self->total_tracks = (int)config.sound.music.size();
 }
@@ -124,12 +124,12 @@ void OMusic_disable(OMusic* self)
         osprites.jump_table[i].control &= ~ENABLE;
     } }
 
-    video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);
+    hwtiles_set_x_clamp(video.tile_layer, CLAMP_RIGHT);
 
     /* Restore original palette for widescreen tiles. */
     if (config.s16_x_off > 0)
     {
-        video.tile_layer->restore_tiles();
+        hwtiles_restore_tiles(video.tile_layer);
         OTiles_setup_palette_tilemap(&otiles);
     }
 

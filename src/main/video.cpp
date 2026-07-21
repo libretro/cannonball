@@ -9,6 +9,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdlib.h>
 #include "video.hpp"
 #include "globals.hpp"
 #include "frontend/config.hpp"
@@ -32,7 +33,8 @@ void Video_ctor(Video* self)
 {
     self->pixels       = NULL;
     self->sprite_layer = new hwsprites();
-    self->tile_layer   = new hwtiles();
+    self->tile_layer = (hwtiles*)malloc(sizeof(hwtiles));
+    hwtiles_ctor(self->tile_layer);
 
     Video_set_shadow_intensity(self, SHADOW_ORIGINAL);
     self->enabled      = false;
@@ -41,7 +43,7 @@ void Video_ctor(Video* self)
 void Video_dtor(Video* self)
 {
     delete self->sprite_layer;
-    delete self->tile_layer;
+    free(self->tile_layer);
     if (self->pixels) delete[] self->pixels;
 }
 
@@ -55,7 +57,7 @@ int Video_init(Video* self, Roms* roms, video_settings_t* settings)
     self->pixels = new uint16_t[config.s16_width * config.s16_height];
 
     /* Convert S16 tiles to a more useable format */
-    self->tile_layer->init(roms->tiles.rom, config.video.hires != 0);
+    hwtiles_init(self->tile_layer, roms->tiles.rom, config.video.hires != 0);
     
     Video_clear_tile_ram(self);
     Video_clear_text_ram(self);
@@ -163,16 +165,16 @@ void Video_prepare_frame(Video* self)
     else
     {
         /* OutRun Hardware Video Emulation */
-        self->tile_layer->update_tile_values();
+        hwtiles_update_tile_values(self->tile_layer);
 
         (hwroad.render_background)(&hwroad, self->pixels);
-        self->tile_layer->render_tile_layer(self->pixels, 1, 0);      /* background layer */
-        self->tile_layer->render_tile_layer(self->pixels, 0, 0);      /* foreground layer */
+        hwtiles_render_tile_layer(self->tile_layer, self->pixels, 1, 0);      /* background layer */
+        hwtiles_render_tile_layer(self->tile_layer, self->pixels, 0, 0);      /* foreground layer */
 
         if (!config.engine.fix_bugs || oroad.horizon_base != HORIZON_OFF)
             (hwroad.render_foreground)(&hwroad, self->pixels);
         hwsprites_render(self->sprite_layer, 8);
-        self->tile_layer->render_text_layer(self->pixels, 1);
+        hwtiles_render_text_layer(self->tile_layer, self->pixels, 1);
      }
 }
 

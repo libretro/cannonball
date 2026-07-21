@@ -263,7 +263,7 @@ void Menu_init(Menu* self)
     hwsprites_set_x_clip(video.sprite_layer, false); /* Stop clipping in wide-screen mode. */
     hwsprites_reset(video.sprite_layer);
     Video_clear_text_ram(&video);
-    video.tile_layer->restore_tiles();
+    hwtiles_restore_tiles(video.tile_layer);
     OLogo_enable(&ologo, LOGO_Y);
 
     /* Setup palette, road and colours for background */
