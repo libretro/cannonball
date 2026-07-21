@@ -593,7 +593,7 @@ else
 endif
 
 $(CORE_DIR)/src/main/%.o: $(CORE_DIR)/src/main/%.c
-	$(CC) -c $(OBJOUT)$@ $< $(CPPFLAGS) $(CFLAGS) -std=c89 -D_ISOC99_SOURCE -Wno-format-truncation
+	$(CC) -c $(OBJOUT)$@ $< $(CPPFLAGS) $(CFLAGS) -std=gnu89 -D_ISOC99_SOURCE -Wno-format-truncation
 
 %.o: %.cpp
 	$(CXX) -c $(OBJOUT)$@ $< $(CPPFLAGS) $(CXXFLAGS)
