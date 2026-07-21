@@ -50,7 +50,7 @@ int TTrial_tick(TTrial* self)
     switch (self->state)
     {
         case INIT_COURSEMAP:
-            outrun.select_course(config.engine.jap != 0, config.engine.prototype != 0); /* Need to setup correct course map graphics. */
+            Outrun_select_course(&outrun, config.engine.jap != 0, config.engine.prototype != 0); /* Need to setup correct course map graphics. */
             Config_load_tiletrial_scores(&config);
             OStats_init(&ostats, true);
             OSprites_init(&osprites);
@@ -87,7 +87,7 @@ int TTrial_tick(TTrial* self)
                 {
                     outils_convert_counter_to_time(self->best_times[self->level_selected], self->best_converted);
 
-                    outrun.cannonball_mode         = Outrun::MODE_TTRIAL;
+                    outrun.cannonball_mode         = MODE_TTRIAL;
                     outrun.ttrial.level            = STAGE_LOOKUP[self->level_selected];
                     outrun.ttrial.current_lap      = 0;
                     outrun.ttrial.best_lap_counter = 10000;

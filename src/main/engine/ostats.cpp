@@ -75,14 +75,14 @@ void OStats_do_timers(OStats* self)
 
     OStats_inc_lap_timer(self);
 
-    if (outrun.cannonball_mode == Outrun::MODE_ORIGINAL || outrun.cannonball_mode == Outrun::MODE_CONT)
+    if (outrun.cannonball_mode == MODE_ORIGINAL || outrun.cannonball_mode == MODE_CONT)
     {
         /* Each stage has a standard counter that just increments. Do this here. */
         self->stage_counters[self->cur_stage]++;
         OHud_draw_lap_timer(&ohud, 0x11016C, self->stage_times[self->cur_stage], self->ms_value);
     }
 
-    else if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
+    else if (outrun.cannonball_mode == MODE_TTRIAL)
     {
         self->stage_counters[outrun.ttrial.current_lap]++;
         OHud_draw_stage_number(&ohud, OHud_translate(&ohud, 30, 2 + outrun.ttrial.current_lap, 0x110030), (outrun.ttrial.current_lap + 1), GREY);
@@ -134,7 +134,7 @@ void OStats_convert_speed_score(OStats* self, uint16_t speed)
 /* Source: 0x7340 */
 void OStats_update_score(OStats* self, uint32_t value)
 {
-    if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
+    if (outrun.cannonball_mode == MODE_TTRIAL)
         return;
 
     self->score = outils_bcd_add(value, self->score);
@@ -177,7 +177,7 @@ void OStats_init_next_level(OStats* self)
             {
                 if (self->extend_play_timer & BIT_3)
                 {
-                    if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
+                    if (outrun.cannonball_mode == MODE_TTRIAL)
                         OHud_blit_text_new(&ohud, 15, 8, "BEST LAP!", PINK);
                     else
                     {
@@ -202,9 +202,9 @@ void OStats_init_next_level(OStats* self)
         uint16_t time_lookup = (config.engine.dip_time * 40) + oroad.stage_lookup_off;
         if (!outrun.freeze_timer)
         {
-            if (outrun.cannonball_mode == outrun.MODE_ORIGINAL)
+            if (outrun.cannonball_mode == MODE_ORIGINAL)
                 self->time_counter = outils_bcd_add(self->time_counter, TIME[time_lookup]);
-            else if (outrun.cannonball_mode == outrun.MODE_CONT)
+            else if (outrun.cannonball_mode == MODE_CONT)
                 self->time_counter = outils_bcd_add(self->time_counter, 0x55);
 
             if (self->time_counter > 0x99) self->time_counter = 0x99;

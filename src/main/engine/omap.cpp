@@ -143,7 +143,7 @@ void OMap_tick(OMap* self)
 
         /* Clear Course Map         */
         case MAP_CLEAR:
-            outrun.init_best_outrunners();
+            Outrun_init_best_outrunners(&outrun);
             return;
     }
 
@@ -315,7 +315,7 @@ void OMap_map_display(OMap* self)
     if (--self->map_delay <= 0)
     {
         self->map_state = MAP_CLEAR;
-        outrun.init_best_outrunners();
+        Outrun_init_best_outrunners(&outrun);
     }
 }
 

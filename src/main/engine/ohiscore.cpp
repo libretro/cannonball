@@ -192,7 +192,7 @@ void OHiScore_insert_score(OHiScore* self)
     /* Calculate total time if game completed. Store result in $20 */
     if (ostats.game_completed)
     {
-        const uint8_t entries = outrun.cannonball_mode == Outrun::MODE_ORIGINAL ? 5 : 15;
+        const uint8_t entries = outrun.cannonball_mode == MODE_ORIGINAL ? 5 : 15;
 
         self->scores[self->score_pos].time = 0;
 
@@ -258,7 +258,7 @@ void OHiScore_check_name_entry(OHiScore* self)
         /* Save new score info */
         if (self->state == STATE_DONE)
             Config_save_scores(&config, 
-                outrun.cannonball_mode == Outrun::MODE_ORIGINAL
+                outrun.cannonball_mode == MODE_ORIGINAL
                     ? FILENAME_SCORES
                     : FILENAME_CONT);
     }
@@ -611,7 +611,7 @@ void OHiScore_blit_score_table(OHiScore* self)
     OHiScore_blit_digit(self);                     /* Blit 1. 2. 3. etc. */
     OHiScore_blit_scores(self);                    /* Blit list of scores */
     OHiScore_blit_initials(self);                  /* Blit initials attached to those scores */
-    if (outrun.cannonball_mode != Outrun::MODE_CONT)
+    if (outrun.cannonball_mode != MODE_CONT)
         OHiScore_blit_route_map(self);            /* Blit Mini Route Map */
     OHiScore_blit_lap_time(self);
 }

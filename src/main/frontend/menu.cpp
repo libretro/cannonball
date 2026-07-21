@@ -245,7 +245,7 @@ void Menu::init()
         TTrial_update_best_time(ttrial);
     }
 
-    outrun.select_course(false, config.engine.prototype != 0);
+    Outrun_select_course(&outrun, false, config.engine.prototype != 0);
     video.enabled = true;
     hwsprites_set_x_clip(video.sprite_layer, false); /* Stop clipping in wide-screen mode. */
     hwsprites_reset(video.sprite_layer);
@@ -470,7 +470,7 @@ void Menu::tick_menu()
         {
             if (SELECTED(ENTRY_PLAYGAME))
             {
-                start_game(Outrun::MODE_ORIGINAL, 0);
+                start_game(MODE_ORIGINAL, 0);
                 return;
             }
             else if (SELECTED(ENTRY_GAMEMODES))
@@ -487,9 +487,9 @@ void Menu::tick_menu()
         else if (menu_selected == &menu_gamemodes)
         {
             if (SELECTED(ENTRY_ENHANCED))
-                start_game(Outrun::MODE_ORIGINAL, 1);
+                start_game(MODE_ORIGINAL, 1);
             else if (SELECTED(ENTRY_ORIGINAL))
-                start_game(Outrun::MODE_ORIGINAL, 2);
+                start_game(MODE_ORIGINAL, 2);
             else if (SELECTED(ENTRY_CONT))
                 set_menu(&menu_cont);
             else if (SELECTED(ENTRY_TIMETRIAL))
@@ -502,7 +502,7 @@ void Menu::tick_menu()
             if (SELECTED(ENTRY_START_CONT))
             {
                 outrun.custom_traffic = config.cont_traffic;
-                start_game(Outrun::MODE_CONT, 0);
+                start_game(MODE_CONT, 0);
             }
             else if (SELECTED(ENTRY_TRAFFIC))
             {

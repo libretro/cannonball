@@ -1128,6 +1128,7 @@ size_t retro_get_memory_size(unsigned id)
 
 void retro_init(void)
 {
+   Outrun_ctor(&outrun);
    Audio_ctor(&cannonball_audio);
    Config_ctor(&config);
    Video_ctor(&video);
@@ -1184,7 +1185,7 @@ void retro_reset(void)
     /* Time Trial stores its selected mode, course and an artificial */
     /* credit before handing control from the frontend to the engine. */
     /* These values must not survive a frontend Reset request. */
-    outrun.cannonball_mode = Outrun::MODE_ORIGINAL;
+    outrun.cannonball_mode = MODE_ORIGINAL;
 
     outrun.ttrial.level            = 0;
     outrun.ttrial.current_lap      = 0;
@@ -1340,7 +1341,7 @@ void retro_run(void)
 
             if (!pause_engine || Input_has_pressed(&input, STEP))
             {
-                outrun.tick(cannonball_tick_frame);
+                Outrun_tick(&outrun, cannonball_tick_frame);
                 if (cannonball_tick_frame) Input_frame_done(&input);
 
                 /* Tick audio program code */
@@ -1363,7 +1364,7 @@ void retro_run(void)
             else
             {
                 pause_engine = false;
-                outrun.init();
+                Outrun_init(&outrun);
                 cannonball_state = STATE_GAME;
             }
             break;

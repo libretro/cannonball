@@ -67,7 +67,7 @@ static void OBonus_init_bonus_text(OBonus* self)
 
     { uint16_t total_time = 0;
 
-    if (outrun.cannonball_mode == Outrun::MODE_ORIGINAL)
+    if (outrun.cannonball_mode == MODE_ORIGINAL)
     {
         /* Add milliseconds remaining from previous stage times */
         { int i; for (i = 0; i < 5; i++)

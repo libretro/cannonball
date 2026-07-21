@@ -435,7 +435,7 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
         if (outrun.game_state == GS_INGAME)
         {
             /* Update score on overtake */
-            if (outrun.cannonball_mode != Outrun::MODE_TTRIAL)
+            if (outrun.cannonball_mode != MODE_TTRIAL)
                 OStats_update_score(&ostats, 0x20000);
             else
             {
@@ -586,7 +586,7 @@ void OTraffic_set_zoom_lookup(OTraffic* self, oentry* sprite)
 /* Source: 0x846E */
 void OTraffic_set_max_traffic(OTraffic* self)
 {
-    if (outrun.cannonball_mode == Outrun::MODE_ORIGINAL)
+    if (outrun.cannonball_mode == MODE_ORIGINAL)
     {
         const static uint8_t MAX_TRAFFIC[] =
         {

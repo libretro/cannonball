@@ -176,70 +176,46 @@ struct adr_t
 
 class OOutputs;
 
-class Outrun
+static const uint8_t MODE_ORIGINAL = 0;
+
+static const uint8_t MODE_TTRIAL   = 1;
+
+static const uint8_t MODE_CONT     = 2;
+
+struct Outrun
 {
-public:
     OOutputs* outputs;
-
     bool freeze_timer;
-
-    /* CannonBall Game Mode */
     uint8_t cannonball_mode;
-
-    const static uint8_t MODE_ORIGINAL = 0; /* Original OutRun Mode */
-    const static uint8_t MODE_TTRIAL   = 1; /* Enhanced Time Trial Mode */
-    const static uint8_t MODE_CONT     = 2; /* Enhanced Continuous Mode */
-
-    /* Max traffic level for custom modes  */
     uint8_t custom_traffic;
-
-    /* Time trial data */
     time_trial_t ttrial;
-
-    /* Service Mode Toggle: Not implemented yet. */
     bool service_mode;
-
-    /* Tick Logic. Used when running at non-standard > 30 fps */
     bool tick_frame;
-
-    /* Tick Counter (always syncd to 30 fps to flash text and other stuff) */
     uint32_t tick_counter;
-
-    /* Main game state */
     int8_t game_state;
-
-    /* Address structures */
     adr_t adr;
-
-	Outrun();
-	~Outrun();
-	void init();
-    void boot();
-	void tick(bool tick_frame);
-	void vint();
-    void init_best_outrunners();
-    void select_course(const bool jap, const bool prototype);
-
-private:
-
     uint8_t attract_view;
     int16_t attract_counter;
-
-    /* Car Increment Backup for attract mode */
     uint32_t car_inc_bak;
-
-    /* Debug to denote when fork has been chosen */
     int8_t fork_chosen;
-
-	void jump_table();
-	void init_jump_table();
-	void main_switch();
-    void controls();
-    bool decrement_timers();
-    void init_motor_calibration();
-    void init_attract();
-    void tick_attract();
-    void check_freeplay_start();
 };
+
+extern Outrun outrun;
+
+void Outrun_ctor(Outrun* self);
+
+void Outrun_dtor(Outrun* self);
+
+void Outrun_init(Outrun* self);
+
+void Outrun_boot(Outrun* self);
+
+void Outrun_tick(Outrun* self, bool tick_frame);
+
+void Outrun_vint(Outrun* self);
+
+void Outrun_init_best_outrunners(Outrun* self);
+
+void Outrun_select_course(Outrun* self, const bool jap, const bool prototype);
 
 extern Outrun outrun;

@@ -128,7 +128,7 @@ void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry *sprite)
 /*   Source: 0xA94C */
 void OSmoke_setup_smoke_sprite(OSmoke* self, bool force_load)
 {
-    uint16_t stage_lookup = outrun.cannonball_mode != Outrun::MODE_ORIGINAL ? oroad.stage_lookup_off : 0;
+    uint16_t stage_lookup = outrun.cannonball_mode != MODE_ORIGINAL ? oroad.stage_lookup_off : 0;
 
     /* Check whether we should load new sprite data when transitioning between stages */
     if (!force_load)

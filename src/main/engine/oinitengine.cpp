@@ -466,7 +466,7 @@ void OInitEngine_check_road_split(OInitEngine* self)
 void OInitEngine_check_stage(OInitEngine* self)
 {
     /* Time Trial Mode */
-    if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
+    if (outrun.cannonball_mode == MODE_TTRIAL)
     {
         /* Store laptime and reset */
         uint8_t* laptimes = outrun.ttrial.laptimes[outrun.ttrial.current_lap];
@@ -515,7 +515,7 @@ void OInitEngine_check_stage(OInitEngine* self)
             }
         }
     }
-    else if (outrun.cannonball_mode == Outrun::MODE_CONT)
+    else if (outrun.cannonball_mode == MODE_CONT)
     {
         oroad.road_pos         = 0;
         oroad.tilemap_h_target = 0;
@@ -996,13 +996,13 @@ void OInitEngine_test_bonus_mode(OInitEngine* self, bool do_bonus_check)
     if (do_bonus_check && obonus.bonus_control)
     {
         /* Do Bonus Text Display */
-        if (outrun.cannonball_mode != Outrun::MODE_TTRIAL && obonus.bonus_state < 3)
+        if (outrun.cannonball_mode != MODE_TTRIAL && obonus.bonus_state < 3)
             OBonus_do_bonus_text(&obonus);
 
         /* End Seq Animation Stage #0 */
         if (obonus.bonus_control == BONUS_SEQ0)
         {
-            if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
+            if (outrun.cannonball_mode == MODE_TTRIAL)
                 outrun.game_state = GS_INIT_GAMEOVER;
             else
                 OAnimSeq_init_end_seq(&oanimseq);

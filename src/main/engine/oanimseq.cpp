@@ -645,10 +645,10 @@ bool OAnimSeq_read_anim_data(OAnimSeq* self, oanimsprite* anim)
             obonus.bonus_control = BONUS_DISABLE;
             /* we're missing all the code here to disable the animsprites, but probably not necessary? */
 
-            if (outrun.cannonball_mode == Outrun::MODE_ORIGINAL)
+            if (outrun.cannonball_mode == MODE_ORIGINAL)
                 outrun.game_state = GS_INIT_MAP;
             else
-                outrun.init_best_outrunners();
+                Outrun_init_best_outrunners(&outrun);
         }
     }
 

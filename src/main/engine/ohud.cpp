@@ -35,7 +35,7 @@ void OHud_draw_main_hud(OHud* self)
     OHud_blit_text1(self, HUD_LAP1);
     OHud_blit_text1(self, HUD_LAP2);
 
-    if (outrun.cannonball_mode == Outrun::MODE_ORIGINAL)
+    if (outrun.cannonball_mode == MODE_ORIGINAL)
     {
         OHud_blit_text1(self, HUD_TIME1);
         OHud_blit_text1(self, HUD_TIME2);
@@ -46,7 +46,7 @@ void OHud_draw_main_hud(OHud* self)
         OHud_blit_text1(self, HUD_ONE);
         OHud_do_mini_map(self);
     }
-    else if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
+    else if (outrun.cannonball_mode == MODE_TTRIAL)
     {
         OHud_draw_score(self, OHud_translate(self, 3, 2, 0x110030), 0, 2);
         OHud_blit_text1(self, 2, 1, HUD_SCORE1);
@@ -54,7 +54,7 @@ void OHud_draw_main_hud(OHud* self)
         OHud_blit_text_big(self, 4, "TIME TO BEAT", false);
         OHud_draw_lap_timer(self, OHud_translate(self, 16, 7, 0x110030), outrun.ttrial.best_lap, outrun.ttrial.best_lap[2]);
     }
-    else if (outrun.cannonball_mode == Outrun::MODE_CONT)
+    else if (outrun.cannonball_mode == MODE_CONT)
     {
         OHud_blit_text1(self, HUD_TIME1);
         OHud_blit_text1(self, HUD_TIME2);
