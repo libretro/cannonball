@@ -755,7 +755,7 @@ void OTraffic_check_collision(OTraffic* self, oentry* sprite)
         {
             /* Set collision settings from property table */
             self->collision_mask = roms.rom0p->read8(outrun.adr.traffic_props + sprite->type + 5);
-            d0 = (sprite->x < 0) ? -OCrash::SKID_RESET : OCrash::SKID_RESET;
+            d0 = (sprite->x < 0) ? -SKID_RESET : SKID_RESET;
 
             /* Enhancement: Bumper enabled, reduce skid distance */
             if (config.engine.bumper)
@@ -763,7 +763,7 @@ void OTraffic_check_collision(OTraffic* self, oentry* sprite)
 
             d0 += ocrash.skid_counter;
 
-            if (d0 <= OCrash::SKID_MAX && d0 >= -OCrash::SKID_MAX)
+            if (d0 <= SKID_MAX && d0 >= -SKID_MAX)
                 ocrash.skid_counter = d0;
 
             /* Set Ferrari speed based on collision speed */

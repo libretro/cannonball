@@ -72,7 +72,7 @@ int Video::init(Roms* roms, video_settings_t* settings)
     }
 
     /* Convert S16 Road Stuff */
-    hwroad.init(roms->road.rom, config.video.hires != 0);
+    HWRoad_init(&hwroad, roms->road.rom, config.video.hires != 0);
     if (roms->road.rom)
     {
         delete[] roms->road.rom;
@@ -163,12 +163,12 @@ void Video::prepare_frame()
         /* OutRun Hardware Video Emulation */
         tile_layer->update_tile_values();
 
-        (hwroad.*hwroad.render_background)(pixels);
+        (hwroad.render_background)(&hwroad, pixels);
         tile_layer->render_tile_layer(pixels, 1, 0);      /* background layer */
         tile_layer->render_tile_layer(pixels, 0, 0);      /* foreground layer */
 
         if (!config.engine.fix_bugs || oroad.horizon_base != ORoad::HORIZON_OFF)
-            (hwroad.*hwroad.render_foreground)(pixels);
+            (hwroad.render_foreground)(&hwroad, pixels);
         sprite_layer->render(8);
         tile_layer->render_text_layer(pixels, 1);
      }

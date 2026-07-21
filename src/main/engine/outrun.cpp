@@ -253,7 +253,7 @@ void Outrun::jump_table()
             if (oferrari.state != OFerrari::FERRARI_END_SEQ)
             {
                 oanimseq.flag_seq();
-                ocrash.tick();
+                OCrash_tick(&ocrash);
                 OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[OSprites::SPRITE_SMOKE1]); /* Do Left Hand Smoke */
                 oferrari.draw_shadow();                                                   /* (0xF1A2) - Draw Ferrari Shadow */
                 OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[OSprites::SPRITE_SMOKE2]); /* Do Right Hand Smoke */

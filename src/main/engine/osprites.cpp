@@ -99,7 +99,7 @@ void OSprites::init()
     jump_table[SPRITE_CRASH_SHADOW].draw_props = oentry::BOTTOM;
     jump_table[SPRITE_CRASH_SHADOW].addr       = outrun.adr.shadow_data;
 
-    ocrash.init(
+    OCrash_init(&ocrash, 
         &jump_table[SPRITE_CRASH], 
         &jump_table[SPRITE_CRASH_SHADOW], 
         &jump_table[SPRITE_CRASH_PASS1],

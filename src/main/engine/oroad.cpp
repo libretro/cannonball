@@ -203,7 +203,7 @@ void ORoad::do_road()
     output_hscroll(&road1_h[0], HW_HSCROLL_TABLE1);
     copy_bg_color();
 
-    hwroad.read_road_control(); /* swap halves of road ram */
+    HWRoad_read_road_control(&hwroad); /* swap halves of road ram */
 }
 
 /* Set Default Horizontal Scroll Values */
@@ -217,9 +217,9 @@ void ORoad::set_default_hscroll()
     uint32_t adr = HW_HSCROLL_TABLE0;
 
     { uint16_t i; for (i = 0; i <= 0x1FF; i++)
-        hwroad.write32(&adr, 0x1000100); }
+        HWRoad_write32(&hwroad, &adr, 0x1000100); }
 
-    hwroad.read_road_control();
+    HWRoad_read_road_control(&hwroad);
 }
 
 /* Clear Road RAM */
@@ -239,9 +239,9 @@ void ORoad::clear_road_ram()
     uint32_t adr = 0x80000; /* start of road ram */
 
     { uint8_t scanline; for (scanline = 0; scanline < S16_HEIGHT; scanline++)
-        hwroad.write16(&adr, scanline); }
+        HWRoad_write16(&hwroad, &adr, scanline); }
 
-    hwroad.read_road_control();
+    HWRoad_read_road_control(&hwroad);
 }
 
 /* Initalize Stage 1 */
@@ -1498,27 +1498,27 @@ void ORoad::blit_roads()
         case ROAD_R0:          /* Road 0 */
         case ROAD_R0_SPLIT:    /* Road 0 (Road Split.) */
             blit_road(road0_adr);
-            hwroad.write_road_control(0);
+            HWRoad_write_road_control(&hwroad, 0);
             break;
 
         case ROAD_R1:          /* Road 1 */
         case ROAD_R1_SPLIT:    /* Road 1 (Road Split. Invert Road 1) */
             blit_road(road1_adr);
-            hwroad.write_road_control(3);
+            HWRoad_write_road_control(&hwroad, 3);
             break;
 
         case ROAD_BOTH_P0:     /* Both Roads (Road 0 Priority) [DEFAULT] */
         case ROAD_BOTH_P0_INV: /* Both Roads (Road 0 Priority) (Road Split. Invert Road 1) */
             blit_road(road0_adr);
             blit_road(road1_adr);
-            hwroad.write_road_control(1);
+            HWRoad_write_road_control(&hwroad, 1);
             break;
 
         case ROAD_BOTH_P1:     /* Both Roads (Road 1 Priority)  */
         case ROAD_BOTH_P1_INV: /* Both Roads (Road 1 Priority) (Road Split. Invert Road 1) */
             blit_road(road0_adr);
             blit_road(road1_adr);
-            hwroad.write_road_control(2);
+            HWRoad_write_road_control(&hwroad, 2);
             break;
     }
 }
@@ -1530,23 +1530,23 @@ void ORoad::blit_road(uint32_t a0)
     /* Write 0x1A0 bytes total Src: (0x260 - 0x400) Dst: 0x1C0 */
     { int16_t i; for (i = 0; i <= 13; i++)
     {
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
 
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
-        a0 -= 2; hwroad.write16(a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
+        a0 -= 2; HWRoad_write16(&hwroad, a0, road_y[--a2]);
     } }
 }
 
@@ -1566,14 +1566,14 @@ void ORoad::output_hscroll(int16_t* src, uint32_t dst)
         int16_t d2l = -src[src_addr++] + d6;
         int16_t d3h = -src[src_addr++] + d6;
         int16_t d3l = -src[src_addr++] + d6;
-        hwroad.write16(&dst, d0h);
-        hwroad.write16(&dst, d0l);
-        hwroad.write16(&dst, d1h);
-        hwroad.write16(&dst, d1l);
-        hwroad.write16(&dst, d2h);
-        hwroad.write16(&dst, d2l);
-        hwroad.write16(&dst, d3h);
-        hwroad.write16(&dst, d3l);
+        HWRoad_write16(&hwroad, &dst, d0h);
+        HWRoad_write16(&hwroad, &dst, d0l);
+        HWRoad_write16(&hwroad, &dst, d1h);
+        HWRoad_write16(&hwroad, &dst, d1l);
+        HWRoad_write16(&hwroad, &dst, d2h);
+        HWRoad_write16(&hwroad, &dst, d2l);
+        HWRoad_write16(&hwroad, &dst, d3h);
+        HWRoad_write16(&hwroad, &dst, d3l);
     } }
 }
 
@@ -1605,13 +1605,13 @@ void ORoad::copy_bg_color()
     /* Copy 1K */
     { int i; for (i = 0; i < 32; i++)
     {
-        hwroad.write32(&dst, roms.rom1p->read32(&src));
-        hwroad.write32(&dst, roms.rom1p->read32(&src));
-        hwroad.write32(&dst, roms.rom1p->read32(&src));
-        hwroad.write32(&dst, roms.rom1p->read32(&src));
-        hwroad.write32(&dst, roms.rom1p->read32(&src));
-        hwroad.write32(&dst, roms.rom1p->read32(&src));
-        hwroad.write32(&dst, roms.rom1p->read32(&src));
-        hwroad.write32(&dst, roms.rom1p->read32(&src));
+        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
+        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
+        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
+        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
+        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
+        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
+        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
+        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
     } }
 }

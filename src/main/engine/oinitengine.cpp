@@ -95,7 +95,7 @@ void OInitEngine::init(int8_t level)
     otiles.setup_palette_tilemap();                 /* Setup Palette For Tilemap */
     setup_stage1();                                 /* Setup Misc stuff relating to Stage 1 */
     otiles.reset_tiles_pal();                       /* Reset Tiles, Palette And Road Split Data */
-    ocrash.clear_crash_state();
+    OCrash_clear_crash_state(&ocrash);
 
     /* The following is set up specifically for time trial mode */
     if (level)
@@ -947,7 +947,7 @@ void OInitEngine::init_crash_bonus()
         ocrash.spin_control2 = 2;
         if (ocrash.coll_count1 == ocrash.coll_count2)
         {
-            ocrash.enable();
+            OCrash_enable(&ocrash);
         }
         test_bonus_mode(false); /* finalise skid */
         return;
@@ -956,7 +956,7 @@ void OInitEngine::init_crash_bonus()
     {
         /* 98c0 */
         ocrash.spin_control1 = 2;
-        ocrash.enable();
+        OCrash_enable(&ocrash);
         test_bonus_mode(false); /* finalise skid */
         return;
     }
@@ -968,7 +968,7 @@ void OInitEngine::init_crash_bonus()
     }
     else
     {
-        ocrash.enable();
+        OCrash_enable(&ocrash);
         test_bonus_mode(false); /* finalise skid */
     }
 }

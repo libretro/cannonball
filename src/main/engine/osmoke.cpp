@@ -62,7 +62,7 @@ void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry *sprite)
     }
 
     /* Enhancement: When not displaying car, don't draw smoke effects */
-    if (oroad.get_view_mode() == ORoad::VIEW_INCAR && !ocrash.is_flip())
+    if (oroad.get_view_mode() == ORoad::VIEW_INCAR && !OCrash_is_flip(&ocrash))
         return;
     
     /* ------------------------------------------------------------------------ */

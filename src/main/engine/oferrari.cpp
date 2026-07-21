@@ -1730,12 +1730,12 @@ void OFerrari::do_skid()
     if (ocrash.skid_counter > 0)
     {
         ocrash.skid_counter--;
-        oinitengine.car_x_pos += OCrash::SKID_X_ADJ;
+        oinitengine.car_x_pos += SKID_X_ADJ;
     }
     else
     {
         ocrash.skid_counter++;
-        oinitengine.car_x_pos -= OCrash::SKID_X_ADJ;
+        oinitengine.car_x_pos -= SKID_X_ADJ;
     }
 }
 
