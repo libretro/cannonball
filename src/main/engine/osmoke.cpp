@@ -290,7 +290,7 @@ void OSmoke::tick_smoke_anim(oentry* sprite, int8_t anim_ctrl, uint32_t addr)
     uint16_t frame   = (sprite->xw1 & 7) << 3;
     sprite->addr     = roms.rom0p->read32(addr + frame);
     sprite->pal_src  = roms.rom0p->read8(addr + frame + 5);
-    uint16_t smoke_z = roms.rom0p->read8(addr + frame + 4) + sprite->z;
+    { uint16_t smoke_z = roms.rom0p->read8(addr + frame + 4) + sprite->z;
     if (smoke_z > 0xFF) smoke_z = 0xFF;
 
     /* inc_crash_z: */
@@ -302,7 +302,7 @@ void OSmoke::tick_smoke_anim(oentry* sprite, int8_t anim_ctrl, uint32_t addr)
 
     /* Set Sprite Zoom */
     if (smoke_z <= 0x40) smoke_z = 0x40;
-    uint8_t shift = (roms.rom0p->read8(addr + frame + 7) & 2) >> 1;
+    { uint8_t shift = (roms.rom0p->read8(addr + frame + 7) & 2) >> 1;
     uint8_t zoom = smoke_z >> shift;
     if (zoom <= 0x40) zoom = 0x40;
     sprite->zoom = zoom;
@@ -316,7 +316,7 @@ void OSmoke::tick_smoke_anim(oentry* sprite, int8_t anim_ctrl, uint32_t addr)
 
     /* Set Sprite X */
     uint8_t hflip = (roms.rom0p->read8(addr + frame + 7) & 1);
-    int8_t x = ((roms.rom0p->read8(addr + frame + 6) >> 3) & 0x1E);
+    { int8_t x = ((roms.rom0p->read8(addr + frame + 6) >> 3) & 0x1E);
 
     /* Enhancement: When viewing in-car, spread the spray out */
     if (oroad.get_view_mode() == ORoad::VIEW_INCAR)
@@ -340,7 +340,7 @@ void OSmoke::tick_smoke_anim(oentry* sprite, int8_t anim_ctrl, uint32_t addr)
 
     osprites.map_palette(sprite);
     osprites.do_spr_order_shadows(sprite);
-}
+ } } }}
 
 /* Draw only helper routine. */
 /* Useful for framerate changes. */

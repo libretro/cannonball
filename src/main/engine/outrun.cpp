@@ -758,9 +758,9 @@ void Outrun::tick_attract()
             attract_counter = 0;
             if (++attract_view > 2)
                 attract_view = 0;
-            bool snap = VIEWS[attract_view] == ORoad::VIEW_INCAR;
+            { bool snap = VIEWS[attract_view] == ORoad::VIEW_INCAR;
             oroad.set_view_mode(VIEWS[attract_view], snap);
-        }
+         }}
     }
 
     if (ostats.credits)

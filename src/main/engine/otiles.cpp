@@ -236,7 +236,7 @@ void OTiles::init_tilemap(int16_t stage_id)
     fg_addr       = roms.rom0p->read32(&addr);  /* Write Default FG Tilemap Address */
     bg_addr       = roms.rom0p->read32(&addr);  /* Write Default BG Tilemap Address */
     tilemap_v_off = roms.rom0p->read16(&addr);
-    int16_t v_off = 0x68 - tilemap_v_off;
+    { int16_t v_off = 0x68 - tilemap_v_off;
     oroad.horizon_y_bak = oroad.horizon_y2;
 
     fg_v_scroll   = v_off;
@@ -250,7 +250,7 @@ void OTiles::init_tilemap(int16_t stage_id)
     copy_fg_tiles(0x100F80);                            /* Copy Foreground tiles to Tile RAM */
     copy_bg_tiles(0x108F80);                            /* Copy Background tiles to Tile RAM */
     tilemap_ctrl = TILEMAP_SCROLL;
-}
+ }}
 
 /* Initialize Tilemap properties for Stage (FG & BG) */
 /* */
@@ -525,7 +525,7 @@ void OTiles::h_scroll_tilemaps()
         
         int32_t tilemap_h_target = h_scroll_lookup << 5;
         tilemap_h_target <<= 16;
-        int32_t tilemap_x = tilemap_h_target - (tilemap_h_scr << 5);
+        { int32_t tilemap_x = tilemap_h_target - (tilemap_h_scr << 5);
         if (tilemap_x != 0) 
         {
             tilemap_x >>= 8;
@@ -539,7 +539,7 @@ void OTiles::h_scroll_tilemaps()
             /* DB1E */
             tilemap_h_scr += (tilemap_x >> 8);
         }
-    }
+     }}
     /* Road Not Splitting */
     else
     {
@@ -547,9 +547,9 @@ void OTiles::h_scroll_tilemaps()
         if (oinitengine.rd_split_state != OInitEngine::SPLIT_NONE && 
             oinitengine.rd_split_state <= 4) return;
 
-        int32_t tilemap_h_target = (oroad.tilemap_h_target << 5) & 0xFFFF;
+        { int32_t tilemap_h_target = (oroad.tilemap_h_target << 5) & 0xFFFF;
         tilemap_h_target <<= 16;
-        int32_t tilemap_x = tilemap_h_target - (tilemap_h_scr << 5);
+        { int32_t tilemap_x = tilemap_h_target - (tilemap_h_scr << 5);
         if (tilemap_x != 0) 
         {
             tilemap_x >>= 8;
@@ -563,7 +563,7 @@ void OTiles::h_scroll_tilemaps()
             /* DB1E */
             tilemap_h_scr += (tilemap_x >> 8);
         }   
-    }
+     } }}
 }
 
 /* V-Scroll Tilemap Code */
@@ -577,7 +577,7 @@ void OTiles::h_scroll_tilemaps()
 void OTiles::v_scroll_tilemaps()
 {
     oroad.horizon_y_bak = (oroad.horizon_y_bak + oroad.horizon_y2) >> 1;
-    int32_t d0 = (0x100 - oroad.horizon_y_bak - tilemap_v_off - vswap_off);
+    { int32_t d0 = (0x100 - oroad.horizon_y_bak - tilemap_v_off - vswap_off);
     tilemap_v_scr ^= d0;
 
     if (d0 < 0)
@@ -588,7 +588,7 @@ void OTiles::v_scroll_tilemaps()
     tilemap_v_scr = d0;         /* Write d0 to master V-Scroll */
     fg_v_scroll = d0;           /* Write d0 to FG V-Scroll (ready for HW write) */
     bg_v_scroll = d0;           /* Write d0 to BG V-Scroll (ready for HW write) */
-}
+ }}
 
 /* Update FG Page Values */
 /* */
@@ -612,13 +612,13 @@ void OTiles::update_fg_page()
     int32_t rol7 = h << 7;
     h = ((rol7 >> 16) & 3) << 1;
     
-    uint8_t cur_stage = page_split ? page + 1 : page;
+    { uint8_t cur_stage = page_split ? page + 1 : page;
 
     cur_stage &= 1;
     cur_stage *= 8;
     h += cur_stage;
     fg_psel = roms.rom0.read16(TILES_PAGE_FG1 + h);
-}
+ }}
 
 void OTiles::update_bg_page()
 {
@@ -636,13 +636,13 @@ void OTiles::update_bg_page()
     int32_t rol7 = h << 7;
     h = ((rol7 >> 16) & 3) << 1;
 
-    uint8_t cur_stage = page_split ? page + 1 : page;
+    { uint8_t cur_stage = page_split ? page + 1 : page;
 
     cur_stage &= 1;
     cur_stage = ((cur_stage * 2) + cur_stage) << 1;
     h += cur_stage;
     bg_psel = roms.rom0.read16(TILES_PAGE_BG1 + h);
-}
+ }}
 
 /* Initalize Next Tilemap. On Level Switch. */
 /* Source: 0xD994 */

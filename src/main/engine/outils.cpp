@@ -81,7 +81,7 @@ int32_t outils::isqrt(const int32_t number)
     if (number == 0)
         return 0;
 
-    int n  = 1;
+    { int n  = 1;
     int n1 = next(n, number);
 
     while(abs(n1 - n) > 1) 
@@ -94,7 +94,7 @@ int32_t outils::isqrt(const int32_t number)
         n1 -= 1;
     }
     return n1;
-}
+ }}
 
 int32_t outils::abs(int32_t n)
 {
@@ -200,7 +200,7 @@ void outils::convert_counter_to_time(uint16_t counter, uint8_t* converted)
         seconds += 6;
 
     s2 = outils::bcd_add(s2, s2);
-    int16_t d3 = s2;
+    { int16_t d3 = s2;
     s2 = outils::bcd_add(s2, s2);
     s2 = outils::bcd_add(s2, d3);
     seconds = outils::bcd_add(s2, seconds);
@@ -208,7 +208,7 @@ void outils::convert_counter_to_time(uint16_t counter, uint8_t* converted)
     converted[0] = (uint8_t) minutes;
     converted[1] = seconds;
     converted[2] = ostats.lap_ms[ms_lookup];
-}
+ }}
 
 /* Convert 16 Bit Decimal Value To Hex. */
 /* */

@@ -440,7 +440,7 @@ void OSprites::sprite_copy()
         return;
     }
 
-    uint32_t spr_cnt_main_copy = spr_cnt_main;
+    { uint32_t spr_cnt_main_copy = spr_cnt_main;
 
     /* look up in sprite_order */
     int32_t src_addr = -0x10;
@@ -452,7 +452,7 @@ void OSprites::sprite_copy()
     while (spr_cnt_main_copy != 0)
     {
         src_addr += 0x10;
-        uint8_t bytes_to_copy = sprite_order[src_addr]; /* warning: actually reads a word here normally, so this is wrong */
+        { uint8_t bytes_to_copy = sprite_order[src_addr]; /* warning: actually reads a word here normally, so this is wrong */
 
         /* Copy the required number of bytes */
         if (bytes_to_copy != 0)
@@ -471,7 +471,7 @@ void OSprites::sprite_copy()
 
         /* Clear number of bytes to copy */
         sprite_order[src_addr] = 0; 
-    }
+     }}
 
     /* cont2: */
     uint16_t cnt_shadow_copy = spr_cnt_shadow;
@@ -487,7 +487,7 @@ void OSprites::sprite_copy()
     } }
 
     finalise_sprites();
-}
+ }}
 
 /* Was originally labelled set_end_marker */
 /*  */
@@ -587,7 +587,7 @@ void OSprites::do_sprite(oentry* input)
 
     /* Sprite Width/Height Settings */
     uint16_t width = 0;
-    uint16_t height = 0;
+    { uint16_t height = 0;
     
     /* Set real h/v zoom values */
     uint32_t index = (input->zoom * 4);
@@ -604,7 +604,7 @@ void OSprites::do_sprite(oentry* input)
     /* which correspond to different screen sizes */
     uint32_t src_offsets = input->addr + ZOOM_LOOKUP[index];
 
-    uint16_t d0 = input->draw_props | (input->zoom << 8);
+    { uint16_t d0 = input->draw_props | (input->zoom << 8);
     uint16_t top_bit = d0 & 0x8000;
     d0 &= 0x7FFF; /* Clear top bit */
     
@@ -625,7 +625,7 @@ void OSprites::do_sprite(oentry* input)
     else
     {
         d0 &= 0x7C00;
-        uint16_t h = d0;
+        { uint16_t h = d0;
 
         d0 = (d0 & 0xFF00) + roms.rom0p->read8(src_offsets + 1);
         width = roms.rom0p->read8(WH_TABLE + d0);
@@ -637,7 +637,7 @@ void OSprites::do_sprite(oentry* input)
         h &= 0xFF;
         height += h;
 
-    }
+     }}
     /* loc 9582: */
     input->width = width;
     
@@ -648,7 +648,7 @@ void OSprites::do_sprite(oentry* input)
     
     /* Here we need the entire value set by above routine, not just top 0x1FF mask! */
     int16_t sprite_x1 = output->get_x();
-    int16_t sprite_x2 = sprite_x1 + width;
+    { int16_t sprite_x2 = sprite_x1 + width;
     int16_t sprite_y1 = output->get_y();
     int16_t sprite_y2 = sprite_y1 + height;
 
@@ -767,7 +767,7 @@ void OSprites::do_sprite(oentry* input)
     /* ------------------------------------------------------------------------- */
     output->set_pitch(roms.rom0p->read8(src_offsets + 5) << 1);
     output->set_priority(input->shadow << 4); /* todo: where does this get set? */
-}
+ } } }}
 
 /* Hide Input And Output Entry */
 void OSprites::hide_hwsprite(oentry* input, osprite* output)

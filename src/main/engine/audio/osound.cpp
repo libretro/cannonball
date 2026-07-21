@@ -306,7 +306,7 @@ void OSound::new_command()
     {
         chan_ram[CHANNEL_YM_FX1] = 0;
 
-        uint16_t adr = YM_LEVEL_CMDS2;
+        { uint16_t adr = YM_LEVEL_CMDS2;
 
         /* Send four level commands */
         { uint8_t i; for (i = 0; i < 4; i++)
@@ -315,7 +315,7 @@ void OSound::new_command()
             uint8_t val = roms.z80.read8(&adr);
             fm_write_reg(reg, val);
         } }
-    }
+     }}
 
     /* Clear channel memory area used for internal format of PCM sound data */
     { int16_t i; for (i = CHANNEL_PCM_FX1; i < CHANNEL_YM_FX1; i++)
@@ -436,7 +436,7 @@ void OSound::process_channel(uint16_t chan_id)
 
     /* 0xF9:   */
     uint8_t reg;
-    uint8_t chan_index = chan[CH_FM_FLAGS] & 7;
+    { uint8_t chan_index = chan[CH_FM_FLAGS] & 7;
 
     /* Use Phase and Amplitude Modulation Sensitivity Table? */
     if (chan[CH_FM_PHASETBL])
@@ -478,7 +478,7 @@ void OSound::process_channel(uint16_t chan_id)
 
     /* Turn modulator and carry channels off */
     fm_write_reg_c(chan[CH_FLAGS], 8, chan_index | 0x78);
-}
+ }}
 
 /* Process Channel Section */
 /* */
@@ -1081,7 +1081,7 @@ void OSound::ym_set_levels()
 
     /* FM Sound Effects: Write fewer levels */
     uint8_t entries = (chan_ram[CHANNEL_YM_FX1] & BIT_7) ? 28 : 32;
-    uint16_t adr = YM_LEVEL_CMDS1;
+    { uint16_t adr = YM_LEVEL_CMDS1;
 
     /* Write Level Info */
     { uint8_t i; for (i = 0; i < entries; i++)
@@ -1090,7 +1090,7 @@ void OSound::ym_set_levels()
         uint8_t val = roms.z80.read8(&adr);
         fm_write_reg(reg, val);
     } }
-}
+ }}
 
 const static uint16_t FM_DATA_TABLE[] =
 {
@@ -1144,9 +1144,9 @@ void OSound::ym_load_patch(uint8_t* chan)
     if (!chan[CH_FM_BLOCK])
         return;
 
-    uint16_t adr = ym_lookup_data(chan[CH_COMMAND], 3, chan[CH_FM_BLOCK]); /* Use Routine 3. */
+    { uint16_t adr = ym_lookup_data(chan[CH_COMMAND], 3, chan[CH_FM_BLOCK]); /* Use Routine 3. */
     fm_write_block(chan[CH_FLAGS], adr, chan[CH_FM_FLAGS] & 7);
-}
+ }}
 
 /* Source: 0xAAA */
 uint16_t OSound::ym_lookup_data(uint8_t cmd, uint8_t offset, uint8_t block)
@@ -1221,9 +1221,9 @@ void OSound::ym_end_track(uint8_t* chan)
     if (!block)
         return;
 
-    uint16_t adr = ym_lookup_data(chan[CH_COMMAND], 3, block);
+    { uint16_t adr = ym_lookup_data(chan[CH_COMMAND], 3, block);
     fm_write_block(chan[CH_FLAGS], adr, chan[CH_FM_FLAGS] & 7);
-}
+ }}
 
 /* Use Phase and Amplitude Modulation Sensitivity Table */
 /* Enabled with FM_PHASETBL flag. */
@@ -1255,11 +1255,11 @@ void OSound::read_mod_table(uint8_t* chan)
         else
         {
             chan[CH_FM_PHASEOFF]++;
-            uint8_t carry = (table_entry < 0xFC) ? 2 : 0;
+            { uint8_t carry = (table_entry < 0xFC) ? 2 : 0;
             /* rotate table_entry left through 9-bits twice */
             chan[CH_FM_PHASE_AMP] = ((table_entry << 2) + carry) + ((table_entry & 0x80) >> 7);
             return;
-        }
+         }}
     }
 }
 
@@ -1275,14 +1275,14 @@ void OSound::call_adr(uint8_t* chan)
     pos++;
 
     chan[CH_MEM_OFFSET]--;
-    uint8_t offset = chan[CH_MEM_OFFSET];
+    { uint8_t offset = chan[CH_MEM_OFFSET];
     chan[CH_MEM_OFFSET]--;
 
     chan[offset]   = pos >> 8;
     chan[offset-1] = pos & 0xFF;
 
     pos = value - 1;
-}
+ }}
 
 /* ---------------------------------------------------------------------------- */
 /*                                ENGINE TONE CODE  */
@@ -1714,7 +1714,7 @@ void OSound::engine_set_pitch(uint16_t& pos, uint8_t* pcm)
     if (bc & 0xFF00)
         bc = (bc & 0xFF00) | 0xFF;
 
-    uint16_t pitch = roms.z80.read8(pos);
+    { uint16_t pitch = roms.z80.read8(pos);
 
     /*std::cout << std::hex << pos << std::endl; */
 
@@ -1731,7 +1731,7 @@ void OSound::engine_set_pitch(uint16_t& pos, uint8_t* pcm)
         pcm[0x7] = (uint8_t) pitch;
     else
         pcm[0x7] = (uint8_t) pitch + 3;
-}
+ }}
 
 /* Mute an engine channel */
 /* Source: 0x7639 */
@@ -1779,7 +1779,7 @@ void OSound::engine_set_pan(uint16_t& pos, uint8_t* chan, uint8_t* pcm)
     uint16_t pitch = r16(chan + CH_ENGINES_PITCH_L) >> 1;
     pitch += roms.z80.read8(++pos);
 
-    uint16_t vol = (chan[CH_ENGINES_VOL1] * pitch) >> 6;
+    { uint16_t vol = (chan[CH_ENGINES_VOL1] * pitch) >> 6;
 
     if (vol > 0x3F)
         vol = 0x3F;
@@ -1799,7 +1799,7 @@ void OSound::engine_set_pan(uint16_t& pos, uint8_t* chan, uint8_t* pcm)
         pcm[0x2] = (uint8_t) vol >> 1; /* left */
         pcm[0x3] = (uint8_t) vol;      /* right; */
     }
-}
+ }}
 
 /* Read Engine Data & Store the engine pitch and volume to PCM Channel RAM */
 /* Source: 0x778D */
@@ -1828,7 +1828,7 @@ void OSound::traffic_process()
     if ((engine_counter & 1) == 0)
         return;
 
-    uint16_t pcm_adr = 0x60; /* Channel 13: PCM Channel RAM Address */
+    { uint16_t pcm_adr = 0x60; /* Channel 13: PCM Channel RAM Address */
 
     /* Iterate PCM Channels 13 to 16 */
     for (engine_channel = 4; engine_channel > 0; engine_channel--)
@@ -1837,7 +1837,7 @@ void OSound::traffic_process()
         pcm_adr += 0x8; /* Advance to next channel */
     }
 
-}
+ }}
 
 /* Process Single Channel Of Traffic Sounds */
 /* Source: 0x7B1F */
@@ -1961,7 +1961,7 @@ void OSound::traffic_set_vol(uint8_t* pcm)
     if (!vol_entry)
         return;
 
-    uint16_t multiply = TRAFFIC_VOL_MULTIPLY + vol_entry - 1;
+    { uint16_t multiply = TRAFFIC_VOL_MULTIPLY + vol_entry - 1;
 
     /* Set traffic volume multiplier */
     pcm[0x83] = roms.z80.read8(multiply);
@@ -1970,7 +1970,7 @@ void OSound::traffic_set_vol(uint8_t* pcm)
         pcm[0x82] &= ~BIT_3; /* Disable Traffic Sound */
     else
         pcm[0x82] |= BIT_3;  /* Enable Traffic Sound */
-}
+ }}
 
 /* Traffic Panning Indexes are as follows: */
 /* 0 = Both */

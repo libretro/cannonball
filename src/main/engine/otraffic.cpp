@@ -297,7 +297,7 @@ void OTraffic::tick_spawned_sprite(oentry* sprite)
             return;
         }
 
-        int16_t x_diff = sprite->xw1 + oinitengine.car_x_pos - (oroad.road_width >> 16); /* d1 */
+        { int16_t x_diff = sprite->xw1 + oinitengine.car_x_pos - (oroad.road_width >> 16); /* d1 */
         int16_t x_diff_abs = x_diff < 0 ? -x_diff : x_diff; /* d0 */
 
         if (x_diff_abs >= 0xA0)
@@ -319,7 +319,7 @@ void OTraffic::tick_spawned_sprite(oentry* sprite)
     
         if (!config.engine.new_attract)
             ai_traffic |= sprite->traffic_proximity;
-    }
+     }}
 
     move_spawned_sprite(sprite);
 }
@@ -417,7 +417,7 @@ void OTraffic::update_props(oentry* sprite)
 
     sprite->z += z_adjust;
     
-    int16_t z16 = sprite->z >> 16;
+    { int16_t z16 = sprite->z >> 16;
 
     /* Disable Traffic Object */
     if (z16 <= 0)
@@ -454,7 +454,7 @@ void OTraffic::update_props(oentry* sprite)
 
     /* Set Screen X */
     int16_t* road_x = (sprite->control & OSprites::TRAFFIC_RHS) ? oroad.road1_h : oroad.road0_h;
-    int32_t x = (sprite->xw1 * z16) >> 9;
+    { int32_t x = (sprite->xw1 * z16) >> 9;
     sprite->x = x + road_x[z16];
 
     if (z16 <= 8)
@@ -492,7 +492,7 @@ void OTraffic::update_props(oentry* sprite)
 
     x = (x >> 2) + (sprite->xw1 >> 2);
     
-    int8_t traffic_frame = 0;
+    { int8_t traffic_frame = 0;
     int32_t xabs = x < 0 ? -x : x;
 
     if (xabs < 0x10)
@@ -520,13 +520,13 @@ void OTraffic::update_props(oentry* sprite)
     
     sprite->pal_src = roms.rom0p->read8(outrun.adr.traffic_props + sprite->type + 4) + traffic_pal_cycle;
 
-    int16_t traffic_type = (roms.rom0p->read8(outrun.adr.traffic_props + sprite->type + 7) << 5) + (traffic_frame << 2) + incline;
+    { int16_t traffic_type = (roms.rom0p->read8(outrun.adr.traffic_props + sprite->type + 7) << 5) + (traffic_frame << 2) + incline;
     sprite->addr = roms.rom0p->read32(outrun.adr.traffic_data + traffic_type);
 
     osprites.map_palette(sprite);
     traffic_speed_total += sprite->traffic_speed;
     osprites.do_spr_order_shadows(sprite);
-}
+ } } } }}
 
 void OTraffic::set_zoom_lookup(oentry* sprite)
 {
@@ -594,10 +594,10 @@ void OTraffic::set_max_traffic()
             5, 6, 7, 8, 8, /* Very Hard Traffic */
         };
 
-        int dip_traffic = config.engine.disable_traffic ? 3 : config.engine.dip_traffic;
-        uint8_t index = (dip_traffic * 5) + (oroad.stage_lookup_off / 8);
+        { int dip_traffic = config.engine.disable_traffic ? 3 : config.engine.dip_traffic;
+        { uint8_t index = (dip_traffic * 5) + (oroad.stage_lookup_off / 8);
         max_traffic = MAX_TRAFFIC[index];
-    }
+     } }}
     else
     {
         max_traffic = outrun.custom_traffic;
@@ -637,7 +637,7 @@ void OTraffic::traffic_logic()
     }
        
     oentry* first = 0;
-    uint8_t index = 0;
+    { uint8_t index = 0;
     uint16_t spr_index = osprites.spr_cnt_shadow;
 
     /* Find First Traffic Entry. Note we use the hardware sprite list here to extract the original object. */
@@ -672,7 +672,7 @@ void OTraffic::traffic_logic()
             traffic_adr[spawned++] = next;
             next->traffic_proximity = 0;
 
-            uint16_t z16 = first->z >> 16;
+            { uint16_t z16 = first->z >> 16;
 
             if (z16 < 0x40)
             {
@@ -713,11 +713,11 @@ void OTraffic::traffic_logic()
             /* Copy car speed into entry 2 to avoid collision */
             next->traffic_near_speed = first->traffic_speed;
             first = next;
-        }
+         }}
     } }
 
     calculate_avg_speed(spawned);
-}
+ }}
 
 /* Source: 7A6A */
 void OTraffic::calculate_avg_speed(uint16_t c)

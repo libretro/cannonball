@@ -429,7 +429,7 @@ void OMusic::blit_music_select()
         uint32_t tilemap16 = TILEMAP_RAM_16 - 20;
         src_addr = 0;
 
-        const uint16_t rows = tilemap->read16(&src_addr);
+        { const uint16_t rows = tilemap->read16(&src_addr);
         const uint16_t cols = tilemap->read16(&src_addr);
 
         { int y; for (y = 0; y < rows; y++)
@@ -439,7 +439,7 @@ void OMusic::blit_music_select()
                 video.write_tile16(&dst_addr, tilemap->read16(&src_addr)); }
             tilemap16 += 0x80; /* next line of tiles */
         } }
-    }
+     }}
     /* -------------------------------------------------------------------------------------------- */
     /* Blit to Tilemap 16: Original 4:3 Version.  */
     /* -------------------------------------------------------------------------------------------- */

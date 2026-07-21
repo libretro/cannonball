@@ -129,9 +129,9 @@ void OStats::convert_speed_score(uint16_t speed)
         0x1250,
     };
 
-    uint16_t score = CONVERT[(speed >> 4)];
+    { uint16_t score = CONVERT[(speed >> 4)];
     update_score(score);
-}
+ }}
 
 /* Update In-Game Score. Adds Value To Overall Score. */
 /* */
