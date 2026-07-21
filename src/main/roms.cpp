@@ -5,7 +5,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include <iostream>
+#include <stdio.h>
 #include <string.h>
 #include <stdint.h>
 #include "roms.hpp"
@@ -143,7 +143,7 @@ bool Roms_load_ym_data(Roms* self, const char* filename)
         }
         else
         {
-            std::cout << "YM Data is too large: " << filename << std::endl;
+            fprintf(stderr, "YM Data is too large: %s\n", filename);
         }
     }
     return false;

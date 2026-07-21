@@ -17,7 +17,6 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include <iostream>
 #include <stdlib.h> /* abs */
 
 #include "utils.hpp"

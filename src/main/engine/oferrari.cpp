@@ -17,6 +17,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdio.h>
 #include "oanimseq.hpp"
 #include "oattractai.hpp"
 #include "obonus.hpp"
@@ -1534,7 +1535,7 @@ void OFerrari_convert_revs_speed(OFerrari* self, int32_t new_torque, int32_t &d2
     
     /*if (!new_torque)
     {
-        std::cout << "convert_revs_speed error!" << std::endl;
+        fprintf(stderr, "convert_revs_speed error!\n");
     }*/
 
     const int max_speed = !config.engine.turbo ? MAX_SPEED : (int) (MAX_SPEED * 1.2f);

@@ -86,7 +86,7 @@ static void OSound_traffic_read_data(OSound* self, uint8_t* pcm);
 /*#define UNUSED_WARNINGS 1 */
 
 #ifdef UNUSED_WARNINGS
-#include <iostream>
+#include <stdio.h>
 #endif
 
 
@@ -339,7 +339,7 @@ void OSound_process_command(OSound* self)
 
             #ifdef UNUSED_WARNINGS
             default:
-                std::cout << "Missing command: " << cmd << std::endl;
+                fprintf(stderr, "Missing command: %d\n", cmd);
                 break;
             #endif
         }
@@ -479,10 +479,10 @@ void OSound_process_channel(OSound* self, uint16_t chan_id)
 
     #ifdef UNUSED_WARNINGS
     if (chan[CH_CTRL])
-        std::cout << "process_channel - unimplemented code 0x167" << std::endl;
+        fprintf(stderr, "process_channel - unimplemented code 0x167\n");
 
     if (chan[CH_FLAGS] & BIT_5)
-        std::cout << "process_channel - unimplemented code 0x21A" << std::endl;
+        fprintf(stderr, "process_channel - unimplemented code 0x21A\n");
     #endif
 
     /* 0xF9:   */
@@ -552,14 +552,14 @@ void OSound_process_section(OSound* self, uint8_t* chan)
     /* Not sure, unused? */
     if (chan[CH_FLAGS] & BIT_5)
     {
-        std::cout << "Warning: process_section - unimplemented code 0x36D!" << std::endl;
+        fprintf(stderr, "Warning: process_section - unimplemented code 0x36D!\n");
         return;
     }
 
     /* Is FM Noise Channel? */
     if (chan[CH_FLAGS] & BIT_1)
     {
-        std::cout << "Warning: process_section - unimplemented code 2!" << std::endl;
+        fprintf(stderr, "Warning: process_section - unimplemented code 2!\n");
         return;
     }
     #endif
@@ -709,7 +709,7 @@ void OSound_next_mml_cmd(OSound* self, uint8_t* chan, uint8_t cmd)
         
         #ifdef UNUSED_WARNINGS
         default:
-            std::cout << std::hex << "next_mml_cmd(...) Unsupported command: " << (int16_t) cmd << " : " << (int16_t) (cmd & 0x3F) << std::endl;
+            fprintf(stderr, "next_mml_cmd(...) Unsupported command: %x : %x\n", (int16_t) cmd, (int16_t) (cmd & 0x3F));
             break;
         #endif
     }
@@ -1299,7 +1299,7 @@ void OSound_read_mod_table(OSound* self, uint8_t* chan)
         {
             #ifdef UNUSED_WARNINGS
             /* Missing code here */
-            std::cout<< "read_mod_table: table_entry 0xFC not supported" << std::endl;
+            fprintf(stderr, "read_mod_table: table_entry 0xFC not supported\n");
             #endif
         }
         /* Increment table position */
