@@ -1,4 +1,4 @@
-#include <cstring> /* memcpy */
+#include <string.h> /* memcpy */
 #include "hwvideo/hwroad.hpp"
 #include "globals.hpp"
 #include "frontend/config.hpp"

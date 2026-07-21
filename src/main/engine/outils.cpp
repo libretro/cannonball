@@ -7,12 +7,12 @@
     Copyright Chris White.
     See license.txt for more details.
 ***************************************************************************/
-#include <cstdlib> 
+#include <stdlib.h> 
 #include "engine/outils.hpp"
 #include "engine/ostats.hpp"
 
 #ifdef __PS3__
-#define rand std::rand
+#define rand rand
 #endif
 
 

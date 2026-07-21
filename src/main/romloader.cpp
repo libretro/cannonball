@@ -8,7 +8,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include <cstddef>
+#include <stddef.h>
 #include <string>
 #include <map>
 #include <vector>

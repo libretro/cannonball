@@ -36,7 +36,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include <cstdlib> 
+#include <stdlib.h> 
 #include <time.h>
 
 #include "oattractai.hpp"
@@ -49,7 +49,7 @@ static void OAttractAI_check_road(OAttractAI* self);
 static void OAttractAI_set_steering(OAttractAI* self);
 
 #ifdef __PS3__
-#define srand std::srand
+#define srand srand
 #endif
 
 OAttractAI oattractai;
@@ -79,7 +79,7 @@ void OAttractAI_tick_ai_enhanced(OAttractAI* self)
     if (self->last_stage != ostats.cur_stage)
     {     
         self->last_stage           = ostats.cur_stage;
-        oferrari.sprite_ai_x = std::rand() & 1;     
+        oferrari.sprite_ai_x = rand() & 1;     
     }
 
     /* -------------------------------------------------------------------------------------------- */

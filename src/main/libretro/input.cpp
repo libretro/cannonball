@@ -7,7 +7,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include <cstdlib> /* abs */
+#include <stdlib.h> /* abs */
 #include <string.h>
 #include "input.hpp"
 
@@ -121,7 +121,7 @@ void Input_handle_joy_axis(Input* self, int wheel_axis, int accel_axis, int brak
    /* Remove Dead Zone */
    if (self->wheel_dead)
    {
-       if (std::abs(CENTRE - adjustedw) <= self->wheel_dead)
+       if (abs(CENTRE - adjustedw) <= self->wheel_dead)
            adjustedw = CENTRE;
    }
    self->a_wheel = adjustedw;

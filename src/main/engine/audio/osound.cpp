@@ -14,7 +14,7 @@ TODO:
 
 */
 
-#include <cstring> /* For memset on GCC */
+#include <string.h> /* For memset on GCC */
 #include "engine/audio/osound.hpp"
 
 static uint8_t OSound_pcm_r(OSound* self, uint16_t adr);
@@ -76,7 +76,7 @@ static void OSound_traffic_note_changes(OSound* self, uint8_t new_vol, uint8_t* 
 static void OSound_traffic_read_data(OSound* self, uint8_t* pcm);
 
 #ifdef __PS3__
-#define memcpy std::memcpy
+#define memcpy memcpy
 #endif
 
 /* Use YM2151 Timing */

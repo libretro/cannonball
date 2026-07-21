@@ -1,9 +1,9 @@
-#include <cstring> /* memcpy */
+#include <string.h> /* memcpy */
 #include "globals.hpp"
 #include "romloader.hpp"
 #include "hwvideo/hwtiles.hpp"
 #include "frontend/config.hpp"
-#include <cstring>
+#include <string.h>
 
 static void hwtiles_render8x8_tile_mask_lores(hwtiles* self, uint16_t *buf,
         uint16_t nTileNumber, 

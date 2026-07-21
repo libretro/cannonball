@@ -6,7 +6,7 @@
 ***************************************************************************/
 
 #include <iostream>
-#include <cstring>
+#include <string.h>
 #include <stdint.h>
 #include "roms.hpp"
 

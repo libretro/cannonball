@@ -18,7 +18,7 @@
 ***************************************************************************/
 
 #include <iostream>
-#include <cstdlib> /* abs */
+#include <stdlib.h> /* abs */
 
 #include "utils.hpp"
 
@@ -467,7 +467,7 @@ static void OOutputs_calibrate_centre(OOutputs* self, int16_t input_motor, uint8
     self->limit_left  = d0 - 6;
     self->limit_right = -d1 + 6;
     
-    if (std::abs(self->motor_centre_pos - 0x80) > 0x20)
+    if (abs(self->motor_centre_pos - 0x80) > 0x20)
     {
         OHud_blit_text_new(&ohud, self->col2, 14, "FAIL DIST", GREY);
         self->motor_enabled = false;
@@ -697,7 +697,7 @@ static void OOutputs_car_moving(OOutputs* self, const int MODE)
 /* Source: 0xE822 */
 static void OOutputs_car_stationary(OOutputs* self)
 {
-    int16_t change = std::abs(self->motor_x_change);
+    int16_t change = abs(self->motor_x_change);
 
     if (change <= 8)
     {
@@ -795,7 +795,7 @@ static void OOutputs_set_value(OOutputs* self, const uint8_t* table, uint8_t ind
 /* Source: 0xE94E */
 static void OOutputs_done(OOutputs* self)
 {
-    if (std::abs(self->motor_x_change) <= 8)
+    if (abs(self->motor_x_change) <= 8)
     {
         self->was_small_change = true;
         self->motor_control    = MOTOR_CENTRE;

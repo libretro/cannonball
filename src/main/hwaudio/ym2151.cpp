@@ -11,8 +11,8 @@
 ***************************************************************************/
 
 #include <stdlib.h>
-#include <cmath>
-#include <cstring>  /* For memset on GCC */
+#include <math.h>
+#include <string.h>  /* For memset on GCC */
 
 #include "hwaudio/ym2151.hpp"
 
@@ -30,10 +30,10 @@ static void YM2151_advance_eg(YM2151* self);
 static void YM2151_advance(YM2151* self);
 
 #ifdef __PS3__
-#define memset std::memset
-#define pow std::pow
-#define floor std::floor
-#define sin std::sin
+#define memset memset
+#define pow pow
+#define floor floor
+#define sin sin
 #define log std::log
 #endif
 
