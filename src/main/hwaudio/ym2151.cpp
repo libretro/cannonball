@@ -414,7 +414,7 @@ static const uint8_t lfo_noise_waveform[256] = {
 
 YM2151::YM2151(float volume, uint32_t clock)
 {
-    sc.volume = volume;  
+    this->volume = volume;
     this->clock = clock;
 }
 
