@@ -50,16 +50,17 @@ typedef struct oanimsprite
 
     /*+0x2C [Word] Animation State */
     int16_t anim_state;
-
-    void init(oentry* s)
-    {
-        sprite = s;
-        sprite->function_holder = -1;
-        anim_addr_curr = 0;
-        anim_addr_next = 0;
-        anim_frame = 0;
-        frame_delay = 0;
-        anim_props = 0;
-        anim_state = 0;
-    }
 } oanimsprite;
+
+static void oanimsprite_init(oanimsprite* self, oentry* s)
+{
+    self->sprite = s;
+        self->sprite->function_holder = -1;
+    self->anim_addr_curr = 0;
+    self->anim_addr_next = 0;
+    self->anim_frame = 0;
+    self->frame_delay = 0;
+    self->anim_props = 0;
+    self->anim_state = 0;
+}
+

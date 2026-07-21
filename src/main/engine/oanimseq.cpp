@@ -72,20 +72,20 @@ void OAnimSeq_init(OAnimSeq* self, oentry* jump_table)
     /* Ferrari & Passenger Animation Setup For Intro */
     /* -------------------------------------------------------------------------------------------- */
     oentry* sprite_ferrari = &jump_table[SPRITE_FERRARI];
-    self->anim_ferrari.init(sprite_ferrari);
+    oanimsprite_init(&self->anim_ferrari, sprite_ferrari);
     self->anim_ferrari.anim_addr_curr = outrun.adr.anim_ferrari_curr;
     self->anim_ferrari.anim_addr_next = outrun.adr.anim_ferrari_next;
     sprite_ferrari->control |= ENABLE;
     sprite_ferrari->draw_props = ANCHOR_BOTTOM;
 
     oentry* sprite_pass1 = &jump_table[SPRITE_PASS1];
-    self->anim_pass1.init(sprite_pass1);
+    oanimsprite_init(&self->anim_pass1, sprite_pass1);
     self->anim_pass1.anim_addr_curr = outrun.adr.anim_pass1_curr;
     self->anim_pass1.anim_addr_next = outrun.adr.anim_pass1_next;
     sprite_pass1->draw_props = ANCHOR_BOTTOM;
 
     oentry* sprite_pass2 = &jump_table[SPRITE_PASS2];
-    self->anim_pass2.init(sprite_pass2);
+    oanimsprite_init(&self->anim_pass2, sprite_pass2);
     self->anim_pass2.anim_addr_curr = outrun.adr.anim_pass2_curr;
     self->anim_pass2.anim_addr_next = outrun.adr.anim_pass2_next;
     sprite_pass2->draw_props = ANCHOR_BOTTOM;
@@ -97,14 +97,14 @@ void OAnimSeq_init(OAnimSeq* self, oentry* jump_table)
     self->seq_pos = 0;
     self->ferrari_stopped = false;
 
-    self->anim_obj1.init(&jump_table[SPRITE_CRASH]);
-    self->anim_obj2.init(&jump_table[SPRITE_CRASH_SHADOW]);
-    self->anim_obj3.init(&jump_table[SPRITE_SHADOW]);
-    self->anim_obj4.init(&jump_table[SPRITE_CRASH_PASS1]);
-    self->anim_obj5.init(&jump_table[SPRITE_CRASH_PASS1_S]);
-    self->anim_obj6.init(&jump_table[SPRITE_CRASH_PASS2]);
-    self->anim_obj7.init(&jump_table[SPRITE_CRASH_PASS2_S]);
-    self->anim_obj8.init(&jump_table[SPRITE_FLAG]);
+    oanimsprite_init(&self->anim_obj1, &jump_table[SPRITE_CRASH]);
+    oanimsprite_init(&self->anim_obj2, &jump_table[SPRITE_CRASH_SHADOW]);
+    oanimsprite_init(&self->anim_obj3, &jump_table[SPRITE_SHADOW]);
+    oanimsprite_init(&self->anim_obj4, &jump_table[SPRITE_CRASH_PASS1]);
+    oanimsprite_init(&self->anim_obj5, &jump_table[SPRITE_CRASH_PASS1_S]);
+    oanimsprite_init(&self->anim_obj6, &jump_table[SPRITE_CRASH_PASS2]);
+    oanimsprite_init(&self->anim_obj7, &jump_table[SPRITE_CRASH_PASS2_S]);
+    oanimsprite_init(&self->anim_obj8, &jump_table[SPRITE_FLAG]);
 }
 
 /* ------------------------------------------------------------------------------------------------ */

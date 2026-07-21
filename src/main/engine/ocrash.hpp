@@ -67,8 +67,8 @@ typedef struct OCrash
     int16_t spin_pass_frame;
     int8_t crash_type;
     int16_t crash_delay;
-    void (*function_pass1)(OCrash* self, oentry*);
-    void (*function_pass2)(OCrash* self, oentry*);
+    void (*function_pass1)(struct OCrash* self, oentry*);
+    void (*function_pass2)(struct OCrash* self, oentry*);
 } OCrash;
 
 extern OCrash ocrash;

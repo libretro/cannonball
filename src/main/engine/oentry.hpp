@@ -153,37 +153,39 @@ typedef struct oentry
     int16_t pass_props;
 
 	/* Initalize to default values */
-	void init(uint8_t i)
-	{
-        control = 0;
-        jump_index = i;
-		function_holder = -1;
-		id = 0;
-		shadow = 3;
-		zoom = 0;
-		draw_props = 0;
-		pal_src = 0;
-		pal_dst = 0;
-		x = 0;
-		y = 0;
-		width = 0;
-		priority = 0;
-		dst_index = 0;
-		addr = 0;
-		road_priority = 0;
-		reload = 0;
-		counter = 0;
-        xw1 = 0;
-        z = 0;
-        traffic_speed = 0;
-        type = 0;
-        xw2 = 0;
-        traffic_proximity = 0;
-        traffic_fx = 0;
-        traffic_orig_speed = 0;
-        traffic_near_speed = 0;
-        yw = 0;
-        pass_props = 0;
-	}
 } oentry;
+
+static void oentry_init(oentry* self, uint8_t i)
+{
+    self->control = 0;
+    self->jump_index = i;
+    self->function_holder = -1;
+    self->id = 0;
+    self->shadow = 3;
+    self->zoom = 0;
+    self->draw_props = 0;
+    self->pal_src = 0;
+    self->pal_dst = 0;
+    self->x = 0;
+    self->y = 0;
+    self->width = 0;
+    self->priority = 0;
+    self->dst_index = 0;
+    self->addr = 0;
+    self->road_priority = 0;
+    self->reload = 0;
+    self->counter = 0;
+    self->xw1 = 0;
+    self->z = 0;
+    self->traffic_speed = 0;
+    self->type = 0;
+    self->xw2 = 0;
+    self->traffic_proximity = 0;
+    self->traffic_fx = 0;
+    self->traffic_orig_speed = 0;
+    self->traffic_near_speed = 0;
+    self->yw = 0;
+    self->pass_props = 0;
+}
+
 

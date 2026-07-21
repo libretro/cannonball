@@ -184,7 +184,7 @@ static const uint8_t MODE_CONT     = 2;
 
 typedef struct Outrun
 {
-    OOutputs* outputs;
+    struct OOutputs* outputs;
     bool freeze_timer;
     uint8_t cannonball_mode;
     uint8_t custom_traffic;

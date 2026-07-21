@@ -43,7 +43,7 @@ void OLogo_enable(OLogo* self, int16_t y)
     /* Enable block of sprites */
     { int i; for (i = self->entry_start; i < self->entry_start + 7; i++)
     {
-        osprites.jump_table[i].init(i);
+        oentry_init(&osprites.jump_table[i], i);
     } }
 
     self->palm_frames[0] = outrun.adr.sprite_logo_palm1;

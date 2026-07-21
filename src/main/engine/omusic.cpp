@@ -96,7 +96,7 @@ void OMusic_enable(OMusic* self)
     self->entry_start = SPRITE_ENTRIES - 0x10;    
     { int i; for (i = self->entry_start; i < self->entry_start + 5; i++)
     {
-        osprites.jump_table[i].init(i);
+        oentry_init(&osprites.jump_table[i], i);
     } }
 
     OMusic_setup_sprite1(self);

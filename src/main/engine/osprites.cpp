@@ -50,16 +50,16 @@ void OSprites_init(OSprites* self)
         osprite_init(&(self->sprite_entries[i])); }
 
     { uint8_t i; for (i = 0; i < SPRITE_ENTRIES; i++)
-        self->jump_table[i].init(i); }
+        oentry_init(&self->jump_table[i], i); }
 
     /* Ferrari + Passenger Sprites */
-    self->jump_table[SPRITE_FERRARI].init(SPRITE_FERRARI);        /* Ferrari */
-    self->jump_table[SPRITE_PASS1].init(SPRITE_PASS1);
-    self->jump_table[SPRITE_PASS2].init(SPRITE_PASS2);
-    self->jump_table[SPRITE_SHADOW].init(SPRITE_SHADOW);          /* Shadow Settings */
+    oentry_init(&self->jump_table[SPRITE_FERRARI], SPRITE_FERRARI);        /* Ferrari */
+    oentry_init(&self->jump_table[SPRITE_PASS1], SPRITE_PASS1);
+    oentry_init(&self->jump_table[SPRITE_PASS2], SPRITE_PASS2);
+    oentry_init(&self->jump_table[SPRITE_SHADOW], SPRITE_SHADOW);          /* Shadow Settings */
     self->jump_table[SPRITE_SHADOW].shadow = 7;
-    self->jump_table[SPRITE_SMOKE1].init(SPRITE_SMOKE1);
-    self->jump_table[SPRITE_SMOKE2].init(SPRITE_SMOKE2);
+    oentry_init(&self->jump_table[SPRITE_SMOKE1], SPRITE_SMOKE1);
+    oentry_init(&self->jump_table[SPRITE_SMOKE2], SPRITE_SMOKE2);
 
     OFerrari_init(&oferrari, &self->jump_table[SPRITE_FERRARI], &self->jump_table[SPRITE_PASS1], &self->jump_table[SPRITE_PASS2], &self->jump_table[SPRITE_SHADOW]);
     
@@ -69,7 +69,7 @@ void OSprites_init(OSprites* self)
 
     { uint8_t i; for (i = SPRITE_TRAFF1; i <= SPRITE_TRAFF8; i++)
     {
-        self->jump_table[i].init(i);      
+        oentry_init(&self->jump_table[i], i);      
         self->jump_table[i].control |= SHADOW;
         self->jump_table[i].addr = outrun.adr.sprite_porsche; /* Initial offset of traffic sprites. Will be changed. */
     } }
@@ -80,7 +80,7 @@ void OSprites_init(OSprites* self)
 
     { uint8_t i; for (i = SPRITE_CRASH; i <= SPRITE_CRASH_PASS2_S; i++)
     {
-        self->jump_table[i].init(i);
+        oentry_init(&self->jump_table[i], i);
     } }
 
     self->jump_table[SPRITE_CRASH_PASS1].draw_props = ANCHOR_BOTTOM;
@@ -110,7 +110,7 @@ void OSprites_init(OSprites* self)
     /* Animation Sequence Sprites */
     /* ------------------------------------------------------------------------ */
 
-    self->jump_table[SPRITE_FLAG].init(SPRITE_FLAG);
+    oentry_init(&self->jump_table[SPRITE_FLAG], SPRITE_FLAG);
     OAnimSeq_init(&oanimseq, self->jump_table);
     
     self->seg_pos             = 0;
