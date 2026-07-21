@@ -476,11 +476,11 @@ static void Outrun_main_switch(Outrun* self)
                 OHud_draw_lap_timer(&ohud, 0x110554, self->ttrial.best_lap, self->ttrial.best_lap[2]);
 
                 OHud_blit_text_new(&ohud, 9,  14, "OVERTAKES          - ", GREY);
-                OHud_blit_text_new(&ohud, 31, 14, Utils_to_string((int) self->ttrial.overtakes).c_str(), GREEN);
+                OHud_blit_text_new(&ohud, 31, 14, Utils_to_string((int) self->ttrial.overtakes), GREEN);
                 OHud_blit_text_new(&ohud, 9,  16, "VEHICLE COLLISIONS - ", GREY);
-                OHud_blit_text_new(&ohud, 31, 16, Utils_to_string((int) self->ttrial.vehicle_cols).c_str(), GREEN);
+                OHud_blit_text_new(&ohud, 31, 16, Utils_to_string((int) self->ttrial.vehicle_cols), GREEN);
                 OHud_blit_text_new(&ohud, 9,  18, "CRASHES            - ", GREY);
-                OHud_blit_text_new(&ohud, 31, 18, Utils_to_string((int) self->ttrial.crashes).c_str(), GREEN);
+                OHud_blit_text_new(&ohud, 31, 18, Utils_to_string((int) self->ttrial.crashes), GREEN);
             }
             OSoundInt_queue_sound(&osoundint, SOUND_NEW_COMMAND);
             self->game_state = GS_GAMEOVER;

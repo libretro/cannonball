@@ -6,6 +6,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <vector>
@@ -919,7 +920,7 @@ void Menu_refresh_menu(Menu* self)
             else if (SELECTED(ENTRY_WIDESCREEN))
                 Menu_set_menu_text(self, ENTRY_WIDESCREEN, config.video.widescreen ? "ON" : "OFF");
             else if (SELECTED(ENTRY_SCALE))
-                Menu_set_menu_text(self, ENTRY_SCALE, Utils_to_string(config.video.scale) + "X");
+                { char vb[16]; snprintf(vb, sizeof(vb), "%dX", config.video.scale); Menu_set_menu_text(self, ENTRY_SCALE, vb); }
             else if (SELECTED(ENTRY_HIRES))
                 Menu_set_menu_text(self, ENTRY_HIRES, config.video.hires ? "ON" : "OFF");
             else if (SELECTED(ENTRY_FPS))
@@ -931,7 +932,7 @@ void Menu_refresh_menu(Menu* self)
                 Menu_set_menu_text(self, ENTRY_FPS, s);
             }
             else if (SELECTED(ENTRY_SCANLINES))
-                Menu_set_menu_text(self, ENTRY_SCANLINES, config.video.scanlines ? Utils_to_string(config.video.scanlines) +"%": "OFF");
+                { char vb[16]; if (config.video.scanlines) snprintf(vb, sizeof(vb), "%d%%", config.video.scanlines); else strcpy(vb, "OFF"); Menu_set_menu_text(self, ENTRY_SCANLINES, vb); }
         }
         else if (self->menu_selected == self->menu_sound)
         {

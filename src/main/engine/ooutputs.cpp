@@ -188,7 +188,7 @@ bool OOutputs_diag_motor(OOutputs* self, int16_t input_motor, uint8_t hw_motor_l
 
     /* Print Motor Position & Limit Switch */
     OHud_blit_text_new(&ohud, self->col2, 16, "  H", 0x80);
-    OHud_blit_text_new(&ohud, self->col2, 16, Utils_to_hex_string(input_motor).c_str(), 0x80);
+    OHud_blit_text_new(&ohud, self->col2, 16, Utils_to_hex_string(input_motor), 0x80);
     OHud_blit_text_new(&ohud, self->col2, 18, (hw_motor_limit & BIT_5) ? "OFF" : "ON ", 0x80);
     OHud_blit_text_new(&ohud, self->col2, 19, (hw_motor_limit & BIT_4) ? "OFF" : "ON ", 0x80);
     OHud_blit_text_new(&ohud, self->col2, 20, (hw_motor_limit & BIT_3) ? "OFF" : "ON ", 0x80);
@@ -213,7 +213,7 @@ static void OOutputs_diag_left(OOutputs* self, int16_t input_motor, uint8_t hw_m
     else if (hw_motor_limit & BIT_3)
     {
         OHud_blit_text_new(&ohud, self->col2, 9, "  H", 0x80);
-        OHud_blit_text_new(&ohud, self->col2, 9, Utils_to_hex_string(input_motor).c_str(), 0x80);
+        OHud_blit_text_new(&ohud, self->col2, 9, Utils_to_hex_string(input_motor), 0x80);
     }
     else
         OHud_blit_text_new(&ohud, self->col2, 9, "FAIL 2", 0x80);
@@ -244,7 +244,7 @@ static void OOutputs_diag_right(OOutputs* self, int16_t input_motor, uint8_t hw_
     else if (hw_motor_limit & BIT_5)
     {
         OHud_blit_text_new(&ohud, self->col2, 11, "  H", 0x80);
-        OHud_blit_text_new(&ohud, self->col2, 11, Utils_to_hex_string(input_motor).c_str(), 0x80);
+        OHud_blit_text_new(&ohud, self->col2, 11, Utils_to_hex_string(input_motor), 0x80);
     }
     else
     {
@@ -276,7 +276,7 @@ static void OOutputs_diag_centre(OOutputs* self, int16_t input_motor, uint8_t hw
     else
     {
         OHud_blit_text_new(&ohud, self->col2, 13, "  H", 0x80);
-        OHud_blit_text_new(&ohud, self->col2, 13, Utils_to_hex_string((input_motor + self->motor_centre_pos) >> 1).c_str(), 0x86);
+        OHud_blit_text_new(&ohud, self->col2, 13, Utils_to_hex_string((input_motor + self->motor_centre_pos) >> 1), 0x86);
         self->hw_motor_control = MOTOR_OFF; /* switch off */
         self->counter          = 32;
         self->motor_state      = OO_STATE_DONE;
@@ -374,7 +374,7 @@ static void OOutputs_calibrate_left(OOutputs* self, int16_t input_motor, uint8_t
     /* Left Limit Reached */
     else if (hw_motor_limit & BIT_3)
     {
-        OHud_blit_text_new(&ohud, self->col2, 10, Utils_to_hex_string(input_motor).c_str(), 0x80);
+        OHud_blit_text_new(&ohud, self->col2, 10, Utils_to_hex_string(input_motor), 0x80);
         self->motor_centre_pos = 0;
         self->limit_left       = input_motor; /* Set Left Limit */
         self->hw_motor_control = MOTOR_LEFT;  /* Move Left */
@@ -418,7 +418,7 @@ static void OOutputs_calibrate_right(OOutputs* self, int16_t input_motor, uint8_
     /* Right Limit Reached */
     else if (hw_motor_limit & BIT_5)
     {
-        OHud_blit_text_new(&ohud, self->col2, 12, Utils_to_hex_string(input_motor).c_str(), 0x80);
+        OHud_blit_text_new(&ohud, self->col2, 12, Utils_to_hex_string(input_motor), 0x80);
         self->limit_right   = input_motor; /* Set Right Limit */
         self->motor_state   = OO_STATE_CENTRE;
         self->counter       = COUNTER_RESET;
@@ -473,7 +473,7 @@ static void OOutputs_calibrate_centre(OOutputs* self, int16_t input_motor, uint8
     }
     else if (!fail)
     {
-        OHud_blit_text_new(&ohud, self->col2, 14, Utils_to_hex_string(self->motor_centre_pos).c_str(), 0x80);
+        OHud_blit_text_new(&ohud, self->col2, 14, Utils_to_hex_string(self->motor_centre_pos), 0x80);
     }
 
     OHud_blit_text_new(&ohud, 13, 17, "TESTS COMPLETE!", 0x82);
