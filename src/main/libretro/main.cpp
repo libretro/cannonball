@@ -1037,10 +1037,7 @@ bool retro_load_game(const struct retro_game_info *info)
    }
 
    config_init();
-   config.data.res_path = std::string(rom_path) + "res/";
-
-   Config_load_custom_music(&config, 
-         config.data.res_path + "config.xml");
+   snprintf(config.data.res_path, sizeof(config.data.res_path), "%sres/", rom_path);
 
    update_variables(true);
 

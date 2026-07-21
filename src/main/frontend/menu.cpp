@@ -600,8 +600,8 @@ static void Menu_tick_menu(Menu* self)
         {
             if (SELECTED(ENTRY_FULLSCREEN))
             {
-                if (++config.video.mode > video_settings_t::MODE_STRETCH)
-                    config.video.mode = video_settings_t::MODE_WINDOW;
+                if (++config.video.mode > MODE_STRETCH)
+                    config.video.mode = MODE_WINDOW;
                 Menu_restart_video(self);
             }
             else if (SELECTED(ENTRY_WIDESCREEN))
@@ -702,8 +702,8 @@ static void Menu_tick_menu(Menu* self)
         {
             if (SELECTED(ENTRY_GEAR))
             {
-                if (++config.controls.gear > config.controls.GEAR_AUTO)
-                    config.controls.gear = config.controls.GEAR_BUTTON;
+                if (++config.controls.gear > GEAR_AUTO)
+                    config.controls.gear = GEAR_BUTTON;
                 lr_options_set_frontend_variable_int(&config.controls.gear);
             }
             else if (SELECTED(ENTRY_ANALOG))
@@ -911,9 +911,9 @@ void Menu_refresh_menu(Menu* self)
         {
             if (SELECTED(ENTRY_FULLSCREEN))
             {
-                if (config.video.mode == video_settings_t::MODE_WINDOW)       s = "OFF";
-                else if (config.video.mode == video_settings_t::MODE_FULL)    s = "ON";
-                else if (config.video.mode == video_settings_t::MODE_STRETCH) s = "STRETCH";
+                if (config.video.mode == MODE_WINDOW)       s = "OFF";
+                else if (config.video.mode == MODE_FULL)    s = "ON";
+                else if (config.video.mode == MODE_STRETCH) s = "STRETCH";
                 Menu_set_menu_text(self, ENTRY_FULLSCREEN, s);
             }
             else if (SELECTED(ENTRY_WIDESCREEN))
@@ -948,10 +948,10 @@ void Menu_refresh_menu(Menu* self)
         {
             if (SELECTED(ENTRY_GEAR))
             {
-                if (config.controls.gear == config.controls.GEAR_BUTTON)        s = "MANUAL";
-                else if (config.controls.gear == config.controls.GEAR_PRESS)    s = "MANUAL CABINET";
-                else if (config.controls.gear == config.controls.GEAR_SEPARATE) s = "MANUAL 2 BUTTONS";
-                else if (config.controls.gear == config.controls.GEAR_AUTO)     s = "AUTOMATIC";
+                if (config.controls.gear == GEAR_BUTTON)        s = "MANUAL";
+                else if (config.controls.gear == GEAR_PRESS)    s = "MANUAL CABINET";
+                else if (config.controls.gear == GEAR_SEPARATE) s = "MANUAL 2 BUTTONS";
+                else if (config.controls.gear == GEAR_AUTO)     s = "AUTOMATIC";
                 Menu_set_menu_text(self, ENTRY_GEAR, s);
             }
             else if (SELECTED(ENTRY_ANALOG))
@@ -1032,7 +1032,7 @@ static void Menu_set_menu_text(Menu* self, std::string s1, std::string s2)
 
 static void Menu_redefine_keyboard(Menu* self)
 {
-    if (self->redef_state == 7 && config.controls.gear != config.controls.GEAR_SEPARATE) /* Skip redefine of second gear press */
+    if (self->redef_state == 7 && config.controls.gear != GEAR_SEPARATE) /* Skip redefine of second gear press */
         self->redef_state++;
 
     switch (self->redef_state)
@@ -1074,7 +1074,7 @@ static void Menu_redefine_keyboard(Menu* self)
 
 static void Menu_redefine_joystick(Menu* self)
 {
-    if (self->redef_state == 3 && config.controls.gear != config.controls.GEAR_SEPARATE) /* Skip redefine of second gear press */
+    if (self->redef_state == 3 && config.controls.gear != GEAR_SEPARATE) /* Skip redefine of second gear press */
         self->redef_state++;
 
     switch (self->redef_state)

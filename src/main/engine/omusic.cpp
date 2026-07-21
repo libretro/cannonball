@@ -7,6 +7,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdio.h>
 #include "main.hpp"
 #include "engine/oferrari.hpp"
 #include "engine/ohud.hpp"
@@ -113,7 +114,7 @@ void OMusic_enable(OMusic* self)
 
     hwtiles_set_x_clamp(video.tile_layer, CLAMP_CENTRE);
     self->cursor_pos = 1;
-    self->total_tracks = (int)config.sound.music.size();
+    self->total_tracks = (int)config.sound.music_num;
 }
 
 void OMusic_disable(OMusic* self)
@@ -272,23 +273,23 @@ void OMusic_play_music(OMusic* self, int index)
 {
     if (index == -1) index = self->music_selected;
 
-    self->next_track = &config.sound.music.at(index);
+    self->next_track = &config.sound.music[index];
 
     switch (self->next_track->type)
     {
-        case music_t::IS_YM_INT:
+        case IS_YM_INT:
             Audio_clear_wav(&cannonball_audio);
             OSoundInt_queue_sound(&osoundint, self->next_track->cmd);
             break;
 
-        case music_t::IS_YM_EXT:
+        case IS_YM_EXT:
             Audio_clear_wav(&cannonball_audio);
-            Roms_load_ym_data(&roms, (config.data.res_path + self->next_track->filename).c_str());
+            { char mp[600]; snprintf(mp, sizeof(mp), "%s%s", config.data.res_path, self->next_track->filename); Roms_load_ym_data(&roms, mp); }
             OSoundInt_queue_sound(&osoundint, self->next_track->cmd);
             break;
 
-        case music_t::IS_WAV:
-            Audio_load_wav(&cannonball_audio, (config.data.res_path + self->next_track->filename).c_str());
+        case IS_WAV:
+            { char mp[600]; snprintf(mp, sizeof(mp), "%s%s", config.data.res_path, self->next_track->filename); Audio_load_wav(&cannonball_audio, mp); }
             break;
     }
 
@@ -355,7 +356,7 @@ static void OMusic_tick_enhanced(OMusic* self, oentry* fm, oentry* dial, oentry*
         OMusic_set_hand(self, HAND_RIGHT, fm, dial, hand);
 
     self->music_selected = self->cursor_pos;
-    OHud_blit_text_big(&ohud, 11, config.sound.music.at(self->music_selected).title.c_str(), true);
+    OHud_blit_text_big(&ohud, 11, config.sound.music[self->music_selected].title, true);
 }
 
 static void OMusic_set_hand(OMusic* self, short direction, oentry* fm, oentry* dial, oentry* hand)

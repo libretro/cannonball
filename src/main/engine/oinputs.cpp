@@ -148,17 +148,17 @@ void OInputs_do_gear(OInputs* self)
     /* ------------------------------------------------------------------------ */
 
     /* Automatic Gears: Don't do anything */
-    if (config.controls.gear == config.controls.GEAR_AUTO)
+    if (config.controls.gear == GEAR_AUTO)
         return;
 
     else
     {
         /* Manual: Cabinet Shifter */
-        if (config.controls.gear == config.controls.GEAR_PRESS)
+        if (config.controls.gear == GEAR_PRESS)
             self->gear = !(Input_is_pressed(&input, GEAR1) || Input_is_pressed(&input, GEAR2));
 
         /* Manual: Two Separate Buttons for gears */
-        else if (config.controls.gear == config.controls.GEAR_SEPARATE)
+        else if (config.controls.gear == GEAR_SEPARATE)
         {
             if (Input_has_pressed(&input, GEAR1))
                 self->gear = false;

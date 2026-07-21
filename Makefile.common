@@ -81,7 +81,6 @@ SOURCES_CXX := \
 			      $(CORE_DIR)/src/main/hwvideo/hwsprites.cpp \
 			      $(CORE_DIR)/src/main/hwvideo/hwtiles.cpp \
 			      \
-			      $(CORE_DIR)/deps/pugixml/pugixml.cpp \
 			      $(CORE_DIR)/src/main/frontend/config.cpp \
 			      $(CORE_DIR)/src/main/frontend/menu.cpp \
 			      $(CORE_DIR)/src/main/frontend/ttrial.cpp

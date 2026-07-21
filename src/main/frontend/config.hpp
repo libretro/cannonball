@@ -11,33 +11,22 @@
 #pragma once
 
 #include <stdint.h>
-#include <set>
-#include <string>
-#include <vector>
 
 typedef struct data_settings_t
 {
-    std::string res_path;
+    char res_path[512];
 } data_settings_t;
+
+enum { IS_YM_INT = 0, IS_YM_EXT = 1, IS_WAV = 2 };
 
 typedef struct music_t
 {
-    const static int IS_YM_INT = 0;
-    const static int IS_YM_EXT = 1;
-    const static int IS_WAV    = 2;
-
     int type;
     int cmd;
-    std::string title;
-    std::string filename;
+    char title[32];
+    char filename[64];
 } music_t;
 
-typedef struct custom_music_t
-{
-    int enabled;
-    std::string title;
-    std::string filename;
-} custom_music_t;
 
 typedef struct ttrial_settings_t
 {
@@ -52,11 +41,10 @@ typedef struct menu_settings_t
     int road_scroll_speed;
 } menu_settings_t;
 
+enum { MODE_WINDOW = 0, MODE_FULL = 1, MODE_STRETCH = 2 };
+
 typedef struct video_settings_t
 {
-    const static int MODE_WINDOW  = 0;
-    const static int MODE_FULL    = 1;
-    const static int MODE_STRETCH = 2;
 
     int mode;
     int scale;
@@ -77,16 +65,14 @@ typedef struct sound_settings_t
     int preview;
     int fix_samples;
     int music_timer;
-    std::vector<music_t> music;
-    custom_music_t custom_music[4];
+    music_t music[8];
+    int     music_num;
 } sound_settings_t;
+
+enum { GEAR_BUTTON = 0, GEAR_PRESS = 1, GEAR_SEPARATE = 2, GEAR_AUTO = 3 };
 
 typedef struct controls_settings_t
 {
-    const static int GEAR_BUTTON   = 0;
-    const static int GEAR_PRESS    = 1; /* For cabinets */
-    const static int GEAR_SEPARATE = 2; /* Separate button presses */
-    const static int GEAR_AUTO     = 3;
 
     int gear;
     int steer_speed;   /* Steering Digital Speed */
@@ -153,11 +139,10 @@ void Config_ctor(Config* self);
 
 void Config_init(Config* self);
 
-void Config_load_custom_music(Config* self, const std::string& filename);
 
-void Config_load_scores(Config* self, const std::string &filename);
+void Config_load_scores(Config* self, const char* filename);
 
-void Config_save_scores(Config* self, const std::string &filename);
+void Config_save_scores(Config* self, const char* filename);
 
 void Config_load_tiletrial_scores(Config* self);
 
