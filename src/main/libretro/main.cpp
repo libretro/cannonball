@@ -1130,6 +1130,7 @@ void retro_init(void)
 {
    Audio_ctor(&cannonball_audio);
    Config_ctor(&config);
+   Video_ctor(&video);
    Roms_ctor(&roms);
    OSoundInt_ctor(&osoundint);
    OAttractAI_ctor(&oattractai);
