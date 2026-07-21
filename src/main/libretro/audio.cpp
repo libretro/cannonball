@@ -4,11 +4,9 @@
     It takes the output from the PCM and YM chips, mixes them and then
     outputs appropriately.
     
-    In order to achieve seamless audio, when audio is enabled the framerate
-    is adjusted to essentially sync the video to the audio output.
-    
-    This is based upon code from the Atari800 emulator project.
-    Copyright (c) 1998-2008 Atari800 development team
+    As a libretro core it mixes exactly one video frame worth of samples
+    per retro_run and hands them to audio_batch_cb; the frontend performs
+    A/V sync from the fps and sample_rate reported in retro_get_system_av_info.
 ***************************************************************************/
 
 #include <string.h>
@@ -26,13 +24,6 @@ static void Audio_resume_audio(Audio* self);
 extern retro_log_printf_t                 log_cb;
 extern retro_audio_sample_batch_t  audio_batch_cb;
 
-/* Note that these variables are accessed by two separate threads. */
-uint8_t* dsp_buffer;
-static int dsp_buffer_bytes;
-static int dsp_write_pos;
-static int dsp_read_pos;
-static int bytes_per_sample; /* Number of bytes per sample entry (usually 4 bytes if stereo and 16-bit sound) */
-
 void Audio_ctor(Audio* self)
 {
     self->custom_wav_volume = 200;
@@ -49,20 +40,13 @@ void Audio_start_audio(Audio* self)
 {
     if (!self->sound_enabled)
     {
-        bytes_per_sample = CHANNELS * (BITS / 8);
-
         /* Start Audio */
         self->sound_enabled = true;
 
-        /* how many fragments in the dsp buffer */
-        const int DSP_BUFFER_FRAGS = 5;
-        { int specified_delay_samps = (FREQ * SND_DELAY) / 1000;
-        int dsp_buffer_samps = SAMPLES * DSP_BUFFER_FRAGS + specified_delay_samps;
-        dsp_buffer_bytes = CHANNELS * dsp_buffer_samps * (BITS / 8);
-        dsp_buffer = (uint8_t*)malloc((dsp_buffer_bytes) * sizeof(uint8_t));
-
-        /* Create Buffer For Mixing */
-        uint16_t buffer_size = (FREQ / config.fps) * CHANNELS;
+        /* One frame of interleaved stereo samples is mixed and pushed to
+           the libretro frontend every retro_run; that is the only buffer
+           we need. */
+        { uint16_t buffer_size = (FREQ / config.fps) * CHANNELS;
         self->mix_buffer = (uint16_t*)malloc((buffer_size) * sizeof(uint16_t));
 
         Audio_clear_buffers(self);
@@ -72,17 +56,10 @@ void Audio_start_audio(Audio* self)
 
 void Audio_clear_buffers(Audio* self)
 {
-    dsp_read_pos  = 0;
-    { int specified_delay_samps = (FREQ * SND_DELAY) / 1000;
-    dsp_write_pos = (specified_delay_samps+SAMPLES) * bytes_per_sample;
-
-    { int i; for (i = 0; i < dsp_buffer_bytes; i++)
-        dsp_buffer[i] = 0; }
-
     { uint16_t buffer_size = (FREQ / config.fps) * CHANNELS;
     { int i; for (i = 0; i < buffer_size; i++)
-        self->mix_buffer[i] = 0; }
- } }}
+        self->mix_buffer[i] = 0; } }
+}
 
 void Audio_stop_audio(Audio* self)
 {
@@ -90,7 +67,6 @@ void Audio_stop_audio(Audio* self)
     {
         self->sound_enabled = false;
 
-        free(dsp_buffer);
         free(self->mix_buffer);
     }
 }static 
@@ -108,11 +84,6 @@ void Audio_resume_audio(Audio* self)
 /* Called every frame to update the audio */
 void Audio_tick(Audio* self)
 {
-    static const unsigned SND_RATE = 44100;
-
-    { int bytes_written = 0;
-    int newpos = 0;
-
     if (!self->sound_enabled)
         return;
 
@@ -151,60 +122,15 @@ void Audio_tick(Audio* self)
             self->wavfile.pos = 0;
     } }
 
-    uint8_t* mbuf8 =
-        (uint8_t*)self->mix_buffer;
-
-    bytes_written =
-        BITS == 8
-            ? samples_written
-            : samples_written * 2;
-
-    newpos =
-        dsp_write_pos + bytes_written;
-
-    if (newpos / dsp_buffer_bytes ==
-        dsp_write_pos / dsp_buffer_bytes)
-    {
-        memcpy(
-            dsp_buffer +
-                (dsp_write_pos % dsp_buffer_bytes),
-            mbuf8,
-            bytes_written);
-    }
-    else
-    {
-        const int first_part_size =
-            dsp_buffer_bytes -
-            (dsp_write_pos % dsp_buffer_bytes);
-
-        memcpy(
-            dsp_buffer +
-                (dsp_write_pos % dsp_buffer_bytes),
-            mbuf8,
-            first_part_size);
-
-        memcpy(
-            dsp_buffer,
-            mbuf8 + first_part_size,
-            bytes_written - first_part_size);
-    }
-
-    dsp_write_pos = newpos;
-    dsp_read_pos += bytes_written;
-
-    while (dsp_read_pos > dsp_buffer_bytes)
-    {
-        dsp_write_pos -= dsp_buffer_bytes;
-        dsp_read_pos  -= dsp_buffer_bytes;
-    }
-
-    { const int audio_frames =
-        SND_RATE / config.fps;
-
+    /* One frame is mixed and handed straight to the frontend. The push
+       count is derived from samples_written -- exactly what the PCM/YM
+       chips produced this frame -- so "samples emitted == samples
+       generated" holds by construction: a deterministic, drift-free
+       stream, one frame of latency, and no intermediate ring buffer. */
     audio_batch_cb(
         (const int16_t*)self->mix_buffer,
-        audio_frames);
- } } }}
+        samples_written / CHANNELS);
+    } }
 
 /* Empty Wav Buffer */
 static int16_t EMPTY_BUFFER[] = {0, 0, 0, 0};

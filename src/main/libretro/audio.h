@@ -30,11 +30,8 @@ static const uint32_t FREQ = 44100;
 
 static const uint32_t CHANNELS = 2;
 
-static const uint32_t BITS = 16;
 
-static const uint32_t SAMPLES  = 1024;
 
-static const int SND_DELAY = 20;
 
 typedef struct Audio
 {
