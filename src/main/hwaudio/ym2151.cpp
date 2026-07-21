@@ -414,7 +414,7 @@ static const uint8_t lfo_noise_waveform[256] = {
 
 YM2151::YM2151(float volume, uint32_t clock)
 {
-    this->volume = volume;  
+    sc.volume = volume;  
     this->clock = clock;
 }
 
@@ -1280,7 +1280,7 @@ int YM2151::read_status()
 */
 void YM2151::init(int rate, int fps)
 {
-    SoundChip::init(STEREO, rate, fps);
+    sc.init(SoundChip::STEREO, rate, fps);
     this->sampfreq = rate;
     init_tables();
 
@@ -1999,10 +1999,10 @@ void YM2151::advance()
 */
 void YM2151::stream_update()
 {
-    SoundChip::clear_buffer();
+    sc.clear_buffer();
     uint32_t i;
     int32_t outl,outr;
-    uint32_t length = frame_size;
+    uint32_t length = sc.frame_size;
 
 #ifdef USE_MAME_TIMERS
         /* ASG 980324 - handled by real timers now */
@@ -2070,8 +2070,8 @@ void YM2151::stream_update()
         if (outr > MAXOUT) outr = MAXOUT;
             else if (outr < MINOUT) outr = MINOUT;
         
-        write_buffer(LEFT,  i, (int16_t) (outl * volume));
-        write_buffer(RIGHT, i, (int16_t) (outr * volume));
+        sc.write_buffer(SoundChip::LEFT,  i, (int16_t) (outl * volume));
+        sc.write_buffer(SoundChip::RIGHT, i, (int16_t) (outr * volume));
 
 #ifdef USE_MAME_TIMERS
         /* ASG 980324 - handled by real timers now */

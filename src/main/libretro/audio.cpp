@@ -124,12 +124,12 @@ void Audio_tick(Audio* self)
     osoundint.pcm->stream_update();
     osoundint.ym->stream_update();
 
-    { int16_t* pcm_buffer = osoundint.pcm->get_buffer();
-    int16_t* ym_buffer  = osoundint.ym->get_buffer();
+    { int16_t* pcm_buffer = osoundint.pcm->sc.get_buffer();
+    int16_t* ym_buffer  = osoundint.ym->sc.get_buffer();
     int16_t* wav_buffer = self->wavfile.data;
 
     const int samples_written =
-        osoundint.pcm->buffer_size;
+        osoundint.pcm->sc.buffer_size;
 
     { int i; for (i = 0; i < samples_written; i++)
     {

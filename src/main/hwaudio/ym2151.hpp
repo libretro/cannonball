@@ -69,9 +69,10 @@ typedef struct
 
 } YM2151Operator;
 
-class YM2151 : public SoundChip
+class YM2151
 {
 public:
+    SoundChip sc;
     bool irq;
 
     YM2151(float volume, uint32_t clock);

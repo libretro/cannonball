@@ -16,9 +16,10 @@
 #include "romloader.hpp"
 #include "hwaudio/soundchip.hpp"
 
-class SegaPCM : public SoundChip
+class SegaPCM
 {
 public:
+    SoundChip sc;
     static const uint32_t BANK_256    = (11);
     static const uint32_t BANK_512    = (12);
     static const uint32_t BANK_12M    = (13);

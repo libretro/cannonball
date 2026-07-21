@@ -32,7 +32,7 @@ public:
     int16_t* get_buffer();
     void set_volume(uint8_t);
 
-protected:
+public:
     const static uint8_t MONO             = 1;
     const static uint8_t STEREO           = 2;
 
@@ -49,7 +49,7 @@ protected:
     void write_buffer(const uint8_t, uint32_t, int16_t);
     int16_t read_buffer(const uint8_t, uint32_t);
 
-private:
+public:
     /* Sound buffer stream */
     int16_t* buffer;
 
