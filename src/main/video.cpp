@@ -66,7 +66,7 @@ int Video_init(Video* self, Roms* roms, video_settings_t* settings)
     }
 
     /* Convert S16 sprites */
-    self->sprite_layer->init(roms->sprites.rom);
+    hwsprites_init(self->sprite_layer, roms->sprites.rom);
     if (roms->sprites.rom)
     {
         delete[] roms->sprites.rom;
@@ -171,7 +171,7 @@ void Video_prepare_frame(Video* self)
 
         if (!config.engine.fix_bugs || oroad.horizon_base != HORIZON_OFF)
             (hwroad.render_foreground)(&hwroad, self->pixels);
-        self->sprite_layer->render(8);
+        hwsprites_render(self->sprite_layer, 8);
         self->tile_layer->render_text_layer(self->pixels, 1);
      }
 }
@@ -305,7 +305,7 @@ uint8_t Video_read_tile8(Video* self, uint32_t addr)
 
 void Video_write_sprite16(Video* self, uint32_t* addr, const uint16_t data)
 {
-    self->sprite_layer->write(*addr & 0xfff, data);
+    hwsprites_write(self->sprite_layer, *addr & 0xfff, data);
     *addr += 2;
 }
 

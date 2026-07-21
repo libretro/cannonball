@@ -245,8 +245,8 @@ void Menu::init()
 
     outrun.select_course(false, config.engine.prototype != 0);
     video.enabled = true;
-    video.sprite_layer->set_x_clip(false); /* Stop clipping in wide-screen mode. */
-    video.sprite_layer->reset();
+    hwsprites_set_x_clip(video.sprite_layer, false); /* Stop clipping in wide-screen mode. */
+    hwsprites_reset(video.sprite_layer);
     Video_clear_text_ram(&video);
     video.tile_layer->restore_tiles();
     OLogo_enable(&ologo, LOGO_Y);
@@ -595,7 +595,7 @@ void Menu::tick_menu()
                 }
 
                 restart_video();
-                video.sprite_layer->set_x_clip(false);
+                hwsprites_set_x_clip(video.sprite_layer, false);
                 update_geometry();
                 lr_options_set_frontend_variable_int(&config.video.hires);
             }

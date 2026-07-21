@@ -51,17 +51,11 @@
 /* Enable for hardware pixel accuracy, where sprite shadowing delayed by 1 clock cycle (slower) */
 #define PIXEL_ACCURACY 0
 
-hwsprites::hwsprites()
-{
-}
 
-hwsprites::~hwsprites()
-{
-}
 
-void hwsprites::init(const uint8_t* src_sprites)
+void hwsprites_init(hwsprites* self, const uint8_t* src_sprites)
 {
-    reset();
+    hwsprites_reset(self);
 
     if (src_sprites)
     {
@@ -75,63 +69,63 @@ void hwsprites::init(const uint8_t* src_sprites)
             uint8_t d1 = *spr++;
             uint8_t d0 = *spr++;
 
-            sprites[i] = (d0 << 24) | (d1 << 16) | (d2 << 8) | d3;
+            self->sprites[i] = (d0 << 24) | (d1 << 16) | (d2 << 8) | d3;
         } }
     }
 }
 
-void hwsprites::reset()
+void hwsprites_reset(hwsprites* self)
 {
     /* Clear Sprite RAM buffers */
     { uint16_t i; for (i = 0; i < SPRITE_RAM_SIZE; i++)
     {
-        ram[i] = 0;
-        ramBuff[i] = 0;
+        self->ram[i] = 0;
+        self->ramBuff[i] = 0;
     } }
 }
 
 /* Clip areas of the screen in wide-screen mode */
-void hwsprites::set_x_clip(bool on)
+void hwsprites_set_x_clip(hwsprites* self, bool on)
 {
     /* Clip to central 320 width window. */
     if (on)
     {
-        x1 = config.s16_x_off;
-        x2 = x1 + S16_WIDTH;
+        self->x1 = config.s16_x_off;
+        self->x2 = self->x1 + S16_WIDTH;
 
         if (config.video.hires)
         {
-            x1 <<= 1;
-            x2 <<= 1;
+            self->x1 <<= 1;
+            self->x2 <<= 1;
         }
     }
     /* Allow full wide-screen. */
     else
     {
-        x1 = 0;
-        x2 = config.s16_width;
+        self->x1 = 0;
+        self->x2 = config.s16_width;
     }
 }
 
-uint8_t hwsprites::read(const uint16_t adr)
+uint8_t hwsprites_read(hwsprites* self, const uint16_t adr)
 {
     uint16_t a = adr >> 1;
     if ((adr & 1) == 1)
-        return ram[a] & 0xff;
+        return self->ram[a] & 0xff;
     else
-        return ram[a] >> 8;
+        return self->ram[a] >> 8;
 }
 
-void hwsprites::write(const uint16_t adr, const uint16_t data)
+void hwsprites_write(hwsprites* self, const uint16_t adr, const uint16_t data)
 {
-    ram[adr >> 1] = data;
+    self->ram[adr >> 1] = data;
 }
 
 /* Copy back buffer to main ram, ready for blit */
-void hwsprites::swap()
+void hwsprites_swap(hwsprites* self)
 {
-    uint16_t *src = (uint16_t *)ram;
-    uint16_t *dst = (uint16_t *)ramBuff;
+    uint16_t *src = (uint16_t *)self->ram;
+    uint16_t *dst = (uint16_t *)self->ramBuff;
 
     /* swap the halves of the road RAM */
     { uint16_t i; for (i = 0; i < SPRITE_RAM_SIZE; i++)
@@ -173,7 +167,7 @@ void hwsprites::swap()
 
 #define draw_pixel()                                                                                  \
 {                                                                                                     \
-    if (x >= x1 && x < x2 && pix != 0 && pix != 15)                                                   \
+    if (x >= self->x1 && x < self->x2 && pix != 0 && pix != 15)                                                   \
     {                                                                                                 \
         if (shadow && pix == 0xa)                                                                     \
         {                                                                                             \
@@ -189,35 +183,35 @@ void hwsprites::swap()
 
 #endif
 
-void hwsprites::render(const uint8_t priority)
+void hwsprites_render(hwsprites* self, const uint8_t priority)
 {
     const uint32_t numbanks = SPRITES_LENGTH / 0x10000;
 
     for (uint16_t data = 0; data < SPRITE_RAM_SIZE; data += 8) 
     {
         /* stop when we hit the end of sprite list */
-        if ((ramBuff[data+0] & 0x8000) != 0) break;
+        if ((self->ramBuff[data+0] & 0x8000) != 0) break;
 
-        uint32_t sprpri  = 1 << ((ramBuff[data+3] >> 12) & 3);
+        uint32_t sprpri  = 1 << ((self->ramBuff[data+3] >> 12) & 3);
         if (sprpri != priority) continue;
 
         /* if hidden, or top greater than/equal to bottom, or invalid bank, punt */
-        int16_t hide    = (ramBuff[data+0] & 0x5000);
-        { int32_t height  = (ramBuff[data+5] >> 8) + 1;       
+        int16_t hide    = (self->ramBuff[data+0] & 0x5000);
+        { int32_t height  = (self->ramBuff[data+5] >> 8) + 1;       
         if (hide != 0 || height == 0) continue;
         
-        { int16_t bank    = (ramBuff[data+0] >> 9) & 7;
-        int32_t top     = (ramBuff[data+0] & 0x1ff) - 0x100;
-        uint32_t addr    = ramBuff[data+1];
-        int32_t pitch  = ((ramBuff[data+2] >> 1) | ((ramBuff[data+4] & 0x1000) << 3)) >> 8;
-        int32_t xpos    =  ramBuff[data+6]; /* moved from original structure to accomodate widescreen */
-        uint8_t shadow  = (ramBuff[data+3] >> 14) & 1;
-        int32_t vzoom    = ramBuff[data+3] & 0x7ff;
-        int32_t ydelta = ((ramBuff[data+4] & 0x8000) != 0) ? 1 : -1;
-        { int32_t flip   = (~ramBuff[data+4] >> 14) & 1;
-        int32_t xdelta = ((ramBuff[data+4] & 0x2000) != 0) ? 1 : -1;
-        { int32_t hzoom    = ramBuff[data+4] & 0x7ff;     
-        int32_t color   = COLOR_BASE + ((ramBuff[data+5] & 0x7f) << 4);
+        { int16_t bank    = (self->ramBuff[data+0] >> 9) & 7;
+        int32_t top     = (self->ramBuff[data+0] & 0x1ff) - 0x100;
+        uint32_t addr    = self->ramBuff[data+1];
+        int32_t pitch  = ((self->ramBuff[data+2] >> 1) | ((self->ramBuff[data+4] & 0x1000) << 3)) >> 8;
+        int32_t xpos    =  self->ramBuff[data+6]; /* moved from original structure to accomodate widescreen */
+        uint8_t shadow  = (self->ramBuff[data+3] >> 14) & 1;
+        int32_t vzoom    = self->ramBuff[data+3] & 0x7ff;
+        int32_t ydelta = ((self->ramBuff[data+4] & 0x8000) != 0) ? 1 : -1;
+        { int32_t flip   = (~self->ramBuff[data+4] >> 14) & 1;
+        int32_t xdelta = ((self->ramBuff[data+4] & 0x2000) != 0) ? 1 : -1;
+        { int32_t hzoom    = self->ramBuff[data+4] & 0x7ff;     
+        int32_t color   = COLOR_BASE + ((self->ramBuff[data+5] & 0x7f) << 4);
         int32_t x, y, ytarget, yacc = 0, pix;
             
         /* adjust X coordinate */
@@ -228,13 +222,13 @@ void hwsprites::render(const uint8_t priority)
         xpos -= 0xbe;
 
         /* initialize the end address to the start address */
-        ramBuff[data+7] = addr;
+        self->ramBuff[data+7] = addr;
 
         /* clamp to within the memory region size */
         if (numbanks)
             bank %= numbanks;
 
-        { const uint32_t* spritedata = sprites + 0x10000 * bank;
+        { const uint32_t* spritedata = self->sprites + 0x10000 * bank;
 
         /* clamp to a maximum of 8x (not 100% confirmed) */
         if (vzoom < 0x40) vzoom = 0x40;
@@ -268,11 +262,11 @@ void hwsprites::render(const uint8_t priority)
                 if (flip == 0)
                 {
                     /* start at the word before because we preincrement below */
-                    ramBuff[data+7] = (addr - 1);
+                    self->ramBuff[data+7] = (addr - 1);
 
                     for (x = xpos; (xdelta > 0 && x < config.s16_width) || (xdelta < 0 && x >= 0); )
                     {
-                        uint32_t pixels = spritedata[++ramBuff[data+7]]; /* Add to base sprite data the vzoom value */
+                        uint32_t pixels = spritedata[++self->ramBuff[data+7]]; /* Add to base sprite data the vzoom value */
 
                         /* draw four pixels */
                         pix = (pixels >> 28) & 0xf; while (xacc < 0x200) { draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
@@ -293,11 +287,11 @@ void hwsprites::render(const uint8_t priority)
                 else
                 {
                     /* start at the word after because we predecrement below */
-                    ramBuff[data+7] = (addr + 1);
+                    self->ramBuff[data+7] = (addr + 1);
 
                     for (x = xpos; (xdelta > 0 && x < config.s16_width) || (xdelta < 0 && x >= 0); )
                     {
-                        uint32_t pixels = spritedata[--ramBuff[data+7]];
+                        uint32_t pixels = spritedata[--self->ramBuff[data+7]];
 
                         /* draw four pixels */
                         pix = (pixels >>  0) & 0xf; while (xacc < 0x200) { draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;

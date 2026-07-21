@@ -645,7 +645,7 @@ void Outrun::init_jump_table()
     outputs->init();
 
     video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);
-    video.sprite_layer->set_x_clip(false);
+    hwsprites_set_x_clip(video.sprite_layer, false);
 }
 
 /* ------------------------------------------------------------------------------- */
@@ -701,7 +701,7 @@ void Outrun::init_motor_calibration()
     outputs->init();
 
     video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);
-    video.sprite_layer->set_x_clip(false);
+    hwsprites_set_x_clip(video.sprite_layer, false);
 
     otiles.fill_tilemap_color(0x4F60); /* Fill Tilemap Light Blue */
 
@@ -791,7 +791,7 @@ void Outrun::check_freeplay_start()
 void Outrun::init_best_outrunners()
 {
     video.enabled = false;
-    video.sprite_layer->set_x_clip(false); /* Stop clipping in wide-screen mode. */
+    hwsprites_set_x_clip(video.sprite_layer, false); /* Stop clipping in wide-screen mode. */
     otiles.fill_tilemap_color(0); /* Fill Tilemap Black */
     OSprites_disable_sprites(&osprites);
     oroad.horizon_base = 0x154;

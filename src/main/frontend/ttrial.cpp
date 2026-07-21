@@ -59,7 +59,7 @@ int TTrial::tick()
             OStats_init(&ostats, true);
             OSprites_init(&osprites);
             video.enabled = true;
-            video.sprite_layer->set_x_clip(false);
+            hwsprites_set_x_clip(video.sprite_layer, false);
             OMap_init(&omap);
             OMap_load_sprites(&omap);
             OMap_position_ferrari(&omap, FERRARI_POS[level_selected = 0]);

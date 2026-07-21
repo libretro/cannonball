@@ -819,7 +819,7 @@ end:
    {
       Video_disable(&video);
       Video_init(&video, &roms, &config.video);
-      video.sprite_layer->set_x_clip(false);
+      hwsprites_set_x_clip(video.sprite_layer, false);
       update_geometry();
    }
 

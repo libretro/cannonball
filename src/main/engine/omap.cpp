@@ -77,7 +77,7 @@ void OMap_tick(OMap* self)
     {
         /* Initialise Route Info */
         case MAP_INIT:
-            video.sprite_layer->set_x_clip(false); /* Don't clip the area in wide-screen mode */
+            hwsprites_set_x_clip(video.sprite_layer, false); /* Don't clip the area in wide-screen mode */
             self->map_route  = roms.rom0.read8(MAP_ROUTE_LOOKUP + ostats.routes[1]);
             self->map_pos    = 0;
             self->map_stage1 = 0;

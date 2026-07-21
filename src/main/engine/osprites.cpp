@@ -137,7 +137,7 @@ void OSprites_update_sprites(OSprites* self)
 	if (self->do_sprite_swap)
 	{
         self->do_sprite_swap = false;
-        video.sprite_layer->swap();
+        hwsprites_swap(video.sprite_layer);
         OSprites_copy_palette_data(self);
 	}
 }
