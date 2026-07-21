@@ -8,20 +8,20 @@
 /* ------------------------------------------------------------------------------------------------ */
 
 /* Internal Sega OutRun Screen Properties */
-const uint16_t S16_WIDTH      = 320;
-const uint16_t S16_HEIGHT     = 224;
+enum { S16_WIDTH = 320 };
+enum { S16_HEIGHT = 224 };
 
 /* Internal Widescreen Width */
-const uint16_t S16_WIDTH_WIDE = 398;
+enum { S16_WIDTH_WIDE = 398 };
 
 /* Palette Address in Memory */
-const uint32_t S16_PALETTE_BASE    = 0x120000;
+enum { S16_PALETTE_BASE = 0x120000 };
 
 /* Number of Palette Entries */
-const uint16_t S16_PALETTE_ENTRIES = 0x1000;
+enum { S16_PALETTE_ENTRIES = 0x1000 };
 
 /* Number of stages */
-const uint16_t STAGES = 15;
+enum { STAGES = 15 };
 
 /* Hard Coded End Point of every level */
 const static uint16_t ROAD_END      = 0x79C;

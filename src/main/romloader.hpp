@@ -28,18 +28,18 @@ void RomLoader_init(RomLoader* self, uint32_t length);
 
 int RomLoader_load_auto(RomLoader* self, const char* filename, const int offset, const int length,
                   const uint32_t expected_crc,
-                  const uint8_t mode = NORMAL,
-                  const bool verbose = true);
+                  const uint8_t mode,
+                  const bool verbose);
 
 int RomLoader_load_rom(RomLoader* self, const char* filename, const int offset, const int length,
                  const uint32_t expected_crc,
-                 const uint8_t mode = NORMAL,
-                 const bool verbose = true);
+                 const uint8_t mode,
+                 const bool verbose);
 
 int RomLoader_load_crc32(RomLoader* self, const char* debug, const int offset, const int length,
                    const uint32_t expected_crc,
-                   const uint8_t mode = NORMAL,
-                   const bool verbose = true);
+                   const uint8_t mode,
+                   const bool verbose);
 
 int RomLoader_load_binary(RomLoader* self, const char* filename);
 int RomLoader_load_mem(RomLoader* self, const uint8_t* data, uint32_t len);
