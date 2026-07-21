@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <boolean.h>
+
 static const uint8_t SNDCHIP_MONO             = 1;
 
 static const uint8_t SNDCHIP_STEREO           = 2;

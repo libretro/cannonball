@@ -9,9 +9,11 @@
 
 #pragma once
 
+#include <boolean.h>
+
 #include <stdint.h>
 
-enum presses {
+typedef enum presses {
         LEFT  = 0,
         RIGHT = 1,
         UP    = 2,
@@ -29,7 +31,7 @@ enum presses {
         STEP  = 12,
         TIMER = 13,
         MENU  = 14
-    };
+    } presses;
 
 static const int CENTRE = 0x80;
 

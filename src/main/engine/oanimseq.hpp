@@ -15,6 +15,8 @@
 
 #pragma once
 
+#include <boolean.h>
+
 #include "oanimsprite.hpp"
 
 typedef struct OAnimSeq

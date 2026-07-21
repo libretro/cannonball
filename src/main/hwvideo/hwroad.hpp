@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boolean.h>
+
 #include <stdint.h>
 
 enum { ROAD_RAM_SIZE = 0x1000 };

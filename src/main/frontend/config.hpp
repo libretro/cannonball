@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <boolean.h>
+
 #include <stdint.h>
 
 typedef struct data_settings_t
