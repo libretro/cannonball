@@ -192,32 +192,32 @@ void TrackLoader_init_layout_tracks(TrackLoader* self, bool jap)
     /* -------------------------------------------------------------------------------------------- */
     /* Check Version is Correct */
     /* -------------------------------------------------------------------------------------------- */
-    if (RomLoader_read32(self->layout, LayOut::HEADER) != LayOut::EXPECTED_VERSION)
+    if (RomLoader_read32(self->layout,  HEADER) !=  EXPECTED_VERSION)
     {
         log_cb(RETRO_LOG_WARN, "Incompatible LayOut Version Detected. Try upgrading CannonBall to the latest version\n");
         TrackLoader_init_original_tracks(self, jap);
         return;
     }
 
-    self->display_start_line = RomLoader_read8(self->layout, (uint32_t)LayOut::HEADER + (uint32_t)sizeof(uint32_t));
+    self->display_start_line = RomLoader_read8(self->layout, (uint32_t) HEADER + (uint32_t)sizeof(uint32_t));
 
     /* -------------------------------------------------------------------------------------------- */
     /* Setup Shared Data */
     /* -------------------------------------------------------------------------------------------- */
 
     /* Height Map Entries */
-    self->heightmap_offset  = RomLoader_read32(self->layout, LayOut::HEIGHT_MAPS);
+    self->heightmap_offset  = RomLoader_read32(self->layout,  HEIGHT_MAPS);
     self->heightmap_data    = &self->layout->rom[0];  
 
     /* Scenery Map Entries */
-    self->scenerymap_offset = RomLoader_read32(self->layout, LayOut::SPRITE_MAPS);
+    self->scenerymap_offset = RomLoader_read32(self->layout,  SPRITE_MAPS);
     self->scenerymap_data   = &self->layout->rom[0]; 
 
     /* Palette Entries */
-    self->pal_sky_offset    = RomLoader_read32(self->layout, LayOut::PAL_SKY);
+    self->pal_sky_offset    = RomLoader_read32(self->layout,  PAL_SKY);
     self->pal_sky_data      = &self->layout->rom[0];
 
-    self->pal_gnd_offset    = RomLoader_read32(self->layout, LayOut::PAL_GND);
+    self->pal_gnd_offset    = RomLoader_read32(self->layout,  PAL_GND);
     self->pal_gnd_data      = &self->layout->rom[0];
 
     /* -------------------------------------------------------------------------------------------- */
@@ -226,11 +226,11 @@ void TrackLoader_init_layout_tracks(TrackLoader* self, bool jap)
     { int i; for (i = 0; i < STAGES; i++)
     {
         /* CPU 0 Data */
-        const uint32_t STAGE_ADR = RomLoader_read32(self->layout, LayOut::LEVELS + (i * sizeof(uint32_t)));
+        const uint32_t STAGE_ADR = RomLoader_read32(self->layout,  LEVELS + (i * sizeof(uint32_t)));
         TrackLoader_setup_level(self, &self->levels[i], self->layout, STAGE_ADR);
 
         /* CPU 1 Data */
-        const uint32_t PATH_ADR = RomLoader_read32(self->layout, LayOut::PATH);
+        const uint32_t PATH_ADR = RomLoader_read32(self->layout,  PATH);
         self->levels[i].path = &self->layout->rom[ PATH_ADR + ((ROAD_END_CPU1 * sizeof(uint32_t)) * i) ];
     } }
 
@@ -239,14 +239,14 @@ void TrackLoader_init_layout_tracks(TrackLoader* self, bool jap)
     /* -------------------------------------------------------------------------------------------- */
 
     /* Split stages don't contain palette information */
-    TrackLoader_setup_section(self, self->level_split, self->layout, RomLoader_read32(self->layout, LayOut::SPLIT_LEVEL));
-    self->level_split->path = &self->layout->rom[ RomLoader_read32(self->layout, LayOut::SPLIT_PATH) ];
+    TrackLoader_setup_section(self, self->level_split, self->layout, RomLoader_read32(self->layout,  SPLIT_LEVEL));
+    self->level_split->path = &self->layout->rom[ RomLoader_read32(self->layout,  SPLIT_PATH) ];
 
     /* End sections don't contain palette information. Shared path. */
-    uint8_t* end_path = &self->layout->rom[ RomLoader_read32(self->layout, LayOut::END_PATH) ];
+    uint8_t* end_path = &self->layout->rom[ RomLoader_read32(self->layout,  END_PATH) ];
     { int i; for (i = 0; i < 5; i++)
     {
-        const uint32_t STAGE_ADR = RomLoader_read32(self->layout, LayOut::END_LEVELS + (i * sizeof(uint32_t)));
+        const uint32_t STAGE_ADR = RomLoader_read32(self->layout,  END_LEVELS + (i * sizeof(uint32_t)));
         TrackLoader_setup_section(self, &self->levels_end[i], self->layout, STAGE_ADR);
         self->levels_end[i].path = end_path;
     } }

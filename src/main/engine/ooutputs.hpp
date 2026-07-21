@@ -16,6 +16,28 @@
 
 #pragma once
 
+enum {
+    MODE_DISABLED = 0,
+    MODE_FFEEDBACK = 2,
+    MODE_RUMBLE = 3,
+    OO_STATE_INIT = 0,
+    OO_STATE_DELAY = 1,
+    OO_STATE_LEFT = 2,
+    OO_STATE_RIGHT = 3,
+    OO_STATE_CENTRE = 4,
+    OO_STATE_DONE = 5,
+    OO_STATE_EXIT = 6,
+    COUNTER_RESET = 300,
+    MOTOR_OFF = 0,
+    MOTOR_RIGHT = 0x5,
+    MOTOR_CENTRE = 0x8,
+    MOTOR_LEFT = 0xB,
+    CENTRE_POS = 0x80,
+    LEFT_LIMIT = 0xC1,
+    RIGHT_LIMIT = 0x3C
+};
+
+
 #include <stdint.h>
 
 typedef struct CoinChute
@@ -36,42 +58,6 @@ enum {
         D_UNUSED     = 0x40, /* bit 6 = ? */
         D_SOUND      = 0x80 /* bit 7 = sound enable */
     };
-
-static const int MODE_DISABLED = 0;
-
-static const int MODE_FFEEDBACK = 2;
-
-static const int MODE_RUMBLE = 3;
-
-static const uint16_t OO_STATE_INIT   = 0;
-
-static const uint16_t OO_STATE_DELAY  = 1;
-
-static const uint16_t OO_STATE_LEFT   = 2;
-
-static const uint16_t OO_STATE_RIGHT  = 3;
-
-static const uint16_t OO_STATE_CENTRE = 4;
-
-static const uint16_t OO_STATE_DONE   = 5;
-
-static const uint16_t OO_STATE_EXIT   = 6;
-
-static const int COUNTER_RESET = 300;
-
-static const uint8_t MOTOR_OFF    = 0;
-
-static const uint8_t MOTOR_RIGHT  = 0x5;
-
-static const uint8_t MOTOR_CENTRE = 0x8;
-
-static const uint8_t MOTOR_LEFT   = 0xB;
-
-static const uint8_t CENTRE_POS    = 0x80;
-
-static const uint8_t LEFT_LIMIT    = 0xC1;
-
-static const uint8_t RIGHT_LIMIT   = 0x3C;
 
 typedef struct OOutputs
 {

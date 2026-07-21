@@ -40,23 +40,22 @@ typedef struct Level
     RoadPalette palr2;        /* Road 2 Generator Palette */
 } Level;
 
-/* LayOut Binary Header Format */
-typedef struct LayOut
-{
-    static const uint32_t EXPECTED_VERSION = 1;
+/* LayOut Binary Header Format (offsets) */
+enum {
+    EXPECTED_VERSION = 1,
+    HEADER = 0,
+    PATH = HEADER      + sizeof(uint32_t) + sizeof(uint8_t),
+    LEVELS = PATH        + sizeof(uint32_t),
+    END_PATH = LEVELS      + (STAGES * sizeof(uint32_t)),
+    END_LEVELS = END_PATH    + sizeof(uint32_t),
+    SPLIT_PATH = END_LEVELS  + (5 * sizeof(uint32_t)),
+    SPLIT_LEVEL = SPLIT_PATH  + sizeof(uint32_t),
+    PAL_SKY = SPLIT_LEVEL + sizeof(uint32_t),
+    PAL_GND = PAL_SKY     + sizeof(uint32_t),
+    SPRITE_MAPS = PAL_GND     + sizeof(uint32_t),
+    HEIGHT_MAPS = SPRITE_MAPS + sizeof(uint32_t)
+};
 
-    static const uint32_t HEADER      = 0;
-    static const uint32_t PATH        = HEADER      + sizeof(uint32_t) + sizeof(uint8_t);
-    static const uint32_t LEVELS      = PATH        + sizeof(uint32_t);
-    static const uint32_t END_PATH    = LEVELS      + (STAGES * sizeof(uint32_t));
-    static const uint32_t END_LEVELS  = END_PATH    + sizeof(uint32_t);
-    static const uint32_t SPLIT_PATH  = END_LEVELS  + (5 * sizeof(uint32_t));
-    static const uint32_t SPLIT_LEVEL = SPLIT_PATH  + sizeof(uint32_t);
-    static const uint32_t PAL_SKY     = SPLIT_LEVEL + sizeof(uint32_t);
-    static const uint32_t PAL_GND     = PAL_SKY     + sizeof(uint32_t);
-    static const uint32_t SPRITE_MAPS = PAL_GND     + sizeof(uint32_t);
-    static const uint32_t HEIGHT_MAPS = SPRITE_MAPS + sizeof(uint32_t);
-} LayOut;
 
 struct RomLoader;
 
