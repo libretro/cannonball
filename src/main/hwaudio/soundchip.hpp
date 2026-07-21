@@ -10,49 +10,38 @@
 
 #pragma once
 
-class SoundChip
+static const uint8_t SNDCHIP_MONO             = 1;
+
+static const uint8_t SNDCHIP_STEREO           = 2;
+
+static const uint8_t SNDCHIP_LEFT             = 0;
+
+static const uint8_t SNDCHIP_RIGHT            = 1;
+
+struct SoundChip
 {
-public:
     bool initalized;
-
-    /* Sample Frequency in use */
     uint32_t sample_freq;
-
-    /* How many channels to support (mono/stereo) */
     uint8_t channels;
-
-    /* Size of the buffer (including channel info) */
     uint32_t buffer_size;
-
-    SoundChip();
-    ~SoundChip();
-
-    void init(uint8_t, int32_t, int32_t);
-
-    int16_t* get_buffer();
-    void set_volume(uint8_t);
-
-public:
-    const static uint8_t MONO             = 1;
-    const static uint8_t STEREO           = 2;
-
-    const static uint8_t LEFT             = 0;
-    const static uint8_t RIGHT            = 1;
-
-    /*  Buffer size for one frame (excluding channel info) */
     uint32_t frame_size;
-
-    /* Volume of sound chip */
     float volume;
-
-    void clear_buffer();
-    void write_buffer(const uint8_t, uint32_t, int16_t);
-    int16_t read_buffer(const uint8_t, uint32_t);
-
-public:
-    /* Sound buffer stream */
     int16_t* buffer;
-
-    /* Frames per second */
-    uint32_t fps; 
+    uint32_t fps;
 };
+
+void SoundChip_ctor(SoundChip* self);
+
+void SoundChip_dtor(SoundChip* self);
+
+void SoundChip_init(SoundChip* self, uint8_t, int32_t, int32_t);
+
+int16_t* SoundChip_get_buffer(SoundChip* self);
+
+void SoundChip_set_volume(SoundChip* self, uint8_t);
+
+void SoundChip_clear_buffer(SoundChip* self);
+
+void SoundChip_write_buffer(SoundChip* self, const uint8_t, uint32_t, int16_t);
+
+int16_t SoundChip_read_buffer(SoundChip* self, const uint8_t, uint32_t);

@@ -58,6 +58,7 @@
 
 SegaPCM::SegaPCM(uint32_t clock, RomLoader* rom, uint8_t* ram, int32_t bank)
 {
+    SoundChip_ctor(&sc);
     this->ram = ram;
     pcm_rom = rom->rom;  
     low = new uint8_t[16];
@@ -81,6 +82,7 @@ SegaPCM::SegaPCM(uint32_t clock, RomLoader* rom, uint8_t* ram, int32_t bank)
 
 SegaPCM::~SegaPCM()
 {
+    SoundChip_dtor(&sc);
     delete[] low;
 }
 
@@ -88,12 +90,12 @@ void SegaPCM::init(int32_t rate, int32_t fps)
 {
     sc.sample_freq = rate;
     downsample = (32000.0 / (double) rate);
-    sc.init(SoundChip::STEREO, rate, fps);
+    SoundChip_init(&(sc), SNDCHIP_STEREO, rate, fps);
 }
 
 void SegaPCM::stream_update()
 {
-    sc.clear_buffer();
+    SoundChip_clear_buffer(&(sc));
 
     /* loop over channels */
     { int ch; for (ch = 0; ch < 16; ch++)
@@ -134,8 +136,8 @@ void SegaPCM::stream_update()
                 v = rom[(addr >> 8) & rgnmask] - 0x80;
 
                 /* apply panning */
-                sc.write_buffer(SoundChip::LEFT,  i, sc.read_buffer(SoundChip::LEFT,  i) + (v * regs[2]));
-                sc.write_buffer(SoundChip::RIGHT, i, sc.read_buffer(SoundChip::RIGHT, i) + (v * regs[3]));
+                SoundChip_write_buffer(&(sc), SNDCHIP_LEFT,  i, SoundChip_read_buffer(&(sc), SNDCHIP_LEFT,  i) + (v * regs[2]));
+                SoundChip_write_buffer(&(sc), SNDCHIP_RIGHT, i, SoundChip_read_buffer(&(sc), SNDCHIP_RIGHT, i) + (v * regs[3]));
 
                 /* Advance. */
                 /* Cannonball Change: Output at a fixed 44,100Hz.  */

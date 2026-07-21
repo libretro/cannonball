@@ -11,61 +11,61 @@
 #include <stdint.h>
 #include "hwaudio/soundchip.hpp"
 
-SoundChip::SoundChip()
+void SoundChip_ctor(SoundChip* self)
 {
-    volume     = 1.0;
-    initalized = false;
+    self->volume     = 1.0;
+    self->initalized = false;
 }
 
-SoundChip::~SoundChip()
+void SoundChip_dtor(SoundChip* self)
 {
-    delete[] buffer;
+    delete[] self->buffer;
 }
 
-void SoundChip::init(uint8_t channels, int32_t sample_freq, int32_t fps)
+void SoundChip_init(SoundChip* self, uint8_t channels, int32_t sample_freq, int32_t fps)
 {
-    this->fps         = fps;
-    this->sample_freq = sample_freq;
-    this->channels    = channels;
+    self->fps         = fps;
+    self->sample_freq = sample_freq;
+    self->channels    = channels;
 
-    frame_size =  sample_freq / fps;
-    buffer_size = frame_size * channels;
+    self->frame_size =  sample_freq / fps;
+    self->buffer_size = self->frame_size * channels;
 
-    if (initalized)
-        delete[] buffer;
+    if (self->initalized)
+        delete[] self->buffer;
     
-    buffer = new int16_t[buffer_size];
+    self->buffer = new int16_t[self->buffer_size];
 
-    initalized = true;
+    self->initalized = true;
 }
 
 /* Set soundchip volume (0 = Off, 10 = Loudest) */
-void SoundChip::set_volume(uint8_t v)
+void SoundChip_set_volume(SoundChip* self, uint8_t v)
 {
     if (v > 10) 
         return;
     
-    volume = (float) (v / 10.0);
+    self->volume = (float) (v / 10.0);
 }
 
-void SoundChip::clear_buffer()
+void SoundChip_clear_buffer(SoundChip* self)
 {
-    { uint32_t i; for (i = 0; i < buffer_size; i++)
-        buffer[i] = 0; }
+    { uint32_t i; for (i = 0; i < self->buffer_size; i++)
+        self->buffer[i] = 0; }
 }
 
-void SoundChip::write_buffer(const uint8_t channel, uint32_t address, int16_t value)
+void SoundChip_write_buffer(SoundChip* self, const uint8_t channel, uint32_t address, int16_t value)
 {
     /*buffer[channel + (address * channels)] = (int16_t) (value * volume); // Unused for now */
-    buffer[channel + (address * channels)] = value;
+    self->buffer[channel + (address * self->channels)] = value;
 }
 
-int16_t SoundChip::read_buffer(const uint8_t channel, uint32_t address)
+int16_t SoundChip_read_buffer(SoundChip* self, const uint8_t channel, uint32_t address)
 {
-    return buffer[channel + (address * channels)];
+    return self->buffer[channel + (address * self->channels)];
 }
 
-int16_t* SoundChip::get_buffer()
+int16_t* SoundChip_get_buffer(SoundChip* self)
 {
-    return buffer;
+    return self->buffer;
 }
