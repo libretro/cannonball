@@ -1020,7 +1020,7 @@ void Outrun_select_course(Outrun* self, bool jap, bool prototype)
         self->adr.road_height_lookup    = ROAD_HEIGHT_LOOKUP;
     }
 
-    trackloader.init(jap);
+    TrackLoader_init(&trackloader, jap);
 
     /* Use Prototype Coconut Beach Track */
     trackloader.stage_data[0] = prototype ? 0x3A : 0x3C;

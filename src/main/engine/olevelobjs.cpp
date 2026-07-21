@@ -162,9 +162,9 @@ void OLevelObjs_setup_sprites(OLevelObjs* self, uint32_t z)
 /* +7: [Byte] Sprite Palette */static 
 void OLevelObjs_setup_sprite(OLevelObjs* self, oentry* sprite, uint32_t z)
 {
-    #define READ8(x)  trackloader.read8(trackloader.scenerymap_data, x)
-    #define READ16(x) trackloader.read16(trackloader.scenerymap_data, x)
-    #define READ32(x) trackloader.read32(trackloader.scenerymap_data, x)
+    #define READ8(x)  TrackLoader_read8(trackloader.scenerymap_data, x)
+    #define READ16(x) TrackLoader_read16(trackloader.scenerymap_data, x)
+    #define READ32(x) TrackLoader_read32(trackloader.scenerymap_data, x)
 
     sprite->control |= ENABLE; /* Turn sprite on */
     uint32_t addr = osprites.seg_spr_addr + osprites.seg_spr_offset1;

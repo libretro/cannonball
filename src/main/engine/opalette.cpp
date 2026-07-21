@@ -40,11 +40,11 @@ void OPalette_init(OPalette* self)
 void OPalette_setup_sky_palette(OPalette* self)
 {
     /* Read Address of sky palette information from index */
-    uint32_t src = trackloader.read_pal_sky_table(trackloader.current_level->pal_sky);
+    uint32_t src = TrackLoader_read_pal_sky_table(&trackloader, trackloader.current_level->pal_sky);
     uint32_t dst = 0x120F00; /* palette ram */
 
     { int16_t i; for (i = 0; i <= 0x1F; i++)
-        Video_write_pal32(&video, &dst, trackloader.read32(trackloader.pal_sky_data, &src)); }
+        Video_write_pal32(&video, &dst, TrackLoader_read32(trackloader.pal_sky_data, &src)); }
 }
 
 /* Setup data in RAM necessary for sky palette fade. */
@@ -69,10 +69,10 @@ void OPalette_setup_sky_change(OPalette* self)
     oinitengine.end_stage_props &= ~BIT_2; /* Denote setup_sky_change done */
 
     /* Address Of Sky Palette Entries for next stage */
-    uint32_t src = trackloader.read_pal_sky_table(trackloader.get_level(stage_offset)->pal_sky);
+    uint32_t src = TrackLoader_read_pal_sky_table(&trackloader, TrackLoader_get_level(&trackloader, stage_offset)->pal_sky);
 
     { int16_t i; for (i = 0; i <= 0x1F; i++)
-        self->pal_manip[i + 0x3E0] = trackloader.read32(trackloader.pal_sky_data, &src); }
+        self->pal_manip[i + 0x3E0] = TrackLoader_read32(trackloader.pal_sky_data, &src); }
 
     self->sky_palette_init |= BIT_0; /* Denote new sky palette setup */
 
@@ -397,7 +397,7 @@ void OPalette_write_next_pal_to_ram(OPalette* self)
     oinitengine.end_stage_props &= ~BIT_1; 
 
     /* Lookup palette entry from the road seg table based on route chosen */
-    Level *next_level = trackloader.get_level(stage_offset);
+    Level *next_level = TrackLoader_get_level(&trackloader, stage_offset);
 
     /* road palette */
     self->pal_fade[dst] = next_level->palr1.road >> 16;             dst += 9;
@@ -414,11 +414,11 @@ void OPalette_write_next_pal_to_ram(OPalette* self)
     self->pal_fade[dst] = next_level->palr1.stripe_centre & 0xFFFF; dst += 9;
     
     /* Ground Palette Entries (Index to table below) */
-    uint32_t ground_pal_addr = trackloader.read_pal_gnd_table(next_level->pal_gnd);
+    uint32_t ground_pal_addr = TrackLoader_read_pal_gnd_table(&trackloader, next_level->pal_gnd);
 
     { int16_t i; for (i = 0; i <= 15; i++)
     {
-        self->pal_fade[dst] = trackloader.read16(trackloader.pal_gnd_data, &ground_pal_addr);
+        self->pal_fade[dst] = TrackLoader_read16(trackloader.pal_gnd_data, &ground_pal_addr);
         dst += 9;
     } }
 }
@@ -502,13 +502,13 @@ void OPalette_write_fade_to_palram(OPalette* self)
 void OPalette_setup_ground_color(OPalette* self)
 {
     /* Read Address of ground palette information */
-    uint32_t src = trackloader.read_pal_gnd_table(trackloader.current_level->pal_gnd);
+    uint32_t src = TrackLoader_read_pal_gnd_table(&trackloader, trackloader.current_level->pal_gnd);
     uint32_t dst_pal_ground1 = 0x120840; /* palette ram: ground 1 */
     uint32_t dst_pal_ground2 = 0x120860; /* palette ram: ground 2 */
 
     { int16_t i; for (i = 0; i < 8; i++)
     {
-        uint32_t data = trackloader.read32(trackloader.pal_gnd_data, &src);
+        uint32_t data = TrackLoader_read32(trackloader.pal_gnd_data, &src);
         Video_write_pal32(&video, &dst_pal_ground1, data);
         Video_write_pal32(&video, &dst_pal_ground2, data);
     } }

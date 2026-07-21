@@ -1128,6 +1128,7 @@ size_t retro_get_memory_size(unsigned id)
 
 void retro_init(void)
 {
+   TrackLoader_ctor(&trackloader);
    Outrun_ctor(&outrun);
    Audio_ctor(&cannonball_audio);
    Config_ctor(&config);

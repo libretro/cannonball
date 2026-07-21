@@ -98,7 +98,7 @@ void OInitEngine_init(OInitEngine* self, int8_t level)
 
     /* Road Renderer: Setup correct stage address  */
     if (level)
-        trackloader.init_path(oroad.stage_lookup_off);
+        TrackLoader_init_path(&trackloader, oroad.stage_lookup_off);
 
     OPalette_setup_sky_palette(&opalette);
 	OPalette_setup_ground_color(&opalette);
@@ -150,7 +150,7 @@ void OInitEngine_setup_stage1(OInitEngine* self)
 
 void OInitEngine_init_road_seg_master(OInitEngine* self)
 {
-    trackloader.init_track(oroad.stage_lookup_off);
+    TrackLoader_init_track(&trackloader, oroad.stage_lookup_off);
 }
 
 /* */
@@ -170,22 +170,22 @@ void OInitEngine_update_road(OInitEngine* self)
 {
     OInitEngine_check_road_split(self); /* Check/Process road split if necessary */
     uint32_t addr = 0;
-    { uint16_t d0 = trackloader.read_width_height(&addr);
+    { uint16_t d0 = TrackLoader_read_width_height(&trackloader, &addr);
     /* Update next road section */
     if (d0 <= oroad.road_pos >> 16)
     {
         /* Skip road width adjustment if set and adjust height */
-        if (trackloader.read_width_height(&addr) == 0)
+        if (TrackLoader_read_width_height(&trackloader, &addr) == 0)
         {
             /* ROM:0000B8A6 skip_next_width */
             if (oroad.height_lookup == 0)
-                 oroad.height_lookup = trackloader.read_width_height(&addr); /* Set new height lookup section */
+                 oroad.height_lookup = TrackLoader_read_width_height(&trackloader, &addr); /* Set new height lookup section */
         }
         else
         {
             /* ROM:0000B87A */
-            int16_t width  = trackloader.read_width_height(&addr); /* Segment road width */
-            int16_t change = trackloader.read_width_height(&addr); /* Segment adjustment speed */
+            int16_t width  = TrackLoader_read_width_height(&trackloader, &addr); /* Segment road width */
+            int16_t change = TrackLoader_read_width_height(&trackloader, &addr); /* Segment adjustment speed */
 
             if (width != (int16_t) (oroad.road_width >> 16))
             {
@@ -240,7 +240,7 @@ void OInitEngine_update_road(OInitEngine* self)
 
     /* ROM:0000B91C set_road_type:  */
 
-    int16_t segment_pos = trackloader.read_curve(0);
+    int16_t segment_pos = TrackLoader_read_curve(&trackloader, 0);
 
     if (segment_pos != -1)
     {
@@ -248,14 +248,14 @@ void OInitEngine_update_road(OInitEngine* self)
 
         if (d1 <= (int16_t) (oroad.road_pos >> 16))
         {
-            self->road_curve_next = trackloader.read_curve(2);
-            self->road_type_next  = trackloader.read_curve(4);
+            self->road_curve_next = TrackLoader_read_curve(&trackloader, 2);
+            self->road_type_next  = TrackLoader_read_curve(&trackloader, 4);
         }
 
         if (segment_pos <= (int16_t) (oroad.road_pos >> 16))
         {
-            self->road_curve = trackloader.read_curve(2);
-            self->road_type  = trackloader.read_curve(4);
+            self->road_curve = TrackLoader_read_curve(&trackloader, 2);
+            self->road_type  = TrackLoader_read_curve(&trackloader, 4);
             trackloader.curve_offset += 6;
             self->road_type_next = 0;
             self->road_curve_next = 0;
@@ -314,7 +314,7 @@ void OInitEngine_update_engine(OInitEngine* self)
             OHud_blit_text_new(&ohud, 9, 26, "L", GREY);
 
         if (config.engine.layout_debug)
-            OHud_draw_debug_info(&ohud, oroad.road_pos, oroad.height_lookup_wrk, trackloader.read_sprite_pattern_index());
+            OHud_draw_debug_info(&ohud, oroad.road_pos, oroad.height_lookup_wrk, TrackLoader_read_sprite_pattern_index(&trackloader));
     }
 
     if (olevelobjs.spray_counter > 0)
@@ -605,7 +605,7 @@ void OInitEngine_init_split1(OInitEngine* self)
     self->road_width_orig        = oroad.road_width >> 16;
     oroad.road_pos         = 0;
     oroad.tilemap_h_target = 0;
-    trackloader.init_track_split();
+    TrackLoader_init_track_split(&trackloader);
 }
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -799,7 +799,7 @@ void OInitEngine_init_bonus(OInitEngine* self, int16_t seq)
     oroad.road_pos  = 0;
     oroad.tilemap_h_target = 0;
     oanimseq.end_seq = (uint8_t) seq; /* Set End Sequence (0 - 4) */
-    trackloader.init_track_bonus(oanimseq.end_seq);
+    TrackLoader_init_track_bonus(&trackloader, oanimseq.end_seq);
     outrun.game_state = GS_INIT_BONUS;
     self->rd_split_state = 0x11;
     OInitEngine_bonus1(self);

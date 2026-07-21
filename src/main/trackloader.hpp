@@ -60,114 +60,89 @@ struct LayOut
 
 class RomLoader;
 
-class TrackLoader
+int32_t TrackLoader_read32(uint8_t* data, uint32_t* addr);
+int32_t TrackLoader_read32(uint8_t* data, uint32_t addr);
+int16_t TrackLoader_read16(uint8_t* data, uint32_t* addr);
+int16_t TrackLoader_read16(uint8_t* data, uint32_t addr);
+int8_t TrackLoader_read8(uint8_t* data, uint32_t* addr);
+int8_t TrackLoader_read8(uint8_t* data, uint32_t addr);
+
+static const int TL_MODE_ORIGINAL = 0;
+
+static const int TL_MODE_LAYOUT   = 1;
+
+struct TrackLoader
 {
-
-public:
-    /* Reference to stage mapping/ordering table */
     uint8_t* stage_data;
-
     Level* current_level;
-
-    const static int MODE_ORIGINAL = 0;
-    const static int MODE_LAYOUT   = 1;
-
-    /* Display start line on Stage 1 */
     uint8_t display_start_line;
-
     uint32_t curve_offset;
     uint32_t wh_offset;
     uint32_t scenery_offset;
-
-    /* Shared Structures */
     uint8_t* pal_sky_data;
     uint8_t* pal_gnd_data;
     uint8_t* heightmap_data;
     uint8_t* scenerymap_data;
-
     uint32_t pal_sky_offset;
     uint32_t pal_gnd_offset;
     uint32_t heightmap_offset;
     uint32_t scenerymap_offset;
-
-    TrackLoader();
-    ~TrackLoader();
-
-    void init(bool jap);
-    void init_original_tracks(bool jap);
-    void init_layout_tracks(bool jap);
-    void init_track(const uint32_t);
-    void init_track_split();
-    void init_track_bonus(const uint32_t);
-
-    void init_path(const uint32_t);
-    void init_path_split();
-    void init_path_end();
-
-    uint32_t read_pal_sky_table(uint16_t entry);
-    uint32_t read_pal_gnd_table(uint16_t entry);    
-    uint32_t read_heightmap_table(uint16_t entry);
-    uint32_t read_scenerymap_table(uint16_t entry);
-
-    int16_t readPath(uint32_t addr);
-    int16_t readPath(uint32_t* addr);
-    int16_t read_width_height(uint32_t* addr);
-    int16_t read_curve(uint32_t addr);
-    uint16_t read_scenery_pos();
-    uint8_t read_total_sprites();
-    uint8_t read_sprite_pattern_index();
-
-    int8_t stage_offset_to_level(uint32_t);
-    Level* get_level(uint32_t);
-
-    inline int32_t read32(uint8_t* data, uint32_t* addr)
-    {    
-        int32_t value = (data[*addr] << 24) | (data[*addr+1] << 16) | (data[*addr+2] << 8) | (data[*addr+3]);
-        *addr += 4;
-        return value;
-    }
-
-    inline int16_t read16(uint8_t* data, uint32_t* addr)
-    {
-        int16_t value = (data[*addr] << 8) | (data[*addr+1]);
-        *addr += 2;
-        return value;
-    }
-
-    inline int8_t read8(uint8_t* data, uint32_t* addr)
-    {
-        return data[(*addr)++]; 
-    }
-
-    inline int32_t read32(uint8_t* data, uint32_t addr)
-    {    
-        return (data[addr] << 24) | (data[addr+1] << 16) | (data[addr+2] << 8) | data[addr+3];
-    }
-
-    inline int16_t read16(uint8_t* data, uint32_t addr)
-    {
-        return (data[addr] << 8) | data[addr+1];
-    }
-
-    inline int8_t read8(uint8_t* data, uint32_t addr)
-    {
-        return data[addr];
-    }
-
-
-private:
     RomLoader* layout;
-
     int mode;
-
-    Level* levels;         /* Normal Stages  */
-    Level* level_split;    /* Split Section */
-    Level* levels_end;     /* End Section */
-
-    uint8_t* current_path; /* CPU 1 Road Path */
-    
-    void setup_level(Level* l, RomLoader* data, const int STAGE_ADR);
-    void setup_section(Level* l, RomLoader* data, const int STAGE_ADR);
+    Level* levels;
+    Level* level_split;
+    Level* levels_end;
+    uint8_t* current_path;
 };
+
+extern TrackLoader trackloader;
+
+void TrackLoader_ctor(TrackLoader* self);
+
+void TrackLoader_dtor(TrackLoader* self);
+
+void TrackLoader_init(TrackLoader* self, bool jap);
+
+void TrackLoader_init_original_tracks(TrackLoader* self, bool jap);
+
+void TrackLoader_init_layout_tracks(TrackLoader* self, bool jap);
+
+void TrackLoader_init_track(TrackLoader* self, const uint32_t);
+
+void TrackLoader_init_track_split(TrackLoader* self);
+
+void TrackLoader_init_track_bonus(TrackLoader* self, const uint32_t);
+
+void TrackLoader_init_path(TrackLoader* self, const uint32_t);
+
+void TrackLoader_init_path_split(TrackLoader* self);
+
+void TrackLoader_init_path_end(TrackLoader* self);
+
+uint32_t TrackLoader_read_pal_sky_table(TrackLoader* self, uint16_t entry);
+
+uint32_t TrackLoader_read_pal_gnd_table(TrackLoader* self, uint16_t entry);
+
+uint32_t TrackLoader_read_heightmap_table(TrackLoader* self, uint16_t entry);
+
+uint32_t TrackLoader_read_scenerymap_table(TrackLoader* self, uint16_t entry);
+
+int16_t TrackLoader_readPath(TrackLoader* self, uint32_t addr);
+
+int16_t TrackLoader_readPath(TrackLoader* self, uint32_t* addr);
+
+int16_t TrackLoader_read_width_height(TrackLoader* self, uint32_t* addr);
+
+int16_t TrackLoader_read_curve(TrackLoader* self, uint32_t addr);
+
+uint16_t TrackLoader_read_scenery_pos(TrackLoader* self);
+
+uint8_t TrackLoader_read_total_sprites(TrackLoader* self);
+
+uint8_t TrackLoader_read_sprite_pattern_index(TrackLoader* self);
+
+int8_t TrackLoader_stage_offset_to_level(TrackLoader* self, uint32_t);
+
+Level* TrackLoader_get_level(TrackLoader* self, uint32_t);
 
 extern TrackLoader trackloader;

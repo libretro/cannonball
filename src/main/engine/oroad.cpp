@@ -281,7 +281,7 @@ void ORoad_clear_road_ram(ORoad* self)
 
 void ORoad_init_stage1(ORoad* self)
 {
-    trackloader.init_path(0); 
+    TrackLoader_init_path(&trackloader, 0); 
     self->road_pos = 0;
     self->road_ctrl = ROAD_BOTH_P0;
     /* ignore init counter stuff (move.b  #$A,$49(a5)) */
@@ -319,21 +319,21 @@ void ORoad_check_load_road(ORoad* self)
     if (ostats.cur_stage != self->stage_loaded)
     {
         self->stage_loaded = ostats.cur_stage; /* Denote loaded */
-        trackloader.init_path(self->stage_lookup_off);
+        TrackLoader_init_path(&trackloader, self->stage_lookup_off);
         return;
     }
 
     /* Check Split */
     if (self->road_load_split)
     {
-        trackloader.init_path_split();
+        TrackLoader_init_path_split(&trackloader);
         self->road_load_split = 0;
     }
 
     /* Check End Section */
     else if (self->road_load_end)
     {
-        trackloader.init_path_end();
+        TrackLoader_init_path_end(&trackloader);
         self->road_load_end = 0;
     }
 }
@@ -367,8 +367,8 @@ void ORoad_setup_road_x(ORoad* self)
 
 void ORoad_setup_x_data(ORoad* self, uint32_t addr)
 {
-    const int16_t x = trackloader.readPath(addr)     + trackloader.readPath(addr + 4); /* Length 1 */
-    const int16_t y = trackloader.readPath(addr + 2) + trackloader.readPath(addr + 6); /* Length 2 */
+    const int16_t x = TrackLoader_readPath(&trackloader, addr)     + TrackLoader_readPath(&trackloader, addr + 4); /* Length 1 */
+    const int16_t y = TrackLoader_readPath(&trackloader, addr + 2) + TrackLoader_readPath(&trackloader, addr + 6); /* Length 2 */
 
     /* Use Pythagorus' theorem to find the distance/length between x & y */
     const uint16_t distance = outils_isqrt((x * x) + (y * y));
@@ -399,8 +399,8 @@ void ORoad_setup_x_data(ORoad* self, uint32_t addr)
     /* We sample 20 Road Positions to generate the road. */
     { uint8_t i; for (i = 0; i <= 0x20; i++)
     {
-        const int32_t x_next = trackloader.readPath(addr)     + trackloader.readPath(addr + 4); /* Length 1 */
-        const int32_t y_next = trackloader.readPath(addr + 2) + trackloader.readPath(addr + 6); /* Length 2 */
+        const int32_t x_next = TrackLoader_readPath(&trackloader, addr)     + TrackLoader_readPath(&trackloader, addr + 4); /* Length 1 */
+        const int32_t y_next = TrackLoader_readPath(&trackloader, addr + 2) + TrackLoader_readPath(&trackloader, addr + 6); /* Length 2 */
         addr += 8;
 
         curve_x_total += x_next;
@@ -460,14 +460,14 @@ void ORoad_set_tilemap_x(ORoad* self, uint32_t addr)
     /* d0 = Word 0 + Word 2 + Word 4 + Word 6 [Next 4 x positions] */
     /* d1 = Word 1 + Word 3 + Word 5 + Word 7 [Next 4 y positions] */
     
-    int16_t x = trackloader.readPath(&addr);
-    int16_t y = trackloader.readPath(&addr);
-    x += trackloader.readPath(&addr);
-    y += trackloader.readPath(&addr);
-    x += trackloader.readPath(&addr);
-    y += trackloader.readPath(&addr);
-    x += trackloader.readPath(&addr);
-    y += trackloader.readPath(&addr);
+    int16_t x = TrackLoader_readPath(&trackloader, &addr);
+    int16_t y = TrackLoader_readPath(&trackloader, &addr);
+    x += TrackLoader_readPath(&trackloader, &addr);
+    y += TrackLoader_readPath(&trackloader, &addr);
+    x += TrackLoader_readPath(&trackloader, &addr);
+    y += TrackLoader_readPath(&trackloader, &addr);
+    x += TrackLoader_readPath(&trackloader, &addr);
+    y += TrackLoader_readPath(&trackloader, &addr);
 
     { int16_t x_abs = x;
     int16_t y_abs = y;
@@ -712,10 +712,10 @@ void ORoad_init_height_seg(ORoad* self)
 
     /* Get Address of actual road height data */
     self->height_lookup_wrk = self->height_lookup;
-    { uint32_t h_addr = trackloader.read_heightmap_table(self->height_lookup_wrk);
+    { uint32_t h_addr = TrackLoader_read_heightmap_table(&trackloader, self->height_lookup_wrk);
 
-    self->height_ctrl2 = trackloader.read8(trackloader.heightmap_data, &h_addr);
-    self->step_adjust  = trackloader.read8(trackloader.heightmap_data, &h_addr); /* Speed at which to move through height segment */
+    self->height_ctrl2 = TrackLoader_read8(trackloader.heightmap_data, &h_addr);
+    self->step_adjust  = TrackLoader_read8(trackloader.heightmap_data, &h_addr); /* Speed at which to move through height segment */
 
     switch (self->height_ctrl2)
     {
@@ -757,8 +757,8 @@ void ORoad_init_height_seg(ORoad* self)
 /* Source Address: 0x1C2C */static 
 void ORoad_init_elevation(ORoad* self, uint32_t& addr)
 {
-    self->down_mult   = trackloader.read8(trackloader.heightmap_data, &addr);
-    self->up_mult     = trackloader.read8(trackloader.heightmap_data, &addr);
+    self->down_mult   = TrackLoader_read8(trackloader.heightmap_data, &addr);
+    self->up_mult     = TrackLoader_read8(trackloader.heightmap_data, &addr);
     self->height_addr = addr;
     self->height_ctrl = 2; /* Use do_elevation() */
     ORoad_do_elevation(self);
@@ -827,7 +827,7 @@ void ORoad_do_elevation(ORoad* self)
 
 void ORoad_init_elevation_delay(ORoad* self, uint32_t& addr)
 {
-    self->height_delay  = trackloader.read16(trackloader.heightmap_data, &addr);
+    self->height_delay  = TrackLoader_read16(trackloader.heightmap_data, &addr);
     self->height_addr   = addr;
     self->do_height_inc = 1;     /* Set to Part 1 */
     self->height_inc    = 0;
@@ -899,7 +899,7 @@ void ORoad_do_elevation_delay(ORoad* self)
 /* Example Data: 0x2A8E */static 
 void ORoad_init_elevation_mixed(ORoad* self, uint32_t& addr)
 {
-    self->height_delay  = trackloader.read16(trackloader.heightmap_data, &addr);
+    self->height_delay  = TrackLoader_read16(trackloader.heightmap_data, &addr);
     self->height_addr   = addr;
     self->do_height_inc = 1;
     self->height_inc    = 0;
@@ -981,7 +981,7 @@ void ORoad_init_horizon_adjust(ORoad* self, uint32_t& addr)
     self->height_addr = addr;
 
     /* Set Horizon Modifier */
-    self->horizon_mod = trackloader.read16(trackloader.heightmap_data, addr) - self->horizon_base;
+    self->horizon_mod = TrackLoader_read16(trackloader.heightmap_data, addr) - self->horizon_base;
     
     /* Use do_horizon_adjust() function */
     self->height_ctrl = 5;
@@ -1083,7 +1083,7 @@ void ORoad_set_y_interpolate(ORoad* self)
     self->road_unk[self->a3_o++] = 0;
     self->counter = 0; /* Reset interpolated self->counter index to 0 */
 
-    const int16_t next_height_value = trackloader.read16(trackloader.heightmap_data, self->a1_lookup);
+    const int16_t next_height_value = TrackLoader_read16(trackloader.heightmap_data, self->a1_lookup);
     self->height_final = (next_height_value * (self->height_start - 0x100)) >> 4;
 
     /* 1faa  */
@@ -1140,7 +1140,7 @@ void ORoad_set_y_2044(ORoad* self)
     /* Writing last part of interpolated data */
     self->road_unk[self->a3_o] = 0;
 
-    { int16_t y = trackloader.read16(trackloader.heightmap_data, self->a1_lookup);
+    { int16_t y = TrackLoader_read16(trackloader.heightmap_data, self->a1_lookup);
 
     /* Return if not end at end of height section data */
     if (y != -1) return;
@@ -1180,7 +1180,7 @@ void ORoad_read_next_height(ORoad* self)
     /* 1ff2: set_elevation_flag */
     /* Note the way this bug was fixed */
     /* Needed to read the signed value into an int16_t before assigning to a 32 bit value */
-    self->change_per_entry = trackloader.read16(trackloader.heightmap_data, &self->a1_lookup) << 4;
+    self->change_per_entry = TrackLoader_read16(trackloader.heightmap_data, &self->a1_lookup) << 4;
     self->change_per_entry += self->d5_o;
     if (self->counter != 1)
     {
@@ -1265,7 +1265,7 @@ void ORoad_set_y_horizon(ORoad* self)
     if (self->height_start != 0x1FF) return;
 
     /* Read Up/Down Multiplier Word From Lookup Table and set new horizon base value */
-    self->horizon_base = (int32_t) (trackloader.read16(trackloader.heightmap_data, self->height_addr));
+    self->horizon_base = (int32_t) (TrackLoader_read16(trackloader.heightmap_data, self->height_addr));
 
     if (self->height_lookup == self->height_lookup_wrk)
         self->height_lookup = 0;
