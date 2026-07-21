@@ -494,8 +494,8 @@ void Config_set_fps(Config* self, int fps)
         self->tick_fps = 60;
 
     if (config.sound.enabled)
-        cannonball_audio.stop_audio();
+        Audio_stop_audio(&cannonball_audio);
     OSoundInt_init(&osoundint);
     if (config.sound.enabled)
-        cannonball_audio.start_audio();
+        Audio_start_audio(&cannonball_audio);
 }

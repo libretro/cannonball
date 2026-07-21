@@ -22,48 +22,36 @@ struct wav_t {
     uint32_t length;
 };
 
-class Audio
+static const uint32_t FREQ = 44100;
+
+static const uint32_t CHANNELS = 2;
+
+static const uint32_t BITS = 16;
+
+static const uint32_t SAMPLES  = 1024;
+
+static const int SND_DELAY = 20;
+
+struct Audio
 {
-public:
-    /* Enable/Disable Sound */
     bool sound_enabled;
-
-    /* Playback volume of custom WAV music, in percent. */
     uint16_t custom_wav_volume;
-
-    Audio();
-    ~Audio();
-
-    void init();
-    void tick();
-    void start_audio();
-    void stop_audio();
-    void load_wav(const char* filename);
-    void clear_wav();
-
-private:
-    /* Sample Rate. Can't be changed easily for now */
-    static const uint32_t FREQ = 44100;
-
-    /* Stereo. Could be changed, requires some recoding. */
-    static const uint32_t CHANNELS = 2;
-
-    /* 16-Bit Audio Output. Could be changed, requires some recoding. */
-    static const uint32_t BITS = 16;
-
-    /* Low value  = Responsiveness, chance of drop out. */
-    /* High value = Laggy, less chance of drop out. */
-    static const uint32_t SAMPLES  = 1024;
-
-    /* Latency (in ms) and thus target buffer size */
-    const static int SND_DELAY = 20;
-
-    /* Buffer used to mix PCM and YM channels together */
     uint16_t* mix_buffer;
-
     wav_t wavfile;
-
-    void clear_buffers();
-    void pause_audio();
-    void resume_audio();
 };
+
+extern Audio cannonball_audio;
+
+void Audio_ctor(Audio* self);
+
+void Audio_init(Audio* self);
+
+void Audio_tick(Audio* self);
+
+void Audio_start_audio(Audio* self);
+
+void Audio_stop_audio(Audio* self);
+
+void Audio_load_wav(Audio* self, const char* filename);
+
+void Audio_clear_wav(Audio* self);

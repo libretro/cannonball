@@ -19,6 +19,10 @@
 #include "engine/audio/osoundint.hpp"
 #include <libretro.h>
 
+static void Audio_clear_buffers(Audio* self);
+static void Audio_pause_audio(Audio* self);
+static void Audio_resume_audio(Audio* self);
+
 extern retro_log_printf_t                 log_cb;
 
 #ifdef __PS3__
@@ -34,30 +38,26 @@ static int dsp_write_pos;
 static int dsp_read_pos;
 static int bytes_per_sample; /* Number of bytes per sample entry (usually 4 bytes if stereo and 16-bit sound) */
 
-Audio::Audio()
+void Audio_ctor(Audio* self)
 {
-    custom_wav_volume = 200;
+    self->custom_wav_volume = 200;
 }
 
-Audio::~Audio()
-{
 
-}
-
-void Audio::init()
+void Audio_init(Audio* self)
 {
     if (config.sound.enabled)
-        start_audio();
+        Audio_start_audio(self);
 }
 
-void Audio::start_audio()
+void Audio_start_audio(Audio* self)
 {
-    if (!sound_enabled)
+    if (!self->sound_enabled)
     {
         bytes_per_sample = CHANNELS * (BITS / 8);
 
         /* Start Audio */
-        sound_enabled = true;
+        self->sound_enabled = true;
 
         /* how many fragments in the dsp buffer */
         const int DSP_BUFFER_FRAGS = 5;
@@ -68,14 +68,14 @@ void Audio::start_audio()
 
         /* Create Buffer For Mixing */
         uint16_t buffer_size = (FREQ / config.fps) * CHANNELS;
-        mix_buffer = new uint16_t[buffer_size];
+        self->mix_buffer = new uint16_t[buffer_size];
 
-        clear_buffers();
-        clear_wav();
+        Audio_clear_buffers(self);
+        Audio_clear_wav(self);
      }}
-}
+}static 
 
-void Audio::clear_buffers()
+void Audio_clear_buffers(Audio* self)
 {
     dsp_read_pos  = 0;
     { int specified_delay_samps = (FREQ * SND_DELAY) / 1000;
@@ -86,39 +86,39 @@ void Audio::clear_buffers()
 
     { uint16_t buffer_size = (FREQ / config.fps) * CHANNELS;
     { int i; for (i = 0; i < buffer_size; i++)
-        mix_buffer[i] = 0; }
+        self->mix_buffer[i] = 0; }
  } }}
 
-void Audio::stop_audio()
+void Audio_stop_audio(Audio* self)
 {
-    if (sound_enabled)
+    if (self->sound_enabled)
     {
-        sound_enabled = false;
+        self->sound_enabled = false;
 
         delete[] dsp_buffer;
-        delete[] mix_buffer;
+        delete[] self->mix_buffer;
     }
-}
+}static 
 
-void Audio::pause_audio()
+void Audio_pause_audio(Audio* self)
 {
-}
+}static 
 
-void Audio::resume_audio()
+void Audio_resume_audio(Audio* self)
 {
-    if (sound_enabled)
-        clear_buffers();
+    if (self->sound_enabled)
+        Audio_clear_buffers(self);
 }
 
 /* Called every frame to update the audio */
-void Audio::tick()
+void Audio_tick(Audio* self)
 {
     static const unsigned SND_RATE = 44100;
 
     { int bytes_written = 0;
     int newpos = 0;
 
-    if (!sound_enabled)
+    if (!self->sound_enabled)
         return;
 
     osoundint.pcm->stream_update();
@@ -126,7 +126,7 @@ void Audio::tick()
 
     { int16_t* pcm_buffer = osoundint.pcm->get_buffer();
     int16_t* ym_buffer  = osoundint.ym->get_buffer();
-    int16_t* wav_buffer = wavfile.data;
+    int16_t* wav_buffer = self->wavfile.data;
 
     const int samples_written =
         osoundint.pcm->buffer_size;
@@ -135,8 +135,8 @@ void Audio::tick()
     {
         const int32_t wav_sample =
             (int32_t)(
-                ((int64_t)wav_buffer[wavfile.pos] *
-                 (int64_t)custom_wav_volume) /
+                ((int64_t)wav_buffer[self->wavfile.pos] *
+                 (int64_t)self->custom_wav_volume) /
                 100);
 
         int32_t mix_data =
@@ -149,15 +149,15 @@ void Audio::tick()
         else if (mix_data < -32768)
             mix_data = -32768;
 
-        mix_buffer[i] =
+        self->mix_buffer[i] =
             (uint16_t)(int16_t)mix_data;
 
-        if (++wavfile.pos >= wavfile.length)
-            wavfile.pos = 0;
+        if (++self->wavfile.pos >= self->wavfile.length)
+            self->wavfile.pos = 0;
     } }
 
     uint8_t* mbuf8 =
-        (uint8_t*)mix_buffer;
+        (uint8_t*)self->mix_buffer;
 
     bytes_written =
         BITS == 8
@@ -207,7 +207,7 @@ void Audio::tick()
         SND_RATE / config.fps;
 
     audio_batch_cb(
-        (const int16_t*)mix_buffer,
+        (const int16_t*)self->mix_buffer,
         audio_frames);
  } } }}
 
@@ -273,15 +273,15 @@ static int16_t wav_read_pcm_sample(
     return 0;
 }
 
-void Audio::load_wav(const char* filename)
+void Audio_load_wav(Audio* self, const char* filename)
 {
     void* file_buffer = NULL;
     int64_t file_length = 0;
 
-    if (!sound_enabled)
+    if (!self->sound_enabled)
         return;
 
-    clear_wav();
+    Audio_clear_wav(self);
 
     if (!filestream_read_file(
             filename,
@@ -546,16 +546,16 @@ void Audio::load_wav(const char* filename)
 
     free(file_buffer);
 
-    wavfile.data =
+    self->wavfile.data =
         output_data;
 
-    wavfile.length =
+    self->wavfile.length =
         (uint32_t)output_samples;
 
-    wavfile.pos = 0;
-    wavfile.loaded = 1;
+    self->wavfile.pos = 0;
+    self->wavfile.loaded = 1;
 
-    resume_audio();
+    Audio_resume_audio(self);
 
     if (log_cb)
         log_cb(
@@ -570,18 +570,18 @@ void Audio::load_wav(const char* filename)
             (unsigned long)output_frames);
  } } } } } }}
 
-void Audio::clear_wav()
+void Audio_clear_wav(Audio* self)
 {
-    if (wavfile.loaded)
+    if (self->wavfile.loaded)
     {
-        if (wavfile.loaded == 1)
-            free(wavfile.data);
+        if (self->wavfile.loaded == 1)
+            free(self->wavfile.data);
         else
-            delete[] wavfile.data;        
+            delete[] self->wavfile.data;        
     }
 
-    wavfile.length = 1;
-    wavfile.data   = EMPTY_BUFFER;
-    wavfile.pos    = 0;
-    wavfile.loaded = false;
+    self->wavfile.length = 1;
+    self->wavfile.data   = EMPTY_BUFFER;
+    self->wavfile.pos    = 0;
+    self->wavfile.loaded = false;
 }

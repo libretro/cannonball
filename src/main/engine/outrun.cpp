@@ -297,7 +297,7 @@ void Outrun::main_switch()
             ostats.frame_counter = frame_reset;
             OHiScore_init(&ohiscore);
             OSoundInt_queue_sound(&osoundint, SOUND_FM_RESET);
-            cannonball_audio.clear_wav();
+            Audio_clear_wav(&cannonball_audio);
             game_state = GS_BEST1;
 
         case GS_BEST1:
@@ -532,7 +532,7 @@ void Outrun::main_switch()
             OHiScore_init(&ohiscore);
             OSoundInt_queue_sound(&osoundint, SOUND_NEW_COMMAND);
             OSoundInt_queue_sound(&osoundint, SOUND_FM_RESET);
-            cannonball_audio.clear_wav();
+            Audio_clear_wav(&cannonball_audio);
             game_state = GS_BEST2;
             /* fall through */
 

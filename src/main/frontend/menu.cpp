@@ -278,7 +278,7 @@ void Menu::init()
     /* Reset audio, so we can play tones */
     osoundint.has_booted = true;
     OSoundInt_init(&osoundint);
-    cannonball_audio.clear_wav();
+    Audio_clear_wav(&cannonball_audio);
 
     frame = 0;
     message_counter = 0;
@@ -633,9 +633,9 @@ void Menu::tick_menu()
             {
                 config.sound.enabled = !config.sound.enabled;
                 if (config.sound.enabled)
-                    cannonball_audio.start_audio();
+                    Audio_start_audio(&cannonball_audio);
                 else
-                    cannonball_audio.stop_audio();              
+                    Audio_stop_audio(&cannonball_audio);              
                 lr_options_set_frontend_variable_int(&config.sound.enabled);
             }
             else if (SELECTED(ENTRY_ADVERTISE))
@@ -1100,12 +1100,12 @@ bool Menu::check_jap_roms()
 void Menu::restart_video()
 {
     if (config.sound.enabled)
-        cannonball_audio.stop_audio();
+        Audio_stop_audio(&cannonball_audio);
     Video_disable(&video);
     Video_init(&video, &roms, &config.video);
     OSoundInt_init(&osoundint);
     if (config.sound.enabled)
-        cannonball_audio.start_audio();
+        Audio_start_audio(&cannonball_audio);
 }
 
 void Menu::start_game(int mode, int settings)

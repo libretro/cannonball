@@ -440,9 +440,9 @@ static void update_variables(bool startup)
       {
          config.sound.enabled = newval;
          if (config.sound.enabled)
-            cannonball_audio.start_audio();
+            Audio_start_audio(&cannonball_audio);
          else
-            cannonball_audio.stop_audio();
+            Audio_stop_audio(&cannonball_audio);
       }
    }
 
@@ -1060,7 +1060,7 @@ bool retro_load_game(const struct retro_game_info *info)
 
    menu = new Menu();
 
-   cannonball_audio.init();
+   Audio_init(&cannonball_audio);
    cannonball_state = config.menu.enabled ? STATE_INIT_MENU : STATE_INIT_GAME;
 
    /* Initialize controls */
@@ -1093,7 +1093,7 @@ bool retro_load_game_special(unsigned game_type,
 
 void retro_unload_game(void)
 {
-    cannonball_audio.stop_audio();
+    Audio_stop_audio(&cannonball_audio);
     Input_close(&input);
     forcefeedback_close();
     delete menu;
@@ -1128,6 +1128,7 @@ size_t retro_get_memory_size(unsigned id)
 
 void retro_init(void)
 {
+   Audio_ctor(&cannonball_audio);
    Config_ctor(&config);
    Roms_ctor(&roms);
    OSoundInt_ctor(&osoundint);
@@ -1169,7 +1170,7 @@ void retro_reset(void)
 
     forcefeedback_deactivate_rumble();
 
-    cannonball_audio.clear_wav();
+    Audio_clear_wav(&cannonball_audio);
 
     /* A frontend may request Reset immediately after changing a Core */
     /* Option, without running another frame. Refresh the live options */
@@ -1343,7 +1344,7 @@ void retro_run(void)
                 /* Tick audio program code */
                 OSoundInt_tick(&osoundint);
                 /* Tick Audio */
-                cannonball_audio.tick();
+                Audio_tick(&cannonball_audio);
             }
             else
             {                
@@ -1372,7 +1373,7 @@ void retro_run(void)
             /* Tick audio program code */
             OSoundInt_tick(&osoundint);
             /* Tick Audio */
-            cannonball_audio.tick();
+            Audio_tick(&cannonball_audio);
         }
         break;
 
