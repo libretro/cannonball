@@ -57,19 +57,19 @@ enum {
         TRACTION_OFF = 2
     };
 
-static const uint16_t PAL_RED = 2;
+#define PAL_RED 2
 
-static const uint16_t PAL_BLUE = 256;
+#define PAL_BLUE 256
 
-static const uint16_t PAL_YELLOW = 261;
+#define PAL_YELLOW 261
 
-static const uint16_t PAL_GREEN = 266;
+#define PAL_GREEN 266
 
-static const uint16_t PAL_CYAN = 271;
+#define PAL_CYAN 271
 
-static const uint16_t PAL_BLACK = 276;
+#define PAL_BLACK 276
 
-static const uint16_t PAL_WHITE = 281;
+#define PAL_WHITE 281
 
 static const uint32_t MAX_SPEED = 0x1260000;
 

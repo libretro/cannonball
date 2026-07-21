@@ -42,11 +42,11 @@ enum {ROAD_DOWN = -1, ROAD_NO_CHANGE = 0, ROAD_UP = 1};
 
 static const int32_t HORIZON_OFF = -0x3FF;
 
-static const uint8_t VIEW_ORIGINAL = 0;
+#define VIEW_ORIGINAL 0
 
-static const uint8_t VIEW_ELEVATED = 1;
+#define VIEW_ELEVATED 1
 
-static const uint8_t VIEW_INCAR    = 2;
+#define VIEW_INCAR 2
 
 static const uint32_t HW_HSCROLL_TABLE0 = 0x80400;
 
