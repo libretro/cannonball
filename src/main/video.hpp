@@ -24,16 +24,16 @@ const static float SHADOW_MAME = 0.78f;     /* Mame Intensity (78%) */
 struct hwsprites;
 struct video_settings_t;
 
-struct Video
+typedef struct Video
 {
-    hwsprites* sprite_layer;
-    hwtiles* tile_layer;
+    struct hwsprites* sprite_layer;
+    struct hwtiles* tile_layer;
     uint16_t *pixels;
     bool enabled;
     uint32_t rgb[S16_PALETTE_ENTRIES * 3];
     uint32_t shadow_multi;
     uint8_t palette[S16_PALETTE_ENTRIES * 2];
-};
+} Video;
 
 extern Video video;
 
@@ -41,11 +41,11 @@ void Video_ctor(Video* self);
 
 void Video_dtor(Video* self);
 
-int Video_init(Video* self, Roms* roms, video_settings_t* settings);
+int Video_init(Video* self, Roms* roms, struct video_settings_t* settings);
 
 void Video_disable(Video* self);
 
-int Video_set_video_mode(Video* self, video_settings_t* settings);
+int Video_set_video_mode(Video* self, struct video_settings_t* settings);
 
 void Video_set_shadow_intensity(Video* self, float);
 

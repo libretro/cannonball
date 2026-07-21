@@ -15,12 +15,12 @@
 #include <string>
 #include <vector>
 
-struct data_settings_t
+typedef struct data_settings_t
 {
     std::string res_path;
-};
+} data_settings_t;
 
-struct music_t
+typedef struct music_t
 {
     const static int IS_YM_INT = 0;
     const static int IS_YM_EXT = 1;
@@ -30,29 +30,29 @@ struct music_t
     int cmd;
     std::string title;
     std::string filename;
-};
+} music_t;
 
-struct custom_music_t
+typedef struct custom_music_t
 {
     int enabled;
     std::string title;
     std::string filename;
-};
+} custom_music_t;
 
-struct ttrial_settings_t
+typedef struct ttrial_settings_t
 {
     int laps;
     int traffic;
     uint16_t best_times[15];
-};
+} ttrial_settings_t;
 
-struct menu_settings_t
+typedef struct menu_settings_t
 {
     int enabled;
     int road_scroll_speed;
-};
+} menu_settings_t;
 
-struct video_settings_t
+typedef struct video_settings_t
 {
     const static int MODE_WINDOW  = 0;
     const static int MODE_FULL    = 1;
@@ -67,9 +67,9 @@ struct video_settings_t
     int hires;
     int filtering;
     int shadow;
-};
+} video_settings_t;
 
-struct sound_settings_t
+typedef struct sound_settings_t
 {
     int enabled;
     int rate;
@@ -79,9 +79,9 @@ struct sound_settings_t
     int music_timer;
     std::vector<music_t> music;
     custom_music_t custom_music[4];
-};
+} sound_settings_t;
 
-struct controls_settings_t
+typedef struct controls_settings_t
 {
     const static int GEAR_BUTTON   = 0;
     const static int GEAR_PRESS    = 1; /* For cabinets */
@@ -102,9 +102,9 @@ struct controls_settings_t
     int max_force;
     int min_force;
     int force_duration;
-};
+} controls_settings_t;
 
-struct engine_settings_t
+typedef struct engine_settings_t
 {
     int dip_time;
     int dip_traffic;
@@ -129,9 +129,9 @@ struct engine_settings_t
     bool turbo;
     int car_pal;
     
-};
+} engine_settings_t;
 
-struct Config
+typedef struct Config
 {
     data_settings_t        data;
     menu_settings_t        menu;
@@ -145,7 +145,7 @@ struct Config
     int fps;
     int tick_fps;
     int cont_traffic;
-};
+} Config;
 
 extern Config config;
 

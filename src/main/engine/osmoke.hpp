@@ -11,7 +11,7 @@
 
 #include "outrun.hpp"
 
-struct OSmoke
+typedef struct OSmoke
 {
     /* Load smoke sprites for next level? */
     int8_t load_smoke_data;
@@ -24,7 +24,7 @@ struct OSmoke
 
     /* Ferrari wheel smoke type after car collision */
     uint16_t smoke_type_slip;
-};
+} OSmoke;
 
 extern OSmoke osmoke;
 

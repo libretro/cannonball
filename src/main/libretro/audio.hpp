@@ -15,12 +15,12 @@
 
 #include "globals.hpp"
 
-struct wav_t {
+typedef struct wav_t {
     uint8_t loaded;
     int16_t *data;
     uint32_t pos;
     uint32_t length;
-};
+} wav_t;
 
 static const uint32_t FREQ = 44100;
 
@@ -32,13 +32,13 @@ static const uint32_t SAMPLES  = 1024;
 
 static const int SND_DELAY = 20;
 
-struct Audio
+typedef struct Audio
 {
     bool sound_enabled;
     uint16_t custom_wav_volume;
     uint16_t* mix_buffer;
     wav_t wavfile;
-};
+} Audio;
 
 extern Audio cannonball_audio;
 

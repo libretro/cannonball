@@ -17,16 +17,16 @@
 #include "globals.hpp"
 
 /* Road Generator Palette Representation */
-struct RoadPalette
+typedef struct RoadPalette
 {
     uint32_t stripe_centre;   /* Centre Stripe Colour */
     uint32_t stripe;          /* Stripe Colour */
     uint32_t side;            /* Side Colour */
     uint32_t road;            /* Main Road Colour */
-};
+} RoadPalette;
 
 /* OutRun Level Representation */
-struct Level
+typedef struct Level
 {
     uint8_t* path;            /* CPU 1 Path Data */
     uint8_t* curve;           /* Track Curve Information (Derived From Path) */
@@ -38,10 +38,10 @@ struct Level
 
     RoadPalette palr1;        /* Road 1 Generator Palette */
     RoadPalette palr2;        /* Road 2 Generator Palette */
-};
+} Level;
 
 /* LayOut Binary Header Format */
-struct LayOut
+typedef struct LayOut
 {
     static const uint32_t EXPECTED_VERSION = 1;
 
@@ -56,7 +56,7 @@ struct LayOut
     static const uint32_t PAL_GND     = PAL_SKY     + sizeof(uint32_t);
     static const uint32_t SPRITE_MAPS = PAL_GND     + sizeof(uint32_t);
     static const uint32_t HEIGHT_MAPS = SPRITE_MAPS + sizeof(uint32_t);
-};
+} LayOut;
 
 struct RomLoader;
 
@@ -71,7 +71,7 @@ static const int TL_MODE_ORIGINAL = 0;
 
 static const int TL_MODE_LAYOUT   = 1;
 
-struct TrackLoader
+typedef struct TrackLoader
 {
     uint8_t* stage_data;
     Level* current_level;
@@ -93,7 +93,7 @@ struct TrackLoader
     Level* level_split;
     Level* levels_end;
     uint8_t* current_path;
-};
+} TrackLoader;
 
 extern TrackLoader trackloader;
 

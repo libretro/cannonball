@@ -11,7 +11,7 @@
 
 #include "outrun.hpp"
 
-struct OPalette
+typedef struct OPalette
 {
     uint8_t pal_manip_ctrl;
     uint32_t pal_manip[(0x20 * 0x1F) * 2];
@@ -21,7 +21,7 @@ struct OPalette
     int16_t fade_counter;
     uint16_t sky_palette_index;
     uint8_t sky_fade_offset;
-};
+} OPalette;
 
 extern OPalette opalette;
 

@@ -13,7 +13,7 @@
 
 static const bool VERBOSE = true;
 
-struct Roms
+typedef struct Roms
 {
     RomLoader rom0;
     RomLoader rom1;
@@ -27,7 +27,7 @@ struct Roms
     RomLoader* rom0p;
     RomLoader* rom1p;
     int jap_rom_status;
-};
+} Roms;
 
 extern Roms roms;
 

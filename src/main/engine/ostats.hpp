@@ -17,7 +17,7 @@ static const int16_t frame_reset = 30;
 
 extern const uint8_t TIME[];
 
-struct OStats
+typedef struct OStats
 {
     int8_t cur_stage;
     uint32_t score;
@@ -32,7 +32,7 @@ struct OStats
     uint8_t credits;
     uint8_t stage_times[15][3];
     uint8_t ms_value;
-};
+} OStats;
 
 extern OStats ostats;
 

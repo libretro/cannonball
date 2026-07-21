@@ -15,7 +15,7 @@ struct RomLoader;
 
 static const short HAND_LEFT = 0, HAND_CENTRE = 1, HAND_RIGHT = 2;
 
-struct OMusic
+typedef struct OMusic
 {
     RomLoader* tilemap;
     RomLoader* tile_patch;
@@ -26,7 +26,7 @@ struct OMusic
     uint16_t entry_start;
     int16_t last_music_selected;
     int8_t preview_counter;
-};
+} OMusic;
 
 extern OMusic omusic;
 

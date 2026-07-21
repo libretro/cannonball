@@ -21,7 +21,7 @@ static const uint16_t PCM_RAM_SIZE = 0x100;
 
 static const uint32_t SOUND_CLOCK = 4000000;
 
-struct OSoundInt
+typedef struct OSoundInt
 {
     SegaPCM* pcm;
     YM2151*  ym;
@@ -33,7 +33,7 @@ struct OSoundInt
     uint8_t queue[QUEUE_LENGTH + 1];
     uint8_t sounds_queued;
     uint8_t sound_head, sound_tail;
-};
+} OSoundInt;
 
 extern OSoundInt osoundint;
 

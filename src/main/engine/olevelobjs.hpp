@@ -26,13 +26,13 @@ static const uint8_t COLLISION_RESET = 4;
 
 static const uint16_t SPRAY_RESET = 0xC;
 
-struct OLevelObjs
+typedef struct OLevelObjs
 {
     uint16_t spray_counter;
     uint16_t spray_type;
     uint8_t collision_sprite;
     int16_t sprite_collision_counter;
-};
+} OLevelObjs;
 
 extern OLevelObjs olevelobjs;
 

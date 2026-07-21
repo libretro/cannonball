@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 
-struct score_entry
+typedef struct score_entry
 {
     uint32_t score;
     uint8_t initial1;
@@ -18,16 +18,16 @@ struct score_entry
     uint8_t initial3;
     uint32_t maptiles;
     uint16_t time;
-};
+} score_entry;
 
-struct minicar_entry
+typedef struct minicar_entry
     {
         int16_t pos;            /* [+0] Word 0: Position */
         int16_t speed;          /* [+2] Word 1: Speed (increments over time) */
         int16_t base_speed;     /* [+4] Word 2: Base Speed */
         int16_t dst_reached;    /* [+6] Word 3: Set when reached destination */
         uint16_t tile_props;    /* [+8] Word 4: Palette/Priority bits for tile */
-    };
+    } minicar_entry;
 
 enum { NO_SCORES = 20 };
 
@@ -42,7 +42,7 @@ enum { NO_MINICARS = 7 };
 
 static const uint16_t TILE_PROPS = 0x8030;
 
-struct OHiScore
+typedef struct OHiScore
 {
     score_entry scores[NO_SCORES];
     uint8_t best_or_state;
@@ -58,7 +58,7 @@ struct OHiScore
     int8_t score_display_pos;
     minicar_entry minicars[NO_MINICARS];
     uint16_t laptime[6];
-};
+} OHiScore;
 
 extern OHiScore ohiscore;
 

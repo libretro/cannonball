@@ -15,12 +15,12 @@
 
 enum {NORMAL = 1, INTERLEAVE2 = 2, INTERLEAVE4 = 4};
 
-struct RomLoader
+typedef struct RomLoader
 {
     uint8_t* rom;
     uint32_t length;
     bool loaded;
-};
+} RomLoader;
 
 void RomLoader_dtor(RomLoader* self);
 

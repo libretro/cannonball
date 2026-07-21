@@ -15,7 +15,7 @@
 
 #include "oentry.hpp"
 
-struct oanimsprite
+typedef struct oanimsprite
 {
 
     /* Base Sprite */
@@ -62,4 +62,4 @@ struct oanimsprite
         anim_props = 0;
         anim_state = 0;
     }
-};
+} oanimsprite;

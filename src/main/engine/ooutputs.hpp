@@ -18,13 +18,13 @@
 
 #include <stdint.h>
 
-struct CoinChute
+typedef struct CoinChute
 {
     /* Coin Chute Counters */
     uint8_t counter[3];
     /* Output bit */
     uint8_t output_bit;
-};
+} CoinChute;
 
 enum {
         D_EXT_MUTE   = 0x01, /* bit 0 = External Amplifier Mute Control */
@@ -73,7 +73,7 @@ static const uint8_t LEFT_LIMIT    = 0xC1;
 
 static const uint8_t RIGHT_LIMIT   = 0x3C;
 
-struct OOutputs
+typedef struct OOutputs
 {
     uint8_t hw_motor_control, hw_motor_control_old;
     CoinChute chute1, chute2;
@@ -98,7 +98,7 @@ struct OOutputs
     int16_t movement_adjust3;
     int16_t counter;
     uint16_t col1, col2;
-};
+} OOutputs;
 
 void OOutputs_ctor(OOutputs* self);
 

@@ -25,7 +25,7 @@ enum {
 
 static const int32_t MESSAGE_TIME = 5;
 
-struct Menu
+typedef struct Menu
 {
     uint8_t state;
     TTrial* ttrial;
@@ -66,7 +66,7 @@ struct Menu
     uint8_t menu_musictest_num;
     const char* text_redefine[MENU_MAX_ENTRIES];
     uint8_t text_redefine_num;
-};
+} Menu;
 
 void Menu_ctor(Menu* self);
 

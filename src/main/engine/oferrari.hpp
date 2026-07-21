@@ -77,7 +77,7 @@ extern uint16_t torque_lookup[];
 
 extern const uint8_t rev_inc_lookup[];
 
-struct OFerrari
+typedef struct OFerrari
 {
     oentry *spr_ferrari;
     oentry *spr_pass1;
@@ -135,7 +135,7 @@ struct OFerrari
     int16_t gfx_smoke;
     int8_t cornering;
     int8_t cornering_old;
-};
+} OFerrari;
 
 extern OFerrari oferrari;
 

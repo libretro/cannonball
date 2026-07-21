@@ -21,7 +21,7 @@ enum
         TRAFFIC_TICK = 0x12        /* Tick Normally */
     };
 
-struct OTraffic
+typedef struct OTraffic
 {
     uint8_t ai_traffic;
     uint8_t bonus_lhs;
@@ -38,7 +38,7 @@ struct OTraffic
     int16_t spawn_location;
     int16_t wheel_reset;
     int16_t wheel_counter;
-};
+} OTraffic;
 
 extern OTraffic otraffic;
 

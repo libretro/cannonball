@@ -81,7 +81,7 @@ static const uint32_t SPRITE_RAM = 0x130000;
 
 static const uint32_t PAL_SPRITES = 0x121000;
 
-struct OSprites
+typedef struct OSprites
 {
     uint8_t no_sprites;
     oentry jump_table[JUMP_ENTRIES_TOTAL];
@@ -104,7 +104,7 @@ struct OSprites
     uint8_t pal_lookup[PAL_LOOKUP_LENGTH];
     uint8_t sprite_order[0x2000];
     uint8_t sprite_order2[0x2000];
-};
+} OSprites;
 
 extern OSprites osprites;
 

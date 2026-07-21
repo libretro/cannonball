@@ -35,7 +35,7 @@ enum {
         ANCHOR_TOP = 4,
         ANCHOR_BOTTOM = 8
     };
-struct oentry
+typedef struct oentry
 {
 
 	/* +00 [Byte] Bit 7 Enables/Disables Address */
@@ -185,5 +185,5 @@ struct oentry
         yw = 0;
         pass_props = 0;
 	}
-};
+} oentry;
 

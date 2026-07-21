@@ -28,7 +28,7 @@ static const uint32_t BANK_MASKF  = (0xf0 << 16);
 
 static const uint32_t BANK_MASKF8 = (0xf8 << 16);
 
-struct SegaPCM
+typedef struct SegaPCM
 {
     SoundChip sc;
     uint8_t* ram;
@@ -39,7 +39,7 @@ struct SegaPCM
     int32_t bankmask;
     int32_t rgnmask;
     double downsample;
-};
+} SegaPCM;
 
 void SegaPCM_ctor(SegaPCM* self, uint32_t clock, RomLoader* rom, uint8_t* ram, int32_t bank);
 

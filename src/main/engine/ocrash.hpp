@@ -33,7 +33,7 @@ static const uint8_t SKID_MAX = 30;
 
 static const uint8_t SKID_X_ADJ = 24;
 
-struct OCrash
+typedef struct OCrash
 {
     oentry* spr_ferrari;
     oentry* spr_shadow;
@@ -69,7 +69,7 @@ struct OCrash
     int16_t crash_delay;
     void (*function_pass1)(OCrash* self, oentry*);
     void (*function_pass2)(OCrash* self, oentry*);
-};
+} OCrash;
 
 extern OCrash ocrash;
 

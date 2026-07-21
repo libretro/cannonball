@@ -238,7 +238,7 @@ static const uint8_t PAN_RIGHT = 0x80;
 
 static const uint8_t PAN_CENTRE = PAN_LEFT | PAN_RIGHT;
 
-struct OSound
+typedef struct OSound
 {
     uint8_t command_input;
     uint8_t engine_data[8];
@@ -253,7 +253,7 @@ struct OSound
     uint16_t chanid_prev;
     uint8_t engine_counter;
     uint8_t engine_channel;
-};
+} OSound;
 
 extern OSound osound;
 

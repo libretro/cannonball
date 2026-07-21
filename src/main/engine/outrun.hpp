@@ -52,7 +52,7 @@ enum
     GS_CALIBRATE_MOTOR = 100   /* Calibrate Motors */
 };
 
-struct time_trial_t
+typedef struct time_trial_t
 {
     bool enabled;             /* Time Trial Mode Enabled */
     uint8_t  level;           /* Time Trial Level */
@@ -66,10 +66,10 @@ struct time_trial_t
     int16_t  best_lap_counter;/* Counter representing best laptime */
     uint8_t  best_lap[3];     /* Stored best lap time */
     bool new_high_score;      /* Has player achieved a new high score? */
-};
+} time_trial_t;
 
 /* Addresses (Used to swap between original and Japanese roms) */
-struct adr_t
+typedef struct adr_t
 {
     /* CPU 0 */
     uint32_t tiles_def_lookup;
@@ -172,7 +172,7 @@ struct adr_t
     
     /* CPU 1 */
     uint32_t road_height_lookup;
-};
+} adr_t;
 
 struct OOutputs;
 
@@ -182,7 +182,7 @@ static const uint8_t MODE_TTRIAL   = 1;
 
 static const uint8_t MODE_CONT     = 2;
 
-struct Outrun
+typedef struct Outrun
 {
     OOutputs* outputs;
     bool freeze_timer;
@@ -198,7 +198,7 @@ struct Outrun
     int16_t attract_counter;
     uint32_t car_inc_bak;
     int8_t fork_chosen;
-};
+} Outrun;
 
 extern Outrun outrun;
 

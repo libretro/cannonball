@@ -24,7 +24,7 @@ enum {VSWAP_OFF, VSWAP_SCROLL_OFF, VSWAP_SCROLL_ON};
 
 enum { SETUP_TILES, SETUP_PAL };
 
-struct OTiles
+typedef struct OTiles
 {
     uint8_t tilemap_ctrl;
     int8_t page;
@@ -47,7 +47,7 @@ struct OTiles
     bool clear_name_tables;
     bool page_split;
     uint16_t h_scroll_lookup;
-};
+} OTiles;
 
 extern OTiles otiles;
 

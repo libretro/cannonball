@@ -10,13 +10,13 @@ enum { SPRITES_LENGTH = 0x100000 >> 2 };
 
 static const uint16_t COLOR_BASE = 0x800;
 
-struct hwsprites
+typedef struct hwsprites
 {
     uint16_t x1, x2;
     uint32_t sprites[SPRITES_LENGTH];
     uint16_t ram[SPRITE_RAM_SIZE];
     uint16_t ramBuff[SPRITE_RAM_SIZE];
-};
+} hwsprites;
 
 void hwsprites_init(hwsprites* self, const uint8_t*);
 

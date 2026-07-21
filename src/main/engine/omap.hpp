@@ -35,7 +35,7 @@ enum
 
 static const uint8_t MAP_PIECES = 0x3C;
 
-struct OMap
+typedef struct OMap
 {
     bool init_sprites;
     uint8_t map_state;
@@ -46,7 +46,7 @@ struct OMap
     int16_t map_stage1;
     int16_t map_stage2;
     uint8_t minicar_enable;
-};
+} OMap;
 
 extern OMap omap;
 

@@ -18,7 +18,7 @@ static const uint8_t SNDCHIP_LEFT             = 0;
 
 static const uint8_t SNDCHIP_RIGHT            = 1;
 
-struct SoundChip
+typedef struct SoundChip
 {
     bool initalized;
     uint32_t sample_freq;
@@ -28,7 +28,7 @@ struct SoundChip
     float volume;
     int16_t* buffer;
     uint32_t fps;
-};
+} SoundChip;
 
 void SoundChip_ctor(SoundChip* self);
 

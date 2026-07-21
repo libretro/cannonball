@@ -40,10 +40,10 @@
 
 #include "outrun.hpp"
 
-struct OAttractAI
+typedef struct OAttractAI
 {
     int8_t last_stage;
-};
+} OAttractAI;
 
 extern OAttractAI oattractai;
 

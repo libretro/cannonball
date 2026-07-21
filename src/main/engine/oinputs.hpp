@@ -34,7 +34,7 @@ static const uint8_t PEDAL_MIN = 0x30;
 
 static const uint8_t PEDAL_MAX = 0x90;
 
-struct OInputs
+typedef struct OInputs
 {
     int8_t crash_input;
     int16_t input_acc;
@@ -50,7 +50,7 @@ struct OInputs
     int16_t steering_old;
     int16_t steering_change;
     int16_t input_brake;
-};
+} OInputs;
 
 extern OInputs oinputs;
 

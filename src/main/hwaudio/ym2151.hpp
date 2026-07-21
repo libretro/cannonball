@@ -69,14 +69,14 @@ typedef struct
 
 } YM2151Operator;
 
-struct YM2151
+typedef struct YM2151
 {
     SoundChip sc;
     bool irq;
     int clock;
     int sampfreq;
     float volume;
-};
+} YM2151;
 
 void YM2151_ctor(YM2151* self, float volume, uint32_t clock);
 

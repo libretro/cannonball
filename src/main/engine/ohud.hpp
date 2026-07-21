@@ -23,10 +23,10 @@ enum {
 
 static const uint16_t DIGIT_BASE = 0x30;
 
-struct OHud
+typedef struct OHud
 {
     int colors;
-};
+} OHud;
 
 extern OHud ohud;
 

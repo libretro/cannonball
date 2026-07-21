@@ -17,7 +17,7 @@
 
 #include "oanimsprite.hpp"
 
-struct OAnimSeq
+typedef struct OAnimSeq
 {
     oanimsprite anim_flag;
     oanimsprite anim_ferrari;
@@ -35,7 +35,7 @@ struct OAnimSeq
     int16_t seq_pos;
     uint8_t end_seq_state;
     bool ferrari_stopped;
-};
+} OAnimSeq;
 
 extern OAnimSeq oanimseq;
 

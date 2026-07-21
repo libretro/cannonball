@@ -10,11 +10,11 @@
 
 #include <stdint.h>
 
-struct osprite
+typedef struct osprite
 {
     uint16_t data[0x7];
     uint32_t scratch;
-};
+} osprite;
 
 void osprite_init(osprite* self);
 

@@ -35,7 +35,7 @@ static const int CENTRE = 0x80;
 
 static const int DIGITAL_DEAD = 3200;
 
-struct Input
+typedef struct Input
 {
     bool keys[15];
     bool keys_old[15];
@@ -52,7 +52,7 @@ struct Input
     int wheel_zone;
     int wheel_dead;
     int pedals_dead;
-};
+} Input;
 
 extern Input input;
 

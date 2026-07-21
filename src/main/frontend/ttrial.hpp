@@ -26,13 +26,13 @@ static const uint8_t MAX_LAPS = 5;
 
 static const uint8_t MAX_TRAFFIC = 8;
 
-struct TTrial
+typedef struct TTrial
 {
     uint8_t state;
     int8_t level_selected;
     uint16_t* best_times;
     uint8_t best_converted[3];
-};
+} TTrial;
 
 void TTrial_ctor(TTrial* self, uint16_t* best_times);
 

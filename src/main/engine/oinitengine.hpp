@@ -21,7 +21,7 @@ enum {ROAD_NOCHANGE, ROAD_STRAIGHT, ROAD_RIGHT, ROAD_LEFT};
 
 static const uint16_t RD_WIDTH_MERGE = 0xD4;
 
-struct OInitEngine
+typedef struct OInitEngine
 {
     int16_t camera_x_off;
     bool ingame_engine;
@@ -46,7 +46,7 @@ struct OInitEngine
     int16_t road_width_orig;
     int16_t road_width_merge;
     int8_t route_updated;
-};
+} OInitEngine;
 
 extern OInitEngine oinitengine;
 

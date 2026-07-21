@@ -11,12 +11,12 @@
 
 extern const uint8_t bg_pal[];
 
-struct OLogo
+typedef struct OLogo
 {
     uint32_t palm_frames[8];
     uint8_t entry_start;
     int16_t y_off;
-};
+} OLogo;
 
 extern OLogo ologo;
 

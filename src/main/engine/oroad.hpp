@@ -50,7 +50,7 @@ static const uint32_t HW_HSCROLL_TABLE1 = 0x80800;
 
 static const uint32_t HW_BGCOLOR = 0x80C00;
 
-struct ORoad
+typedef struct ORoad
 {
     uint32_t road_pos;
     int16_t tilemap_h_target;
@@ -112,7 +112,7 @@ struct ORoad
     uint32_t y_addr;
     int16_t scanline;
     int32_t total_height;
-};
+} ORoad;
 
 extern ORoad oroad;
 

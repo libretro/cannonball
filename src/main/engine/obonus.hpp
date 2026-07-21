@@ -33,7 +33,7 @@ enum
     BONUS_TEXT_DONE = 3
 };
 
-struct OBonus
+typedef struct OBonus
 {
     /* Bonus Control */
     int8_t bonus_control;
@@ -48,7 +48,7 @@ struct OBonus
     int16_t bonus_secs;
 
     int16_t bonus_counter;
-};
+} OBonus;
 
 extern OBonus obonus;
 
