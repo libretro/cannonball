@@ -15,9 +15,9 @@
 
 #include "oentry.hpp"
 
-class oanimsprite
+struct oanimsprite
 {
-public:
+
     /* Base Sprite */
     oentry* sprite;
 
