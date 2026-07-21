@@ -29,9 +29,6 @@ public:
 
     void init(uint8_t, int32_t, int32_t);
 
-    /* Pure virtual function. Denotes virtual class. */
-    virtual void stream_update() = 0;
-
     int16_t* get_buffer();
     void set_volume(uint8_t);
 
