@@ -12,6 +12,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /* FM Note & Octave Lookup Table */
 const static uint16_t YM_NOTE_OCTAVE = 0xAC9;
@@ -104,3 +108,7 @@ const static uint16_t ENGINE_ADR_TABLE = 0x7951;
 
 /* Traffic Volume Multiply Table. How much to increase traffic volume by dependent on distance. */
 const static uint16_t TRAFFIC_VOL_MULTIPLY = 0x7CEF;
+
+#ifdef __cplusplus
+}
+#endif

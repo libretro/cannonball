@@ -12,6 +12,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "oentry.hpp"
 
@@ -64,3 +68,6 @@ static void oanimsprite_init(oanimsprite* self, oentry* s)
     self->anim_state = 0;
 }
 
+#ifdef __cplusplus
+}
+#endif

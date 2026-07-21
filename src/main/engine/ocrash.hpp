@@ -22,6 +22,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -82,3 +86,7 @@ void OCrash_enable(OCrash* self);
 void OCrash_clear_crash_state(OCrash* self);
 
 void OCrash_tick(OCrash* self);
+
+#ifdef __cplusplus
+}
+#endif

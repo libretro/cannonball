@@ -11,6 +11,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 #include "romloader.hpp"
@@ -89,3 +93,7 @@ void YM2151_stream_update(YM2151* self);
 void YM2151_write_reg(YM2151* self, int r, int v);
 
 int YM2151_read_status(YM2151* self);
+
+#ifdef __cplusplus
+}
+#endif

@@ -15,6 +15,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -47,3 +51,7 @@ void OLevelObjs_setup_sprites(OLevelObjs* self, uint32_t);
 void OLevelObjs_do_sprite_routine(OLevelObjs* self);
 
 void OLevelObjs_hide_sprite(OLevelObjs* self, oentry*);
+
+#ifdef __cplusplus
+}
+#endif

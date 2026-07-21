@@ -15,6 +15,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 enum {
     MODE_DISABLED = 0,
@@ -107,3 +111,7 @@ void OOutputs_clear_digital(OOutputs* self, uint8_t);
 int OOutputs_is_set(OOutputs* self, uint8_t);
 
 void OOutputs_coin_chute_out(OOutputs* self, CoinChute* chute, bool insert);
+
+#ifdef __cplusplus
+}
+#endif

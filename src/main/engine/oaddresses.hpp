@@ -13,6 +13,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /* ---------------------------------------------------------------------------- */
 /* Text Structures */
@@ -612,3 +616,7 @@ const uint32_t WH_TABLE = 0x20000;
 /* 0     - 0xFF : X Position */
 /* 0x100 - 0x1FF: Y Position */
 const uint32_t DATA_MOVEMENT = 0x30800;
+
+#ifdef __cplusplus
+}
+#endif

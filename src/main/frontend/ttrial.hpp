@@ -7,6 +7,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 
@@ -41,3 +45,7 @@ void TTrial_init(TTrial* self);
 int TTrial_tick(TTrial* self);
 
 void TTrial_update_best_time(TTrial* self);
+
+#ifdef __cplusplus
+}
+#endif

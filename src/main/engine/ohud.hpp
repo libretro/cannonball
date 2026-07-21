@@ -12,6 +12,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -79,3 +83,7 @@ void OHud_draw_credits(OHud* self);
 uint32_t OHud_setup_mini_map(OHud* self);
 
 uint32_t OHud_translate(OHud* self, const uint16_t x, const uint16_t y, const uint32_t BASE_POS);
+
+#ifdef __cplusplus
+}
+#endif

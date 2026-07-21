@@ -11,6 +11,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 #include "romloader.hpp"
@@ -48,3 +52,7 @@ void SegaPCM_dtor(SegaPCM* self);
 void SegaPCM_init(SegaPCM* self, int32_t rate, int32_t fps);
 
 void SegaPCM_stream_update(SegaPCM* self);
+
+#ifdef __cplusplus
+}
+#endif

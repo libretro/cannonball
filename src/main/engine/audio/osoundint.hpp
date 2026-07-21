@@ -10,6 +10,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "hwaudio/segapcm.hpp"
 #include "hwaudio/ym2151.hpp"
@@ -54,3 +58,7 @@ void OSoundInt_queue_sound_service(OSoundInt* self, uint8_t snd);
 void OSoundInt_queue_sound(OSoundInt* self, uint8_t snd);
 
 void OSoundInt_queue_clear(OSoundInt* self);
+
+#ifdef __cplusplus
+}
+#endif

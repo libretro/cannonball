@@ -18,6 +18,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -164,3 +168,7 @@ void OFerrari_do_sound_score_slip(OFerrari* self);
 void OFerrari_shake(OFerrari* self);
 
 void OFerrari_do_skid(OFerrari* self);
+
+#ifdef __cplusplus
+}
+#endif

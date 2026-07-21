@@ -9,6 +9,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <boolean.h>
 
@@ -154,3 +158,6 @@ bool Config_clear_scores(Config* self);
 
 void Config_set_fps(Config* self, int fps);
 
+#ifdef __cplusplus
+}
+#endif

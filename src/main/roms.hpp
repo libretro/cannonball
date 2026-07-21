@@ -6,6 +6,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <boolean.h>
 
@@ -40,3 +44,7 @@ bool Roms_load_japanese_roms(Roms* self);
 int Roms_load_pcm_rom(Roms* self, bool);
 
 bool Roms_load_ym_data(Roms* self, const char* filename);
+
+#ifdef __cplusplus
+}
+#endif

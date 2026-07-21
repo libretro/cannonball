@@ -14,6 +14,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <boolean.h>
 
@@ -53,3 +57,6 @@ void OAnimSeq_init_end_seq(OAnimSeq* self);
 
 void OAnimSeq_tick_end_seq(OAnimSeq* self);
 
+#ifdef __cplusplus
+}
+#endif

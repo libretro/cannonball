@@ -6,6 +6,10 @@
     The original game features a bug, which causes sprites at certain z
     positions to be scaled incorrectly.
 ***************************************************************************/
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 
@@ -293,3 +297,7 @@ const static uint16_t ZOOM_LOOKUP[] =
     0x0100, 0x7F00, SIZE1, UNUSED,
     0x0100, 0x7F00, SIZE1, UNUSED,
 };
+
+#ifdef __cplusplus
+}
+#endif

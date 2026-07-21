@@ -13,6 +13,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -61,3 +65,7 @@ void OMap_load_sprites(OMap* self);
 void OMap_draw_course_map(OMap* self);
 
 void OMap_position_ferrari(OMap* self, uint8_t index);
+
+#ifdef __cplusplus
+}
+#endif

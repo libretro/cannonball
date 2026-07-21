@@ -7,6 +7,10 @@
     Copyright Chris White.
     See license.txt for more details.
 ***************************************************************************/
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 
@@ -51,3 +55,7 @@ void osprite_sub_height(osprite* self, uint8_t);
 void osprite_set_bank(osprite* self, uint8_t);
 
 void osprite_hide(osprite* self);
+
+#ifdef __cplusplus
+}
+#endif

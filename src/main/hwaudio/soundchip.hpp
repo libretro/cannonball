@@ -9,6 +9,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <boolean.h>
 
@@ -47,3 +51,7 @@ void SoundChip_clear_buffer(SoundChip* self);
 void SoundChip_write_buffer(SoundChip* self, const uint8_t, uint32_t, int16_t);
 
 int16_t SoundChip_read_buffer(SoundChip* self, const uint8_t, uint32_t);
+
+#ifdef __cplusplus
+}
+#endif

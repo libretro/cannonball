@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "globals.hpp"
 
@@ -27,3 +31,7 @@ enum
     STATE_GAME,
     STATE_QUIT
 };
+
+#ifdef __cplusplus
+}
+#endif

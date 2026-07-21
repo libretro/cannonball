@@ -7,6 +7,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /* ---------------------------------------------------------------------------- */
 /* Commands to send from main program code */
@@ -65,3 +69,7 @@ enum
     SOUND_TRAFFIC3,
     SOUND_TRAFFIC4
 };
+
+#ifdef __cplusplus
+}
+#endif

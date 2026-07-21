@@ -8,6 +8,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -32,3 +36,7 @@ void OSmoke_init(OSmoke* self);
 void OSmoke_setup_smoke_sprite(OSmoke* self, bool force_load);
 void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry* sprite);
 void OSmoke_draw(OSmoke* self, oentry* sprite);
+
+#ifdef __cplusplus
+}
+#endif

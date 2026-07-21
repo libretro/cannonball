@@ -8,6 +8,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 #include "roms.hpp"
@@ -219,3 +223,7 @@ void Outrun_init_best_outrunners(Outrun* self);
 void Outrun_select_course(Outrun* self, const bool jap, const bool prototype);
 
 extern Outrun outrun;
+
+#ifdef __cplusplus
+}
+#endif

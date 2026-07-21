@@ -29,6 +29,7 @@ SOURCES_C += \
 	       $(LIBRETRO_COMM_DIR)/streams/file_stream.c \
 	       $(LIBRETRO_COMM_DIR)/streams/file_stream_transforms.c \
 	       $(LIBRETRO_COMM_DIR)/string/stdstring.c \
+	       $(CORE_DIR)/src/main/engine/osmoke.c \
 	       $(LIBRETRO_COMM_DIR)/time/rtime.c
 endif
 
@@ -61,7 +62,6 @@ SOURCES_CXX := \
 			      $(CORE_DIR)/src/main/engine/ooutputs.cpp \
 			      $(CORE_DIR)/src/main/engine/opalette.cpp \
 			      $(CORE_DIR)/src/main/engine/oroad.cpp \
-			      $(CORE_DIR)/src/main/engine/osmoke.cpp \
 			      $(CORE_DIR)/src/main/engine/osprite.cpp \
 			      $(CORE_DIR)/src/main/engine/osprites.cpp \
 			      $(CORE_DIR)/src/main/engine/ostats.cpp \

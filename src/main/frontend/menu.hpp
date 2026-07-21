@@ -7,6 +7,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #define MENU_MAX_ENTRIES 24
 
@@ -77,3 +81,7 @@ void Menu_init(Menu* self);
 void Menu_tick(Menu* self);
 
 void Menu_refresh_menu(Menu* self);
+
+#ifdef __cplusplus
+}
+#endif

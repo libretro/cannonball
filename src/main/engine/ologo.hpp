@@ -8,6 +8,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 extern const uint8_t bg_pal[];
 
@@ -27,3 +31,7 @@ void OLogo_disable(OLogo* self);
 void OLogo_tick(OLogo* self);
 
 void OLogo_blit(OLogo* self);
+
+#ifdef __cplusplus
+}
+#endif

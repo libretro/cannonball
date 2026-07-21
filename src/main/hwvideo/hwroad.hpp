@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <boolean.h>
 
@@ -36,3 +40,6 @@ uint16_t HWRoad_read_road_control(struct HWRoad* self);
 
 void HWRoad_write_road_control(struct HWRoad* self, const uint8_t);
 
+#ifdef __cplusplus
+}
+#endif

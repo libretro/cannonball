@@ -8,6 +8,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <boolean.h>
 
@@ -76,3 +80,6 @@ void Input_handle_key(Input* self, const int, const bool);
 
 void Input_handle_joy(Input* self, const uint8_t, const bool);
 
+#ifdef __cplusplus
+}
+#endif

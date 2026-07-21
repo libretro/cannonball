@@ -37,6 +37,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -59,3 +63,6 @@ void OAttractAI_check_road_bonus(OAttractAI* self);
 
 void OAttractAI_set_steering_bonus(OAttractAI* self);
 
+#ifdef __cplusplus
+}
+#endif

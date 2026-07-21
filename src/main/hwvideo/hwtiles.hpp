@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 
@@ -65,3 +69,7 @@ void hwtiles_render_tile_layer(struct hwtiles* self, uint16_t*, uint8_t, uint8_t
 void hwtiles_render_text_layer(struct hwtiles* self, uint16_t*, uint8_t);
 
 void hwtiles_render_all_tiles(struct hwtiles* self, uint16_t*);
+
+#ifdef __cplusplus
+}
+#endif

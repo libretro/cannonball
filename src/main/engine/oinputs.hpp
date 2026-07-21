@@ -9,6 +9,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "libretro/input.hpp"
 
@@ -70,3 +74,6 @@ bool OInputs_is_analog_r(OInputs* self);
 
 bool OInputs_is_analog_select(OInputs* self);
 
+#ifdef __cplusplus
+}
+#endif

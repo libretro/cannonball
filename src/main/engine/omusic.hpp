@@ -8,6 +8,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -52,3 +56,6 @@ void OMusic_cycle_music(OMusic* self);
 
 extern OMusic omusic;
 
+#ifdef __cplusplus
+}
+#endif

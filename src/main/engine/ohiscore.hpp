@@ -7,6 +7,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 
@@ -74,3 +78,6 @@ void OHiScore_setup_road_best(OHiScore* self);
 
 void OHiScore_display_scores(OHiScore* self);
 
+#ifdef __cplusplus
+}
+#endif

@@ -25,6 +25,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 
@@ -188,4 +192,6 @@ static void oentry_init(oentry* self, uint8_t i)
     self->pass_props = 0;
 }
 
-
+#ifdef __cplusplus
+}
+#endif

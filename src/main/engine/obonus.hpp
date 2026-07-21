@@ -8,6 +8,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -54,3 +58,7 @@ extern OBonus obonus;
 
 void OBonus_init(OBonus* self);
 void OBonus_do_bonus_text(OBonus* self);
+
+#ifdef __cplusplus
+}
+#endif

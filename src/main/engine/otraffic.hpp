@@ -11,6 +11,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -55,3 +59,7 @@ void OTraffic_set_max_traffic(OTraffic* self);
 void OTraffic_traffic_logic(OTraffic* self);
 
 void OTraffic_traffic_sound(OTraffic* self);
+
+#ifdef __cplusplus
+}
+#endif

@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 /***************************************************************************
@@ -363,3 +367,7 @@ enum { PAL_LOOKUP_LENGTH = (sizeof(PALETTE_EXPANSION) / sizeof(PALETTE_EXPANSION
 	   std::cout << std::hex << "0x" << std::setfill('0') << std::setw(8) << c8 << std::endl;
    }
 */
+
+#ifdef __cplusplus
+}
+#endif

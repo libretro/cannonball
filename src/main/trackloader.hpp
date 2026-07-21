@@ -13,6 +13,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "globals.hpp"
 
@@ -145,3 +149,7 @@ int8_t TrackLoader_stage_offset_to_level(TrackLoader* self, uint32_t);
 Level* TrackLoader_get_level(TrackLoader* self, uint32_t);
 
 extern TrackLoader trackloader;
+
+#ifdef __cplusplus
+}
+#endif

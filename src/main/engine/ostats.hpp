@@ -10,6 +10,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -52,3 +56,6 @@ void OStats_update_score(OStats* self, uint32_t);
 
 void OStats_init_next_level(OStats* self);
 
+#ifdef __cplusplus
+}
+#endif

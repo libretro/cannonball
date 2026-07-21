@@ -13,6 +13,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "oentry.hpp"
 #include "osprite.hpp"
@@ -136,3 +140,6 @@ void OSprites_set_hrender(OSprites* self, oentry*, osprite*, uint16_t, uint16_t)
 
 void OSprites_move_sprite(OSprites* self, oentry*, uint8_t);
 
+#ifdef __cplusplus
+}
+#endif

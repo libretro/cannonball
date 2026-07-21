@@ -9,6 +9,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 #include <boolean.h>
@@ -90,3 +94,7 @@ static uint16_t RomLoader_read16_16(RomLoader* self, uint16_t addr)
 {
         return (self->rom[addr + 1] << 8) | self->rom[addr];
     }
+
+#ifdef __cplusplus
+}
+#endif

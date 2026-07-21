@@ -6,6 +6,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <libretro.h>
 
@@ -20,4 +24,6 @@ extern void lr_options_close();
 extern void lr_options_set_frontend_variable_bool(const bool *config_var);
 extern void lr_options_set_frontend_variable_int(const int *config_var);
 
-
+#ifdef __cplusplus
+}
+#endif

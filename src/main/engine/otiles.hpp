@@ -12,6 +12,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -75,3 +79,6 @@ void OTiles_set_scroll(OTiles* self, int16_t h_scroll, int16_t v_scroll);
 
 extern OTiles otiles;
 
+#ifdef __cplusplus
+}
+#endif

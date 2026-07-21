@@ -10,6 +10,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 #include "globals.hpp"
@@ -99,3 +103,6 @@ uint16_t Video_read_pal16(Video* self, uint32_t);
 
 uint32_t Video_read_pal32(Video* self, uint32_t*);
 
+#ifdef __cplusplus
+}
+#endif

@@ -12,6 +12,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "globals.hpp"
 
@@ -55,3 +59,7 @@ void Audio_stop_audio(Audio* self);
 void Audio_load_wav(Audio* self, const char* filename);
 
 void Audio_clear_wav(Audio* self);
+
+#ifdef __cplusplus
+}
+#endif

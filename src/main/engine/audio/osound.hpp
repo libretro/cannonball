@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 #include "globals.hpp"
@@ -262,3 +266,7 @@ void OSound_init(OSound* self, YM2151* ym, uint8_t* pcm_ram);
 void OSound_init_fm_chip(OSound* self);
 
 void OSound_tick(OSound* self);
+
+#ifdef __cplusplus
+}
+#endif

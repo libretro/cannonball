@@ -8,6 +8,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <libretro.h>
 
@@ -24,3 +28,6 @@ extern void forcefeedback_close();
 extern int  forcefeedback_set(int xdirection, int force);
 extern bool forcefeedback_is_supported();
 
+#ifdef __cplusplus
+}
+#endif

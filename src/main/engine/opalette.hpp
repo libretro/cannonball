@@ -8,6 +8,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -46,3 +50,7 @@ void OPalette_setup_road_stripes(OPalette* self);
 void OPalette_setup_road_side(OPalette* self);
 
 void OPalette_setup_road_colour(OPalette* self);
+
+#ifdef __cplusplus
+}
+#endif

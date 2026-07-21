@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 
@@ -32,3 +36,6 @@ void hwsprites_write(hwsprites* self, const uint16_t adr, const uint16_t data);
 
 void hwsprites_render(hwsprites* self, const uint8_t);
 
+#ifdef __cplusplus
+}
+#endif

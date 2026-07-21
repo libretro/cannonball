@@ -19,6 +19,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 enum {
 		ROAD_OFF = 0,         /* Both Roads Off */
@@ -125,3 +129,7 @@ uint8_t ORoad_get_view_mode(ORoad* self);
 int16_t ORoad_get_road_y(ORoad* self, uint16_t);
 
 void ORoad_set_view_mode(ORoad* self, uint8_t, bool snap);
+
+#ifdef __cplusplus
+}
+#endif

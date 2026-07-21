@@ -12,6 +12,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "outrun.hpp"
 
@@ -67,3 +71,7 @@ void OInitEngine_set_granular_position(OInitEngine* self);
 void OInitEngine_set_fine_position(OInitEngine* self);
 
 void OInitEngine_init_bonus(OInitEngine* self, int16_t);
+
+#ifdef __cplusplus
+}
+#endif

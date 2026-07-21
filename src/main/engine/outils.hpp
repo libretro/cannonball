@@ -9,6 +9,10 @@
 ***************************************************************************/
 
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 
@@ -38,3 +42,6 @@ static void outils_swap32u(uint32_t* v){
         *v = ((*v & 0xFFFF0000) >> 16) + ((*v & 0xFFFF) << 16);
     }
 
+#ifdef __cplusplus
+}
+#endif

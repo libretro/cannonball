@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <stdint.h>
 #include <boolean.h>
@@ -49,3 +53,7 @@ enum
     BIT_9 = 0x200,
     BIT_A = 0x400
 };
+
+#ifdef __cplusplus
+}
+#endif
