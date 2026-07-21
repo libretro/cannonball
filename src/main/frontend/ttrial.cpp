@@ -55,7 +55,7 @@ int TTrial::tick()
     {
         case INIT_COURSEMAP:
             outrun.select_course(config.engine.jap != 0, config.engine.prototype != 0); /* Need to setup correct course map graphics. */
-            config.load_tiletrial_scores();
+            Config_load_tiletrial_scores(&config);
             OStats_init(&ostats, true);
             OSprites_init(&osprites);
             video.enabled = true;
@@ -66,7 +66,7 @@ int TTrial::tick()
             OHud_blit_text_big(&ohud, 1, "STEER TO SELECT TRACK", false);
             OHud_blit_text1(&ohud, 2, 25, TEXT1_LAPTIME1);
             OHud_blit_text1(&ohud, 2, 26, TEXT1_LAPTIME2);
-            osoundint.queue_sound(SOUND_PCM_WAVE);
+            OSoundInt_queue_sound(&osoundint, SOUND_PCM_WAVE);
             outrun.ttrial.laps    = config.ttrial.laps;
             outrun.custom_traffic = config.ttrial.traffic;
             state = TICK_COURSEMAP;
@@ -125,5 +125,5 @@ int TTrial::tick()
 void TTrial::update_best_time()
 {
     best_times[level_selected] = outrun.ttrial.best_lap_counter;
-    config.save_tiletrial_scores();
+    Config_save_tiletrial_scores(&config);
 }

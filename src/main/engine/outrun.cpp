@@ -88,14 +88,14 @@ void Outrun::boot()
     /* Initialize default hi-score entries */
     OHiScore_init_def_scores(&ohiscore);
     /* Load saved hi-score entries */
-    config.load_scores(
+    Config_load_scores(&config, 
         cannonball_mode == Outrun::MODE_ORIGINAL
             ? FILENAME_SCORES
             : FILENAME_CONT);
     OStats_init(&ostats, cannonball_mode == MODE_TTRIAL);
     init_jump_table();
     OInitEngine_init(&oinitengine, cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
-    osoundint.init();
+    OSoundInt_init(&osoundint);
     outils::reset_random_seed(); /* Ensure we match the genuine boot up of the original game each time */
 }
 
@@ -296,7 +296,7 @@ void Outrun::main_switch()
             ostats.time_counter = 5;
             ostats.frame_counter = frame_reset;
             OHiScore_init(&ohiscore);
-            osoundint.queue_sound(SOUND_FM_RESET);
+            OSoundInt_queue_sound(&osoundint, SOUND_FM_RESET);
             cannonball_audio.clear_wav();
             game_state = GS_BEST1;
 
@@ -318,7 +318,7 @@ void Outrun::main_switch()
             oferrari.car_inc_old = 0;
             ostats.time_counter = 5;
             ostats.frame_counter = frame_reset;
-            osoundint.queue_sound(0);
+            OSoundInt_queue_sound(&osoundint, 0);
             OLogo_enable(&ologo, SOUND_FM_RESET);
             game_state = GS_LOGO;
 
@@ -372,9 +372,9 @@ void Outrun::main_switch()
             oroad.tick();
             oroad.tick();
             oroad.tick();
-            osoundint.queue_sound(SOUND_STOP_CHEERS);
-            osoundint.queue_sound(SOUND_VOICE_GETREADY);
-            osoundint.queue_sound(SOUND_REVS);             /* Moved from Z80 Code for extra flexibility */
+            OSoundInt_queue_sound(&osoundint, SOUND_STOP_CHEERS);
+            OSoundInt_queue_sound(&osoundint, SOUND_VOICE_GETREADY);
+            OSoundInt_queue_sound(&osoundint, SOUND_REVS);             /* Moved from Z80 Code for extra flexibility */
             omusic.play_music(-1);
             
             if (!freeze_timer)
@@ -386,7 +386,7 @@ void Outrun::main_switch()
             ostats.credits--;                                   /* Update Credits */
             OHud_blit_text1(&ohud, TEXT1_CLEAR_START);
             OHud_blit_text1(&ohud, TEXT1_CLEAR_CREDITS);
-            osoundint.queue_sound(SOUND_INIT_CHEERS);
+            OSoundInt_queue_sound(&osoundint, SOUND_INIT_CHEERS);
             video.enabled = true;
             game_state = GS_START1;
             OHud_draw_main_hud(&ohud);
@@ -397,7 +397,7 @@ void Outrun::main_switch()
         case GS_START2:
             if (--ostats.frame_counter < 0)
             {
-                osoundint.queue_sound(SOUND_SIGNAL1);
+                OSoundInt_queue_sound(&osoundint, SOUND_SIGNAL1);
                 ostats.frame_counter = frame_reset;
                 game_state++;
             }
@@ -411,8 +411,8 @@ void Outrun::main_switch()
                     OHud_clear_timetrial_text(&ohud);
                 }
 
-                osoundint.queue_sound(SOUND_SIGNAL2);
-                osoundint.queue_sound(SOUND_STOP_CHEERS);
+                OSoundInt_queue_sound(&osoundint, SOUND_SIGNAL2);
+                OSoundInt_queue_sound(&osoundint, SOUND_STOP_CHEERS);
                 ostats.frame_counter = frame_reset;
                 game_state++;
             }
@@ -470,7 +470,7 @@ void Outrun::main_switch()
                 OHud_blit_text_new(&ohud, 9,  18, "CRASHES            - ", GREY);
                 OHud_blit_text_new(&ohud, 31, 18, Utils::to_string((int) ttrial.crashes).c_str(), GREEN);
             }
-            osoundint.queue_sound(SOUND_NEW_COMMAND);
+            OSoundInt_queue_sound(&osoundint, SOUND_NEW_COMMAND);
             game_state = GS_GAMEOVER;
 
         case GS_GAMEOVER:
@@ -530,8 +530,8 @@ void Outrun::main_switch()
             ostats.time_counter = config.engine.hiscore_timer;
             ostats.frame_counter = frame_reset;
             OHiScore_init(&ohiscore);
-            osoundint.queue_sound(SOUND_NEW_COMMAND);
-            osoundint.queue_sound(SOUND_FM_RESET);
+            OSoundInt_queue_sound(&osoundint, SOUND_NEW_COMMAND);
+            OSoundInt_queue_sound(&osoundint, SOUND_FM_RESET);
             cannonball_audio.clear_wav();
             game_state = GS_BEST2;
             /* fall through */
@@ -738,7 +738,7 @@ void Outrun::init_attract()
     ostats.frame_counter      = frame_reset;
     attract_counter           = 0;
     attract_view              = 0;
-    oattractai.init();
+    OAttractAI_init(&oattractai);
     game_state = cannonball_mode == MODE_TTRIAL ? GS_INIT_MUSIC : GS_ATTRACT;
 }
 

@@ -121,7 +121,7 @@ void OInitEngine_init(OInitEngine* self, int8_t level)
         oroad.road_width = RD_WIDTH_MERGE;        /* Setup a default road width */
     }
 
-    osoundint.reset();
+    OSoundInt_reset(&osoundint);
 }
 
 /* Source: 0x8402 */static 

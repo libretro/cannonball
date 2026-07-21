@@ -398,7 +398,7 @@ void OCrash_do_collision(OCrash* self)
             {
                 self->slide = -self->slide;
                 oinitengine.car_x_pos -= self->slide;
-                osoundint.queue_sound(SOUND_CRASH2);
+                OSoundInt_queue_sound(&osoundint, SOUND_CRASH2);
             }
         }
         /* Road generator 2 */
@@ -408,7 +408,7 @@ void OCrash_do_collision(OCrash* self)
             {
                 self->slide = -self->slide;
                 oinitengine.car_x_pos -= self->slide;
-                osoundint.queue_sound(SOUND_CRASH2);
+                OSoundInt_queue_sound(&osoundint, SOUND_CRASH2);
             }
         }
     }
@@ -479,7 +479,7 @@ void OCrash_do_collision(OCrash* self)
     /* Last spin */
     if (--self->spinflipcount1 <= 0)
     {
-        osoundint.queue_sound(SOUND_STOP_SLIP);
+        OSoundInt_queue_sound(&osoundint, SOUND_STOP_SLIP);
         if (self->spin_control2)
         {
             self->spin_control2++;
@@ -601,7 +601,7 @@ void OCrash_do_car_flip(OCrash* self)
             {
                 self->slide = -self->slide;
                 oinitengine.car_increment = ((car_inc16 >> 1) << 16) | (oinitengine.car_increment & 0xFFFF);
-                osoundint.queue_sound(SOUND_CRASH2);
+                OSoundInt_queue_sound(&osoundint, SOUND_CRASH2);
                 if (oinitengine.car_increment >> 16 > 0x14)
                 {
                     int16_t z = self->spr_ferrari->counter > 0x1FD ? 0x1FD : self->spr_ferrari->counter; /* d3 */
@@ -622,7 +622,7 @@ void OCrash_do_car_flip(OCrash* self)
             {
                 self->slide = -self->slide;
                 oinitengine.car_increment = ((car_inc16 >> 1) << 16) | (oinitengine.car_increment & 0xFFFF);
-                osoundint.queue_sound(SOUND_CRASH2);
+                OSoundInt_queue_sound(&osoundint, SOUND_CRASH2);
                 if (oinitengine.car_increment >> 16 > 0x14)
                 {
                     int16_t z = self->spr_ferrari->counter > 0x1FD ? 0x1FD : self->spr_ferrari->counter; /* d3 */
@@ -685,7 +685,7 @@ void OCrash_do_car_flip(OCrash* self)
     if (passenger_frame == 0)
     {
         self->slide >>= 1;
-        osoundint.queue_sound(SOUND_CRASH2);
+        OSoundInt_queue_sound(&osoundint, SOUND_CRASH2);
     }
 
     /* Set Z during lower frames */
@@ -898,7 +898,7 @@ void OCrash_pan_camera(OCrash* self)
 /* Source: 0x1C7E */static 
 void OCrash_init_spin1(OCrash* self)
 {
-    osoundint.queue_sound(SOUND_INIT_SLIP);
+    OSoundInt_queue_sound(&osoundint, SOUND_INIT_SLIP);
     { uint16_t car_inc = oinitengine.car_increment >> 16;
     uint16_t spins = 1;
     if (car_inc > 0xB4)
@@ -927,7 +927,7 @@ void OCrash_init_spin1(OCrash* self)
 /* Source: 0x1C10 */static 
 void OCrash_init_spin2(OCrash* self)
 {
-    osoundint.queue_sound(SOUND_INIT_SLIP);
+    OSoundInt_queue_sound(&osoundint, SOUND_INIT_SLIP);
     { uint16_t car_inc = oinitengine.car_increment >> 16;
     self->spinflipcount1 = 1;
     self->crash_spin_count = 2;
@@ -956,7 +956,7 @@ void OCrash_init_spin2(OCrash* self)
 /* Source: 0x19EE */static 
 void OCrash_collide_slow(OCrash* self)
 {
-    osoundint.queue_sound(SOUND_REBOUND);
+    OSoundInt_queue_sound(&osoundint, SOUND_REBOUND);
     
     /* Setup shift value for car bump, based on current speed, which ultimately determines how much car rises in air */
     uint16_t car_inc = oinitengine.car_increment >> 16;
@@ -996,7 +996,7 @@ void OCrash_collide_slow(OCrash* self)
 /* Source: 0x1A98 */static 
 void OCrash_collide_med(OCrash* self)
 {
-    osoundint.queue_sound(SOUND_INIT_SLIP);
+    OSoundInt_queue_sound(&osoundint, SOUND_INIT_SLIP);
     
     /* Set number of spins based on car speed */
     uint16_t car_inc = oinitengine.car_increment >> 16;    
@@ -1027,7 +1027,7 @@ void OCrash_collide_med(OCrash* self)
 /* Source: 0x1B12 */static 
 void OCrash_collide_fast(OCrash* self)
 {
-    osoundint.queue_sound(SOUND_CRASH1);
+    OSoundInt_queue_sound(&osoundint, SOUND_CRASH1);
 
     { uint16_t car_inc = oinitengine.car_increment >> 16;
     if (car_inc > 0xFA)

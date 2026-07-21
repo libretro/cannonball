@@ -45,40 +45,40 @@
 #include "ostats.hpp"
 #include "otraffic.hpp"
 
+static void OAttractAI_check_road(OAttractAI* self);
+static void OAttractAI_set_steering(OAttractAI* self);
+
 #ifdef __PS3__
 #define srand std::srand
 #endif
 
 OAttractAI oattractai;
 
-OAttractAI::OAttractAI(void)
+void OAttractAI_ctor(OAttractAI* self)
 {
     srand((unsigned int) time(NULL));
 }
 
 
-OAttractAI::~OAttractAI(void)
-{
-}
 
-void OAttractAI::init()
+void OAttractAI_init(OAttractAI* self)
 {
-    last_stage = -1;
+    self->last_stage = -1;
 }
 
 /* ------------------------------------------------------------------------------------------------ */
 /*                                           ENHANCED AI CODE */
 /* ------------------------------------------------------------------------------------------------ */
 
-void OAttractAI::tick_ai_enhanced()
+void OAttractAI_tick_ai_enhanced(OAttractAI* self)
 {
     /* -------------------------------------------------------------------------------------------- */
     /* Choose Route At Random */
     /* -------------------------------------------------------------------------------------------- */
 
-    if (last_stage != ostats.cur_stage)
+    if (self->last_stage != ostats.cur_stage)
     {     
-        last_stage           = ostats.cur_stage;
+        self->last_stage           = ostats.cur_stage;
         oferrari.sprite_ai_x = std::rand() & 1;     
     }
 
@@ -174,14 +174,14 @@ void OAttractAI::tick_ai_enhanced()
 /* Attract Mode AI Code */
 /* */
 /* Source: 0xA084 */
-void OAttractAI::tick_ai()
+void OAttractAI_tick_ai(OAttractAI* self)
 {
     /* Check upcoming road segment for straight/curve. */
     /* Choose route from pre defined table at road split. */
-    check_road();    
+    OAttractAI_check_road(self);    
     
     /* Set steering value based on upcoming road segment */
-    set_steering();  
+    OAttractAI_set_steering(self);  
   
     oinputs.brake_adjust = 0;
 
@@ -239,9 +239,9 @@ void OAttractAI::tick_ai()
 /* Check upcoming road segment for straight/curve */
 /* Check upcoming road segment for road split */
 /* */
-/* Source: 0xA318 */
+/* Source: 0xA318 */static 
 
-void OAttractAI::check_road()
+void OAttractAI_check_road(OAttractAI* self)
 {
     /* -------------------------------------------------------------------------------------------- */
     /* Process Upcoming Curve */
@@ -292,8 +292,8 @@ void OAttractAI::check_road()
 
 /* Set steering value based on road split, previously set curve info */
 /* */
-/* Source: 0xA3C2 */
-void OAttractAI::set_steering()
+/* Source: 0xA3C2 */static 
+void OAttractAI_set_steering(OAttractAI* self)
 {
     int16_t steering = 0;   /* d0 */
     int16_t car_x_diff = 0; /* d1 */
@@ -402,7 +402,7 @@ void OAttractAI::set_steering()
 /* Check upcoming road segment for straight/curve */
 /* */
 /* Source: 0xA498 */
-void OAttractAI::check_road_bonus()
+void OAttractAI_check_road_bonus(OAttractAI* self)
 {
     /* Upcoming Road: Straight or No Change */
     if (oinitengine.road_type_next <= ROAD_STRAIGHT)
@@ -431,7 +431,7 @@ void OAttractAI::check_road_bonus()
 /* Bonus Mode: Set steering value configured in check_road_bonus() */
 /* */
 /* Source: 0xA510 */
-void OAttractAI::set_steering_bonus()
+void OAttractAI_set_steering_bonus(OAttractAI* self)
 {
     int16_t steering = oinitengine.car_x_pos;      /* d4 */
 

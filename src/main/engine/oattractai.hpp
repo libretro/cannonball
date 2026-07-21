@@ -40,23 +40,22 @@
 
 #include "outrun.hpp"
 
-class OAttractAI
+struct OAttractAI
 {
-public:
-    OAttractAI(void);
-    ~OAttractAI(void);
-
-    void init();
-    void tick_ai_enhanced();
-
-    void tick_ai();
-    void check_road_bonus();
-    void set_steering_bonus();
-
-private:
     int8_t last_stage;
-    void check_road();
-    void set_steering();
 };
 
 extern OAttractAI oattractai;
+
+void OAttractAI_ctor(OAttractAI* self);
+
+void OAttractAI_init(OAttractAI* self);
+
+void OAttractAI_tick_ai_enhanced(OAttractAI* self);
+
+void OAttractAI_tick_ai(OAttractAI* self);
+
+void OAttractAI_check_road_bonus(OAttractAI* self);
+
+void OAttractAI_set_steering_bonus(OAttractAI* self);
+

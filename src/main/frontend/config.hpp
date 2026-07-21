@@ -15,7 +15,6 @@
 #include <string>
 #include <vector>
 
-
 struct data_settings_t
 {
     std::string res_path;
@@ -132,9 +131,8 @@ struct engine_settings_t
     
 };
 
-class Config
+struct Config
 {
-public:
     data_settings_t        data;
     menu_settings_t        menu;
     video_settings_t       video;
@@ -142,35 +140,30 @@ public:
     controls_settings_t    controls;
     engine_settings_t      engine;
     ttrial_settings_t      ttrial;
-
-    /* Internal screen width and height */
     uint16_t s16_width, s16_height;
-
-    /* Internal screen x offset */
     uint16_t s16_x_off;
-
-    /* 30 or 60 fps */
     int fps;
-
-    /* Original game ticks sprites at 30fps but background scroll at 60fps */
     int tick_fps;
-
-    /* Continuous Mode: Traffic Setting */
     int cont_traffic;
-
-    Config(void);
-    ~Config(void);
-
-    void init();
-    void load_custom_music(const std::string& filename);
-    void load_scores(const std::string &filename);
-    void save_scores(const std::string &filename);
-    void load_tiletrial_scores();
-    void save_tiletrial_scores();
-    bool clear_scores();
-    void set_fps(int fps);
-   
-private:
 };
 
 extern Config config;
+
+void Config_ctor(Config* self);
+
+void Config_init(Config* self);
+
+void Config_load_custom_music(Config* self, const std::string& filename);
+
+void Config_load_scores(Config* self, const std::string &filename);
+
+void Config_save_scores(Config* self, const std::string &filename);
+
+void Config_load_tiletrial_scores(Config* self);
+
+void Config_save_tiletrial_scores(Config* self);
+
+bool Config_clear_scores(Config* self);
+
+void Config_set_fps(Config* self, int fps);
+

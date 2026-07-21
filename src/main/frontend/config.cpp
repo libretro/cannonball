@@ -30,19 +30,19 @@ extern retro_log_printf_t                 log_cb;
 
 Config config;
 
-Config::Config(void)
+void Config_ctor(Config* self)
 {
-    /* Safe defaults required before Config::set_fps() initializes audio. */
-    sound.rate        = 44100;
-    sound.music_timer = MUSIC_TIMER;
-    video.shadow      = 0;
-    engine.hiscore_delete = true;
-    engine.hiscore_timer  = HIGHSCORE_TIMER;
-    engine.grippy_tyres   = false;
-    engine.offroad        = false;
-    engine.bumper         = false;
-    engine.turbo          = false;
-    engine.car_pal        = 0;
+    /* Safe defaults required before Config_set_fps(Config* self) initializes audio. */
+    self->sound.rate        = 44100;
+    self->sound.music_timer = MUSIC_TIMER;
+    self->video.shadow      = 0;
+    self->engine.hiscore_delete = true;
+    self->engine.hiscore_timer  = HIGHSCORE_TIMER;
+    self->engine.grippy_tyres   = false;
+    self->engine.offroad        = false;
+    self->engine.bumper         = false;
+    self->engine.turbo          = false;
+    self->engine.car_pal        = 0;
 
     music_t magical;
     magical.type  = music_t::IS_YM_INT;
@@ -59,29 +59,26 @@ Config::Config(void)
     splash.cmd   = SOUND_MUSIC_SPLASH;
     splash.title = "SPLASH WAVE";
 
-    sound.music.push_back(magical);
-    sound.music.push_back(breeze);
-    sound.music.push_back(splash);
+    self->sound.music.push_back(magical);
+    self->sound.music.push_back(breeze);
+    self->sound.music.push_back(splash);
 }
 
 
-Config::~Config(void)
-{
-}
 
-void Config::init()
+void Config_init(Config* self)
 {
 
 }
 
-void Config::load_custom_music(const std::string& filename)
+void Config_load_custom_music(Config* self, const std::string& filename)
 {
     /* Remove custom tracks added by any previous content load, */
     /* while retaining the three original arcade tracks. */
     const size_t original_track_count = 3;
 
-    if (sound.music.size() > original_track_count)
-        sound.music.resize(original_track_count);
+    if (self->sound.music.size() > original_track_count)
+        self->sound.music.resize(original_track_count);
 
     pugi::xml_document document;
 
@@ -175,7 +172,7 @@ void Config::load_custom_music(const std::string& filename)
 
         music.cmd = SOUND_MUSIC_CUSTOM;
 
-        sound.music.push_back(music);
+        self->sound.music.push_back(music);
         loaded_tracks++;
      }} }
 
@@ -209,10 +206,10 @@ static void append_xml_declaration(
 }
 
 
-void Config::load_scores(const std::string &filename)
+void Config_load_scores(Config* self, const std::string &filename)
 {
     const std::string xml_filename =
-        get_xml_filename(filename, engine.jap);
+        get_xml_filename(filename, self->engine.jap);
 
     pugi::xml_document document;
 
@@ -292,10 +289,10 @@ void Config::load_scores(const std::string &filename)
 }
 
 
-void Config::save_scores(const std::string &filename)
+void Config_save_scores(Config* self, const std::string &filename)
 {
     const std::string xml_filename =
-        get_xml_filename(filename, engine.jap);
+        get_xml_filename(filename, self->engine.jap);
 
     pugi::xml_document document;
 
@@ -375,16 +372,16 @@ void Config::save_scores(const std::string &filename)
  }}
 
 
-void Config::load_tiletrial_scores()
+void Config_load_tiletrial_scores(Config* self)
 {
     const std::string xml_filename =
-        get_xml_filename(FILENAME_TTRIAL, engine.jap);
+        get_xml_filename(FILENAME_TTRIAL, self->engine.jap);
 
     /* Counter value representing 1m 15s 0ms. */
     static const uint16_t COUNTER_1M_15 = 0x11D0;
 
     { int i; for (i = 0; i < 15; i++)
-        ttrial.best_times[i] = COUNTER_1M_15; }
+        self->ttrial.best_times[i] = COUNTER_1M_15; }
 
     pugi::xml_document document;
 
@@ -406,7 +403,7 @@ void Config::load_tiletrial_scores()
         const std::string score_name =
             "score" + Utils::to_string(i);
 
-        ttrial.best_times[i] =
+        self->ttrial.best_times[i] =
             time_trial
                 .child(score_name.c_str())
                 .text()
@@ -415,10 +412,10 @@ void Config::load_tiletrial_scores()
 }
 
 
-void Config::save_tiletrial_scores()
+void Config_save_tiletrial_scores(Config* self)
 {
     const std::string xml_filename =
-        get_xml_filename(FILENAME_TTRIAL, engine.jap);
+        get_xml_filename(FILENAME_TTRIAL, self->engine.jap);
 
     pugi::xml_document document;
 
@@ -435,7 +432,7 @@ void Config::save_tiletrial_scores()
         time_trial
             .append_child(score_name.c_str())
             .text()
-            .set(ttrial.best_times[i]);
+            .set(self->ttrial.best_times[i]);
     } }
 
     { const bool saved =
@@ -452,7 +449,7 @@ void Config::save_tiletrial_scores()
             xml_filename.c_str());
  }}
 
-bool Config::clear_scores()
+bool Config_clear_scores(Config* self)
 {
     /* Init Default Hiscores */
     OHiScore_init_def_scores(&ohiscore);
@@ -477,28 +474,28 @@ bool Config::clear_scores()
     return files_removed;
 }
 
-void Config::set_fps(int fps)
+void Config_set_fps(Config* self, int fps)
 {
-    video.fps = fps;
+    self->video.fps = fps;
     /* Set core FPS to 30fps, 60fps or 120fps */
-    if (video.fps == 0)
-        this->fps = 30;
-    else if (video.fps == 3)
-        this->fps = 120;
+    if (self->video.fps == 0)
+        self->fps = 30;
+    else if (self->video.fps == 3)
+        self->fps = 120;
     else
-        this->fps = 60;
+        self->fps = 60;
     
     /* Original game ticks sprites at 30fps but background scroll at 60fps */
-    if (video.fps == 3)
-        tick_fps = 120;
-    else if (video.fps < 2)
-        tick_fps = 30;
+    if (self->video.fps == 3)
+        self->tick_fps = 120;
+    else if (self->video.fps < 2)
+        self->tick_fps = 30;
     else
-        tick_fps = 60;
+        self->tick_fps = 60;
 
     if (config.sound.enabled)
         cannonball_audio.stop_audio();
-    osoundint.init();
+    OSoundInt_init(&osoundint);
     if (config.sound.enabled)
         cannonball_audio.start_audio();
 }

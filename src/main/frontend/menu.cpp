@@ -277,7 +277,7 @@ void Menu::init()
 
     /* Reset audio, so we can play tones */
     osoundint.has_booted = true;
-    osoundint.init();
+    OSoundInt_init(&osoundint);
     cannonball_audio.clear_wav();
 
     frame = 0;
@@ -303,7 +303,7 @@ void Menu::tick()
                 if (ttrial_state == TTrial::INIT_GAME)
                 {
                     cannonball_state = STATE_INIT_GAME;
-                    osoundint.queue_clear();
+                    OSoundInt_queue_clear(&osoundint);
                 }
                 else if (ttrial_state == TTrial::BACK_TO_MENU)
                 {
@@ -447,14 +447,14 @@ void Menu::tick_menu()
     /* Tick Controls */
     if (Input_has_pressed(&input, DOWN) || OInputs_is_analog_r(&oinputs))
     {
-        osoundint.queue_sound(SOUND_BEEP1);
+        OSoundInt_queue_sound(&osoundint, SOUND_BEEP1);
 
         if (++cursor >= (int16_t) menu_selected->size())
             cursor = 0;
     }
     else if (Input_has_pressed(&input, UP) || OInputs_is_analog_l(&oinputs))
     {
-        osoundint.queue_sound(SOUND_BEEP1);
+        OSoundInt_queue_sound(&osoundint, SOUND_BEEP1);
 
         if (--cursor < 0)
             cursor = menu_selected->size() - 1;
@@ -552,7 +552,7 @@ void Menu::tick_menu()
                 set_menu(&menu_engine);
             else if (SELECTED(ENTRY_SCORES))
             {
-                if (config.clear_scores())
+                if (Config_clear_scores(&config))
                     display_message("SCORES CLEARED");
                 else
                     display_message("NO SAVED SCORES FOUND!");
@@ -619,7 +619,7 @@ void Menu::tick_menu()
                 {
                     config.video.fps = 0;
                 }
-                config.set_fps(config.video.fps);
+                Config_set_fps(&config, config.video.fps);
                 if (config.fps != fps_prev)
                     update_timing();
                 lr_options_set_frontend_variable_int(&config.video.fps);
@@ -652,7 +652,7 @@ void Menu::tick_menu()
             {
                 int rom_type = !config.sound.fix_samples;
                 
-                if (roms.load_pcm_rom(rom_type == 1))
+                if (Roms_load_pcm_rom(&roms, rom_type == 1))
                 {
                     config.sound.fix_samples = rom_type;
                     display_message(rom_type == 1 ? "FIXED SAMPLES LOADED" : "ORIGINAL SAMPLES LOADED");
@@ -823,24 +823,24 @@ void Menu::tick_menu()
         else if (menu_selected == &menu_musictest)
         {
             if (SELECTED(ENTRY_MUSIC1))
-                osoundint.queue_sound(SOUND_MUSIC_MAGICAL);
+                OSoundInt_queue_sound(&osoundint, SOUND_MUSIC_MAGICAL);
             else if (SELECTED(ENTRY_MUSIC2))
-                osoundint.queue_sound(SOUND_MUSIC_BREEZE);
+                OSoundInt_queue_sound(&osoundint, SOUND_MUSIC_BREEZE);
             else if (SELECTED(ENTRY_MUSIC3))
-                osoundint.queue_sound(SOUND_MUSIC_SPLASH);
+                OSoundInt_queue_sound(&osoundint, SOUND_MUSIC_SPLASH);
             else if (SELECTED(ENTRY_MUSIC4))
-                osoundint.queue_sound(SOUND_MUSIC_LASTWAVE);
+                OSoundInt_queue_sound(&osoundint, SOUND_MUSIC_LASTWAVE);
 
             else if (SELECTED(ENTRY_BACK))
             {
-                osoundint.queue_sound(SOUND_FM_RESET);
+                OSoundInt_queue_sound(&osoundint, SOUND_FM_RESET);
                 set_menu(&menu_sound);
             }
         }
         else
             set_menu(&menu_main);
 
-        osoundint.queue_sound(SOUND_BEEP1);
+        OSoundInt_queue_sound(&osoundint, SOUND_BEEP1);
         refresh_menu();
     }
 }
@@ -1088,7 +1088,7 @@ void Menu::display_message(std::string s)
 
 bool Menu::check_jap_roms()
 {
-    if (config.engine.jap && !roms.load_japanese_roms())
+    if (config.engine.jap && !Roms_load_japanese_roms(&roms))
     {
         display_message("JAPANESE ROMSET NOT FOUND");
         return false;
@@ -1103,7 +1103,7 @@ void Menu::restart_video()
         cannonball_audio.stop_audio();
     video.disable();
     video.init(&roms, &config.video);
-    osoundint.init();
+    OSoundInt_init(&osoundint);
     if (config.sound.enabled)
         cannonball_audio.start_audio();
 }
@@ -1123,11 +1123,11 @@ void Menu::start_game(int mode, int settings)
 
         if (!config.sound.fix_samples)
         {
-            if (roms.load_pcm_rom(true))
+            if (Roms_load_pcm_rom(&roms, true))
                 config.sound.fix_samples = 1;
         }
 
-        config.set_fps(config.video.fps = 2);
+        Config_set_fps(&config, config.video.fps = 2);
         config.video.widescreen     = 1;
         config.video.hires          = 1;
         config.engine.level_objects = 1;
@@ -1159,11 +1159,11 @@ void Menu::start_game(int mode, int settings)
 
         if (config.sound.fix_samples)
         {
-            if (roms.load_pcm_rom(false))
+            if (Roms_load_pcm_rom(&roms, false))
                 config.sound.fix_samples = 0;
         }
 
-        config.set_fps(config.video.fps = 1);
+        Config_set_fps(&config, config.video.fps = 1);
         config.video.widescreen     = 0;
         config.video.hires          = 0;
         config.engine.level_objects = 0;
@@ -1195,6 +1195,6 @@ void Menu::start_game(int mode, int settings)
     {
         outrun.cannonball_mode = mode;
         cannonball_state = STATE_INIT_GAME;
-        osoundint.queue_clear();
+        OSoundInt_queue_clear(&osoundint);
     }
 }

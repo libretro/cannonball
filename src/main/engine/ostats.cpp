@@ -217,8 +217,8 @@ void OStats_init_next_level(OStats* self)
         OHud_draw_lap_timer(&ohud, 0x110554, self->stage_times[self->cur_stage-1], config.engine.fix_bugs ? self->lap_ms[self->stage_times[self->cur_stage-1][2]] : self->ms_value);
 
         OTraffic_set_max_traffic(&otraffic);
-        osoundint.queue_sound(SOUND_YM_CHECKPOINT);
-        osoundint.queue_sound(SOUND_VOICE_CHECKPOINT);
+        OSoundInt_queue_sound(&osoundint, SOUND_YM_CHECKPOINT);
+        OSoundInt_queue_sound(&osoundint, SOUND_VOICE_CHECKPOINT);
         
         /* Update Stage Number on HUD */
         OHud_draw_stage_number(&ohud, 0x110d76, self->cur_stage+1, GREEN);

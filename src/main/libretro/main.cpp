@@ -31,6 +31,9 @@
 #include "../engine/omusic.hpp"
 #include "../engine/ostats.hpp"
 #include "../frontend/config.hpp"
+#include "roms.hpp"
+#include "engine/audio/osoundint.hpp"
+#include "engine/oattractai.hpp"
 #include "../frontend/menu.hpp"
 
 #include "lr_options.hpp"
@@ -88,7 +91,7 @@ static void config_init(void)
     /* Must be set before set_fps() initializes the audio chips. */
     config.sound.rate       = 44100;
 
-    config.set_fps(config.video.fps);
+    Config_set_fps(&config, config.video.fps);
 
     /* ------------------------------------------------------------------------ */
     /* Sound Settings */
@@ -821,7 +824,7 @@ end:
    }
 
    if (timing_update)
-      config.set_fps(config.video.fps);
+      Config_set_fps(&config, config.video.fps);
 
    /* Show/hide core options */
    update_option_visibility();
@@ -1025,7 +1028,7 @@ bool retro_load_game(const struct retro_game_info *info)
    log_cb(RETRO_LOG_INFO, "Rom directory: %s\n", rom_path);
    retro_build_save_paths();
 
-   bool loaded = roms.load_revb_roms(false);
+   bool loaded = Roms_load_revb_roms(&roms, false);
 
    if (!loaded)
    {
@@ -1036,14 +1039,14 @@ bool retro_load_game(const struct retro_game_info *info)
    config_init();
    config.data.res_path = std::string(rom_path) + "res/";
 
-   config.load_custom_music(
+   Config_load_custom_music(&config, 
          config.data.res_path + "config.xml");
 
    update_variables(true);
 
    /* Load fixed PCM ROM based on config */
    if (config.sound.fix_samples)
-      roms.load_pcm_rom(true);
+      Roms_load_pcm_rom(&roms, true);
 
    /* Load patched widescreen tilemaps */
    if (!omusic.load_widescreen_map(std::string(rom_path) + "res/"))
@@ -1125,6 +1128,10 @@ size_t retro_get_memory_size(unsigned id)
 
 void retro_init(void)
 {
+   Config_ctor(&config);
+   Roms_ctor(&roms);
+   OSoundInt_ctor(&osoundint);
+   OAttractAI_ctor(&oattractai);
    unsigned                  level = 2;
    environ_cb(RETRO_ENVIRONMENT_SET_PERFORMANCE_LEVEL, &level);
 
@@ -1334,7 +1341,7 @@ void retro_run(void)
                 if (cannonball_tick_frame) Input_frame_done(&input);
 
                 /* Tick audio program code */
-                osoundint.tick();
+                OSoundInt_tick(&osoundint);
                 /* Tick Audio */
                 cannonball_audio.tick();
             }
@@ -1346,7 +1353,7 @@ void retro_run(void)
         break;
 
         case STATE_INIT_GAME:
-            if (config.engine.jap && !roms.load_japanese_roms())
+            if (config.engine.jap && !Roms_load_japanese_roms(&roms))
             {
                 cannonball_state = STATE_QUIT;
             }
@@ -1363,7 +1370,7 @@ void retro_run(void)
             menu->tick();
             Input_frame_done(&input);
             /* Tick audio program code */
-            osoundint.tick();
+            OSoundInt_tick(&osoundint);
             /* Tick Audio */
             cannonball_audio.tick();
         }

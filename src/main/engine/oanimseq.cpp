@@ -516,7 +516,7 @@ void OAnimSeq_anim_seq_outro_ferrari(OAnimSeq* self)
         }
         else
         {
-            osoundint.queue_sound(SOUND_VOICE_CONGRATS);
+            OSoundInt_queue_sound(&osoundint, SOUND_VOICE_CONGRATS);
             self->ferrari_stopped = true;
         }
     }

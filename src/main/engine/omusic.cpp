@@ -76,9 +76,9 @@ void OMusic::enable()
     blit_music_select();
     OHud_blit_text2(&ohud, TEXT2_SELECT_MUSIC); /* Select Music By Steering */
   
-    osoundint.queue_sound(SOUND_RESET);
+    OSoundInt_queue_sound(&osoundint, SOUND_RESET);
     if (!config.sound.preview)
-        osoundint.queue_sound(SOUND_PCM_WAVE); /* Wave Noises */
+        OSoundInt_queue_sound(&osoundint, SOUND_PCM_WAVE); /* Wave Noises */
 
     /* Enable block of sprites */
     entry_start = SPRITE_ENTRIES - 0x10;    
@@ -246,7 +246,7 @@ void OMusic::tick()
         if (music_selected != last_music_selected)
         {
             if (preview_counter == 0 && last_music_selected != -1)
-                osoundint.queue_sound(SOUND_FM_RESET);
+                OSoundInt_queue_sound(&osoundint, SOUND_FM_RESET);
 
             if (++preview_counter >= 10)
             {
@@ -267,13 +267,13 @@ void OMusic::play_music(int index)
     {
         case music_t::IS_YM_INT:
             cannonball_audio.clear_wav();
-            osoundint.queue_sound(next_track->cmd);
+            OSoundInt_queue_sound(&osoundint, next_track->cmd);
             break;
 
         case music_t::IS_YM_EXT:
             cannonball_audio.clear_wav();
-            roms.load_ym_data((config.data.res_path + next_track->filename).c_str());
-            osoundint.queue_sound(next_track->cmd);
+            Roms_load_ym_data(&roms, (config.data.res_path + next_track->filename).c_str());
+            OSoundInt_queue_sound(&osoundint, next_track->cmd);
             break;
 
         case music_t::IS_WAV:

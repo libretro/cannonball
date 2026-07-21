@@ -9,10 +9,10 @@
 
 #include "romloader.hpp"
 
-class Roms
+static const bool VERBOSE = true;
+
+struct Roms
 {
-public:
-    /* Western ROMs */
     RomLoader rom0;
     RomLoader rom1;
     RomLoader tiles;
@@ -20,25 +20,21 @@ public:
     RomLoader road;
     RomLoader z80;
     RomLoader pcm;
-
-    /* Japanese ROMs */
     RomLoader j_rom0;
     RomLoader j_rom1;
-
-    /* Paged Roms (Swap between Jap and Western) */
     RomLoader* rom0p;
     RomLoader* rom1p;
-
-    Roms();
-    ~Roms();
-    bool load_revb_roms(bool);
-    bool load_japanese_roms();
-    int load_pcm_rom(bool);
-    bool load_ym_data(const char* filename);
-
-private:
     int jap_rom_status;
-    const static bool VERBOSE = true;
 };
 
 extern Roms roms;
+
+void Roms_ctor(Roms* self);
+
+bool Roms_load_revb_roms(Roms* self, bool);
+
+bool Roms_load_japanese_roms(Roms* self);
+
+int Roms_load_pcm_rom(Roms* self, bool);
+
+bool Roms_load_ym_data(Roms* self, const char* filename);

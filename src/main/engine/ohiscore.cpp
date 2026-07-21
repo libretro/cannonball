@@ -120,8 +120,8 @@ void OHiScore_tick(OHiScore* self)
             /* New High Score */
             if (self->score_pos != -1)
             {
-                osoundint.queue_sound(SOUND_PCM_WAVE);
-                osoundint.queue_sound(SOUND_MUSIC_LASTWAVE);
+                OSoundInt_queue_sound(&osoundint, SOUND_PCM_WAVE);
+                OSoundInt_queue_sound(&osoundint, SOUND_MUSIC_LASTWAVE);
                 OHiScore_insert_score(self);               
             }
             /* Not a High Score */
@@ -257,7 +257,7 @@ void OHiScore_check_name_entry(OHiScore* self)
         
         /* Save new score info */
         if (self->state == STATE_DONE)
-            config.save_scores(
+            Config_save_scores(&config, 
                 outrun.cannonball_mode == Outrun::MODE_ORIGINAL
                     ? FILENAME_SCORES
                     : FILENAME_CONT);

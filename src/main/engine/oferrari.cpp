@@ -249,8 +249,8 @@ void OFerrari::logic()
             obonus.bonus_control = BONUS_TICK;
 
         case BONUS_TICK:
-            oattractai.check_road_bonus();
-            oattractai.set_steering_bonus();
+            OAttractAI_check_road_bonus(&oattractai);
+            OAttractAI_set_steering_bonus(&oattractai);
 
             /* Accelerate Car */
             if (oinitengine.rd_split_state == 0 || (oroad.road_pos >> 16) <= 0x163)
@@ -320,7 +320,7 @@ void OFerrari::ferrari_normal()
 {
     if (config.engine.force_ai && outrun.game_state == GS_INGAME)
     {
-        oattractai.tick_ai_enhanced();
+        OAttractAI_tick_ai_enhanced(&oattractai);
         setup_ferrari_sprite();
         return;
     }
@@ -331,9 +331,9 @@ void OFerrari::ferrari_normal()
         case GS_INIT:
         case GS_ATTRACT:
             if (config.engine.new_attract)
-                oattractai.tick_ai_enhanced();
+                OAttractAI_tick_ai_enhanced(&oattractai);
             else
-                oattractai.tick_ai();
+                OAttractAI_tick_ai(&oattractai);
             setup_ferrari_sprite();
             break;
 
@@ -522,8 +522,8 @@ void OFerrari::setup_ferrari_bonus_sprite()
 void OFerrari::init_end_seq()
 {
     /* AI for remainder */
-    oattractai.check_road_bonus();
-    oattractai.set_steering_bonus();
+    OAttractAI_check_road_bonus(&oattractai);
+    OAttractAI_set_steering_bonus(&oattractai);
     /* Brake Car! */
     oinputs.acc_adjust = 0;
     oinputs.brake_adjust = 0xFF;
@@ -1139,16 +1139,16 @@ void OFerrari::move()
         if (oinitengine.car_increment >> 16)
         {
             if (slip_sound == SOUND_STOP_SLIP)
-                osoundint.queue_sound(slip_sound = SOUND_INIT_SLIP);
+                OSoundInt_queue_sound(&osoundint, slip_sound = SOUND_INIT_SLIP);
         }
         else
-            osoundint.queue_sound(slip_sound = SOUND_STOP_SLIP);
+            OSoundInt_queue_sound(&osoundint, slip_sound = SOUND_STOP_SLIP);
     }
     /* no_smoke: */
     else
     {
         if (slip_sound != SOUND_STOP_SLIP)
-            osoundint.queue_sound(slip_sound = SOUND_STOP_SLIP);        
+            OSoundInt_queue_sound(&osoundint, slip_sound = SOUND_STOP_SLIP);        
     }
     /* move_car */
     car_inc_old = oinitengine.car_increment >> 16;
@@ -1624,7 +1624,7 @@ void OFerrari::do_sound_score_slip()
         if (ocrash.skid_counter)
         {
             is_slipping = -1;
-            osoundint.queue_sound(SOUND_INIT_SLIP);
+            OSoundInt_queue_sound(&osoundint, SOUND_INIT_SLIP);
         }
     }
     /* 0xBE94 */
@@ -1633,7 +1633,7 @@ void OFerrari::do_sound_score_slip()
         if (!ocrash.skid_counter)
         {
             is_slipping = 0;
-            osoundint.queue_sound(SOUND_STOP_SLIP);
+            OSoundInt_queue_sound(&osoundint, SOUND_STOP_SLIP);
         }
     }
     /* 0xBEAC */
@@ -1650,7 +1650,7 @@ void OFerrari::do_sound_score_slip()
             if (cornering)
             {
                 is_slipping = -1;
-                osoundint.queue_sound(SOUND_INIT_SLIP);
+                OSoundInt_queue_sound(&osoundint, SOUND_INIT_SLIP);
             }
         }
         /* 0xBEE4: Stop Cornering    */
@@ -1659,7 +1659,7 @@ void OFerrari::do_sound_score_slip()
             if (!cornering)
             {
                 is_slipping = 0;
-                osoundint.queue_sound(SOUND_STOP_SLIP);
+                OSoundInt_queue_sound(&osoundint, SOUND_STOP_SLIP);
             }
         }
     }
@@ -1670,13 +1670,13 @@ void OFerrari::do_sound_score_slip()
     {
         /* If previous wheels on-road & current wheels off-road - play safety zone sound */
         if (!wheel_state)
-            osoundint.queue_sound(SOUND_STOP_SAFETYZONE);
+            OSoundInt_queue_sound(&osoundint, SOUND_STOP_SAFETYZONE);
     }
     /* Stop Safety Sound */
     else
     {
         if (wheel_state)
-            osoundint.queue_sound(SOUND_INIT_SAFETYZONE);
+            OSoundInt_queue_sound(&osoundint, SOUND_INIT_SAFETYZONE);
     }
     sprite_wheel_state = wheel_state;
 }

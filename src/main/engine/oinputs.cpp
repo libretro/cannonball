@@ -248,7 +248,7 @@ uint8_t OInputs_do_credits(OInputs* self)
         {
             ostats.credits++;
             /* todo: Increment credits total for bookkeeping */
-            osoundint.queue_sound(SOUND_COIN_IN);
+            OSoundInt_queue_sound(&osoundint, SOUND_COIN_IN);
         }
         return 3;
     }

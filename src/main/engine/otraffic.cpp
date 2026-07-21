@@ -431,7 +431,7 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
     /* Overtake Traffic Object */
     if (z16 >= 0x200)
     {
-        osoundint.queue_sound(SOUND_RESET);
+        OSoundInt_queue_sound(&osoundint, SOUND_RESET);
         if (outrun.game_state == GS_INGAME)
         {
             /* Update score on overtake */
@@ -787,7 +787,7 @@ void OTraffic_check_collision(OTraffic* self, oentry* sprite)
     /* New sound effect triggered */
     if (!traffic_fx_old && sprite->traffic_fx)
     {
-        osoundint.queue_sound(sprite->traffic_fx);
+        OSoundInt_queue_sound(&osoundint, sprite->traffic_fx);
         /* Set all proximity bits on */
         if (outils::random() & 1)
             sprite->traffic_proximity = 0xFF;

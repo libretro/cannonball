@@ -123,7 +123,7 @@ static void OBonus_decrement_bonus_secs(OBonus* self)
 
     /* Play Signal 1 Sound In A Steady Fashion */
     if ((((self->bonus_counter - 1) ^ self->bonus_counter) & BIT_2) == 0)
-        osoundint.queue_sound(SOUND_SIGNAL1);
+        OSoundInt_queue_sound(&osoundint, SOUND_SIGNAL1);
 
     /* Increment Score by 100K points */
     OStats_update_score(&ostats, 0x100000);

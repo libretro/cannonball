@@ -13,70 +13,72 @@
 #include "engine/audio/osound.hpp"
 #include "engine/audio/osoundint.hpp"
 
+static void OSoundInt_add_to_queue(OSoundInt* self, uint8_t snd);
+
 OSoundInt osoundint;
 OSound osound;
 
-OSoundInt::OSoundInt()
+void OSoundInt_ctor(OSoundInt* self)
 {
-    pcm_ram = new uint8_t[PCM_RAM_SIZE];
-    has_booted = false;
+    self->pcm_ram = new uint8_t[PCM_RAM_SIZE];
+    self->has_booted = false;
 }
 
-OSoundInt::~OSoundInt()
+void OSoundInt_dtor(OSoundInt* self)
 {
-    delete[] pcm_ram;
+    delete[] self->pcm_ram;
 }
 
-void OSoundInt::init()
+void OSoundInt_init(OSoundInt* self)
 {
-    if (pcm == NULL)
-        pcm = new SegaPCM(SOUND_CLOCK, &roms.pcm, pcm_ram, SegaPCM::BANK_512);       
+    if (self->pcm == NULL)
+        self->pcm = new SegaPCM(SOUND_CLOCK, &roms.pcm, self->pcm_ram, SegaPCM::BANK_512);       
 
-    if (ym == NULL)
-        ym = new YM2151(0.5f, SOUND_CLOCK);
+    if (self->ym == NULL)
+        self->ym = new YM2151(0.5f, SOUND_CLOCK);
 
-    pcm->init(config.sound.rate, config.fps);
-    ym->init(config.sound.rate, config.fps);
+    self->pcm->init(config.sound.rate, config.fps);
+    self->ym->init(config.sound.rate, config.fps);
 
-    reset();
+    OSoundInt_reset(self);
 
     /* Clear PCM Chip RAM */
     { uint16_t i; for (i = 0; i < PCM_RAM_SIZE; i++)
-        pcm_ram[i] = 0; }
+        self->pcm_ram[i] = 0; }
 
     { uint8_t i; for (i = 0; i < 8; i++)
-        engine_data[i] = 0; }
+        self->engine_data[i] = 0; }
 
-    osound.init(ym, pcm_ram);
+    osound.init(self->ym, self->pcm_ram);
 }
 
 /* Clear sound queue */
 /* Source: 0x5086 */
-void OSoundInt::reset()
+void OSoundInt_reset(OSoundInt* self)
 {
-    sound_counter = 0;
-    sound_head    = 0;
-    sound_tail    = 0;
-    sounds_queued = 0;
+    self->sound_counter = 0;
+    self->sound_head    = 0;
+    self->sound_tail    = 0;
+    self->sounds_queued = 0;
 
-    audio_ticks = 0;
+    self->audio_ticks = 0;
 }
 
-void OSoundInt::tick()
+void OSoundInt_tick(OSoundInt* self)
 {
     /* The audio code is updated 125 times per second */
-    audio_ticks += (125.0 / config.fps);
+    self->audio_ticks += (125.0 / config.fps);
 
     /* Ticks per frame will vary between 2 and 3 at 60fps. */
-    const int max_ticks = (int) audio_ticks;
+    const int max_ticks = (int) self->audio_ticks;
 
     { int i; for (i = 0; i < max_ticks; i++)
     {
-        play_queued_sound(); /* Process audio commands from main program code */
+        OSoundInt_play_queued_sound(self); /* Process audio commands from main program code */
         osound.tick();       /* Tick Ported Z80 Audio Code */
     } }
 
-    audio_ticks -= max_ticks;
+    self->audio_ticks -= max_ticks;
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -86,12 +88,12 @@ void OSoundInt::tick()
 /* Play Queued Sounds & Send Engine Noise Commands to Z80 */
 /* Was called by horizontal interrupt routine */
 /* Source: 0x564E */
-void OSoundInt::play_queued_sound()
+void OSoundInt_play_queued_sound(OSoundInt* self)
 {
-    if (!has_booted)
+    if (!self->has_booted)
     {
-        sound_head = 0;
-        sounds_queued = 0;
+        self->sound_head = 0;
+        self->sounds_queued = 0;
         return;
     }
 
@@ -101,11 +103,11 @@ void OSoundInt::play_queued_sound()
         /* Process queued sound */
         if (counter == 0)
         {
-            if (sounds_queued != 0)
+            if (self->sounds_queued != 0)
             {
-                osound.command_input = queue[sound_head];
-                sound_head = (sound_head + 1) & QUEUE_LENGTH;
-                sounds_queued--;
+                osound.command_input = self->queue[self->sound_head];
+                self->sound_head = (self->sound_head + 1) & QUEUE_LENGTH;
+                self->sounds_queued--;
             }
             else
             {
@@ -115,7 +117,7 @@ void OSoundInt::play_queued_sound()
         /* Process player engine sounds and passing traffic */
         else
         {
-            osound.engine_data[counter] = engine_data[counter];
+            osound.engine_data[counter] = self->engine_data[counter];
         }
     } }
 }
@@ -123,20 +125,20 @@ void OSoundInt::play_queued_sound()
 /* Queue a sound in service mode */
 /* Used to trigger both sound effects and music */
 /* Source: 0x56C6 */
-void OSoundInt::queue_sound_service(uint8_t snd)
+void OSoundInt_queue_sound_service(OSoundInt* self, uint8_t snd)
 {
-    if (has_booted)
-        add_to_queue(snd);
+    if (self->has_booted)
+        OSoundInt_add_to_queue(self, snd);
     else
-        queue_clear();
+        OSoundInt_queue_clear(self);
 }
 
 /* Queue a sound in-game */
 /* Note: This version has an additional check, so that certain sounds aren't played depending on game mode */
 /* Source: 0x56D4 */
-void OSoundInt::queue_sound(uint8_t snd)
+void OSoundInt_queue_sound(OSoundInt* self, uint8_t snd)
 {
-    if (has_booted)
+    if (self->has_booted)
     {
         if (outrun.game_state == GS_ATTRACT)
         {
@@ -148,22 +150,22 @@ void OSoundInt::queue_sound(uint8_t snd)
                 snd == SOUND_MUSIC_SPLASH || snd == SOUND_MUSIC_LASTWAVE)
                 return;
         }
-        add_to_queue(snd);
+        OSoundInt_add_to_queue(self, snd);
     }
     else
-        queue_clear();
-}
+        OSoundInt_queue_clear(self);
+}static 
 
-void OSoundInt::add_to_queue(uint8_t snd)
+void OSoundInt_add_to_queue(OSoundInt* self, uint8_t snd)
 {
     /* Add sound to the tail end of the queue */
-    queue[sound_tail] = snd;
-    sound_tail = (sound_tail + 1) & QUEUE_LENGTH;
-    sounds_queued++;
+    self->queue[self->sound_tail] = snd;
+    self->sound_tail = (self->sound_tail + 1) & QUEUE_LENGTH;
+    self->sounds_queued++;
 }
 
-void OSoundInt::queue_clear()
+void OSoundInt_queue_clear(OSoundInt* self)
 {
-    sound_tail = 0;
-    sounds_queued = 0;
+    self->sound_tail = 0;
+    self->sounds_queued = 0;
 }
