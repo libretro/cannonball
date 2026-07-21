@@ -203,10 +203,10 @@ void hwsprites::render(const uint8_t priority)
 
         /* if hidden, or top greater than/equal to bottom, or invalid bank, punt */
         int16_t hide    = (ramBuff[data+0] & 0x5000);
-        int32_t height  = (ramBuff[data+5] >> 8) + 1;       
+        { int32_t height  = (ramBuff[data+5] >> 8) + 1;       
         if (hide != 0 || height == 0) continue;
         
-        int16_t bank    = (ramBuff[data+0] >> 9) & 7;
+        { int16_t bank    = (ramBuff[data+0] >> 9) & 7;
         int32_t top     = (ramBuff[data+0] & 0x1ff) - 0x100;
         uint32_t addr    = ramBuff[data+1];
         int32_t pitch  = ((ramBuff[data+2] >> 1) | ((ramBuff[data+4] & 0x1000) << 3)) >> 8;
@@ -214,9 +214,9 @@ void hwsprites::render(const uint8_t priority)
         uint8_t shadow  = (ramBuff[data+3] >> 14) & 1;
         int32_t vzoom    = ramBuff[data+3] & 0x7ff;
         int32_t ydelta = ((ramBuff[data+4] & 0x8000) != 0) ? 1 : -1;
-        int32_t flip   = (~ramBuff[data+4] >> 14) & 1;
+        { int32_t flip   = (~ramBuff[data+4] >> 14) & 1;
         int32_t xdelta = ((ramBuff[data+4] & 0x2000) != 0) ? 1 : -1;
-        int32_t hzoom    = ramBuff[data+4] & 0x7ff;     
+        { int32_t hzoom    = ramBuff[data+4] & 0x7ff;     
         int32_t color   = COLOR_BASE + ((ramBuff[data+5] & 0x7f) << 4);
         int32_t x, y, ytarget, yacc = 0, pix;
             
@@ -234,7 +234,7 @@ void hwsprites::render(const uint8_t priority)
         if (numbanks)
             bank %= numbanks;
 
-        const uint32_t* spritedata = sprites + 0x10000 * bank;
+        { const uint32_t* spritedata = sprites + 0x10000 * bank;
 
         /* clamp to a maximum of 8x (not 100% confirmed) */
         if (vzoom < 0x40) vzoom = 0x40;
@@ -320,5 +320,5 @@ void hwsprites::render(const uint8_t priority)
             addr += pitch * (yacc >> 9);
             yacc &= 0x1ff;
         }
-    }
+     } } } } }}
 }

@@ -228,7 +228,7 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
             if (my >= 32 && mx >= 64)                  /* bottom right page */
                 ActPage = (EffPage >> 12) & 0x0f;
 
-            uint32_t TileIndex = 64 * 32 * 2 * ActPage + ((2 * 64 * my) & 0xfff) + ((2 * mx) & 0x7f);
+            { uint32_t TileIndex = 64 * 32 * 2 * ActPage + ((2 * 64 * my) & 0xfff) + ((2 * mx) & 0x7f);
 
             uint16_t Data = (tile_ram[TileIndex + 0] << 8) | tile_ram[TileIndex + 1];
 
@@ -259,7 +259,7 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
                 if (y < -288)
                     y += 512;
 
-                uint16_t ColourOff = TILEMAP_COLOUR_OFFSET;
+                { uint16_t ColourOff = TILEMAP_COLOUR_OFFSET;
                 if (Colour >= 0x20)
 					ColourOff = 0x100 | TILEMAP_COLOUR_OFFSET;
                 if (Colour >= 0x40)
@@ -271,8 +271,8 @@ void hwtiles::render_tile_layer(uint16_t* buf, uint8_t page_index, uint8_t prior
                     (this->*render8x8_tile_mask)(buf, Code, x, y, Colour, 3, 0, ColourOff);
                 else if (x > -8 && x < s16_width_noscale && y > -8 && y < S16_HEIGHT)
 					(this->*render8x8_tile_mask_clip)(buf, Code, x, y, Colour, 3, 0, ColourOff);
-            } /* end priority check */
-        } }
+             }} /* end priority check */
+         }} }
     } } /* end for loop */
 }
 

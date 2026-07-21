@@ -303,7 +303,7 @@ void HWRoad::render_foreground_lores(uint16_t* pixels)
             { 0x81,0x81,0x81,0x8f,0,0,0,0x80 }
         };
 
-        const uint32_t data0 = roadram[0x000 + y];
+        { const uint32_t data0 = roadram[0x000 + y];
         const uint32_t data1 = roadram[0x100 + y];
 
         /* if both roads are low priority, skip */
@@ -367,7 +367,7 @@ void HWRoad::render_foreground_lores(uint16_t* pixels)
                 for (x = 0; x < config.s16_width; x++) 
                 {
                     int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
-                    int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
+                    { int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
                     if (((priority_map[0][pix0] >> pix1) & 1) != 0)
                         pPixel[x] = color_table[0x10 + pix1];
                     else
@@ -375,7 +375,7 @@ void HWRoad::render_foreground_lores(uint16_t* pixels)
 
                     hpos0 = (hpos0 + 1) & 0xfff;
                     hpos1 = (hpos1 + 1) & 0xfff;
-                }
+                 }}
                 break;
 
             case 2:
@@ -384,7 +384,7 @@ void HWRoad::render_foreground_lores(uint16_t* pixels)
                 for (x = 0; x < config.s16_width; x++) 
                 {
                     int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
-                    int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
+                    { int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
                     if (((priority_map[1][pix0] >> pix1) & 1) != 0)
                         pPixel[x] = color_table[0x10 + pix1];
                     else
@@ -392,7 +392,7 @@ void HWRoad::render_foreground_lores(uint16_t* pixels)
 
                     hpos0 = (hpos0 + 1) & 0xfff;
                     hpos1 = (hpos1 + 1) & 0xfff;
-                }
+                 }}
                 break;
 
             case 3:
@@ -407,7 +407,7 @@ void HWRoad::render_foreground_lores(uint16_t* pixels)
                 }
                 break;
             } /* end switch */
-    } /* end for */
+     }} /* end for */
 }
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -491,7 +491,7 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
             { 0x81,0x81,0x81,0x8f,0,0,0,0x80 }
         };
 
-        uint32_t data0 = roadram[0x000 + yy];
+        { uint32_t data0 = roadram[0x000 + yy];
         uint32_t data1 = roadram[0x100 + yy];
 
         /* if both roads are low priority, skip */
@@ -518,27 +518,27 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
             uint32_t data1_next = roadram[0x100 + yy + 1];
 
             int32_t  hpos0_next = roadram[0x200 + (((road_control & 4) != 0) ? yy + 1 : (data0_next & 0x1ff))] & 0xfff;
-            int32_t  hpos1_next = roadram[0x400 + (((road_control & 4) != 0) ? yy + 1 : (data1_next & 0x1ff))] & 0xfff;
+            { int32_t  hpos1_next = roadram[0x400 + (((road_control & 4) != 0) ? yy + 1 : (data1_next & 0x1ff))] & 0xfff;
 
             /* Interpolate road 1 position */
             if (((data0 & 0x800) == 0) && (data0_next & 0x800) == 0)
             {
                 data0      = (data0      >> 1) & 0xFF;
                 data0_next = (data0_next >> 1) & 0xFF;
-                int32_t diff = (data0 + ((data0_next - data0) >> 1)) & 0xFF;
+                { int32_t diff = (data0 + ((data0_next - data0) >> 1)) & 0xFF;
                 src0 = (roads + (0x000 + diff) * 512);
                 hpos0 = (hpos0 + ((hpos0_next - hpos0) >> 1)) & 0xFFF;
-            }
+             }}
             /* Interpolate road 2 source position */
             if (((data1 & 0x800) == 0) && (data1_next & 0x800) == 0)
             {
                 data1      = (data1      >> 1) & 0xFF;
                 data1_next = (data1_next >> 1) & 0xFF;
-                int32_t diff = (data1 + ((data1_next - data1) >> 1)) & 0xFF;
+                { int32_t diff = (data1 + ((data1_next - data1) >> 1)) & 0xFF;
                 src1 = (roads + (0x100 + diff) * 512);
                 hpos1 = (hpos1 + ((hpos1_next - hpos1) >> 1)) & 0xFFF;
-            }     
-        }
+             }}     
+         }}
         /* ---------------------------------------------------------------------------------------- */
         /* Recalculate for non-interpolated scanlines */
         /* ---------------------------------------------------------------------------------------- */
@@ -595,7 +595,7 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
                 for (x = 0; x < config.s16_width; x++) 
                 {
                     int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
-                    int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
+                    { int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
                     if (((priority_map[0][pix0] >> pix1) & 1) != 0)
                         pPixel[x] = color_table[0x10 + pix1];
                     else
@@ -606,7 +606,7 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
                         hpos0 = (hpos0 + 1) & 0xfff;
                         hpos1 = (hpos1 + 1) & 0xfff;
                     }
-                }
+                 }}
                 break;
 
             case 2:
@@ -615,7 +615,7 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
                 for (x = 0; x < config.s16_width; x++) 
                 {
                     int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
-                    int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
+                    { int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
                     if (((priority_map[1][pix0] >> pix1) & 1) != 0)
                         pPixel[x] = color_table[0x10 + pix1];
                     else
@@ -626,7 +626,7 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
                         hpos0 = (hpos0 + 1) & 0xfff;
                         hpos1 = (hpos1 + 1) & 0xfff;
                     }
-                }
+                 }}
                 break;
 
             case 3:
@@ -642,6 +642,6 @@ void HWRoad::render_foreground_hires(uint16_t* pixels)
                 }
                 break;
             } /* end switch */
-    } /* end for */
+     }} /* end for */
 }
 

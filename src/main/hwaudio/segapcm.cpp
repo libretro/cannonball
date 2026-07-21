@@ -65,11 +65,11 @@ SegaPCM::SegaPCM(uint32_t clock, RomLoader* rom, uint8_t* ram, int32_t bank)
     bankshift = bank & 0xFF;
     rgnmask = max_addr - 1;
 
-    int32_t mask = bank >> 16;
+    { int32_t mask = bank >> 16;
     if (mask == 0)
         mask = BANK_MASK7 >> 16;
 
-    int32_t rom_mask;
+    { int32_t rom_mask;
     for (rom_mask = 1; rom_mask < max_addr; rom_mask *= 2);
     rom_mask--;
 
@@ -77,7 +77,7 @@ SegaPCM::SegaPCM(uint32_t clock, RomLoader* rom, uint8_t* ram, int32_t bank)
 
     { int32_t i; for (i = 0; i < 0x100; i++)
         ram[i] = 0xff; }
-}
+ } }}
 
 SegaPCM::~SegaPCM()
 {
