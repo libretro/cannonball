@@ -566,7 +566,7 @@ void OFerrari::set_ferrari_palette()
     uint8_t pal;
 
     /* Denote palette for brake light */
-    if (oinputs.brake_adjust >= OInputs::BRAKE_THRESHOLD1)
+    if (oinputs.brake_adjust >= BRAKE_THRESHOLD1)
     {
         outrun.outputs->set_digital(OOutputs::D_BRAKE_LAMP);
         pal = 2;
@@ -1410,22 +1410,22 @@ void OFerrari::set_brake_subtract()
     /* Not skidding or spinning */
     if (ocrash.skid_counter == 0 && ocrash.spin_control1 == 0)
     {
-        if (brake_value < OInputs::BRAKE_THRESHOLD1)
+        if (brake_value < BRAKE_THRESHOLD1)
         {
             brake_subtract = d6;
             return;
         }
-        else if (brake_value < OInputs::BRAKE_THRESHOLD2)
+        else if (brake_value < BRAKE_THRESHOLD2)
         {
             brake_subtract = d6 + DEC;
             return;
         }
-        else if (brake_value < OInputs::BRAKE_THRESHOLD3)
+        else if (brake_value < BRAKE_THRESHOLD3)
         {
             brake_subtract = d6 + (DEC * 3);
             return;
         }
-        else if (brake_value < OInputs::BRAKE_THRESHOLD4)
+        else if (brake_value < BRAKE_THRESHOLD4)
         {
             brake_subtract = d6 + (DEC * 5);
             return;

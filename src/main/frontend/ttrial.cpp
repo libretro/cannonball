@@ -60,9 +60,9 @@ int TTrial::tick()
             osprites.init();
             video.enabled = true;
             video.sprite_layer->set_x_clip(false);
-            omap.init();
-            omap.load_sprites();
-            omap.position_ferrari(FERRARI_POS[level_selected = 0]);
+            OMap_init(&omap);
+            OMap_load_sprites(&omap);
+            OMap_position_ferrari(&omap, FERRARI_POS[level_selected = 0]);
             ohud.blit_text_big(1, "STEER TO SELECT TRACK", false);
             ohud.blit_text1(2, 25, TEXT1_LAPTIME1);
             ohud.blit_text1(2, 26, TEXT1_LAPTIME2);
@@ -77,17 +77,17 @@ int TTrial::tick()
                 {
                     return BACK_TO_MENU;
                 }
-                else if (input.has_pressed(Input::LEFT) || oinputs.is_analog_l())
+                else if (input.has_pressed(Input::LEFT) || OInputs_is_analog_l(&oinputs))
                 {
                     if (--level_selected < 0)
                         level_selected = sizeof(FERRARI_POS) - 1;
                 }
-                else if (input.has_pressed(Input::RIGHT)|| oinputs.is_analog_r())
+                else if (input.has_pressed(Input::RIGHT)|| OInputs_is_analog_r(&oinputs))
                 {
                     if (++level_selected > sizeof(FERRARI_POS) - 1)
                         level_selected = 0;
                 }
-                else if (input.has_pressed(Input::START) || input.has_pressed(Input::ACCEL) || oinputs.is_analog_select())
+                else if (input.has_pressed(Input::START) || input.has_pressed(Input::ACCEL) || OInputs_is_analog_select(&oinputs))
                 {
                     outils::convert_counter_to_time(best_times[level_selected], best_converted);
 
@@ -106,10 +106,10 @@ int TTrial::tick()
                     ostats.credits = 1;
                     return INIT_GAME;
                 }
-                omap.position_ferrari(FERRARI_POS[level_selected]);
+                OMap_position_ferrari(&omap, FERRARI_POS[level_selected]);
                 outils::convert_counter_to_time(best_times[level_selected], best_converted);
                 ohud.draw_lap_timer(ohud.translate(7, 26, 0x110030), best_converted, best_converted[2]);
-                omap.blit();
+                OMap_blit(&omap);
                 oroad.tick();
                 osprites.sprite_copy();
                 osprites.update_sprites();

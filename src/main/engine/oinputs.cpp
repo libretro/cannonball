@@ -12,66 +12,63 @@
 #include "oinputs.hpp"
 #include "ostats.hpp"
 
+static void OInputs_digital_steering(OInputs* self);
+static void OInputs_digital_pedals(OInputs* self);
+
 OInputs oinputs;
 
-OInputs::OInputs(void)
+
+
+void OInputs_init(OInputs* self)
 {
+    self->input_steering  = STEERING_CENTRE;
+    self->steering_old    = STEERING_CENTRE;
+    self->steering_adjust = 0;
+    self->acc_adjust      = 0;
+    self->brake_adjust    = 0;
+    self->steering_change = 0;
+
+    self->steering_inc = config.controls.steer_speed;
+    self->acc_inc      = config.controls.pedal_speed * 4;
+    self->brake_inc    = config.controls.pedal_speed * 4;
+
+    self->input_acc   = 0;
+    self->input_brake = 0;
+    self->gear        = false;
+    self->crash_input = 0;
+    self->delay1      = 0;
+    self->delay2      = 0;
+    self->delay3      = 0;
 }
 
-OInputs::~OInputs(void)
-{
-}
-
-void OInputs::init()
-{
-    input_steering  = STEERING_CENTRE;
-    steering_old    = STEERING_CENTRE;
-    steering_adjust = 0;
-    acc_adjust      = 0;
-    brake_adjust    = 0;
-    steering_change = 0;
-
-    steering_inc = config.controls.steer_speed;
-    acc_inc      = config.controls.pedal_speed * 4;
-    brake_inc    = config.controls.pedal_speed * 4;
-
-    input_acc   = 0;
-    input_brake = 0;
-    gear        = false;
-    crash_input = 0;
-    delay1      = 0;
-    delay2      = 0;
-    delay3      = 0;
-}
-
-void OInputs::tick()
+void OInputs_tick(OInputs* self)
 {
     /* Digital Controls: Simulate Analog */
     if (!input.analog || !input.gamepad)
     {
-        digital_steering();
-        digital_pedals();
+        OInputs_digital_steering(self);
+        OInputs_digital_pedals(self);
     }
     /* Analog Controls */
     else
     {
-        input_steering = input.a_wheel;
+        self->input_steering = input.a_wheel;
 
         /* Analog Pedals */
         if (input.analog == 1)
         {
-            input_acc   = input.a_accel;
-            input_brake = input.a_brake;
+            self->input_acc   = input.a_accel;
+            self->input_brake = input.a_brake;
         }
         /* Digital Pedals */
         else
         {
-            digital_pedals();
+            OInputs_digital_pedals(self);
         }
     }
 }
-/* DIGITAL CONTROLS: Digital Simulation of analog steering */
-void OInputs::digital_steering()
+/* DIGITAL CONTROLS: Digital Simulation of analog steering */static 
+void OInputs_digital_steering(OInputs* self)
 {
     /* ------------------------------------------------------------------------ */
     /* STEERING */
@@ -79,39 +76,39 @@ void OInputs::digital_steering()
     if (input.is_pressed(Input::LEFT))
     {
         /* Recentre wheel immediately if facing other way */
-        if (input_steering > STEERING_CENTRE) input_steering = STEERING_CENTRE;
+        if (self->input_steering > STEERING_CENTRE) self->input_steering = STEERING_CENTRE;
 
-        input_steering -= steering_inc;
-        if (input_steering < STEERING_MIN) input_steering = STEERING_MIN;
+        self->input_steering -= self->steering_inc;
+        if (self->input_steering < STEERING_MIN) self->input_steering = STEERING_MIN;
     }
     else if (input.is_pressed(Input::RIGHT))
     {
         /* Recentre wheel immediately if facing other way */
-        if (input_steering < STEERING_CENTRE) input_steering = STEERING_CENTRE;
+        if (self->input_steering < STEERING_CENTRE) self->input_steering = STEERING_CENTRE;
 
-        input_steering += steering_inc;
-        if (input_steering > STEERING_MAX) input_steering = STEERING_MAX;
+        self->input_steering += self->steering_inc;
+        if (self->input_steering > STEERING_MAX) self->input_steering = STEERING_MAX;
     }
     /* Return steering to centre if nothing pressed */
     else
     {
-        if (input_steering < STEERING_CENTRE)
+        if (self->input_steering < STEERING_CENTRE)
         {
-            input_steering += steering_inc;
-            if (input_steering > STEERING_CENTRE)
-                input_steering = STEERING_CENTRE;
+            self->input_steering += self->steering_inc;
+            if (self->input_steering > STEERING_CENTRE)
+                self->input_steering = STEERING_CENTRE;
         }
-        else if (input_steering > STEERING_CENTRE)
+        else if (self->input_steering > STEERING_CENTRE)
         {
-            input_steering -= steering_inc;
-            if (input_steering < STEERING_CENTRE)
-                input_steering = STEERING_CENTRE;
+            self->input_steering -= self->steering_inc;
+            if (self->input_steering < STEERING_CENTRE)
+                self->input_steering = STEERING_CENTRE;
         }
     }
 }
 
-/* DIGITAL CONTROLS: Digital Simulation of analog pedals */
-void OInputs::digital_pedals()
+/* DIGITAL CONTROLS: Digital Simulation of analog pedals */static 
+void OInputs_digital_pedals(OInputs* self)
 {
     /* ------------------------------------------------------------------------ */
     /* ACCELERATION */
@@ -119,13 +116,13 @@ void OInputs::digital_pedals()
 
     if (input.is_pressed(Input::ACCEL))
     {
-        input_acc += acc_inc;
-        if (input_acc > 0xFF) input_acc = 0xFF;
+        self->input_acc += self->acc_inc;
+        if (self->input_acc > 0xFF) self->input_acc = 0xFF;
     }
     else
     {
-        input_acc -= acc_inc;
-        if (input_acc < 0) input_acc = 0;
+        self->input_acc -= self->acc_inc;
+        if (self->input_acc < 0) self->input_acc = 0;
     }
 
     /* ------------------------------------------------------------------------ */
@@ -134,17 +131,17 @@ void OInputs::digital_pedals()
 
     if (input.is_pressed(Input::BRAKE))
     {
-        input_brake += brake_inc;
-        if (input_brake > 0xFF) input_brake = 0xFF;
+        self->input_brake += self->brake_inc;
+        if (self->input_brake > 0xFF) self->input_brake = 0xFF;
     }
     else
     {
-        input_brake -= brake_inc;
-        if (input_brake < 0) input_brake = 0;
+        self->input_brake -= self->brake_inc;
+        if (self->input_brake < 0) self->input_brake = 0;
     }
 }
 
-void OInputs::do_gear()
+void OInputs_do_gear(OInputs* self)
 {
     /* ------------------------------------------------------------------------ */
     /* GEAR SHIFT */
@@ -158,22 +155,22 @@ void OInputs::do_gear()
     {
         /* Manual: Cabinet Shifter */
         if (config.controls.gear == config.controls.GEAR_PRESS)
-            gear = !(input.is_pressed(Input::GEAR1) || input.is_pressed(Input::GEAR2));
+            self->gear = !(input.is_pressed(Input::GEAR1) || input.is_pressed(Input::GEAR2));
 
         /* Manual: Two Separate Buttons for gears */
         else if (config.controls.gear == config.controls.GEAR_SEPARATE)
         {
             if (input.has_pressed(Input::GEAR1))
-                gear = false;
+                self->gear = false;
             else if (input.has_pressed(Input::GEAR2))
-                gear = true;
+                self->gear = true;
         }
 
         /* Manual: Keyboard/Digital Button */
         else
         {
             if (input.has_pressed(Input::GEAR1) || input.has_pressed(Input::GEAR2))
-                gear = !gear;
+                self->gear = !self->gear;
         }
     }
 }
@@ -185,53 +182,53 @@ void OInputs::do_gear()
 /* */
 /* Source: 74E2 */
 
-void OInputs::adjust_inputs()
+void OInputs_adjust_inputs(OInputs* self)
 {
     /* Cap Steering Value */
-    if (input_steering < STEERING_MIN) input_steering = STEERING_MIN;
-    else if (input_steering > STEERING_MAX) input_steering = STEERING_MAX;
+    if (self->input_steering < STEERING_MIN) self->input_steering = STEERING_MIN;
+    else if (self->input_steering > STEERING_MAX) self->input_steering = STEERING_MAX;
 
-    if (crash_input)
+    if (self->crash_input)
     {
-        crash_input--;
-        { int16_t d0 = ((input_steering - 0x80) * 0x100) / 0x70;
+        self->crash_input--;
+        { int16_t d0 = ((self->input_steering - 0x80) * 0x100) / 0x70;
         if (d0 > 0x7F) d0 = 0x7F;
         else if (d0 < -0x7F) d0 = -0x7F;
-        steering_adjust = ocrash.crash_counter ? 0 : d0;
+        self->steering_adjust = ocrash.crash_counter ? 0 : d0;
      }}
     else
     {
         /* no_crash1: */
-        int16_t d0 = input_steering - steering_old;
-        steering_old = input_steering;
-        steering_change += d0;
-        d0 = steering_change < 0 ? -steering_change : steering_change;
+        int16_t d0 = self->input_steering - self->steering_old;
+        self->steering_old = self->input_steering;
+        self->steering_change += d0;
+        d0 = self->steering_change < 0 ? -self->steering_change : self->steering_change;
 
         /* Note the below line "if (d0 > 2)" causes a bug in the original game */
         /* whereby if you hold the wheel to the left whilst stationary, then accelerate the car will veer left even */
         /* when the wheel has been centered */
         if (config.engine.fix_bugs || d0 > 2)
         {
-            steering_change = 0;
+            self->steering_change = 0;
             /* Convert input steering value to internal value */
-            d0 = ((input_steering - 0x80) * 0x100) / 0x70;
+            d0 = ((self->input_steering - 0x80) * 0x100) / 0x70;
             if (d0 > 0x7F) d0 = 0x7F;
             else if (d0 < -0x7F) d0 = -0x7F;
-            steering_adjust = ocrash.crash_counter ? 0 : d0;
+            self->steering_adjust = ocrash.crash_counter ? 0 : d0;
         }
     }
 
     /* Cap & Adjust Acceleration Value */
-    int16_t acc = input_acc;
+    int16_t acc = self->input_acc;
     if (acc > PEDAL_MAX) acc = PEDAL_MAX;
     else if (acc < PEDAL_MIN) acc = PEDAL_MIN;
-    acc_adjust = ((acc - 0x30) * 0x100) / 0x61;
+    self->acc_adjust = ((acc - 0x30) * 0x100) / 0x61;
 
     /* Cap & Adjust Brake Value */
-    int16_t brake = input_brake;
+    int16_t brake = self->input_brake;
     if (brake > PEDAL_MAX) brake = PEDAL_MAX;
     else if (brake < PEDAL_MIN) brake = PEDAL_MIN;
-    brake_adjust = ((brake - 0x30) * 0x100) / 0x61;
+    self->brake_adjust = ((brake - 0x30) * 0x100) / 0x61;
 }
 
 /* Simplified version of do credits routine.  */
@@ -243,7 +240,7 @@ void OInputs::adjust_inputs()
 /*          3 (Key Pressed / Service Button) */
 /* */
 /* Source: 0x6DE0 */
-uint8_t OInputs::do_credits()
+uint8_t OInputs_do_credits(OInputs* self)
 {
     if (input.has_pressed(Input::COIN))
     {
@@ -262,47 +259,47 @@ uint8_t OInputs::do_credits()
 /* Menu Selection Controls */
 /* ------------------------------------------------------------------------------------------------ */
 
-bool OInputs::is_analog_l()
+bool OInputs_is_analog_l(OInputs* self)
 {
-    if (input_steering < STEERING_CENTRE - 0x10)
+    if (self->input_steering < STEERING_CENTRE - 0x10)
     {
-        if (--delay1 < 0)
+        if (--self->delay1 < 0)
         {
-            delay1 = DELAY_RESET;
+            self->delay1 = DELAY_RESET;
             return true;
         }
     }
     else
-        delay1 = DELAY_RESET;
+        self->delay1 = DELAY_RESET;
     return false;
 }
 
-bool OInputs::is_analog_r()
+bool OInputs_is_analog_r(OInputs* self)
 {
-    if (input_steering > STEERING_CENTRE + 0x10)
+    if (self->input_steering > STEERING_CENTRE + 0x10)
     {
-        if (--delay2 < 0)
+        if (--self->delay2 < 0)
         {
-            delay2 = DELAY_RESET;
+            self->delay2 = DELAY_RESET;
             return true;
         }
     }
     else
-        delay2 = DELAY_RESET;
+        self->delay2 = DELAY_RESET;
     return false;
 }
 
-bool OInputs::is_analog_select()
+bool OInputs_is_analog_select(OInputs* self)
 {
-    if (input_acc > 0x90)
+    if (self->input_acc > 0x90)
     {
-        if (--delay3 < 0)
+        if (--self->delay3 < 0)
         {
-            delay3 = DELAY_RESET;
+            self->delay3 = DELAY_RESET;
             return true;
         }
     }
     else
-        delay3 = DELAY_RESET;
+        self->delay3 = DELAY_RESET;
     return false;
 }

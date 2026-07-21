@@ -1313,8 +1313,8 @@ void retro_run(void)
 
     if (cannonball_tick_frame)
     {
-        oinputs.tick();           /* Do Controls */
-        oinputs.do_gear();        /* Digital Gear */
+        OInputs_tick(&oinputs);           /* Do Controls */
+        OInputs_do_gear(&oinputs);        /* Digital Gear */
     }
 
     switch (cannonball_state)
@@ -1370,7 +1370,7 @@ void retro_run(void)
         break;
 
         case STATE_INIT_MENU:
-            oinputs.init();
+            OInputs_init(&oinputs);
             outrun.outputs->init();
             menu->init();
             cannonball_state = STATE_MENU;

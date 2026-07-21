@@ -254,12 +254,12 @@ void Menu::init()
     /* Setup palette, road and colours for background */
     oroad.stage_lookup_off = 9;
     oinitengine.init_road_seg_master();
-    opalette.setup_sky_palette();
-    opalette.setup_ground_color();
-    opalette.setup_road_centre();
-    opalette.setup_road_stripes();
-    opalette.setup_road_side();
-    opalette.setup_road_colour();
+    OPalette_setup_sky_palette(&opalette);
+    OPalette_setup_ground_color(&opalette);
+    OPalette_setup_road_centre(&opalette);
+    OPalette_setup_road_stripes(&opalette);
+    OPalette_setup_road_side(&opalette);
+    OPalette_setup_road_colour(&opalette);
     otiles.setup_palette_hud();
 
     oroad.init();
@@ -445,21 +445,21 @@ static bool menu_starts_with(
 void Menu::tick_menu()
 {
     /* Tick Controls */
-    if (input.has_pressed(Input::DOWN) || oinputs.is_analog_r())
+    if (input.has_pressed(Input::DOWN) || OInputs_is_analog_r(&oinputs))
     {
         osoundint.queue_sound(SOUND_BEEP1);
 
         if (++cursor >= (int16_t) menu_selected->size())
             cursor = 0;
     }
-    else if (input.has_pressed(Input::UP) || oinputs.is_analog_l())
+    else if (input.has_pressed(Input::UP) || OInputs_is_analog_l(&oinputs))
     {
         osoundint.queue_sound(SOUND_BEEP1);
 
         if (--cursor < 0)
             cursor = menu_selected->size() - 1;
     }
-    else if (input.has_pressed(Input::ACCEL) || input.has_pressed(Input::START) || oinputs.is_analog_select())
+    else if (input.has_pressed(Input::ACCEL) || input.has_pressed(Input::START) || OInputs_is_analog_select(&oinputs))
     {
         /* Get option that was selected */
         const char* OPTION = menu_selected->at(cursor).c_str();

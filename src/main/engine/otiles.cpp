@@ -420,7 +420,7 @@ void OTiles::scroll_tilemaps()
     /* Determine if road splitting */
     else if (oinitengine.end_stage_props & BIT_0)
     {
-        opalette.setup_sky_change();
+        OPalette_setup_sky_change(&opalette);
         tilemap_ctrl  = TILEMAP_INIT;
         tilemap_setup = SETUP_TILES;
     }
@@ -473,7 +473,7 @@ void OTiles::loop_to_stage1()
 {
     opalette.pal_manip_ctrl = 1;    /* Enable palette fade routines to transition between levels */
     init_tilemap(0);                 /* Initalize Default Tilemap (Stage 1) */
-    opalette.setup_sky_change();    /* Setup data in RAM necessary for sky palette fade. */
+    OPalette_setup_sky_change(&opalette);    /* Setup data in RAM necessary for sky palette fade. */
 }
 
 /* Clear the name tables used by the previous stage's tilemap, which aren't needed anymore */

@@ -19,15 +19,27 @@
 #include "engine/olevelobjs.hpp"
 #include "engine/ostats.hpp"
 
+static void OLevelObjs_init_entries(OLevelObjs* self, uint32_t, const uint8_t start_index, const uint8_t);
+static void OLevelObjs_setup_sprite(OLevelObjs* self, oentry*, uint32_t);
+static void OLevelObjs_setup_sprite_routine(OLevelObjs* self, oentry*);
+static void OLevelObjs_sprite_collision_z1c(OLevelObjs* self, oentry*);
+static void OLevelObjs_sprite_lights(OLevelObjs* self, oentry*);
+static void OLevelObjs_sprite_lights_countdown(OLevelObjs* self, oentry*);
+static void OLevelObjs_sprite_grass(OLevelObjs* self, oentry* sprite);
+static void OLevelObjs_sprite_water(OLevelObjs* self, oentry* sprite);
+static void OLevelObjs_sprite_rocks(OLevelObjs* self, oentry* sprite);
+static void OLevelObjs_sprite_debris(OLevelObjs* self, oentry* sprite);
+static void OLevelObjs_sprite_minitree(OLevelObjs* self, oentry* sprite);
+static void OLevelObjs_do_thickness_sprite(OLevelObjs* self, oentry* sprite, const uint32_t);
+static void OLevelObjs_sprite_clouds(OLevelObjs* self, oentry* sprite);
+static void OLevelObjs_sprite_normal(OLevelObjs* self, oentry*, uint8_t);
+static void OLevelObjs_set_spr_zoom_priority(OLevelObjs* self, oentry*, uint8_t);
+static void OLevelObjs_set_spr_zoom_priority2(OLevelObjs* self, oentry*, uint8_t);
+static void OLevelObjs_set_spr_zoom_priority_rocks(OLevelObjs* self, oentry*, uint8_t);
+
 OLevelObjs olevelobjs;
 
-OLevelObjs::OLevelObjs(void)
-{
-}
 
-OLevelObjs::~OLevelObjs(void)
-{
-}
 
 /* SetupSpriteEntries */
 /* Initialize default sprite entries for game engine. */
@@ -36,26 +48,26 @@ OLevelObjs::~OLevelObjs(void)
 /* Once setup, this routine is replaced with SpriteControl */
 /* */
 /* Source: 0x3B48 */
-void OLevelObjs::init_startline_sprites()
+void OLevelObjs_init_startline_sprites(OLevelObjs* self)
 {
     /* Return if Music Selection Screen */
     if (outrun.game_state == GS_MUSIC) return; 
-    init_entries(outrun.adr.sprite_def_props1, 0, DEF_SPRITE_ENTRIES);
+    OLevelObjs_init_entries(self, outrun.adr.sprite_def_props1, 0, DEF_SPRITE_ENTRIES);
 }
 
-void OLevelObjs::init_timetrial_sprites()
+void OLevelObjs_init_timetrial_sprites(OLevelObjs* self)
 {
     const uint8_t start_index = outrun.ttrial.level == 0 ? 0 : 18;
-    init_entries(outrun.adr.sprite_def_props1 + (start_index * 0x10), start_index, DEF_SPRITE_ENTRIES);
+    OLevelObjs_init_entries(self, outrun.adr.sprite_def_props1 + (start_index * 0x10), start_index, DEF_SPRITE_ENTRIES);
 }
 
 /* Setup hi-score screen sprite entries */
-void OLevelObjs::init_hiscore_sprites()
+void OLevelObjs_init_hiscore_sprites(OLevelObjs* self)
 {
-    init_entries(outrun.adr.sprite_def_props2, 0, HISCORE_SPRITE_ENTRIES);
-}
+    OLevelObjs_init_entries(self, outrun.adr.sprite_def_props2, 0, HISCORE_SPRITE_ENTRIES);
+}static 
 
-void OLevelObjs::init_entries(uint32_t a4, const uint8_t start_index, const uint8_t no_entries)
+void OLevelObjs_init_entries(OLevelObjs* self, uint32_t a4, const uint8_t start_index, const uint8_t no_entries)
 {
     /* next_sprite: */
     { uint8_t i; for (i = start_index; i <= no_entries; i++)
@@ -121,14 +133,14 @@ void OLevelObjs::init_entries(uint32_t a4, const uint8_t start_index, const uint
 /* Source: 3CB2 */
 /* */
 /* Input: Default Zoom Value */
-void OLevelObjs::setup_sprites(uint32_t z)
+void OLevelObjs_setup_sprites(OLevelObjs* self, uint32_t z)
 {
     /* Setup entries that have not yet been enabled */
     { uint8_t i; for (i = 0; i < osprites.no_sprites; i++)
     {
         if ((osprites.jump_table[i].control & OSprites::ENABLE) == 0)
         {
-            setup_sprite(&osprites.jump_table[i], z);
+            OLevelObjs_setup_sprite(self, &osprites.jump_table[i], z);
             return;
         }
     } }
@@ -147,8 +159,8 @@ void OLevelObjs::setup_sprites(uint32_t z)
 /* +1: [Byte] Sprite X World Position */
 /* +2: [Word] Sprite Y World Position */
 /* +5: [Byte] Sprite Type */
-/* +7: [Byte] Sprite Palette */
-void OLevelObjs::setup_sprite(oentry* sprite, uint32_t z)
+/* +7: [Byte] Sprite Palette */static 
+void OLevelObjs_setup_sprite(OLevelObjs* self, oentry* sprite, uint32_t z)
 {
     #define READ8(x)  trackloader.read8(trackloader.scenerymap_data, x)
     #define READ16(x) trackloader.read16(trackloader.scenerymap_data, x)
@@ -189,10 +201,10 @@ void OLevelObjs::setup_sprite(oentry* sprite, uint32_t z)
     sprite->draw_props = READ8(addr + 0) & 0xF0;
     sprite->function_holder = sprite->draw_props >> 4; /* set sprite type */
 
-    setup_sprite_routine(sprite);
-}
+    OLevelObjs_setup_sprite_routine(self, sprite);
+}static 
 
-void OLevelObjs::setup_sprite_routine(oentry* sprite)
+void OLevelObjs_setup_sprite_routine(OLevelObjs* self, oentry* sprite)
 {
     switch (sprite->function_holder)
     {
@@ -281,7 +293,7 @@ void OLevelObjs::setup_sprite_routine(oentry* sprite)
     }
 }
 
-void OLevelObjs::do_sprite_routine()
+void OLevelObjs_do_sprite_routine(OLevelObjs* self)
 {
     { uint8_t i; for (i = 0; i < osprites.no_sprites; i++)
     {
@@ -294,39 +306,39 @@ void OLevelObjs::do_sprite_routine()
                 /* Normal Sprite: (Possible With/Without Collision, Zoom 1) */
                 case 0:
                     if (sprite->yw == 0)
-                       sprite_normal(sprite, 1);
+                       OLevelObjs_sprite_normal(self, sprite, 1);
                     else
-                       set_spr_zoom_priority(sprite, 1);
+                       OLevelObjs_set_spr_zoom_priority(self, sprite, 1);
                     break;
 
                 /* Grass Sprite */
                 case 1:
-                    sprite_grass(sprite);
+                    OLevelObjs_sprite_grass(self, sprite);
                     break;
 
                 /* Sprite based clouds that span entire sky */
                 case 2:
-                    sprite_clouds(sprite);
+                    OLevelObjs_sprite_clouds(self, sprite);
                     break;
 
                 /* Water on LHS of Stage 1 */
                 case 3:
-                    sprite_water(sprite);
+                    OLevelObjs_sprite_water(self, sprite);
                     break;
 
                 /* Start Lights & Base Pillar of Checkpoint Sign */
                 case 4:
-                    sprite_lights(sprite);
+                    OLevelObjs_sprite_lights(self, sprite);
                     break;
                 
                 /* 5 - Checkpoint (Bottom Of Sign) */
                 case 5:
-                    set_spr_zoom_priority(sprite, 1);
+                    OLevelObjs_set_spr_zoom_priority(self, sprite, 1);
                     break;
 
                 /* 6 - Checkpoint (Top Of Sign) */
                 case 6:
-                    set_spr_zoom_priority(sprite, 1);
+                    OLevelObjs_set_spr_zoom_priority(self, sprite, 1);
                     /* Have we passed the checkpoint? */
                     if (!(sprite->control & OSprites::ENABLE))
                         oinitengine.checkpoint_marker = -1;
@@ -334,55 +346,55 @@ void OLevelObjs::do_sprite_routine()
 
                 /* Draw From Centre Collision Check */
                 case 7:
-                    sprite_collision_z1c(sprite);
+                    OLevelObjs_sprite_collision_z1c(self, sprite);
                     break;
 
                 /* Normal Sprite: (Collision, Zoom 2) */
                 case 8:
-                    sprite_normal(sprite, 2);
+                    OLevelObjs_sprite_normal(self, sprite, 2);
                     break;
 
                 /* Wide Rocks on Stage 2 */
                 case 9:
-                    sprite_rocks(sprite);
+                    OLevelObjs_sprite_rocks(self, sprite);
                     break;
 
                 /* Sand Strips */
                 case 10:
-                    do_thickness_sprite(sprite, outrun.adr.sprite_sand);
+                    OLevelObjs_do_thickness_sprite(self, sprite, outrun.adr.sprite_sand);
                     break;
 
                 /* Stone Strips */
                 case 11:
-                    do_thickness_sprite(sprite, outrun.adr.sprite_stone);
+                    OLevelObjs_do_thickness_sprite(self, sprite, outrun.adr.sprite_stone);
                     break;
 
                 /* Mini-Tree (Stage 5, Level ID: 0x24) */
                 case 12:
-                    sprite_minitree(sprite);
+                    OLevelObjs_sprite_minitree(self, sprite);
                     break;
                 
                 /* Track Debris on Stage 3a */
                 case 13:
-                    sprite_debris(sprite);
+                    OLevelObjs_sprite_debris(self, sprite);
                     break;
 
                 /* Sand (Again) - Used in end sequence #2 */
                 case 14:
-                    do_thickness_sprite(sprite, outrun.adr.sprite_sand);
+                    OLevelObjs_do_thickness_sprite(self, sprite, outrun.adr.sprite_sand);
                     break;
             }
         }
     } }
 }
 
-/* Source: 4048 */
-void OLevelObjs::sprite_normal(oentry *sprite, uint8_t zoom)
+/* Source: 4048 */static 
+void OLevelObjs_sprite_normal(OLevelObjs* self, oentry *sprite, uint8_t zoom)
 {
     /* Omit collision check if we're already colliding with something */
-    if (sprite_collision_counter != 0 || (sprite->z >> 16) < 0x1B0)
+    if (self->sprite_collision_counter != 0 || (sprite->z >> 16) < 0x1B0)
     {
-        set_spr_zoom_priority(sprite, zoom);
+        OLevelObjs_set_spr_zoom_priority(self, sprite, zoom);
         return;
     }
     /* Check Collision with sprite */
@@ -409,24 +421,24 @@ void OLevelObjs::sprite_normal(oentry *sprite, uint8_t zoom)
     /* If off left hand side or off right hand side of screen */
     if (sprite->x + x1 > 0 || sprite->x + x2 < 0)
     {
-        set_spr_zoom_priority(sprite, zoom);
+        OLevelObjs_set_spr_zoom_priority(self, sprite, zoom);
         return;
     }
 
-    collision_sprite++; /* Denote collision with sprite */
-    sprite_collision_counter = COLLISION_RESET; /* Reset sprite collision counter */
-    set_spr_zoom_priority(sprite, zoom);
+    self->collision_sprite++; /* Denote collision with sprite */
+    self->sprite_collision_counter = COLLISION_RESET; /* Reset sprite collision counter */
+    OLevelObjs_set_spr_zoom_priority(self, sprite, zoom);
 }
 
 /* Identical to sprite_normal, but calls the countdown routine at the end.  */
 /* */
-/* Source: 0x4658 */
-void OLevelObjs::sprite_lights(oentry *sprite)
+/* Source: 0x4658 */static 
+void OLevelObjs_sprite_lights(OLevelObjs* self, oentry *sprite)
 {
     /* Omit collision check if we're already colliding with something */
-    if (sprite_collision_counter != 0 || (sprite->z >> 16) < 0x1B0)
+    if (self->sprite_collision_counter != 0 || (sprite->z >> 16) < 0x1B0)
     {
-        sprite_lights_countdown(sprite);
+        OLevelObjs_sprite_lights_countdown(self, sprite);
         return;
     }
     /* Check Collision with sprite */
@@ -453,16 +465,16 @@ void OLevelObjs::sprite_lights(oentry *sprite)
     /* If off left hand side or off right hand side of screen */
     if (sprite->x + x1 > 0 || sprite->x + x2 < 0)
     {
-        sprite_lights_countdown(sprite);
+        OLevelObjs_sprite_lights_countdown(self, sprite);
         return;
     }
 
-    collision_sprite++; /* Denote collision with sprite */
-    sprite_collision_counter = COLLISION_RESET; /* Reset sprite collision counter */
-    sprite_lights_countdown(sprite);
-}
+    self->collision_sprite++; /* Denote collision with sprite */
+    self->sprite_collision_counter = COLLISION_RESET; /* Reset sprite collision counter */
+    OLevelObjs_sprite_lights_countdown(self, sprite);
+}static 
 
-void OLevelObjs::sprite_lights_countdown(oentry *sprite)
+void OLevelObjs_sprite_lights_countdown(OLevelObjs* self, oentry *sprite)
 {
     /* Yes, here we use the game_state to control the countdown palette :-s */
     int countdown_pal = outrun.game_state - 9;
@@ -475,15 +487,15 @@ void OLevelObjs::sprite_lights_countdown(oentry *sprite)
         osprites.map_palette(sprite);
     }
     
-    set_spr_zoom_priority(sprite, 1); /* WIDE_ROAD must be set for this to work. */
+    OLevelObjs_set_spr_zoom_priority(self, sprite, 1); /* WIDE_ROAD must be set for this to work. */
 }
 
 /* Set Sprite Priority To Other Sprites */
 /* Set Sprite Priority To Road */
 /* Set Index To Lookup Sprite Settings (Width/Height) From Zoom Value */
 /* */
-/* Source Address: 0x404A */
-void OLevelObjs::set_spr_zoom_priority(oentry *sprite, uint8_t zoom)
+/* Source Address: 0x404A */static 
+void OLevelObjs_set_spr_zoom_priority(OLevelObjs* self, oentry *sprite, uint8_t zoom)
 {
     osprites.move_sprite(sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
@@ -491,7 +503,7 @@ void OLevelObjs::set_spr_zoom_priority(oentry *sprite, uint8_t zoom)
     if (z16 < 4) return;
     if (z16 >= 0x200)
     {
-        hide_sprite(sprite);
+        OLevelObjs_hide_sprite(self, sprite);
         return;
     }
     sprite->road_priority = z16;
@@ -542,13 +554,13 @@ void OLevelObjs::set_spr_zoom_priority(oentry *sprite, uint8_t zoom)
 /* Source: 0x4828 */
 /*  */
 /* - Zoom Shift: 1 */
-/* - Test For Collision */
-void OLevelObjs::sprite_collision_z1c(oentry* sprite)
+/* - Test For Collision */static 
+void OLevelObjs_sprite_collision_z1c(OLevelObjs* self, oentry* sprite)
 {
     /* Omit collision check if we're already colliding with something */
-    if (sprite_collision_counter != 0 || (sprite->z >> 16) < 0x1B0)
+    if (self->sprite_collision_counter != 0 || (sprite->z >> 16) < 0x1B0)
     {
-        set_spr_zoom_priority2(sprite, 1);
+        OLevelObjs_set_spr_zoom_priority2(self, sprite, 1);
         return;
     }
     /* Check Collision with sprite */
@@ -579,13 +591,13 @@ void OLevelObjs::sprite_collision_z1c(oentry* sprite)
     /* If off left hand side or off right hand side of screen */
     if (sprite->x + x1 > 0 || sprite->x + x2 < 0)
     {
-        set_spr_zoom_priority2(sprite, 1);
+        OLevelObjs_set_spr_zoom_priority2(self, sprite, 1);
         return;
     }
 
-    collision_sprite++; /* Denote collision with sprite */
-    sprite_collision_counter = COLLISION_RESET; /* Reset sprite collision counter */
-    set_spr_zoom_priority2(sprite, 1);
+    self->collision_sprite++; /* Denote collision with sprite */
+    self->sprite_collision_counter = COLLISION_RESET; /* Reset sprite collision counter */
+    OLevelObjs_set_spr_zoom_priority2(self, sprite, 1);
  }}
 
 /* Almost identical to set_spr_zoom_priority */
@@ -596,8 +608,8 @@ void OLevelObjs::sprite_collision_z1c(oentry* sprite)
 /* Set Sprite Priority To Road */
 /* Set Index To Lookup Sprite Settings (Width/Height) From Zoom Value */
 /* */
-/* Source Address: 0x404A */
-void OLevelObjs::set_spr_zoom_priority2(oentry *sprite, uint8_t zoom)
+/* Source Address: 0x404A */static 
+void OLevelObjs_set_spr_zoom_priority2(OLevelObjs* self, oentry *sprite, uint8_t zoom)
 {
     osprites.move_sprite(sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
@@ -605,7 +617,7 @@ void OLevelObjs::set_spr_zoom_priority2(oentry *sprite, uint8_t zoom)
     if (z16 < 4) return;
     if (z16 >= 0x200)
     {
-        hide_sprite(sprite);
+        OLevelObjs_hide_sprite(self, sprite);
         return;
     }
     sprite->road_priority = z16;
@@ -641,11 +653,11 @@ void OLevelObjs::set_spr_zoom_priority2(oentry *sprite, uint8_t zoom)
 
 /* Water, as used on LHS of Stage 1 */
 /* */
-/* Source: 0x4408 */
-void OLevelObjs::sprite_water(oentry* sprite)
+/* Source: 0x4408 */static 
+void OLevelObjs_sprite_water(OLevelObjs* self, oentry* sprite)
 {
     /* check_spray */
-    if (spray_counter == 0)
+    if (self->spray_counter == 0)
     {
         if ((sprite->z >> 16) < 0x1B0)
         {
@@ -655,20 +667,20 @@ void OLevelObjs::sprite_water(oentry* sprite)
         else if (((sprite->control & OSprites::HFLIP) == 0               && sprite->x < 0) ||
                  ((sprite->control & OSprites::HFLIP) == OSprites::HFLIP && sprite->x > 0))
         {
-            spray_counter = SPRAY_RESET;
-            spray_type = 0;
+            self->spray_counter = SPRAY_RESET;
+            self->spray_type = 0;
         }
     }
-    do_thickness_sprite(sprite, outrun.adr.sprite_water);
+    OLevelObjs_do_thickness_sprite(self, sprite, outrun.adr.sprite_water);
 }
 
 /* Grass Sprites */
 /* */
-/* Source: 0x4416 */
-void OLevelObjs::sprite_grass(oentry* sprite)
+/* Source: 0x4416 */static 
+void OLevelObjs_sprite_grass(OLevelObjs* self, oentry* sprite)
 {
     /* check_spray */
-    if (spray_counter == 0)
+    if (self->spray_counter == 0)
     {
         if ((sprite->z >> 16) < 0x1B0)
         {
@@ -678,13 +690,13 @@ void OLevelObjs::sprite_grass(oentry* sprite)
         else if (((sprite->control & OSprites::HFLIP) == 0               && sprite->x < 0) ||
                  ((sprite->control & OSprites::HFLIP) == OSprites::HFLIP && sprite->x > 0))
         {
-            spray_counter = SPRAY_RESET;
-            spray_type = 4; /* Set Spray Type = Yellow */
+            self->spray_counter = SPRAY_RESET;
+            self->spray_type = 4; /* Set Spray Type = Yellow */
             if (sprite->pal_src != 0x49) /* Check whether palette is set to green/grass palette */
-                spray_type = 8; /* Set Spray Type = Green */
+                self->spray_type = 8; /* Set Spray Type = Green */
         }
     }
-    do_thickness_sprite(sprite, outrun.adr.sprite_grass);
+    OLevelObjs_do_thickness_sprite(self, sprite, outrun.adr.sprite_grass);
 }
 
 /* Sprite: MiniTrees  */
@@ -694,9 +706,9 @@ void OLevelObjs::sprite_grass(oentry* sprite)
 /*  */
 /* Note: This routine is very similar to do_thickness_sprites and can probably be refactored */
 /* */
-/* Source: 0x428A */
+/* Source: 0x428A */static 
 
-void OLevelObjs::sprite_minitree(oentry* sprite)
+void OLevelObjs_sprite_minitree(OLevelObjs* self, oentry* sprite)
 {
     osprites.move_sprite(sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
@@ -704,7 +716,7 @@ void OLevelObjs::sprite_minitree(oentry* sprite)
     if (z16 < 4) return;
     if (z16 >= 0x200)
     {
-        hide_sprite(sprite);
+        OLevelObjs_hide_sprite(self, sprite);
         return;
     }
      
@@ -756,13 +768,13 @@ void OLevelObjs::sprite_minitree(oentry* sprite)
     osprites.do_spr_order_shadows(sprite);
  } } }}
 
-/* Source:  */
-void OLevelObjs::sprite_debris(oentry* sprite)
+/* Source:  */static 
+void OLevelObjs_sprite_debris(OLevelObjs* self, oentry* sprite)
 {
     const uint8_t zoom = 2;
-    if (spray_counter != 0 || (sprite->z >> 16) < 0x1B0)
+    if (self->spray_counter != 0 || (sprite->z >> 16) < 0x1B0)
     {
-        set_spr_zoom_priority(sprite, zoom);
+        OLevelObjs_set_spr_zoom_priority(self, sprite, zoom);
         return;
     }
     /* Check Collision with sprite */
@@ -789,22 +801,22 @@ void OLevelObjs::sprite_debris(oentry* sprite)
     /* If off left hand side or off right hand side of screen */
     if (sprite->x + x1 > 0 || sprite->x + x2 < 0)
     {
-        set_spr_zoom_priority(sprite, zoom);
+        OLevelObjs_set_spr_zoom_priority(self, sprite, zoom);
         return;
     }
 
     /* Passing through spray! */
-    spray_counter = SPRAY_RESET;
-    spray_type = 0xC;
-    set_spr_zoom_priority(sprite, zoom);
+    self->spray_counter = SPRAY_RESET;
+    self->spray_type = 0xC;
+    OLevelObjs_set_spr_zoom_priority(self, sprite, zoom);
  }}
 
 /* Sprite based clouds that span entire sky. */
 /* */
 /* Appear on Stage 3 - Rightmost Route. */
 /* */
-/* Source: 0x4144 */
-void OLevelObjs::sprite_clouds(oentry* sprite)
+/* Source: 0x4144 */static 
+void OLevelObjs_sprite_clouds(OLevelObjs* self, oentry* sprite)
 {
     osprites.move_sprite(sprite, 1);
     { uint16_t z16 = sprite->z >> 16;
@@ -817,7 +829,7 @@ void OLevelObjs::sprite_clouds(oentry* sprite)
     }
     if (z16 >= 0x200)
     {
-        hide_sprite(sprite);
+        OLevelObjs_hide_sprite(self, sprite);
         return;
     }
      
@@ -882,9 +894,9 @@ void OLevelObjs::sprite_clouds(oentry* sprite)
     /* end */
     osprites.map_palette(sprite);
     osprites.do_spr_order_shadows(sprite);  
- } }}
+ } }}static 
 
-void OLevelObjs::do_thickness_sprite(oentry* sprite, const uint32_t sprite_table_address)
+void OLevelObjs_do_thickness_sprite(OLevelObjs* self, oentry* sprite, const uint32_t sprite_table_address)
 {
     osprites.move_sprite(sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
@@ -892,7 +904,7 @@ void OLevelObjs::do_thickness_sprite(oentry* sprite, const uint32_t sprite_table
     if (z16 < 4) return;
     if (z16 >= 0x200)
     {
-        hide_sprite(sprite);
+        OLevelObjs_hide_sprite(self, sprite);
         return;
     }
      
@@ -950,15 +962,15 @@ void OLevelObjs::do_thickness_sprite(oentry* sprite, const uint32_t sprite_table
 /*  */
 /* TODO: Merge with sprite_normal routine and then pass in the set_spr_zoom_priority_rocks routine as an argument */
 /* */
-/* Source: 0x492A */
+/* Source: 0x492A */static 
 
-void OLevelObjs::sprite_rocks(oentry *sprite)
+void OLevelObjs_sprite_rocks(OLevelObjs* self, oentry *sprite)
 {
     uint8_t zoom = 1;
     /* Omit collision check if we're already colliding with something */
-    if (sprite_collision_counter != 0 || (sprite->z >> 16) < 0x1B0)
+    if (self->sprite_collision_counter != 0 || (sprite->z >> 16) < 0x1B0)
     {
-        set_spr_zoom_priority_rocks(sprite, zoom);
+        OLevelObjs_set_spr_zoom_priority_rocks(self, sprite, zoom);
         return;
     }
     /* Check Collision with sprite */
@@ -985,21 +997,21 @@ void OLevelObjs::sprite_rocks(oentry *sprite)
     /* If off left hand side or off right hand side of screen */
     if (sprite->x + x1 > 0 || sprite->x + x2 < 0)
     {
-        set_spr_zoom_priority_rocks(sprite, zoom);
+        OLevelObjs_set_spr_zoom_priority_rocks(self, sprite, zoom);
         return;
     }
 
-    collision_sprite++; /* Denote collision with sprite */
-    sprite_collision_counter = COLLISION_RESET; /* Reset sprite collision counter */
-    set_spr_zoom_priority_rocks(sprite, zoom);
+    self->collision_sprite++; /* Denote collision with sprite */
+    self->sprite_collision_counter = COLLISION_RESET; /* Reset sprite collision counter */
+    OLevelObjs_set_spr_zoom_priority_rocks(self, sprite, zoom);
 }
 
 /* Set Sprite Priority To Other Sprites */
 /* Set Sprite Priority To Road */
 /* Set Index To Lookup Sprite Settings (Width/Height) From Zoom Value */
 /* */
-/* Source Address: 0x404A */
-void OLevelObjs::set_spr_zoom_priority_rocks(oentry *sprite, uint8_t zoom)
+/* Source Address: 0x404A */static 
+void OLevelObjs_set_spr_zoom_priority_rocks(OLevelObjs* self, oentry *sprite, uint8_t zoom)
 {
     osprites.move_sprite(sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
@@ -1007,7 +1019,7 @@ void OLevelObjs::set_spr_zoom_priority_rocks(oentry *sprite, uint8_t zoom)
     if (z16 < 4) return;
     if (z16 >= 0x200)
     {
-        hide_sprite(sprite);
+        OLevelObjs_hide_sprite(self, sprite);
         return;
     }
     sprite->road_priority = z16;
@@ -1046,7 +1058,7 @@ void OLevelObjs::set_spr_zoom_priority_rocks(oentry *sprite, uint8_t zoom)
  } } }}
 
 /* Source Address: 0x4648 */
-void OLevelObjs::hide_sprite(oentry *sprite)
+void OLevelObjs_hide_sprite(OLevelObjs* self, oentry *sprite)
 {
     sprite->z = 0;
     sprite->zoom = 0; /* Hide the sprite */

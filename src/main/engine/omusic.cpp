@@ -60,7 +60,7 @@ void OMusic::enable()
     oferrari.car_ctrl_active = false;
     video.clear_text_ram();
     osprites.disable_sprites();
-    otraffic.disable_traffic();
+    OTraffic_disable_traffic(&otraffic);
     /*edit jump table 3 */
     oinitengine.car_increment = 0;
     oferrari.car_inc_old      = 0;
@@ -331,9 +331,9 @@ void OMusic::tick_original(oentry* fm, oentry* dial, oentry* hand)
 /* Enhanced Version of music selection with infinite tracks. */
 void OMusic::tick_enhanced(oentry* fm, oentry* dial, oentry* hand)
 {
-    if (input.has_pressed(Input::LEFT) || oinputs.is_analog_l())
+    if (input.has_pressed(Input::LEFT) || OInputs_is_analog_l(&oinputs))
         if (--cursor_pos < 0) cursor_pos = total_tracks - 1;
-    if (input.has_pressed(Input::RIGHT) || oinputs.is_analog_r())
+    if (input.has_pressed(Input::RIGHT) || OInputs_is_analog_r(&oinputs))
         if (++cursor_pos >= total_tracks) cursor_pos = 0;
 
     if (oinputs.steering_adjust + 0x80 <= 0x70)

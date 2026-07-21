@@ -160,7 +160,7 @@ void Outrun::tick(bool tick_frame)
     /* Moved out of vertical interrupt */
     if (tick_frame)
     {
-        uint8_t coin = oinputs.do_credits();
+        uint8_t coin = OInputs_do_credits(&oinputs);
         outputs->coin_chute_out(&outputs->chute1, coin == 1);
         outputs->coin_chute_out(&outputs->chute2, coin == 2);
     }
@@ -176,8 +176,8 @@ void Outrun::vint()
     otiles.write_tilemap_hw();
     osprites.update_sprites();
     otiles.update_tilemaps(cannonball_mode == MODE_ORIGINAL ? ostats.cur_stage : 0);
-    opalette.cycle_sky_palette();
-    opalette.fade_palette();
+    OPalette_cycle_sky_palette(&opalette);
+    OPalette_fade_palette(&opalette);
     ostats.do_timers();
     if (cannonball_mode != MODE_TTRIAL) ohud.draw_timer1(ostats.time_counter);
     oinitengine.set_granular_position();
@@ -188,7 +188,7 @@ void Outrun::jump_table()
     if (tick_frame && game_state != GS_CALIBRATE_MOTOR)
     {
         main_switch();                  /* Address #1 (0xB128) - Main Switch */
-        oinputs.adjust_inputs();        /* Address #2 (0x74D8) - Adjust Analogue Inputs */
+        OInputs_adjust_inputs(&oinputs);        /* Address #2 (0x74D8) - Adjust Analogue Inputs */
     }
 
     switch (game_state)
@@ -201,14 +201,14 @@ void Outrun::jump_table()
         /* Couse Map Specific Code */
         /* ---------------------------------------------------------------------------------------- */
         case GS_MAP:
-            omap.tick();
+            OMap_tick(&omap);
             break;
 
 
         case GS_MUSIC:
             if (tick_frame) omusic.check_start(); /* Check for start button */
             osprites.tick();
-            olevelobjs.do_sprite_routine();
+            OLevelObjs_do_sprite_routine(&olevelobjs);
 
             if (!outrun.tick_frame)
             {
@@ -222,7 +222,7 @@ void Outrun::jump_table()
         case GS_INIT_BEST2:
         case GS_BEST2:
             osprites.tick();
-            olevelobjs.do_sprite_routine();
+            OLevelObjs_do_sprite_routine(&olevelobjs);
 
             if (!tick_frame)
             {
@@ -245,9 +245,9 @@ void Outrun::jump_table()
         
         default:
             if (tick_frame) osprites.tick();                /* Address #3 Jump_SetupSprites */
-            olevelobjs.do_sprite_routine();                 /* replaces calling each sprite individually */
+            OLevelObjs_do_sprite_routine(&olevelobjs);                 /* replaces calling each sprite individually */
             if (!config.engine.disable_traffic)
-                otraffic.tick();                            /* Spawn & Tick Traffic */
+                OTraffic_tick(&otraffic);                            /* Spawn & Tick Traffic */
             if (tick_frame) oinitengine.init_crash_bonus(); /* Initalize crash sequence or bonus code */
             oferrari.tick();
             if (oferrari.state != OFerrari::FERRARI_END_SEQ)
@@ -500,7 +500,7 @@ void Outrun::main_switch()
         /* Display Course Map */
         /* ---------------------------------------------------------------------------------------- */
         case GS_INIT_MAP:
-            omap.init();
+            OMap_init(&omap);
             ohud.blit_text2(TEXT2_COURSEMAP);
             game_state = GS_MAP;
             /* fall through */
@@ -515,10 +515,10 @@ void Outrun::main_switch()
             oroad.set_view_mode(ORoad::VIEW_ORIGINAL, true);
             /* bsr.w   EndGame */
             osprites.disable_sprites();
-            otraffic.disable_traffic();
+            OTraffic_disable_traffic(&otraffic);
             /* bsr.w   EditJumpTable3 */
             osprites.clear_palette_data();
-            olevelobjs.init_hiscore_sprites();
+            OLevelObjs_init_hiscore_sprites(&olevelobjs);
             ocrash.coll_count1   = 0;
             ocrash.coll_count2   = 0;
             ocrash.crash_counter = 0;
@@ -628,19 +628,19 @@ void Outrun::init_jump_table()
     osprites.init();
     if (cannonball_mode != MODE_TTRIAL) 
     {
-        otraffic.init_stage1_traffic();      /* Hard coded traffic in right hand lane */
+        OTraffic_init_stage1_traffic(&otraffic);      /* Hard coded traffic in right hand lane */
         if (trackloader.display_start_line)
-            olevelobjs.init_startline_sprites(); /* Hard coded start line sprites (not part of level data) */
+            OLevelObjs_init_startline_sprites(&olevelobjs); /* Hard coded start line sprites (not part of level data) */
     }
     else if (trackloader.display_start_line)
-        olevelobjs.init_timetrial_sprites();
+        OLevelObjs_init_timetrial_sprites(&olevelobjs);
 
-    otraffic.init();
+    OTraffic_init(&otraffic);
     OSmoke_init(&osmoke);
     oroad.init();
     otiles.init();
-    opalette.init();
-    oinputs.init();
+    OPalette_init(&opalette);
+    OInputs_init(&oinputs);
     OBonus_init(&obonus);
     outputs->init();
 
@@ -696,8 +696,8 @@ bool Outrun::decrement_timers()
 void Outrun::init_motor_calibration()
 {
     otiles.init();
-    opalette.init();
-    oinputs.init();
+    OPalette_init(&opalette);
+    OInputs_init(&oinputs);
     outputs->init();
 
     video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);

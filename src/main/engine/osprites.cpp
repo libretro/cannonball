@@ -245,7 +245,7 @@ void OSprites::sprite_control()
         seg_spr_offset1 -= 8; /*  Decrement rom address offset to point at next sprite [8 byte boundary] */
         if (seg_spr_offset1 < 0)
             seg_spr_offset1 = seg_spr_offset2; /* Reload sprite info offset value */
-        olevelobjs.setup_sprites(0x10400);
+        OLevelObjs_setup_sprites(&olevelobjs, 0x10400);
     }
  
     if (seg_total_sprites == 0)
@@ -266,7 +266,7 @@ void OSprites::sprite_control()
         seg_spr_offset1 -= 8; /*  Decrement rom address offset to point at next sprite [8 byte boundary] */
         if (seg_spr_offset1 < 0)
             seg_spr_offset1 = seg_spr_offset2; /* Reload sprite info offset value */
-        olevelobjs.setup_sprites(0x10000);
+        OLevelObjs_setup_sprites(&olevelobjs, 0x10000);
     }
 
      seg_pos++;
@@ -506,8 +506,8 @@ void OSprites::finalise_sprites()
 
     /* TODO: Code to wait for interrupt goes here */
     blit_sprites();
-    otraffic.traffic_logic();
-    otraffic.traffic_sound();
+    OTraffic_traffic_logic(&otraffic);
+    OTraffic_traffic_sound(&otraffic);
     spr_cnt_main = spr_cnt_shadow = 0;
 
     /* Ready to swap buffer and blit */

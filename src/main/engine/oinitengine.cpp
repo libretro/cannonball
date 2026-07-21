@@ -84,12 +84,12 @@ void OInitEngine::init(int8_t level)
     if (level)
         trackloader.init_path(oroad.stage_lookup_off);
 
-    opalette.setup_sky_palette();
-	opalette.setup_ground_color();
-	opalette.setup_road_centre();
-	opalette.setup_road_stripes();
-	opalette.setup_road_side();
-	opalette.setup_road_colour();   
+    OPalette_setup_sky_palette(&opalette);
+	OPalette_setup_ground_color(&opalette);
+	OPalette_setup_road_centre(&opalette);
+	OPalette_setup_road_stripes(&opalette);
+	OPalette_setup_road_side(&opalette);
+	OPalette_setup_road_colour(&opalette);   
     otiles.setup_palette_hud();                     /* Init Default Palette for HUD */
     osprites.copy_palette_data();                   /* Copy Palette Data to RAM */
     otiles.setup_palette_tilemap();                 /* Setup Palette For Tilemap */
@@ -120,7 +120,7 @@ void OInitEngine::setup_stage1()
     osoundint.engine_data[SOUND_ENGINE_VOL] = 0x3F;
     ostats.extend_play_timer = 0;
     checkpoint_marker = 0;              /* Denote not past checkpoint marker */
-    otraffic.set_max_traffic();         /* Set Number Of Enemy Cars Based On Dip Switches */
+    OTraffic_set_max_traffic(&otraffic);         /* Set Number Of Enemy Cars Based On Dip Switches */
     ostats.clear_route_info();
     OSmoke_setup_smoke_sprite(&osmoke, true);
 }
@@ -307,7 +307,7 @@ void OInitEngine::update_engine()
     if (olevelobjs.sprite_collision_counter > 0)
         olevelobjs.sprite_collision_counter--;
 
-    opalette.setup_sky_cycle();
+    OPalette_setup_sky_cycle(&opalette);
 }
 
 void OInitEngine::update_shadow_offset()
@@ -527,7 +527,7 @@ void OInitEngine::check_stage()
             oinitengine.end_stage_props |= BIT_1; /* Don't bump stage offset when fetching next palette */
             oinitengine.end_stage_props |= BIT_2;
             opalette.pal_manip_ctrl = 1;
-            opalette.setup_sky_change();
+            OPalette_setup_sky_change(&opalette);
             
             /* Denote Checkpoint Passed */
             checkpoint_marker = -1;

@@ -220,7 +220,7 @@ void OStats::init_next_level()
         ohud.blit_text1(TEXT1_LAPTIME2);
         ohud.draw_lap_timer(0x110554, stage_times[cur_stage-1], config.engine.fix_bugs ? lap_ms[stage_times[cur_stage-1][2]] : ms_value);
 
-        otraffic.set_max_traffic();
+        OTraffic_set_max_traffic(&otraffic);
         osoundint.queue_sound(SOUND_YM_CHECKPOINT);
         osoundint.queue_sound(SOUND_VOICE_CHECKPOINT);
         

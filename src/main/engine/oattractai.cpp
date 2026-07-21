@@ -126,11 +126,11 @@ void OAttractAI::tick_ai_enhanced()
             /* Don't break */
             if (x > -NEAR && x <= NEAR)      oinputs.brake_adjust = 0;
             /* Both Wheels Off */
-            else if (x < -FAR || x > FAR)    oinputs.brake_adjust = OInputs::BRAKE_THRESHOLD4;
+            else if (x < -FAR || x > FAR)    oinputs.brake_adjust = BRAKE_THRESHOLD4;
             /* Right Wheel Nearly Off */
-            else if (x > NEAR && x <= FAR)   oinputs.brake_adjust = OInputs::BRAKE_THRESHOLD3;
+            else if (x > NEAR && x <= FAR)   oinputs.brake_adjust = BRAKE_THRESHOLD3;
             /* Left Wheel Nearly Off */
-            else if (x <= NEAR && x >= -FAR) oinputs.brake_adjust = OInputs::BRAKE_THRESHOLD3;
+            else if (x <= NEAR && x >= -FAR) oinputs.brake_adjust = BRAKE_THRESHOLD3;
         }
         /* Two Roads (But we only bother braking if they are joined) */
         else if (oroad.road_ctrl == ORoad::ROAD_BOTH_P0 || oroad.road_ctrl == ORoad::ROAD_BOTH_P1)
@@ -142,9 +142,9 @@ void OAttractAI::tick_ai_enhanced()
                 road_width += FAR;
                 if (x < 0) x = -x;
                 if (x > road_width)             
-                    oinputs.brake_adjust = OInputs::BRAKE_THRESHOLD4;  /* Both Wheels Nearly Off */
+                    oinputs.brake_adjust = BRAKE_THRESHOLD4;  /* Both Wheels Nearly Off */
                 else if (x > road_width - 0x30) 
-                    oinputs.brake_adjust = OInputs::BRAKE_THRESHOLD3;  /* One Wheel Nearly Off */
+                    oinputs.brake_adjust = BRAKE_THRESHOLD3;  /* One Wheel Nearly Off */
             }
         }
     }
@@ -153,7 +153,7 @@ void OAttractAI::tick_ai_enhanced()
     if (otraffic.ai_traffic)
     {
         if (oinitengine.car_increment >> 16 >= 0xF0)
-            oinputs.brake_adjust = OInputs::BRAKE_THRESHOLD4;
+            oinputs.brake_adjust = BRAKE_THRESHOLD4;
         otraffic.ai_traffic = 0;
     }
 
@@ -196,13 +196,13 @@ void OAttractAI::tick_ai()
     if (otraffic.ai_traffic)
     {
         otraffic.ai_traffic = 0;
-        oinputs.brake_adjust = OInputs::BRAKE_THRESHOLD3;
+        oinputs.brake_adjust = BRAKE_THRESHOLD3;
     }
   
     /* If either wheel of the car is off-road, set brake on */
     else if (oferrari.wheel_state != OFerrari::WHEELS_ON)
     {
-        oinputs.brake_adjust = OInputs::BRAKE_THRESHOLD3;
+        oinputs.brake_adjust = BRAKE_THRESHOLD3;
     }
   
     /* Upcoming road: Straight Road */
@@ -226,7 +226,7 @@ void OAttractAI::tick_ai()
         else if (oferrari.sprite_ai_curve)
         {
              if (oferrari.sprite_ai_curve <= 0xA || oferrari.sprite_ai_curve & BIT_3)
-                 oinputs.brake_adjust = OInputs::BRAKE_THRESHOLD2;
+                 oinputs.brake_adjust = BRAKE_THRESHOLD2;
 
             oferrari.sprite_ai_curve--;
         }   
