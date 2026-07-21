@@ -15,6 +15,8 @@
 #include "engine/ostats.hpp"
 #include "engine/otraffic.hpp"
 
+static void OStats_inc_lap_timer(OStats* self);
+
 OStats ostats;
 
 /* Original buggy millisecond lookup table (Used when 64 frames = 1 second) */
@@ -37,89 +39,83 @@ const static uint8_t LAP_MS_60[] =
     0x76, 0x78, 0x80, 0x81, 0x83, 0x85, 0x86, 0x88, 0x90, 0x91, 0x93, 0x95, 0x96, 0x98
 };
 
-OStats::OStats(void)
-{
-}
 
-OStats::~OStats(void)
-{
-}
 
-void OStats::init(bool ttrial)
+void OStats_init(OStats* self, bool ttrial)
 {
-    credits = ttrial ? 1 : 0;
+    self->credits = ttrial ? 1 : 0;
     /* Choose correct lookup table if timing bugs fixed */
-    lap_ms = config.engine.fix_timer ? LAP_MS_60 : LAP_MS_64;
+    self->lap_ms = config.engine.fix_timer ? LAP_MS_60 : LAP_MS_64;
 }
 
-void OStats::clear_stage_times()
+void OStats_clear_stage_times(OStats* self)
 {
     { int i; for (i = 0; i < 15; i++)
     {
-        stage_counters[i] = 0;
+        self->stage_counters[i] = 0;
 
         { int j; for (j = 0; j < 3; j++)
-            stage_times[i][j] = 0; }
+            self->stage_times[i][j] = 0; }
     } }
 }
 
-void OStats::clear_route_info()
+void OStats_clear_route_info(OStats* self)
 {
-    route_info = 0;
-    routes[0] = routes[1] = routes[2] = routes[3] = 
-    routes[4] = routes[5] = routes[6] = routes[7] = 0;
+    self->route_info = 0;
+    self->routes[0] = self->routes[1] = self->routes[2] = self->routes[3] = 
+    self->routes[4] = self->routes[5] = self->routes[6] = self->routes[7] = 0;
 }
 
 /* Increment Counters, Stage Timers & Print Stage Timers */
 /* */
 /* Source: 0x7F12 */
-void OStats::do_timers()
+void OStats_do_timers(OStats* self)
 {
     if (outrun.game_state != GS_INGAME) return;
 
-    inc_lap_timer();
+    OStats_inc_lap_timer(self);
 
     if (outrun.cannonball_mode == Outrun::MODE_ORIGINAL || outrun.cannonball_mode == Outrun::MODE_CONT)
     {
         /* Each stage has a standard counter that just increments. Do this here. */
-        stage_counters[cur_stage]++;
-        ohud.draw_lap_timer(0x11016C, stage_times[cur_stage], ms_value);
+        self->stage_counters[self->cur_stage]++;
+        ohud.draw_lap_timer(0x11016C, self->stage_times[self->cur_stage], self->ms_value);
     }
 
     else if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
     {
-        stage_counters[outrun.ttrial.current_lap]++;
+        self->stage_counters[outrun.ttrial.current_lap]++;
         ohud.draw_stage_number(ohud.translate(30, 2 + outrun.ttrial.current_lap, 0x110030), (outrun.ttrial.current_lap + 1), OHud::GREY);
-        ohud.draw_lap_timer(ohud.translate(32, 2 + outrun.ttrial.current_lap, 0x110030), stage_times[cur_stage], ms_value);
+        ohud.draw_lap_timer(ohud.translate(32, 2 + outrun.ttrial.current_lap, 0x110030), self->stage_times[self->cur_stage], self->ms_value);
     }
 }
 
 /* Increment and store lap timer for each stage. */
 /* */
-/* Source: 0x7F4C */
-void OStats::inc_lap_timer()
+/* Source: 0x7F4C */static 
+void OStats_inc_lap_timer(OStats* self)
 {
     /* Add MS (Not actual milliseconds, as these are looked up from the table below) */
-    if (++stage_times[cur_stage][2] >= (config.engine.fix_timer ? 0x3C : 0x40))
+    if (++self->stage_times[self->cur_stage][2] >= (config.engine.fix_timer ? 0x3C : 0x40))
     {
         /* Looped MS, so add a second */
-        stage_times[cur_stage][2] = 0;
-        stage_times[cur_stage][1] = outils::bcd_add(stage_times[cur_stage][1], 1);
+        self->stage_times[self->cur_stage][2] = 0;
+        self->stage_times[self->cur_stage][1] = outils::bcd_add(self->stage_times[self->cur_stage][1], 1);
 
         /* Loop seconds, so add a minute */
-        if (stage_times[cur_stage][1] == 0x60)
+        if (self->stage_times[self->cur_stage][1] == 0x60)
         {
-            stage_times[cur_stage][1] = 0;
-            stage_times[cur_stage][0] = outils::bcd_add(stage_times[cur_stage][0], 1);
+            self->stage_times[self->cur_stage][1] = 0;
+            self->stage_times[self->cur_stage][0] = outils::bcd_add(self->stage_times[self->cur_stage][0], 1);
         }
     }
 
     /* Get MS Value */
-    ms_value = lap_ms[stage_times[cur_stage][2]];
+    self->ms_value = self->lap_ms[self->stage_times[self->cur_stage][2]];
 }
 
 /* Source: 0xBE4E */
-void OStats::convert_speed_score(uint16_t speed)
+void OStats_convert_speed_score(OStats* self, uint16_t speed)
 {
     /* 0x960 is the last value in this table to be actively used */
     static const uint16_t CONVERT[] = 
@@ -130,23 +126,23 @@ void OStats::convert_speed_score(uint16_t speed)
     };
 
     { uint16_t score = CONVERT[(speed >> 4)];
-    update_score(score);
+    OStats_update_score(self, score);
  }}
 
 /* Update In-Game Score. Adds Value To Overall Score. */
 /* */
 /* Source: 0x7340 */
-void OStats::update_score(uint32_t value)
+void OStats_update_score(OStats* self, uint32_t value)
 {
     if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
         return;
 
-    score = outils::bcd_add(value, score);
+    self->score = outils::bcd_add(value, self->score);
 
-    if (score > 0x99999999)
-        score = 0x99999999;
+    if (self->score > 0x99999999)
+        self->score = 0x99999999;
 
-    ohud.draw_score_ingame(score);
+    ohud.draw_score_ingame(self->score);
 }
 
 /* Initialize Next Level */
@@ -160,12 +156,12 @@ void OStats::update_score(uint32_t value)
 /* */
 /* Source: 0x8FAC */
 
-void OStats::init_next_level()
+void OStats_init_next_level(OStats* self)
 {
-    if (extend_play_timer)
+    if (self->extend_play_timer)
     {
         /* End Extend Play: Clear Text From Screen */
-        if (--extend_play_timer <= 0)
+        if (--self->extend_play_timer <= 0)
         {
             ohud.blit_text1(TEXT1_EXTEND_CLEAR1);
             ohud.blit_text1(TEXT1_EXTEND_CLEAR2);
@@ -175,11 +171,11 @@ void OStats::init_next_level()
         /* Extend Play: Flash Text */
         else
         {
-            int16_t do_blit = ((extend_play_timer - 1) ^ extend_play_timer) & BIT_3;
+            int16_t do_blit = ((self->extend_play_timer - 1) ^ self->extend_play_timer) & BIT_3;
 
             if (do_blit)
             {
-                if (extend_play_timer & BIT_3)
+                if (self->extend_play_timer & BIT_3)
                 {
                     if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
                         ohud.blit_text_new(15, 8, "BEST LAP!", OHud::PINK);
@@ -200,32 +196,32 @@ void OStats::init_next_level()
     else if (outrun.game_state == GS_INGAME && oinitengine.checkpoint_marker)
     {
         oinitengine.checkpoint_marker = 0;
-        extend_play_timer             = 0x80;
+        self->extend_play_timer             = 0x80;
         
         /* Calculate Time To Add */
         uint16_t time_lookup = (config.engine.dip_time * 40) + oroad.stage_lookup_off;
         if (!outrun.freeze_timer)
         {
             if (outrun.cannonball_mode == outrun.MODE_ORIGINAL)
-                time_counter = outils::bcd_add(time_counter, TIME[time_lookup]);
+                self->time_counter = outils::bcd_add(self->time_counter, TIME[time_lookup]);
             else if (outrun.cannonball_mode == outrun.MODE_CONT)
-                time_counter = outils::bcd_add(time_counter, 0x55);
+                self->time_counter = outils::bcd_add(self->time_counter, 0x55);
 
-            if (time_counter > 0x99) time_counter = 0x99;
+            if (self->time_counter > 0x99) self->time_counter = 0x99;
         }
 
         /* Draw last laptime */
         /* Note there is a bug in the original code here, where the current ms value is displayed, instead of the ms value from the last lap time */
         ohud.blit_text1(TEXT1_LAPTIME1);
         ohud.blit_text1(TEXT1_LAPTIME2);
-        ohud.draw_lap_timer(0x110554, stage_times[cur_stage-1], config.engine.fix_bugs ? lap_ms[stage_times[cur_stage-1][2]] : ms_value);
+        ohud.draw_lap_timer(0x110554, self->stage_times[self->cur_stage-1], config.engine.fix_bugs ? self->lap_ms[self->stage_times[self->cur_stage-1][2]] : self->ms_value);
 
         OTraffic_set_max_traffic(&otraffic);
         osoundint.queue_sound(SOUND_YM_CHECKPOINT);
         osoundint.queue_sound(SOUND_VOICE_CHECKPOINT);
         
         /* Update Stage Number on HUD */
-        ohud.draw_stage_number(0x110d76, cur_stage+1, OHud::GREEN);
+        ohud.draw_stage_number(0x110d76, self->cur_stage+1, OHud::GREEN);
         /* No need to redraw the stage info as that was a bug in the original game */
     }
 }
@@ -260,7 +256,7 @@ void OStats::init_next_level()
 /*         '---------------------------' */
 
 
-const uint8_t OStats::TIME[] =
+const uint8_t TIME[] =
 {
     /* Easy */
     0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

@@ -249,7 +249,7 @@ void Menu::init()
     video.sprite_layer->reset();
     video.clear_text_ram();
     video.tile_layer->restore_tiles();
-    ologo.enable(LOGO_Y);
+    OLogo_enable(&ologo, LOGO_Y);
 
     /* Setup palette, road and colours for background */
     oroad.stage_lookup_off = 9;
@@ -375,7 +375,7 @@ void Menu::tick_ui()
         || (config.fps == 60 && (frame & 1) == 0)
         || (config.fps == 120 && (frame & 3) == 1))
     {
-        ologo.tick();
+        OLogo_tick(&ologo);
         osprites.sprite_copy();
         osprites.update_sprites();
     }

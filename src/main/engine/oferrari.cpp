@@ -1615,7 +1615,7 @@ void OFerrari::do_sound_score_slip()
     /* Wheels onroad - Convert Speed To Score */
     if (wheel_state == WHEELS_ON) 
     {
-        ostats.convert_speed_score(oinitengine.car_increment >> 16);
+        OStats_convert_speed_score(&ostats, oinitengine.car_increment >> 16);
     }
 
     /* 0xBE6E */

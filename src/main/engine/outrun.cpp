@@ -92,7 +92,7 @@ void Outrun::boot()
         cannonball_mode == Outrun::MODE_ORIGINAL
             ? FILENAME_SCORES
             : FILENAME_CONT);
-    ostats.init(cannonball_mode == MODE_TTRIAL);
+    OStats_init(&ostats, cannonball_mode == MODE_TTRIAL);
     init_jump_table();
     oinitengine.init(cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
     osoundint.init();
@@ -178,7 +178,7 @@ void Outrun::vint()
     otiles.update_tilemaps(cannonball_mode == MODE_ORIGINAL ? ostats.cur_stage : 0);
     OPalette_cycle_sky_palette(&opalette);
     OPalette_fade_palette(&opalette);
-    ostats.do_timers();
+    OStats_do_timers(&ostats);
     if (cannonball_mode != MODE_TTRIAL) ohud.draw_timer1(ostats.time_counter);
     oinitengine.set_granular_position();
 }
@@ -237,7 +237,7 @@ void Outrun::jump_table()
         /* ---------------------------------------------------------------------------------------- */
         case GS_LOGO:
             if (!tick_frame)
-                ologo.blit();
+                OLogo_blit(&ologo);
 
         case GS_ATTRACT:
         case GS_BEST1:
@@ -294,7 +294,7 @@ void Outrun::main_switch()
             oinitengine.car_increment = 0;
             oferrari.car_inc_old = 0;
             ostats.time_counter = 5;
-            ostats.frame_counter = ostats.frame_reset;
+            ostats.frame_counter = frame_reset;
             ohiscore.init();
             osoundint.queue_sound(SOUND_FM_RESET);
             cannonball_audio.clear_wav();
@@ -317,22 +317,22 @@ void Outrun::main_switch()
             oinitengine.car_increment = 0;
             oferrari.car_inc_old = 0;
             ostats.time_counter = 5;
-            ostats.frame_counter = ostats.frame_reset;
+            ostats.frame_counter = frame_reset;
             osoundint.queue_sound(0);
-            ologo.enable(SOUND_FM_RESET);
+            OLogo_enable(&ologo, SOUND_FM_RESET);
             game_state = GS_LOGO;
 
         case GS_LOGO:
             ohud.draw_credits();
             ohud.draw_copyright_text();
             ohud.draw_insert_coin();
-            ologo.tick();
+            OLogo_tick(&ologo);
 
             if (ostats.credits)
                 game_state = GS_INIT_MUSIC;
             else if (decrement_timers())
             {
-                ologo.disable();
+                OLogo_disable(&ologo);
                 game_state = GS_INIT; /* Resume attract mode */
             }
             break;
@@ -378,11 +378,11 @@ void Outrun::main_switch()
             omusic.play_music(-1);
             
             if (!freeze_timer)
-                ostats.time_counter = ostats.TIME[config.engine.dip_time * 40]; /* Set time to begin level with */
+                ostats.time_counter = TIME[config.engine.dip_time * 40]; /* Set time to begin level with */
             else
                 ostats.time_counter = 0x30;
 
-            ostats.frame_counter = ostats.frame_reset + 50;
+            ostats.frame_counter = frame_reset + 50;
             ostats.credits--;                                   /* Update Credits */
             ohud.blit_text1(TEXT1_CLEAR_START);
             ohud.blit_text1(TEXT1_CLEAR_CREDITS);
@@ -398,7 +398,7 @@ void Outrun::main_switch()
             if (--ostats.frame_counter < 0)
             {
                 osoundint.queue_sound(SOUND_SIGNAL1);
-                ostats.frame_counter = ostats.frame_reset;
+                ostats.frame_counter = frame_reset;
                 game_state++;
             }
             break;
@@ -413,7 +413,7 @@ void Outrun::main_switch()
 
                 osoundint.queue_sound(SOUND_SIGNAL2);
                 osoundint.queue_sound(SOUND_STOP_CHEERS);
-                ostats.frame_counter = ostats.frame_reset;
+                ostats.frame_counter = frame_reset;
                 game_state++;
             }
             break;
@@ -427,7 +427,7 @@ void Outrun::main_switch()
         /* Bonus Mode */
         /* ---------------------------------------------------------------------------------------- */
         case GS_INIT_BONUS:
-            ostats.frame_counter = ostats.frame_reset;
+            ostats.frame_counter = frame_reset;
             obonus.bonus_control = BONUS_INIT;  /* Initialize Bonus Mode Logic */
             oroad.road_load_end   |= BIT_0;             /* Instruct CPU 1 to load end road section */
             ostats.game_completed |= BIT_0;             /* Denote game completed */
@@ -452,7 +452,7 @@ void Outrun::main_switch()
                 oinitengine.car_increment = 0;
                 oferrari.car_inc_old = 0;
                 ostats.time_counter = 3;
-                ostats.frame_counter = ostats.frame_reset;
+                ostats.frame_counter = frame_reset;
                 ohud.blit_text2(TEXT2_GAMEOVER);
             }
             else
@@ -528,7 +528,7 @@ void Outrun::main_switch()
             oinitengine.car_increment = 0;
             oferrari.car_inc_old = 0;
             ostats.time_counter = config.engine.hiscore_timer;
-            ostats.frame_counter = ostats.frame_reset;
+            ostats.frame_counter = frame_reset;
             ohiscore.init();
             osoundint.queue_sound(SOUND_NEW_COMMAND);
             osoundint.queue_sound(SOUND_FM_RESET);
@@ -669,7 +669,7 @@ bool Outrun::decrement_timers()
         if (--ostats.frame_counter > 0)
             return false;
 
-        ostats.frame_counter = ostats.frame_reset;
+        ostats.frame_counter = frame_reset;
         ostats.time_counter  = outils::bcd_sub(1, ostats.time_counter);
 
         /* We need to manually refresh the HUD here to display '0' seconds */
@@ -683,7 +683,7 @@ bool Outrun::decrement_timers()
         if (--ostats.frame_counter >= 0)
             return false;
 
-        ostats.frame_counter = ostats.frame_reset;
+        ostats.frame_counter = frame_reset;
         ostats.time_counter  = outils::bcd_sub(1, ostats.time_counter);
         return (ostats.time_counter < 0);
     }
@@ -735,7 +735,7 @@ void Outrun::init_attract()
     oferrari.car_inc_old      = car_inc_bak >> 16;
     oinitengine.car_increment = car_inc_bak;
     ostats.time_counter       = config.engine.new_attract ? 0x80 : 0x15;
-    ostats.frame_counter      = ostats.frame_reset;
+    ostats.frame_counter      = frame_reset;
     attract_counter           = 0;
     attract_view              = 0;
     oattractai.init();

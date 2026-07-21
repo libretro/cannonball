@@ -71,7 +71,7 @@ void OMusic::enable()
     last_music_selected       = -1;
     preview_counter           = -20; /* Delay before playing music */
     ostats.time_counter       = config.sound.music_timer; /* Move 30 seconds to timer countdown (note on the original roms this is 15 seconds) */
-    ostats.frame_counter      = ostats.frame_reset;  
+    ostats.frame_counter      = frame_reset;  
      
     blit_music_select();
     ohud.blit_text2(TEXT2_SELECT_MUSIC); /* Select Music By Steering */
@@ -208,7 +208,7 @@ void OMusic::check_start()
     if (ostats.credits && input.has_pressed(Input::START))
     {
         outrun.game_state = GS_INIT_GAME;
-        ologo.disable();
+        OLogo_disable(&ologo);
         disable();
     }
 }

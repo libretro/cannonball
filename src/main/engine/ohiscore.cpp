@@ -373,7 +373,7 @@ void OHiScore::do_input(uint32_t adr)
         if (++initial_selected >= (config.engine.hiscore_delete ? 4 : 3))
         {
             state = STATE_DONE;
-            ostats.frame_counter = ostats.frame_reset;
+            ostats.frame_counter = frame_reset;
             ostats.time_counter  = 2;
             /* code to enable easter egg if YU. is inputted goes here. */
         }

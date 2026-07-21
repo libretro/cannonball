@@ -436,7 +436,7 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
         {
             /* Update score on overtake */
             if (outrun.cannonball_mode != Outrun::MODE_TTRIAL)
-                ostats.update_score(0x20000);
+                OStats_update_score(&ostats, 0x20000);
             else
             {
                 ohud.draw_score(ohud.translate(3, 2, 0x110030), outils::convert16_dechex(++outrun.ttrial.overtakes), 2);

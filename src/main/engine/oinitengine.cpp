@@ -113,7 +113,7 @@ void OInitEngine::setup_stage1()
 {
     oroad.road_width = 0x1C2 << 16;     /* Force display of two roads at start */
     ostats.score = 0;
-    ostats.clear_stage_times();
+    OStats_clear_stage_times(&ostats);
     oferrari.reset_car();               /* Reset Car Speed/Rev Values */
     outrun.outputs->set_digital(OOutputs::D_EXT_MUTE);
     outrun.outputs->set_digital(OOutputs::D_SOUND);
@@ -121,7 +121,7 @@ void OInitEngine::setup_stage1()
     ostats.extend_play_timer = 0;
     checkpoint_marker = 0;              /* Denote not past checkpoint marker */
     OTraffic_set_max_traffic(&otraffic);         /* Set Number Of Enemy Cars Based On Dip Switches */
-    ostats.clear_route_info();
+    OStats_clear_route_info(&ostats);
     OSmoke_setup_smoke_sprite(&osmoke, true);
 }
 
@@ -330,7 +330,7 @@ void OInitEngine::update_shadow_offset()
 void OInitEngine::check_road_split()
 {
     /* Check whether to initialize the next level */
-    ostats.init_next_level();
+    OStats_init_next_level(&ostats);
 
     switch (rd_split_state)
     {
@@ -566,7 +566,7 @@ void OInitEngine::reload_stage1()
     ostats.cur_stage       = -1;
     oroad.stage_lookup_off = -8;
 
-    ostats.clear_route_info();
+    OStats_clear_route_info(&ostats);
 
     end_stage_props |= BIT_1; /* Loop back to stage 1 (Used by tilemap code) */
     end_stage_props |= BIT_2;

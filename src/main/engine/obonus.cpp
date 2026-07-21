@@ -126,7 +126,7 @@ static void OBonus_decrement_bonus_secs(OBonus* self)
         osoundint.queue_sound(SOUND_SIGNAL1);
 
     /* Increment Score by 100K points */
-    ostats.update_score(0x100000);
+    OStats_update_score(&ostats, 0x100000);
     
     /* Blit bonus seconds remaining */
     OBonus_blit_bonus_secs(self);
