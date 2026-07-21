@@ -59,7 +59,7 @@ void OMusic::enable()
 {
     oferrari.car_ctrl_active = false;
     video.clear_text_ram();
-    osprites.disable_sprites();
+    OSprites_disable_sprites(&osprites);
     OTraffic_disable_traffic(&otraffic);
     /*edit jump table 3 */
     oinitengine.car_increment = 0;
@@ -81,7 +81,7 @@ void OMusic::enable()
         osoundint.queue_sound(SOUND_PCM_WAVE); /* Wave Noises */
 
     /* Enable block of sprites */
-    entry_start = OSprites::SPRITE_ENTRIES - 0x10;    
+    entry_start = SPRITE_ENTRIES - 0x10;    
     { int i; for (i = entry_start; i < entry_start + 5; i++)
     {
         osprites.jump_table[i].init(i);
@@ -110,7 +110,7 @@ void OMusic::disable()
     /* Disable block of sprites */
     { int i; for (i = entry_start; i < entry_start + 5; i++)
     {
-        osprites.jump_table[i].control &= ~OSprites::ENABLE;
+        osprites.jump_table[i].control &= ~ENABLE;
     } }
 
     video.tile_layer->set_x_clamp(video.tile_layer->RIGHT);
@@ -137,7 +137,7 @@ void OMusic::setup_sprite1()
     e->zoom = 0x7F;
     e->pal_src = 0xB0;
     e->addr = outrun.adr.sprite_radio;
-    osprites.map_palette(e);
+    OSprites_map_palette(&osprites, e);
 }
 
 /* Music Selection Screen: Setup Equalizer Sprite */
@@ -152,7 +152,7 @@ void OMusic::setup_sprite2()
     e->zoom = 0x7F;
     e->pal_src = 0xA7;
     e->addr = outrun.adr.sprite_eq;
-    osprites.map_palette(e);
+    OSprites_map_palette(&osprites, e);
 }
 
 /* Music Selection Screen: Setup FM Radio Readout */
@@ -167,7 +167,7 @@ void OMusic::setup_sprite3()
     e->zoom = 0x7F;
     e->pal_src = 0x87;
     e->addr = outrun.adr.sprite_fm_left;
-    osprites.map_palette(e);
+    OSprites_map_palette(&osprites, e);
 }
 
 /* Music Selection Screen: Setup FM Radio Dial */
@@ -182,7 +182,7 @@ void OMusic::setup_sprite4()
     e->zoom = 0x7F;
     e->pal_src = 0x89;
     e->addr = outrun.adr.sprite_dial_left;
-    osprites.map_palette(e);
+    OSprites_map_palette(&osprites, e);
 }
 
 /* Music Selection Screen: Setup Hand Sprite */
@@ -197,7 +197,7 @@ void OMusic::setup_sprite5()
     e->zoom = 0x7F;
     e->pal_src = 0xAF;
     e->addr = outrun.adr.sprite_hand_left;
-    osprites.map_palette(e);
+    OSprites_map_palette(&osprites, e);
 }
 
 /* Check for start button during music selection screen */
@@ -217,14 +217,14 @@ void OMusic::check_start()
 void OMusic::tick()
 {
     /* Radio Sprite */
-    osprites.do_spr_order_shadows(&osprites.jump_table[entry_start + 0]);
+    OSprites_do_spr_order_shadows(&osprites, &osprites.jump_table[entry_start + 0]);
 
     /* Animated EQ Sprite (Cycle the graphical equalizer on the radio) */
     oentry *e = &osprites.jump_table[entry_start + 1];
     e->reload++; /* Increment palette entry */
     e->pal_src = roms.rom0.read8((e->reload & 0x3E) >> 1 | MUSIC_EQ_PAL);
-    osprites.map_palette(e);
-    osprites.do_spr_order_shadows(e);
+    OSprites_map_palette(&osprites, e);
+    OSprites_do_spr_order_shadows(&osprites, e);
 
     /* Draw appropriate FM station on radio, depending on steering setting */
     /* Draw Dial on radio, depending on steering setting */
@@ -236,9 +236,9 @@ void OMusic::tick()
     if (total_tracks < 3) tick_original(e, dial, hand);
     else tick_enhanced(e, dial, hand);
 
-    osprites.do_spr_order_shadows(e);
-    osprites.do_spr_order_shadows(dial);
-    osprites.do_spr_order_shadows(hand);;
+    OSprites_do_spr_order_shadows(&osprites, e);
+    OSprites_do_spr_order_shadows(&osprites, dial);
+    OSprites_do_spr_order_shadows(&osprites, hand);;
 
     /* Enhancement: Preview Music On Sound Selection Screen */
     if (config.sound.preview)
@@ -378,7 +378,7 @@ void OMusic::set_hand(short direction, oentry* fm, oentry* dial, oentry* hand)
 void OMusic::blit()
 {
     { int i; for (i = 0; i < 5; i++)
-        osprites.do_spr_order_shadows(&osprites.jump_table[entry_start + i]); }
+        OSprites_do_spr_order_shadows(&osprites, &osprites.jump_table[entry_start + i]); }
 }
 
 /* Blit Music Selection Tiles to text ram layer (Double Row) */

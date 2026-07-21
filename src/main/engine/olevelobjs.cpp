@@ -93,7 +93,7 @@ void OLevelObjs_init_entries(OLevelObjs* self, uint32_t a4, const uint8_t start_
         { int16_t road_x = oroad.road0_h[z_orig];
         int16_t xw1 = sprite->xw1;
 
-        if (xw1 >= 0 && (sprite->control & OSprites::WIDE_ROAD) == 0)
+        if (xw1 >= 0 && (sprite->control & WIDE_ROAD) == 0)
         {
             xw1 += (oroad.road_width << 1) << 16;
         }
@@ -124,7 +124,7 @@ void OLevelObjs_init_entries(OLevelObjs* self, uint32_t a4, const uint8_t start_
         else if (i >= 48 && i <= 67)
             sprite->function_holder = 8; /* SpriteNoCollisionZ2; */
 
-        osprites.map_palette(sprite);    
+        OSprites_map_palette(&osprites, sprite);    
      } }} }
 }
 
@@ -138,7 +138,7 @@ void OLevelObjs_setup_sprites(OLevelObjs* self, uint32_t z)
     /* Setup entries that have not yet been enabled */
     { uint8_t i; for (i = 0; i < osprites.no_sprites; i++)
     {
-        if ((osprites.jump_table[i].control & OSprites::ENABLE) == 0)
+        if ((osprites.jump_table[i].control & ENABLE) == 0)
         {
             OLevelObjs_setup_sprite(self, &osprites.jump_table[i], z);
             return;
@@ -166,7 +166,7 @@ void OLevelObjs_setup_sprite(OLevelObjs* self, oentry* sprite, uint32_t z)
     #define READ16(x) trackloader.read16(trackloader.scenerymap_data, x)
     #define READ32(x) trackloader.read32(trackloader.scenerymap_data, x)
 
-    sprite->control |= OSprites::ENABLE; /* Turn sprite on */
+    sprite->control |= ENABLE; /* Turn sprite on */
     uint32_t addr = osprites.seg_spr_addr + osprites.seg_spr_offset1;
 
     /* Set sprite x,y (world coordinates) */
@@ -177,26 +177,26 @@ void OLevelObjs_setup_sprite(OLevelObjs* self, oentry* sprite, uint32_t z)
     sprite->addr    = roms.rom0p->read32(outrun.adr.sprite_type_table + sprite->type);
     sprite->pal_src = (uint8_t) (READ8 (addr + 7));
 
-    osprites.map_palette(sprite);
+    OSprites_map_palette(&osprites, sprite);
 
     sprite->width = 0;
     sprite->reload = 0;
     sprite->z = z; /* Set default zoom */
     
     if (READ8(addr + 0) & 1)
-        sprite->control |= OSprites::HFLIP;
+        sprite->control |= HFLIP;
     else
-        sprite->control &=~ OSprites::HFLIP;
+        sprite->control &=~ HFLIP;
 
     if (READ8(addr + 0) & 2)
-        sprite->control |= OSprites::SHADOW;
+        sprite->control |= SHADOW;
     else
-        sprite->control &=~ OSprites::SHADOW;
+        sprite->control &=~ SHADOW;
 
     if ((int16_t) (oroad.road_width >> 16) > 0x118)
-        sprite->control |= OSprites::WIDE_ROAD;
+        sprite->control |= WIDE_ROAD;
     else
-        sprite->control &=~ OSprites::WIDE_ROAD;
+        sprite->control &=~ WIDE_ROAD;
 
     sprite->draw_props = READ8(addr + 0) & 0xF0;
     sprite->function_holder = sprite->draw_props >> 4; /* set sprite type */
@@ -217,7 +217,7 @@ void OLevelObjs_setup_sprite_routine(OLevelObjs* self, oentry* sprite)
         case 1: /* Grass Sprite */
         case 11:  /* Stone Strips */
             sprite->shadow = 7;
-            if (sprite->control & OSprites::HFLIP)
+            if (sprite->control & HFLIP)
                 sprite->draw_props |= 2;
             else
                 sprite->draw_props |= 1;
@@ -226,7 +226,7 @@ void OLevelObjs_setup_sprite_routine(OLevelObjs* self, oentry* sprite)
         /* Overhead Clouds */
         case 2: 
             sprite->shadow = 3;
-            if (sprite->control & OSprites::HFLIP)
+            if (sprite->control & HFLIP)
                 sprite->draw_props |= 0xA;
             else
                 sprite->draw_props |= 9;
@@ -242,7 +242,7 @@ void OLevelObjs_setup_sprite_routine(OLevelObjs* self, oentry* sprite)
         /* Water Sprite */
         case 3:
             sprite->shadow = 3;
-            if (sprite->control & OSprites::HFLIP)
+            if (sprite->control & HFLIP)
                 sprite->draw_props |= 2; /* anchor x right */
             else
                 sprite->draw_props |= 1; /* anchor x left */
@@ -260,7 +260,7 @@ void OLevelObjs_setup_sprite_routine(OLevelObjs* self, oentry* sprite)
         /* Draw From Top Left Collision Check */
         case 7:
             sprite->shadow = 7;
-            if (sprite->control & OSprites::HFLIP)
+            if (sprite->control & HFLIP)
                 sprite->draw_props |= 9;
             else
                 sprite->draw_props |= 0xA;
@@ -270,7 +270,7 @@ void OLevelObjs_setup_sprite_routine(OLevelObjs* self, oentry* sprite)
         case 10:
         case 14: /* version for wider road widths */
             sprite->shadow = 3;
-            if (sprite->control & OSprites::HFLIP)
+            if (sprite->control & HFLIP)
                 sprite->draw_props |= 2;
             else
                 sprite->draw_props |= 1;
@@ -279,7 +279,7 @@ void OLevelObjs_setup_sprite_routine(OLevelObjs* self, oentry* sprite)
         /* Mini Tree */
         case 12:
             sprite->shadow = 7;
-            if (sprite->control & OSprites::HFLIP)
+            if (sprite->control & HFLIP)
                 sprite->draw_props |= 0xA;
             else
                 sprite->draw_props |= 9;
@@ -299,7 +299,7 @@ void OLevelObjs_do_sprite_routine(OLevelObjs* self)
     {
         oentry* sprite = &osprites.jump_table[i];
 
-        if (sprite->control & OSprites::ENABLE)
+        if (sprite->control & ENABLE)
         {
             switch (sprite->function_holder)
             {
@@ -340,7 +340,7 @@ void OLevelObjs_do_sprite_routine(OLevelObjs* self)
                 case 6:
                     OLevelObjs_set_spr_zoom_priority(self, sprite, 1);
                     /* Have we passed the checkpoint? */
-                    if (!(sprite->control & OSprites::ENABLE))
+                    if (!(sprite->control & ENABLE))
                         oinitengine.checkpoint_marker = -1;
                     break;
 
@@ -405,7 +405,7 @@ void OLevelObjs_sprite_normal(OLevelObjs* self, oentry *sprite, uint8_t zoom)
     int16_t x2; 
 
     /* H-Flip - swap x co-ordinates */
-    if (sprite->control & OSprites::HFLIP)
+    if (sprite->control & HFLIP)
     {
         x2 = (int16_t) roms.rom0.read16(&offset_addr);
         x1 = (int16_t) roms.rom0.read16(&offset_addr);
@@ -449,7 +449,7 @@ void OLevelObjs_sprite_lights(OLevelObjs* self, oentry *sprite)
     int16_t x2; 
 
     /* H-Flip - swap x co-ordinates */
-    if (sprite->control & OSprites::HFLIP)
+    if (sprite->control & HFLIP)
     {
         x2 = (int16_t) roms.rom0.read16(&offset_addr);
         x1 = (int16_t) roms.rom0.read16(&offset_addr);
@@ -484,7 +484,7 @@ void OLevelObjs_sprite_lights_countdown(OLevelObjs* self, oentry *sprite)
     {
         countdown_pal += 0x7A + ostats.cur_stage;
         sprite->pal_src = (uint8_t) countdown_pal;
-        osprites.map_palette(sprite);
+        OSprites_map_palette(&osprites, sprite);
     }
     
     OLevelObjs_set_spr_zoom_priority(self, sprite, 1); /* WIDE_ROAD must be set for this to work. */
@@ -497,7 +497,7 @@ void OLevelObjs_sprite_lights_countdown(OLevelObjs* self, oentry *sprite)
 /* Source Address: 0x404A */static 
 void OLevelObjs_set_spr_zoom_priority(OLevelObjs* self, oentry *sprite, uint8_t zoom)
 {
-    osprites.move_sprite(sprite, 0);
+    OSprites_move_sprite(&osprites, sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
 
     if (z16 < 4) return;
@@ -538,7 +538,7 @@ void OLevelObjs_set_spr_zoom_priority(OLevelObjs* self, oentry *sprite, uint8_t 
             xw1 += (oroad.road_width >> 16) << 1;
         else
         {
-            if ((sprite->control & OSprites::WIDE_ROAD) == 0)
+            if ((sprite->control & WIDE_ROAD) == 0)
                 xw1 += (oroad.road_width >> 16) << 1;
         }
     }
@@ -546,7 +546,7 @@ void OLevelObjs_set_spr_zoom_priority(OLevelObjs* self, oentry *sprite, uint8_t 
     { int32_t multiply = (xw1 * z16) >> 9; /* only used as a 16 bit value so truncate here */
     sprite->x = road_x + multiply;
 
-    osprites.do_spr_order_shadows(sprite);
+    OSprites_do_spr_order_shadows(&osprites, sprite);
  } } }}
 
 /* Seems to be identical to sprite_normal */
@@ -571,7 +571,7 @@ void OLevelObjs_sprite_collision_z1c(OLevelObjs* self, oentry* sprite)
     int16_t x2; 
 
     /* H-Flip - swap x co-ordinates */
-    if (sprite-> control & OSprites::HFLIP)
+    if (sprite-> control & HFLIP)
     {
         x2 = (int16_t) roms.rom0.read16(&offset_addr);
         x1 = (int16_t) roms.rom0.read16(&offset_addr);
@@ -611,7 +611,7 @@ void OLevelObjs_sprite_collision_z1c(OLevelObjs* self, oentry* sprite)
 /* Source Address: 0x404A */static 
 void OLevelObjs_set_spr_zoom_priority2(OLevelObjs* self, oentry *sprite, uint8_t zoom)
 {
-    osprites.move_sprite(sprite, 0);
+    OSprites_move_sprite(&osprites, sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
 
     if (z16 < 4) return;
@@ -633,7 +633,7 @@ void OLevelObjs_set_spr_zoom_priority2(OLevelObjs* self, oentry *sprite, uint8_t
     int16_t road_x = oroad.road0_h[z16];
     { int16_t xw1 = sprite->xw1;
 
-    if (xw1 >= 0 && (sprite->control & OSprites::WIDE_ROAD) == 0)
+    if (xw1 >= 0 && (sprite->control & WIDE_ROAD) == 0)
     {
         xw1 +=  ((int16_t) (oroad.road_width >> 16)) << 1;
     }
@@ -648,7 +648,7 @@ void OLevelObjs_set_spr_zoom_priority2(OLevelObjs* self, oentry *sprite, uint8_t
     /* 2/ Use Sprite Y World Data if not 0, converted to a screen position [World] */
     sprite->y = -(oroad.road_y[oroad.road_p0 + z16] >> 4) + 223;
 
-    osprites.do_spr_order_shadows(sprite);
+    OSprites_do_spr_order_shadows(&osprites, sprite);
  } } }}
 
 /* Water, as used on LHS of Stage 1 */
@@ -664,8 +664,8 @@ void OLevelObjs_sprite_water(OLevelObjs* self, oentry* sprite)
 
         }
         /* Check whether to initialise spray */
-        else if (((sprite->control & OSprites::HFLIP) == 0               && sprite->x < 0) ||
-                 ((sprite->control & OSprites::HFLIP) == OSprites::HFLIP && sprite->x > 0))
+        else if (((sprite->control & HFLIP) == 0               && sprite->x < 0) ||
+                 ((sprite->control & HFLIP) == HFLIP && sprite->x > 0))
         {
             self->spray_counter = SPRAY_RESET;
             self->spray_type = 0;
@@ -687,8 +687,8 @@ void OLevelObjs_sprite_grass(OLevelObjs* self, oentry* sprite)
 
         }
         /* Check whether to initialise spray */
-        else if (((sprite->control & OSprites::HFLIP) == 0               && sprite->x < 0) ||
-                 ((sprite->control & OSprites::HFLIP) == OSprites::HFLIP && sprite->x > 0))
+        else if (((sprite->control & HFLIP) == 0               && sprite->x < 0) ||
+                 ((sprite->control & HFLIP) == HFLIP && sprite->x > 0))
         {
             self->spray_counter = SPRAY_RESET;
             self->spray_type = 4; /* Set Spray Type = Yellow */
@@ -710,7 +710,7 @@ void OLevelObjs_sprite_grass(OLevelObjs* self, oentry* sprite)
 
 void OLevelObjs_sprite_minitree(OLevelObjs* self, oentry* sprite)
 {
-    osprites.move_sprite(sprite, 0);
+    OSprites_move_sprite(&osprites, sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
 
     if (z16 < 4) return;
@@ -765,7 +765,7 @@ void OLevelObjs_sprite_minitree(OLevelObjs* self, oentry* sprite)
         sprite->addr = roms.rom0p->read32(outrun.adr.sprite_minitree + offset);
     }
     /* order_sprites */
-    osprites.do_spr_order_shadows(sprite);
+    OSprites_do_spr_order_shadows(&osprites, sprite);
  } } }}
 
 /* Source:  */static 
@@ -785,7 +785,7 @@ void OLevelObjs_sprite_debris(OLevelObjs* self, oentry* sprite)
     int16_t x2; 
 
     /* H-Flip - swap x co-ordinates */
-    if (sprite->control & OSprites::HFLIP)
+    if (sprite->control & HFLIP)
     {
         x2 = (int16_t) roms.rom0.read16(&offset_addr);
         x1 = (int16_t) roms.rom0.read16(&offset_addr);
@@ -818,7 +818,7 @@ void OLevelObjs_sprite_debris(OLevelObjs* self, oentry* sprite)
 /* Source: 0x4144 */static 
 void OLevelObjs_sprite_clouds(OLevelObjs* self, oentry* sprite)
 {
-    osprites.move_sprite(sprite, 1);
+    OSprites_move_sprite(&osprites, sprite, 1);
     { uint16_t z16 = sprite->z >> 16;
 
     if (z16 < 4)
@@ -892,13 +892,13 @@ void OLevelObjs_sprite_clouds(OLevelObjs* self, oentry* sprite)
         sprite->zoom = roms.rom0.read8(MOVEMENT_LOOKUP_Z + z + 1);
     }
     /* end */
-    osprites.map_palette(sprite);
-    osprites.do_spr_order_shadows(sprite);  
+    OSprites_map_palette(&osprites, sprite);
+    OSprites_do_spr_order_shadows(&osprites, sprite);  
  } }}static 
 
 void OLevelObjs_do_thickness_sprite(OLevelObjs* self, oentry* sprite, const uint32_t sprite_table_address)
 {
-    osprites.move_sprite(sprite, 0);
+    OSprites_move_sprite(&osprites, sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
 
     if (z16 < 4) return;
@@ -917,7 +917,7 @@ void OLevelObjs_do_thickness_sprite(OLevelObjs* self, oentry* sprite, const uint
 
     if (xw1 >= 0)
     {
-        if (sprite->id != 14 || (sprite->control & OSprites::WIDE_ROAD) == 0) /* Rolled in separate routine with this one line. (Sand 2 used in bonus sequence) */
+        if (sprite->id != 14 || (sprite->control & WIDE_ROAD) == 0) /* Rolled in separate routine with this one line. (Sand 2 used in bonus sequence) */
             xw1 += ((int16_t) (oroad.road_width >> 16)) << 1;
     }
 
@@ -948,7 +948,7 @@ void OLevelObjs_do_thickness_sprite(OLevelObjs* self, oentry* sprite, const uint
         sprite->addr = roms.rom0p->read32(z + sprite_table_address); /* Set Frame Data Based On Zoom Value */
     }
     /* order_sprites */
-    osprites.do_spr_order_shadows(sprite);
+    OSprites_do_spr_order_shadows(&osprites, sprite);
  } } }}
 
 /* --------------- */
@@ -981,7 +981,7 @@ void OLevelObjs_sprite_rocks(OLevelObjs* self, oentry *sprite)
     int16_t x2; 
 
     /* H-Flip - swap x co-ordinates */
-    if (sprite->control & OSprites::HFLIP)
+    if (sprite->control & HFLIP)
     {
         x2 = (int16_t) roms.rom0.read16(&offset_addr);
         x1 = (int16_t) roms.rom0.read16(&offset_addr);
@@ -1013,7 +1013,7 @@ void OLevelObjs_sprite_rocks(OLevelObjs* self, oentry *sprite)
 /* Source Address: 0x404A */static 
 void OLevelObjs_set_spr_zoom_priority_rocks(OLevelObjs* self, oentry *sprite, uint8_t zoom)
 {
-    osprites.move_sprite(sprite, 0);
+    OSprites_move_sprite(&osprites, sprite, 0);
     { uint16_t z16 = sprite->z >> 16;
 
     if (z16 < 4) return;
@@ -1040,7 +1040,7 @@ void OLevelObjs_set_spr_zoom_priority_rocks(OLevelObjs* self, oentry *sprite, ui
     int16_t road_x = oroad.road0_h[z16];
     { int16_t xw1 = sprite->xw1;
    
-    if (xw1 >= 0 && (sprite->control & OSprites::WIDE_ROAD) == 0)
+    if (xw1 >= 0 && (sprite->control & WIDE_ROAD) == 0)
     {
         xw1 +=  ((int16_t) (oroad.road_width >> 16)) << 1;
     }
@@ -1054,7 +1054,7 @@ void OLevelObjs_set_spr_zoom_priority_rocks(OLevelObjs* self, oentry *sprite, ui
     uint16_t width = (sprite->width >> 1) + 160 + config.s16_x_off;
     if (sprite->x >= width || sprite->x + width < 0) return;
 
-    osprites.do_spr_order_shadows(sprite);
+    OSprites_do_spr_order_shadows(&osprites, sprite);
  } } }}
 
 /* Source Address: 0x4648 */
@@ -1062,5 +1062,5 @@ void OLevelObjs_hide_sprite(OLevelObjs* self, oentry *sprite)
 {
     sprite->z = 0;
     sprite->zoom = 0; /* Hide the sprite */
-    sprite->control &= ~OSprites::ENABLE; /* Disable entry in jump table */
+    sprite->control &= ~ENABLE; /* Disable entry in jump table */
 }

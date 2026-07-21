@@ -84,11 +84,11 @@ void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry *sprite)
         uint32_t smoke_adr = roms.rom0p->read32(outrun.adr.smoke_data + self->smoke_type_offroad);
 
         /* Left Wheel Only */
-        if (sprite == &osprites.jump_table[OSprites::SPRITE_SMOKE2] && oferrari.wheel_state == OFerrari::WHEELS_LEFT_OFF)
+        if (sprite == &osprites.jump_table[SPRITE_SMOKE2] && oferrari.wheel_state == OFerrari::WHEELS_LEFT_OFF)
             OSmoke_tick_smoke_anim(self, sprite, 1, smoke_adr);
 
         /* Right Wheel Only */
-        else if (sprite == &osprites.jump_table[OSprites::SPRITE_SMOKE1] && oferrari.wheel_state == OFerrari::WHEELS_RIGHT_OFF)
+        else if (sprite == &osprites.jump_table[SPRITE_SMOKE1] && oferrari.wheel_state == OFerrari::WHEELS_RIGHT_OFF)
             OSmoke_tick_smoke_anim(self, sprite, 1, smoke_adr);
         
         /* Both Wheels */
@@ -208,9 +208,9 @@ static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctr
             /* Car is slid to the side, so we need to offset the smoke accordingly */
             if (ocrash.crash_state == 4)
             {
-                if (ocrash.spr_ferrari->control & OSprites::HFLIP)
+                if (ocrash.spr_ferrari->control & HFLIP)
                 {
-                    if (sprite == &osprites.jump_table[OSprites::SPRITE_SMOKE2])
+                    if (sprite == &osprites.jump_table[SPRITE_SMOKE2])
                     {
                         sprite->y -= 10;
                     }
@@ -222,7 +222,7 @@ static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctr
                 }
                 else
                 {
-                    if (sprite == &osprites.jump_table[OSprites::SPRITE_SMOKE2])
+                    if (sprite == &osprites.jump_table[SPRITE_SMOKE2])
                     {
                         sprite->x += 64;
                         sprite->y -= 4;
@@ -269,14 +269,14 @@ static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctr
                 sprite->xw1++; /* Increment Frame */
             }
             /* Two Wheels On Road */
-            else if (sprite == &osprites.jump_table[OSprites::SPRITE_SMOKE1])
+            else if (sprite == &osprites.jump_table[SPRITE_SMOKE1])
             {
                 sprite->counter = sprite->reload;
                 sprite->xw1++; /* Increment Frame */
 
                 /* Copy to second smoke sprite (yes this is crap, but it's directly ported code) */
-                osprites.jump_table[OSprites::SPRITE_SMOKE2].counter = sprite->reload;
-                osprites.jump_table[OSprites::SPRITE_SMOKE2].xw1 = sprite->xw1;
+                osprites.jump_table[SPRITE_SMOKE2].counter = sprite->reload;
+                osprites.jump_table[SPRITE_SMOKE2].xw1 = sprite->xw1;
             }
         }
     }
@@ -316,7 +316,7 @@ static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctr
     if (oroad.get_view_mode() == ORoad::VIEW_INCAR)
         x += 10;
 
-    if (sprite == &osprites.jump_table[OSprites::SPRITE_SMOKE1])
+    if (sprite == &osprites.jump_table[SPRITE_SMOKE1])
     {
         sprite->draw_props = oentry::BOTTOM | oentry::LEFT; /* Anchor bottom left */
         hflip++;
@@ -329,11 +329,11 @@ static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctr
     sprite->x += (x * zoom) >> 8;
 
     /* Set H-Flip */
-    if (hflip & 1) sprite->control |= OSprites::HFLIP;
-    else sprite->control &= ~OSprites::HFLIP;
+    if (hflip & 1) sprite->control |= HFLIP;
+    else sprite->control &= ~HFLIP;
 
-    osprites.map_palette(sprite);
-    osprites.do_spr_order_shadows(sprite);
+    OSprites_map_palette(&osprites, sprite);
+    OSprites_do_spr_order_shadows(&osprites, sprite);
  } } }}
 
 /* Draw only helper routine. */
@@ -351,6 +351,6 @@ void OSmoke_draw(OSmoke* self, oentry* sprite)
     if (oferrari.car_state != OFerrari::CAR_ANIM_SEQ && oinitengine.car_increment >> 16 == 0)
         return; 
     
-    osprites.map_palette(sprite);
-    osprites.do_spr_order_shadows(sprite);
+    OSprites_map_palette(&osprites, sprite);
+    OSprites_do_spr_order_shadows(&osprites, sprite);
 }

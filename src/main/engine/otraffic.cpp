@@ -54,15 +54,15 @@ void OTraffic_init(OTraffic* self)
 /* Initalize traffic in right land lane for Stage 1 */
 void OTraffic_init_stage1_traffic(OTraffic* self)
 {
-    const uint8_t flags = OSprites::TRAFFIC_SPRITE | OSprites::TRAFFIC_RHS | OSprites::ENABLE;
+    const uint8_t flags = TRAFFIC_SPRITE | TRAFFIC_RHS | ENABLE;
 
-    oentry* t = &osprites.jump_table[OSprites::SPRITE_TRAFF1];
+    oentry* t = &osprites.jump_table[SPRITE_TRAFF1];
     t->function_holder = TRAFFIC_INIT;
     t->control        |= flags;
     t->draw_props     |= oentry::BOTTOM;
     t->z               = 0x140F520;
 
-    t = &osprites.jump_table[OSprites::SPRITE_TRAFF2];
+    t = &osprites.jump_table[SPRITE_TRAFF2];
     t->function_holder = TRAFFIC_INIT;
     t->control        |= flags;
     t->draw_props     |= oentry::BOTTOM;
@@ -71,7 +71,7 @@ void OTraffic_init_stage1_traffic(OTraffic* self)
     t->type            = 0x18;
     t->xw2             = 0x70;
 
-    t = &osprites.jump_table[OSprites::SPRITE_TRAFF3];
+    t = &osprites.jump_table[SPRITE_TRAFF3];
     t->function_holder = TRAFFIC_INIT;
     t->control        |= flags;
     t->draw_props     |= oentry::BOTTOM;
@@ -80,7 +80,7 @@ void OTraffic_init_stage1_traffic(OTraffic* self)
     t->type            = 0x20; 
     t->xw2             = -0x70;
 
-    t = &osprites.jump_table[OSprites::SPRITE_TRAFF4];
+    t = &osprites.jump_table[SPRITE_TRAFF4];
     t->function_holder = TRAFFIC_INIT;
     t->control        |= flags;
     t->draw_props     |= oentry::BOTTOM;
@@ -89,7 +89,7 @@ void OTraffic_init_stage1_traffic(OTraffic* self)
     t->type            = 0x28; 
     t->xw2             = 0x70;
 
-    t = &osprites.jump_table[OSprites::SPRITE_TRAFF5];
+    t = &osprites.jump_table[SPRITE_TRAFF5];
     t->function_holder = TRAFFIC_INIT;
     t->control        |= flags;
     t->draw_props     |= oentry::BOTTOM;
@@ -108,7 +108,7 @@ void OTraffic_tick(OTraffic* self)
     if (outrun.tick_frame) 
         OTraffic_spawn_traffic(self);
 
-    { uint8_t i; for (i = OSprites::SPRITE_TRAFF1; i <= OSprites::SPRITE_TRAFF8; i++)
+    { uint8_t i; for (i = SPRITE_TRAFF1; i <= SPRITE_TRAFF8; i++)
     {
         oentry* sprite = &osprites.jump_table[i];
 
@@ -142,8 +142,8 @@ void OTraffic_tick(OTraffic* self)
 /* Source: 0x4A78 */
 void OTraffic_disable_traffic(OTraffic* self)
 {
-    { uint8_t i; for (i = OSprites::SPRITE_TRAFF1; i <= OSprites::SPRITE_TRAFF8; i++)
-        osprites.jump_table[i].control &= ~OSprites::ENABLE; }
+    { uint8_t i; for (i = SPRITE_TRAFF1; i <= SPRITE_TRAFF8; i++)
+        osprites.jump_table[i].control &= ~ENABLE; }
 }
 
 /* Master Function to determine when to spawn traffic */
@@ -185,11 +185,11 @@ void OTraffic_spawn_traffic(OTraffic* self)
         return;
 
     /* Spawn Traffic if possible in one of the eight slots */
-    { uint8_t i; for (i = OSprites::SPRITE_TRAFF1; i <= OSprites::SPRITE_TRAFF8; i++)
+    { uint8_t i; for (i = SPRITE_TRAFF1; i <= SPRITE_TRAFF8; i++)
     {
         oentry* sprite = &osprites.jump_table[i];
         
-        if (!(sprite->control & OSprites::ENABLE))
+        if (!(sprite->control & ENABLE))
         {
             OTraffic_spawn_car(self, sprite);
             return;
@@ -203,7 +203,7 @@ void OTraffic_spawn_traffic(OTraffic* self)
 /* Source: 0x4BAC */static 
 void OTraffic_spawn_car(OTraffic* self, oentry* sprite)
 {
-    sprite->control |= OSprites::ENABLE | OSprites::TRAFFIC_SPRITE;
+    sprite->control |= ENABLE | TRAFFIC_SPRITE;
     sprite->draw_props = oentry::BOTTOM;
     sprite->shadow = 7;     /* Used as priority */
     sprite->width = 0;
@@ -217,18 +217,18 @@ void OTraffic_spawn_car(OTraffic* self, oentry* sprite)
     if (self->spawn_location & 1)
     {
         const int8_t TABLE[] = {0, -0x70, -0x70, 0x70};
-        sprite->control &= ~OSprites::TRAFFIC_RHS;
+        sprite->control &= ~TRAFFIC_RHS;
         /* note we use (rnd & 6) >> 1 rather than (rnd & 3) to match original random number generation */
         sprite->xw1 = sprite->xw2 = TABLE[(rnd & 6) >> 1];  
-        sprite->control |= OSprites::HFLIP;   
+        sprite->control |= HFLIP;   
     }
     /* Spawn On Right Hand Side Of Road */
     else
     {
         const int8_t TABLE[] = {0, -0x70, 0x70, 0x70};
-        sprite->control |= OSprites::TRAFFIC_RHS;
+        sprite->control |= TRAFFIC_RHS;
         sprite->xw1 = sprite->xw2 = TABLE[(rnd & 6) >> 1];
-        sprite->control &= ~OSprites::HFLIP;
+        sprite->control &= ~HFLIP;
     }
     
     rnd = (int8_t) rnd; /* ext.w */
@@ -266,9 +266,9 @@ void OTraffic_tick_spawned_sprite(OTraffic* self, oentry* sprite)
     {
         /* Force side of road when in bonus mode, or road splitting */
         if (self->bonus_lhs)
-            sprite->control |= OSprites::TRAFFIC_RHS;
+            sprite->control |= TRAFFIC_RHS;
         else if (self->traffic_split)
-            sprite->control ^= OSprites::TRAFFIC_RHS;
+            sprite->control ^= TRAFFIC_RHS;
     
         /* Check for collision with player's car */
         OTraffic_check_collision(self, sprite);
@@ -333,13 +333,13 @@ void OTraffic_move_spawned_sprite(OTraffic* self, oentry* sprite)
     /* Road Splitting: Return if enemy on opposite side of road to split */
     if (oinitengine.road_remove_split)
     {
-        if (((oinitengine.route_selected ^ sprite->control) & OSprites::TRAFFIC_RHS) == 0) 
+        if (((oinitengine.route_selected ^ sprite->control) & TRAFFIC_RHS) == 0) 
             return;
     }
 
     if (outrun.game_state != GS_INGAME && outrun.game_state != GS_BONUS && outrun.game_state != GS_ATTRACT)
     {
-        osprites.do_spr_order_shadows(sprite);
+        OSprites_do_spr_order_shadows(&osprites, sprite);
         return;
     }
 
@@ -456,15 +456,15 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
     OTraffic_set_zoom_lookup(self, sprite);
 
     /* Set Screen X */
-    int16_t* road_x = (sprite->control & OSprites::TRAFFIC_RHS) ? oroad.road1_h : oroad.road0_h;
+    int16_t* road_x = (sprite->control & TRAFFIC_RHS) ? oroad.road1_h : oroad.road0_h;
     { int32_t x = (sprite->xw1 * z16) >> 9;
     sprite->x = x + road_x[z16];
 
     if (z16 <= 8)
     {
-        osprites.map_palette(sprite);
+        OSprites_map_palette(&osprites, sprite);
         self->traffic_speed_total += sprite->traffic_speed;
-        osprites.do_spr_order_shadows(sprite);
+        OSprites_do_spr_order_shadows(&osprites, sprite);
         return;
     }
 
@@ -481,7 +481,7 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
 
     x = oinitengine.car_x_pos - (oroad.road_width >> 16);
 
-    if (sprite->control & OSprites::TRAFFIC_RHS)
+    if (sprite->control & TRAFFIC_RHS)
     {
         x += (oroad.road_width >> 16) << 1;
     }
@@ -507,11 +507,11 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
 
     if (x < 0)
     {
-        sprite->control &= ~OSprites::HFLIP;
+        sprite->control &= ~HFLIP;
     }
     else
     {
-        sprite->control |= OSprites::HFLIP;
+        sprite->control |= HFLIP;
     }
 
     /* ------------------------------------------------------------------------ */
@@ -526,9 +526,9 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
     { int16_t traffic_type = (roms.rom0p->read8(outrun.adr.traffic_props + sprite->type + 7) << 5) + (traffic_frame << 2) + incline;
     sprite->addr = roms.rom0p->read32(outrun.adr.traffic_data + traffic_type);
 
-    osprites.map_palette(sprite);
+    OSprites_map_palette(&osprites, sprite);
     self->traffic_speed_total += sprite->traffic_speed;
-    osprites.do_spr_order_shadows(sprite);
+    OSprites_do_spr_order_shadows(&osprites, sprite);
  } } } }}static 
 
 void OTraffic_set_zoom_lookup(OTraffic* self, oentry* sprite)
@@ -649,7 +649,7 @@ void OTraffic_traffic_logic(OTraffic* self)
         uint16_t src_index = osprites.sprite_entries[spr_index++].scratch;
 
         first = &osprites.jump_table[src_index];
-        if (first->control & OSprites::TRAFFIC_SPRITE)
+        if (first->control & TRAFFIC_SPRITE)
         {
             self->traffic_adr[spawned++] = first;
             break;
@@ -670,7 +670,7 @@ void OTraffic_traffic_logic(OTraffic* self)
     {
         uint16_t src_index = osprites.sprite_entries[spr_index++].scratch;
         next = &osprites.jump_table[src_index];
-        if (next->control & OSprites::TRAFFIC_SPRITE)
+        if (next->control & TRAFFIC_SPRITE)
         {
             self->traffic_adr[spawned++] = next;
             next->traffic_proximity = 0;

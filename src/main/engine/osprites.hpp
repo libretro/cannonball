@@ -19,12 +19,7 @@
 #include "outrun.hpp"
 #include "engine/data/sprite_pals.hpp"
 
-class OSprites
-{
-public:
-
-	enum 
-    {
+enum {
 		HFLIP = 0x1,			/* Bit 0: Horizontally flip sprite */
 		WIDE_ROAD = 0x4,		/* Bit 2: Set if road_width >= 0x118,  */
         TRAFFIC_SPRITE = 0x8,   /* Bit 3: Traffic Sprite - Set for traffic */
@@ -34,151 +29,110 @@ public:
 		ENABLE = 0x80	        /* Bit 7: Toggle sprite visibility */
 	};
 
-    /* Note, the original game has 0x4F entries. */
-    /* But we can set it to a higher value, to fix the broken arches on Gateway. */
-    /* this is a limitation in the original game. */
-    /* We just leave the larger array in place when changing the settings.  */
-    
-    /* Total sprite entries in Jump Table (start at offset #3) */
-	enum { SPRITE_ENTRIES = 0x62 };
-    
-    /* This is initalized based on the config */
+enum { SPRITE_ENTRIES = 0x62 };
+
+enum { JUMP_ENTRIES_TOTAL = SPRITE_ENTRIES + 24 };
+
+enum { PAL_ENTRIES = 0x100 };
+
+static const uint8_t SPRITE_FERRARI = SPRITE_ENTRIES + 1;
+
+static const uint8_t SPRITE_PASS1   = SPRITE_ENTRIES + 2;
+
+static const uint8_t SPRITE_PASS2   = SPRITE_ENTRIES + 3;
+
+static const uint8_t SPRITE_SHADOW  = SPRITE_ENTRIES + 4;
+
+static const uint8_t SPRITE_SMOKE1  = SPRITE_ENTRIES + 5;
+
+static const uint8_t SPRITE_SMOKE2  = SPRITE_ENTRIES + 6;
+
+static const uint8_t SPRITE_TRAFF1  = SPRITE_ENTRIES + 7;
+
+static const uint8_t SPRITE_TRAFF2  = SPRITE_ENTRIES + 8;
+
+static const uint8_t SPRITE_TRAFF3  = SPRITE_ENTRIES + 9;
+
+static const uint8_t SPRITE_TRAFF4  = SPRITE_ENTRIES + 10;
+
+static const uint8_t SPRITE_TRAFF5  = SPRITE_ENTRIES + 11;
+
+static const uint8_t SPRITE_TRAFF6  = SPRITE_ENTRIES + 12;
+
+static const uint8_t SPRITE_TRAFF7  = SPRITE_ENTRIES + 13;
+
+static const uint8_t SPRITE_TRAFF8  = SPRITE_ENTRIES + 14;
+
+static const uint8_t SPRITE_CRASH          = SPRITE_ENTRIES + 15;
+
+static const uint8_t SPRITE_CRASH_SHADOW   = SPRITE_ENTRIES + 16;
+
+static const uint8_t SPRITE_CRASH_PASS1    = SPRITE_ENTRIES + 17;
+
+static const uint8_t SPRITE_CRASH_PASS1_S  = SPRITE_ENTRIES + 18;
+
+static const uint8_t SPRITE_CRASH_PASS2    = SPRITE_ENTRIES + 19;
+
+static const uint8_t SPRITE_CRASH_PASS2_S  = SPRITE_ENTRIES + 20;
+
+static const uint8_t SPRITE_FLAG  = SPRITE_ENTRIES + 21;
+
+static const uint32_t SPRITE_RAM = 0x130000;
+
+static const uint32_t PAL_SPRITES = 0x121000;
+
+struct OSprites
+{
     uint8_t no_sprites;
-
-    /* Total number of object entries, including SPRITE_ENTRIES, FERRARI, PASSENGERS, TRAFFIC etc. */
-    enum { JUMP_ENTRIES_TOTAL = SPRITE_ENTRIES + 24 };
-
-    const static uint8_t SPRITE_FERRARI = SPRITE_ENTRIES + 1;
-    const static uint8_t SPRITE_PASS1   = SPRITE_ENTRIES + 2;   /* Passengers */
-    const static uint8_t SPRITE_PASS2   = SPRITE_ENTRIES + 3;
-    const static uint8_t SPRITE_SHADOW  = SPRITE_ENTRIES + 4;   /* Ferrari Shadow */
-    const static uint8_t SPRITE_SMOKE1  = SPRITE_ENTRIES + 5;   /* Ferrari Tyre Smoke/Effects */
-    const static uint8_t SPRITE_SMOKE2  = SPRITE_ENTRIES + 6;
-    const static uint8_t SPRITE_TRAFF1  = SPRITE_ENTRIES + 7;   /* 8 Traffic Entries */
-    const static uint8_t SPRITE_TRAFF2  = SPRITE_ENTRIES + 8;
-    const static uint8_t SPRITE_TRAFF3  = SPRITE_ENTRIES + 9;
-    const static uint8_t SPRITE_TRAFF4  = SPRITE_ENTRIES + 10;
-    const static uint8_t SPRITE_TRAFF5  = SPRITE_ENTRIES + 11;
-    const static uint8_t SPRITE_TRAFF6  = SPRITE_ENTRIES + 12;
-    const static uint8_t SPRITE_TRAFF7  = SPRITE_ENTRIES + 13;
-    const static uint8_t SPRITE_TRAFF8  = SPRITE_ENTRIES + 14;
-    
-    const static uint8_t SPRITE_CRASH          = SPRITE_ENTRIES + 15;
-    const static uint8_t SPRITE_CRASH_SHADOW   = SPRITE_ENTRIES + 16;
-    const static uint8_t SPRITE_CRASH_PASS1    = SPRITE_ENTRIES + 17;
-    const static uint8_t SPRITE_CRASH_PASS1_S  = SPRITE_ENTRIES + 18;
-    const static uint8_t SPRITE_CRASH_PASS2    = SPRITE_ENTRIES + 19;
-    const static uint8_t SPRITE_CRASH_PASS2_S  = SPRITE_ENTRIES + 20;
-
-    const static uint8_t SPRITE_FLAG  = SPRITE_ENTRIES + 21;    /* Flag Man */
-
-	/* Jump Table Sprite Entries */
-	oentry jump_table[JUMP_ENTRIES_TOTAL]; 
-
-	/* Converted sprite entries in RAM for hardware. */
-	osprite sprite_entries[JUMP_ENTRIES_TOTAL];
-
-	/* ------------------------------------------------------------------------- */
-	/* Jump Table 2 Entries For Sprite Control */
-	/* ------------------------------------------------------------------------- */
-
-	/* +22 [Word] Road Position For Next Segment Of Sprites */
-	uint16_t seg_pos;
-
-	/* +24 [Byte] Number Of Sprites In Segment   */
-	uint8_t seg_total_sprites;
-
-	/* +26 [Word] Sprite Frequency Bitmask */
-	uint16_t seg_sprite_freq;
-
-	/* +28 [Word] Sprite Info Offset - Start Value. Loaded Into 2A.  */
-	int16_t seg_spr_offset2;
-
-	/* +2A [Word] Sprite Info Offset */
-	int16_t seg_spr_offset1;
-
-	/* +2C [Long] Sprite Info Base - Lookup for Sprite X World, Sprite Y World, Sprite Type Table Info [8 byte boundary blocks in ROM] */
-	uint32_t seg_spr_addr;
-
-	/* ------------------------------------------------------------------------- */
-
-    /* Speed at which sprites should scroll. Depends on granular position difference. */
-	uint16_t sprite_scroll_speed;
-
-    /* Shadow multiplication value (signed). Offsets the shadow from the sprite. */
-    /* Adjusted by the tilemap horizontal scroll, so shadows change depending on how much we've scrolled left and right */
+    oentry jump_table[JUMP_ENTRIES_TOTAL];
+    osprite sprite_entries[JUMP_ENTRIES_TOTAL];
+    uint16_t seg_pos;
+    uint8_t seg_total_sprites;
+    uint16_t seg_sprite_freq;
+    int16_t seg_spr_offset2;
+    int16_t seg_spr_offset1;
+    uint32_t seg_spr_addr;
+    uint16_t sprite_scroll_speed;
     int16_t shadow_offset;
-
-	/* Number of sprites to draw for sprite drawing routine (sum of spr_cnt_main and spr_cnt_shadow). */
-	uint16_t sprite_count;
-
-	/* Number of sprites to draw */
-	uint16_t spr_cnt_main;
-
-	/* Number of shadows to draw */
-	uint16_t spr_cnt_shadow;
-
-	OSprites(void);
-	~OSprites(void);
-	void init();
-    void disable_sprites();
-    void tick();
-    void update_sprites();
-
-    void clear_palette_data();
-	void copy_palette_data();
-	void map_palette(oentry* spr);
-	void sprite_copy();
-	void blit_sprites();
-
-	void do_spr_order_shadows(oentry*);
-	void do_sprite(oentry*);
-	void set_sprite_xy(oentry*, osprite*, uint16_t, uint16_t);
-	void set_hrender(oentry*, osprite*, uint16_t, uint16_t);
-
-    void move_sprite(oentry*, uint8_t);
-
-private:
-
-	/* Start of Sprite RAM */
-	static const uint32_t SPRITE_RAM = 0x130000;
-
-	/* Palette Ram: Sprite Entries Start Here */
-	static const uint32_t PAL_SPRITES = 0x121000;
-
-	/* Denote whether to swap sprite ram */
-	bool do_sprite_swap;
-
-	/* Store the next available sprite colour palette (0 - 7F) */
-	uint8_t spr_col_pal;
-
-	/* Stores number of palette entries to copy from rom to palram */
-	int16_t pal_copy_count; 
-
-	/* Palette Addresses. Used in conjunction with palette lookup table. */
-	/* Originally stored between 0x61602 - 0x617FF in RAM */
-	/* */
-	/* Format: */
-	/* Word 1: ROM Source Offset */
-	/* Word 2: Palette RAM Destination Offset */
-	/* */
-	/* Word 3: ROM Source Offset */
-	/* Word 4: Palette RAM Destination Offset */
-	/* */
-	/*etc. */
-	enum { PAL_ENTRIES = 0x100 }; /* hardware palette entries (before extra CannonBall palettes) */
-	uint16_t pal_addresses[PAL_ENTRIES]; /* todo: rename to pal_mapping */
-
-	/* Palette Lookup Table (was 0x100, but extended to account for extra palettes in CannonBall) */
-	uint8_t pal_lookup[PAL_LOOKUP_LENGTH];
-
-	/* Converted sprite entries in RAM for hardware. */
-	uint8_t sprite_order[0x2000];
-	uint8_t sprite_order2[0x2000];
-
-    void sprite_control();
-	void hide_hwsprite(oentry*, osprite*);
-	void finalise_sprites();
+    uint16_t sprite_count;
+    uint16_t spr_cnt_main;
+    uint16_t spr_cnt_shadow;
+    bool do_sprite_swap;
+    uint8_t spr_col_pal;
+    int16_t pal_copy_count;
+    uint16_t pal_addresses[PAL_ENTRIES];
+    uint8_t pal_lookup[PAL_LOOKUP_LENGTH];
+    uint8_t sprite_order[0x2000];
+    uint8_t sprite_order2[0x2000];
 };
 
 extern OSprites osprites;
+
+void OSprites_init(OSprites* self);
+
+void OSprites_disable_sprites(OSprites* self);
+
+void OSprites_tick(OSprites* self);
+
+void OSprites_update_sprites(OSprites* self);
+
+void OSprites_clear_palette_data(OSprites* self);
+
+void OSprites_copy_palette_data(OSprites* self);
+
+void OSprites_map_palette(OSprites* self, oentry* spr);
+
+void OSprites_sprite_copy(OSprites* self);
+
+void OSprites_blit_sprites(OSprites* self);
+
+void OSprites_do_spr_order_shadows(OSprites* self, oentry*);
+
+void OSprites_do_sprite(OSprites* self, oentry*);
+
+void OSprites_set_sprite_xy(OSprites* self, oentry*, osprite*, uint16_t, uint16_t);
+
+void OSprites_set_hrender(OSprites* self, oentry*, osprite*, uint16_t, uint16_t);
+
+void OSprites_move_sprite(OSprites* self, oentry*, uint8_t);
+

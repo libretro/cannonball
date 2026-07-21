@@ -250,17 +250,17 @@ void OAttractAI::check_road()
     const int16_t STEER = 0xb4;
 
     /* Upcoming Road: Straight or No Change */
-    if (oinitengine.road_type_next <= OInitEngine::ROAD_STRAIGHT)
+    if (oinitengine.road_type_next <= ROAD_STRAIGHT)
     {
-        if (oinitengine.road_type_next == OInitEngine::ROAD_STRAIGHT)
+        if (oinitengine.road_type_next == ROAD_STRAIGHT)
         {
-            oferrari.sprite_ai_x = oinitengine.road_type == OInitEngine::ROAD_RIGHT ? STEER : -STEER;
+            oferrari.sprite_ai_x = oinitengine.road_type == ROAD_RIGHT ? STEER : -STEER;
         }
         else /* NO CHANGE */
         {
-            if (oinitengine.road_type == OInitEngine::ROAD_LEFT)
+            if (oinitengine.road_type == ROAD_LEFT)
                 oferrari.sprite_ai_x = STEER;
-            else if (oinitengine.road_type != OInitEngine::ROAD_RIGHT)
+            else if (oinitengine.road_type != ROAD_RIGHT)
             {
                 oferrari.sprite_ai_x = 0;
                 return;
@@ -272,7 +272,7 @@ void OAttractAI::check_road()
     /* Upcoming Road: Curve */
     else
     {
-        oferrari.sprite_ai_x = oinitengine.road_type_next == OInitEngine::ROAD_LEFT ? STEER : -STEER;
+        oferrari.sprite_ai_x = oinitengine.road_type_next == ROAD_LEFT ? STEER : -STEER;
     }
 
     /* -------------------------------------------------------------------------------------------- */
@@ -405,17 +405,17 @@ void OAttractAI::set_steering()
 void OAttractAI::check_road_bonus()
 {
     /* Upcoming Road: Straight or No Change */
-    if (oinitengine.road_type_next <= OInitEngine::ROAD_STRAIGHT)
+    if (oinitengine.road_type_next <= ROAD_STRAIGHT)
     {
-        if (oinitengine.road_type_next == OInitEngine::ROAD_STRAIGHT)
+        if (oinitengine.road_type_next == ROAD_STRAIGHT)
         {
-            oferrari.sprite_ai_x = oinitengine.road_type == OInitEngine::ROAD_RIGHT ? -0xB4 : 0xB4; /* different from check_road()  */
+            oferrari.sprite_ai_x = oinitengine.road_type == ROAD_RIGHT ? -0xB4 : 0xB4; /* different from check_road()  */
         }
         else /* NO CHANGE */
         {
-            if (oinitengine.road_type == OInitEngine::ROAD_LEFT)
+            if (oinitengine.road_type == ROAD_LEFT)
                 oferrari.sprite_ai_x = 0xB4;
-            else if (oinitengine.road_type != OInitEngine::ROAD_RIGHT)
+            else if (oinitengine.road_type != ROAD_RIGHT)
                 oferrari.sprite_ai_x = 0;
             else
                 oferrari.sprite_ai_x = -0xB4;
@@ -424,7 +424,7 @@ void OAttractAI::check_road_bonus()
     /* Upcoming Road: Curve */
     else
     {
-        oferrari.sprite_ai_x = oinitengine.road_type_next == OInitEngine::ROAD_LEFT ? 0xB4 : -0xB4;
+        oferrari.sprite_ai_x = oinitengine.road_type_next == ROAD_LEFT ? 0xB4 : -0xB4;
     }
 }
 

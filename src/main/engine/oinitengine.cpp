@@ -30,6 +30,28 @@
 #include "engine/otraffic.hpp"
 #include "engine/oinitengine.hpp"
 
+static void OInitEngine_setup_stage1(OInitEngine* self);
+static void OInitEngine_check_road_split(OInitEngine* self);
+static void OInitEngine_check_stage(OInitEngine* self);
+static void OInitEngine_init_split1(OInitEngine* self);
+static void OInitEngine_init_split2(OInitEngine* self);
+static void OInitEngine_init_split3(OInitEngine* self);
+static void OInitEngine_init_split4(OInitEngine* self);
+static void OInitEngine_init_split5(OInitEngine* self);
+static void OInitEngine_init_split6(OInitEngine* self);
+static void OInitEngine_init_split7(OInitEngine* self);
+static void OInitEngine_init_split9(OInitEngine* self);
+static void OInitEngine_init_split10(OInitEngine* self);
+static void OInitEngine_bonus1(OInitEngine* self);
+static void OInitEngine_bonus2(OInitEngine* self);
+static void OInitEngine_bonus3(OInitEngine* self);
+static void OInitEngine_bonus4(OInitEngine* self);
+static void OInitEngine_bonus5(OInitEngine* self);
+static void OInitEngine_bonus6(OInitEngine* self);
+static void OInitEngine_reload_stage1(OInitEngine* self);
+static void OInitEngine_init_split_next_level(OInitEngine* self);
+static void OInitEngine_test_bonus_mode(OInitEngine* self, bool);
+
 OInitEngine oinitengine;
 
 /* Continuous Mode Level Ordering */
@@ -38,47 +60,41 @@ const static uint8_t CONTINUOUS_LEVELS[] = {0, 0x8, 0x9, 0x10, 0x11, 0x12, 0x18,
 /* Set to 0 to 4 to test bonus sequence, -1 disables */
 const static int DEBUG_BONUS = -1;
 
-OInitEngine::OInitEngine()
-{
-}
 
 
-OInitEngine::~OInitEngine()
-{
-}
 
 /* Source: 0x8360 */
-void OInitEngine::init(int8_t level)
+void OInitEngine_init(OInitEngine* self, int8_t level)
 {
     ostats.game_completed  = 0;
 
-    ingame_engine          = false;
-    ingame_counter         = 0;
+    self->ingame_engine          = false;
+    self->ingame_counter         = 0;
     ostats.cur_stage       = 0;
     oroad.stage_lookup_off = level ? level : 0;
-    rd_split_state         = SPLIT_NONE;
-    road_type              = ROAD_NOCHANGE;
-    road_type_next         = ROAD_NOCHANGE;
-    end_stage_props        = 0;
-    car_increment          = 0;
-    car_x_pos              = 0;
-    car_x_old              = 0;
-    checkpoint_marker      = 0;
-    road_curve             = 0;
-    road_curve_next        = 0;
-    road_remove_split      = 0;
-    route_selected         = 0;
+    self->rd_split_state         = SPLIT_NONE;
+    self->road_type              = ROAD_NOCHANGE;
+    self->road_type_next         = ROAD_NOCHANGE;
+    self->end_stage_props        = 0;
+    self->car_increment          = 0;
+    self->car_x_pos              = 0;
+    self->car_x_old              = 0;
+    self->checkpoint_marker      = 0;
+    self->road_curve             = 0;
+    self->road_curve_next        = 0;
+    self->road_remove_split      = 0;
+    self->route_selected         = 0;
     
-    road_width_next        = 0;
-    road_width_adj         = 0;
-    change_width           = 0;
-    granular_rem           = 0;
-    pos_fine_old           = 0;
-    road_width_orig        = 0;
-    road_width_merge       = 0;
-    route_updated          = 0;
+    self->road_width_next        = 0;
+    self->road_width_adj         = 0;
+    self->change_width           = 0;
+    self->granular_rem           = 0;
+    self->pos_fine_old           = 0;
+    self->road_width_orig        = 0;
+    self->road_width_merge       = 0;
+    self->route_updated          = 0;
 
-	init_road_seg_master();
+	OInitEngine_init_road_seg_master(self);
 
     /* Road Renderer: Setup correct stage address  */
     if (level)
@@ -91,9 +107,9 @@ void OInitEngine::init(int8_t level)
 	OPalette_setup_road_side(&opalette);
 	OPalette_setup_road_colour(&opalette);   
     otiles.setup_palette_hud();                     /* Init Default Palette for HUD */
-    osprites.copy_palette_data();                   /* Copy Palette Data to RAM */
+    OSprites_copy_palette_data(&osprites);                   /* Copy Palette Data to RAM */
     otiles.setup_palette_tilemap();                 /* Setup Palette For Tilemap */
-    setup_stage1();                                 /* Setup Misc stuff relating to Stage 1 */
+    OInitEngine_setup_stage1(self);                                 /* Setup Misc stuff relating to Stage 1 */
     otiles.reset_tiles_pal();                       /* Reset Tiles, Palette And Road Split Data */
     OCrash_clear_crash_state(&ocrash);
 
@@ -108,8 +124,8 @@ void OInitEngine::init(int8_t level)
     osoundint.reset();
 }
 
-/* Source: 0x8402 */
-void OInitEngine::setup_stage1()
+/* Source: 0x8402 */static 
+void OInitEngine_setup_stage1(OInitEngine* self)
 {
     oroad.road_width = 0x1C2 << 16;     /* Force display of two roads at start */
     ostats.score = 0;
@@ -119,7 +135,7 @@ void OInitEngine::setup_stage1()
     outrun.outputs->set_digital(OOutputs::D_SOUND);
     osoundint.engine_data[SOUND_ENGINE_VOL] = 0x3F;
     ostats.extend_play_timer = 0;
-    checkpoint_marker = 0;              /* Denote not past checkpoint marker */
+    self->checkpoint_marker = 0;              /* Denote not past checkpoint marker */
     OTraffic_set_max_traffic(&otraffic);         /* Set Number Of Enemy Cars Based On Dip Switches */
     OStats_clear_route_info(&ostats);
     OSmoke_setup_smoke_sprite(&osmoke, true);
@@ -132,7 +148,7 @@ void OInitEngine::setup_stage1()
 /* */
 /* Source: 0x8C80 */
 
-void OInitEngine::init_road_seg_master()
+void OInitEngine_init_road_seg_master(OInitEngine* self)
 {
     trackloader.init_track(oroad.stage_lookup_off);
 }
@@ -150,9 +166,9 @@ void OInitEngine::init_road_seg_master()
 /* Word 3 [+4]: Segment Road Width / Segment Road Height Index */
 /* Word 4 [+6]: Segment Width Adjustment SIGNED (Speed at which width is adjusted) */
 
-void OInitEngine::update_road()
+void OInitEngine_update_road(OInitEngine* self)
 {
-    check_road_split(); /* Check/Process road split if necessary */
+    OInitEngine_check_road_split(self); /* Check/Process road split if necessary */
     uint32_t addr = 0;
     { uint16_t d0 = trackloader.read_width_height(&addr);
     /* Update next road section */
@@ -176,9 +192,9 @@ void OInitEngine::update_road()
                 if (width <= (int16_t) (oroad.road_width >> 16))
                     change = -change;
 
-                road_width_next = width;
-                road_width_adj  = change;
-                change_width = -1; /* Denote road width is changing */
+                self->road_width_next = width;
+                self->road_width_adj  = change;
+                self->change_width = -1; /* Denote road width is changing */
             }
         }
         trackloader.wh_offset += 8;
@@ -186,24 +202,24 @@ void OInitEngine::update_road()
 
     /* ROM:0000B8BC set_road_width     */
     /* Width of road is changing & car is moving */
-    if (change_width != 0 && car_increment >> 16 != 0)
+    if (self->change_width != 0 && self->car_increment >> 16 != 0)
     {
-        int32_t d0 = ((car_increment >> 16) * road_width_adj) << 4;
+        int32_t d0 = ((self->car_increment >> 16) * self->road_width_adj) << 4;
         oroad.road_width += d0; /* add long here */
         if (d0 > 0)
         {    
-            if (road_width_next < (int16_t) (oroad.road_width >> 16))
+            if (self->road_width_next < (int16_t) (oroad.road_width >> 16))
             {
-                change_width = 0;
-                oroad.road_width = road_width_next << 16;
+                self->change_width = 0;
+                oroad.road_width = self->road_width_next << 16;
             }
         }
         else
         {
-            if (road_width_next >= (int16_t) (oroad.road_width >> 16))
+            if (self->road_width_next >= (int16_t) (oroad.road_width >> 16))
             {
-                change_width = 0;
-                oroad.road_width = road_width_next << 16;
+                self->change_width = 0;
+                oroad.road_width = self->road_width_next << 16;
             }
         }
     }
@@ -232,23 +248,23 @@ void OInitEngine::update_road()
 
         if (d1 <= (int16_t) (oroad.road_pos >> 16))
         {
-            road_curve_next = trackloader.read_curve(2);
-            road_type_next  = trackloader.read_curve(4);
+            self->road_curve_next = trackloader.read_curve(2);
+            self->road_type_next  = trackloader.read_curve(4);
         }
 
         if (segment_pos <= (int16_t) (oroad.road_pos >> 16))
         {
-            road_curve = trackloader.read_curve(2);
-            road_type  = trackloader.read_curve(4);
+            self->road_curve = trackloader.read_curve(2);
+            self->road_type  = trackloader.read_curve(4);
             trackloader.curve_offset += 6;
-            road_type_next = 0;
-            road_curve_next = 0;
+            self->road_type_next = 0;
+            self->road_curve_next = 0;
         }
     }
  }}
 
 /* Carries on from the above in the original code */
-void OInitEngine::update_engine()
+void OInitEngine_update_engine(OInitEngine* self)
 {   
     /* ------------------------------------------------------------------------ */
     /* TILE MAP OFFSETS */
@@ -256,7 +272,7 @@ void OInitEngine::update_engine()
     /* Setup the shadow offset based on how much we've scrolled left/right. Lovely and subtle! */
     /* ------------------------------------------------------------------------ */
 
-    update_shadow_offset();
+    OInitEngine_update_shadow_offset(self);
 
     /* ------------------------------------------------------------------------ */
     /* Main Car Logic Block */
@@ -278,14 +294,14 @@ void OInitEngine::update_engine()
     /* ------------------------------------------------------------------------ */
     /* Setup New Sprite Scroll Speed. Based On Granular Difference. */
     /* ------------------------------------------------------------------------ */
-    set_granular_position();
-    set_fine_position();
+    OInitEngine_set_granular_position(self);
+    OInitEngine_set_fine_position(self);
 
     /* Draw Speed & Hud Stuff */
     if (outrun.game_state >= GS_START1 && outrun.game_state <= GS_BONUS)
     {
         /* Convert & Blit Car Speed */
-        OHud_blit_speed(&ohud, 0x110CB6, car_increment >> 16);
+        OHud_blit_speed(&ohud, 0x110CB6, self->car_increment >> 16);
         OHud_blit_text1(&ohud, HUD_KPH1);
         OHud_blit_text1(&ohud, HUD_KPH2);
 
@@ -310,7 +326,7 @@ void OInitEngine::update_engine()
     OPalette_setup_sky_cycle(&opalette);
 }
 
-void OInitEngine::update_shadow_offset()
+void OInitEngine_update_shadow_offset(OInitEngine* self)
 {
     int16_t shadow_off = oroad.tilemap_h_target & 0x3FF;
     if (shadow_off > 0x1FF)
@@ -326,77 +342,77 @@ void OInitEngine::update_shadow_offset()
 /* - Checks position in level and determine whether to init road split */
 /* - Processes road split if initialized */
 /* */
-/* Source: 868E */
-void OInitEngine::check_road_split()
+/* Source: 868E */static 
+void OInitEngine_check_road_split(OInitEngine* self)
 {
     /* Check whether to initialize the next level */
     OStats_init_next_level(&ostats);
 
-    switch (rd_split_state)
+    switch (self->rd_split_state)
     {
         /* State 0: No road split. Check current road position with ROAD_END. */
         case SPLIT_NONE:
             if (DEBUG_BONUS == -1)
             {
                 if (oroad.road_pos >> 16 <= ROAD_END) return;
-                check_stage(); /* Do Split - Split behaviour depends on stage */
+                OInitEngine_check_stage(self); /* Do Split - Split behaviour depends on stage */
             }
             else
             {
                 if (oroad.road_pos >> 16 <= 0x100) return;
-                init_bonus(DEBUG_BONUS);
+                OInitEngine_init_bonus(self, DEBUG_BONUS);
             }
             break;
 
         /* State 1: (Does this ever need to be called directly?) */
         case SPLIT_INIT:
-            init_split1();
+            OInitEngine_init_split1(self);
             break;
         
         /* State 2: Road Split */
         case SPLIT_CHOICE1:
             if (oroad.road_pos >> 16 >= 0x3F)  
-                init_split2();            
+                OInitEngine_init_split2(self);            
             break;
 
         /* State 3: Beginning of split. User must choose. */
         case SPLIT_CHOICE2:
-            init_split2();
+            OInitEngine_init_split2(self);
             break;
 
         /* State 4: Road physically splits into two individual roads */
         case 4:
-            init_split3();
+            OInitEngine_init_split3(self);
             break;
 
         /* State 5: Road fully split. Init remove other road */
         case 5:
-            if (!road_curve)
-                rd_split_state = 6; /* and fall through */
+            if (!self->road_curve)
+                self->rd_split_state = 6; /* and fall through */
             else
                 break;
         
         /* State 6: Road split. Only one road drawn. */
         case 6:
-            init_split5();
+            OInitEngine_init_split5(self);
             break;
 
         /* Stage 7 */
         case 7:
-            init_split6();
+            OInitEngine_init_split6(self);
             break;
 
         /* State 8: Init Road Merge before checkpoint sign */
         case 8:
             otraffic.traffic_split = -1;
-            rd_split_state = 9;
+            self->rd_split_state = 9;
             break;
 
         /* State 9: Road Merge before checkpoint sign */
         case 9:
             otraffic.traffic_split = 0;
         case 0x0A:
-            init_split9();
+            OInitEngine_init_split9(self);
             break;
 
         case 0x0B:
@@ -404,38 +420,38 @@ void OInitEngine::check_road_split()
         case 0x0D:
         case 0x0E:
         case 0x0F:
-            init_split10();
+            OInitEngine_init_split10(self);
             break;
         
         /* Init Bonus Sequence */
         case 0x10:
-            init_bonus(oroad.stage_lookup_off - 0x20);
+            OInitEngine_init_bonus(self, oroad.stage_lookup_off - 0x20);
             break;
 
         case 0x11:
-            bonus1();
+            OInitEngine_bonus1(self);
             break;
 
         case 0x12:
-            bonus2();
+            OInitEngine_bonus2(self);
             break;
 
         case 0x13:
-            bonus3();
+            OInitEngine_bonus3(self);
             break;
 
         case 0x14:
-            bonus4();
+            OInitEngine_bonus4(self);
             break;
 
         case 0x15:
-            bonus5();
+            OInitEngine_bonus5(self);
             break;
 
         case 0x16:
         case 0x17:
         case 0x18:
-            bonus6();
+            OInitEngine_bonus6(self);
             break;
     }
 }
@@ -446,8 +462,8 @@ void OInitEngine::check_road_split()
 /* Stage 1-4: Init Road Split */
 /* Stage 5: Init Bonus */
 /* Stage 5 ATTRACT: Loop to Stage 1 */
-/* ------------------------------------------------------------------------------------------------ */
-void OInitEngine::check_stage()
+/* ------------------------------------------------------------------------------------------------ */static 
+void OInitEngine_check_stage(OInitEngine* self)
 {
     /* Time Trial Mode */
     if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
@@ -488,14 +504,14 @@ void OInitEngine::check_stage()
                 /* Update lap number */
                 oroad.road_pos = 0;
                 oroad.tilemap_h_target = 0;
-                init_road_seg_master();
+                OInitEngine_init_road_seg_master(self);
             }
             else 
             {
                 /* Set correct finish segment for final 5 stages, otherwise just default to first one. */
                 oroad.stage_lookup_off = oroad.stage_lookup_off < 0x20 ? 0x20 : oroad.stage_lookup_off;
                 ostats.time_counter = 1;
-                init_bonus(oroad.stage_lookup_off - 0x20);
+                OInitEngine_init_bonus(self, oroad.stage_lookup_off - 0x20);
             }
         }
     }
@@ -507,15 +523,15 @@ void OInitEngine::check_stage()
         if ((ostats.cur_stage + 1) == 15)
         {
             if (outrun.game_state == GS_INGAME)
-                init_bonus(outils::random() % 5);
+                OInitEngine_init_bonus(self, outils::random() % 5);
             else
-                reload_stage1();
+                OInitEngine_reload_stage1(self);
         }
         else
         {
             oroad.stage_lookup_off = CONTINUOUS_LEVELS[++ostats.cur_stage];
-            init_road_seg_master();
-            osprites.clear_palette_data();
+            OInitEngine_init_road_seg_master(self);
+            OSprites_clear_palette_data(&osprites);
 
             /* Init next tilemap */
             otiles.set_vertical_swap(); /* Tell tilemap to v-scroll off/on */
@@ -530,7 +546,7 @@ void OInitEngine::check_stage()
             OPalette_setup_sky_change(&opalette);
             
             /* Denote Checkpoint Passed */
-            checkpoint_marker = -1;
+            self->checkpoint_marker = -1;
 
             /* Cycle Music every 5 stages */
             if (outrun.game_state == GS_INGAME)
@@ -544,22 +560,22 @@ void OInitEngine::check_stage()
     /* Stages 0-4, do road split */
     else if (ostats.cur_stage <= 3)
     {
-        rd_split_state = SPLIT_INIT;
-        init_split1();
+        self->rd_split_state = SPLIT_INIT;
+        OInitEngine_init_split1(self);
     }
     /* Stage 5: Init Bonus */
     else if (outrun.game_state == GS_INGAME)
     {
-        init_bonus(oroad.stage_lookup_off - 0x20);
+        OInitEngine_init_bonus(self, oroad.stage_lookup_off - 0x20);
     }
     /* Stage 5 Attract Mode: Reload Stage 1 */
     else
     {
-        reload_stage1();
+        OInitEngine_reload_stage1(self);
     }
-}
+}static 
 
-void OInitEngine::reload_stage1()
+void OInitEngine_reload_stage1(OInitEngine* self)
 {
     oroad.road_pos         = 0;
     oroad.tilemap_h_target = 0;
@@ -568,25 +584,25 @@ void OInitEngine::reload_stage1()
 
     OStats_clear_route_info(&ostats);
 
-    end_stage_props |= BIT_1; /* Loop back to stage 1 (Used by tilemap code) */
-    end_stage_props |= BIT_2;
-    end_stage_props |= BIT_3;
+    self->end_stage_props |= BIT_1; /* Loop back to stage 1 (Used by tilemap code) */
+    self->end_stage_props |= BIT_2;
+    self->end_stage_props |= BIT_3;
     OSmoke_setup_smoke_sprite(&osmoke, true);
-    init_split_next_level();
+    OInitEngine_init_split_next_level(self);
 }
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Road Split 1 */
 /* Init Road Split & Begin Road Split */
 /* Called When We're Not On The Final Stage */
-/* ------------------------------------------------------------------------------------------------ */
-void OInitEngine::init_split1()
+/* ------------------------------------------------------------------------------------------------ */static 
+void OInitEngine_init_split1(OInitEngine* self)
 {
-    rd_split_state = SPLIT_CHOICE1;
+    self->rd_split_state = SPLIT_CHOICE1;
 
     oroad.road_load_split  = -1;
     oroad.road_ctrl        = ORoad::ROAD_BOTH_P0_INV; /* Both Roads (Road 0 Priority) (Road Split. Invert Road 0) */
-    road_width_orig        = oroad.road_width >> 16;
+    self->road_width_orig        = oroad.road_width >> 16;
     oroad.road_pos         = 0;
     oroad.tilemap_h_target = 0;
     trackloader.init_track_split();
@@ -594,45 +610,45 @@ void OInitEngine::init_split1()
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Road Split 2: Beginning of split. User must choose. */
-/* ------------------------------------------------------------------------------------------------ */
-void OInitEngine::init_split2()
+/* ------------------------------------------------------------------------------------------------ */static 
+void OInitEngine_init_split2(OInitEngine* self)
 {
-    rd_split_state = SPLIT_CHOICE2;
+    self->rd_split_state = SPLIT_CHOICE2;
 
     /* Manual adjustments to the road width, based on the current position */
-    int16_t pos = (((oroad.road_pos >> 16) - 0x3F) << 3) + road_width_orig;
+    int16_t pos = (((oroad.road_pos >> 16) - 0x3F) << 3) + self->road_width_orig;
     oroad.road_width = (pos << 16) | (oroad.road_width & 0xFFFF);
     if (pos > 0xFF)
     {
-        route_updated &= ~BIT_0;
-        init_split3();
+        self->route_updated &= ~BIT_0;
+        OInitEngine_init_split3(self);
     }
 }
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Road Split 3: Road physically splits into two individual roads */
-/* ------------------------------------------------------------------------------------------------ */
-void OInitEngine::init_split3()
+/* ------------------------------------------------------------------------------------------------ */static 
+void OInitEngine_init_split3(OInitEngine* self)
 {
-    rd_split_state = 4;
+    self->rd_split_state = 4;
 
-    { int16_t pos = (((oroad.road_pos >> 16) - 0x3F) << 3) + road_width_orig;
+    { int16_t pos = (((oroad.road_pos >> 16) - 0x3F) << 3) + self->road_width_orig;
     oroad.road_width = (pos << 16) | (oroad.road_width & 0xFFFF);
 
-    if (route_updated & BIT_0 || pos <= 0x168)
+    if (self->route_updated & BIT_0 || pos <= 0x168)
     {
         if (oroad.road_width >> 16 > 0x300)
-            init_split4();
+            OInitEngine_init_split4(self);
         return;
     }
 
-    route_updated |= BIT_0; /* Denote route info updated */
-    route_selected = 0;
+    self->route_updated |= BIT_0; /* Denote route info updated */
+    self->route_selected = 0;
 
     /* Go Left */
-    if (car_x_pos > 0)
+    if (self->car_x_pos > 0)
     {
-        route_selected = -1;
+        self->route_selected = -1;
         { uint8_t inc = 1 << (3 - ostats.cur_stage);
 
         /* One of the following increment values */
@@ -648,91 +664,91 @@ void OInitEngine::init_split3()
      }}
     /* Go Right / Continue */
 
-    end_stage_props |= BIT_0;                                 /* Set end of stage property (road splitting) */
+    self->end_stage_props |= BIT_0;                                 /* Set end of stage property (road splitting) */
     osmoke.load_smoke_data |= BIT_0;                          /* Denote we should load smoke sprite data */
     ostats.routes[0]++;                                       /* Set upcoming stage number to store route info */
     ostats.routes[ostats.routes[0]] = ostats.route_info;      /* Store route info for course map screen */
 
     if (oroad.road_width >> 16 > 0x300)
-        init_split4();
+        OInitEngine_init_split4(self);
  }}
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Road Split 4: Road Fully Split, Remove Other Road */
-/* ------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------ */static 
 
-void OInitEngine::init_split4()
+void OInitEngine_init_split4(OInitEngine* self)
 {
-    rd_split_state = 5; /* init_split4 */
+    self->rd_split_state = 5; /* init_split4 */
 
      /* Set Appropriate Road Control Value, Dependent On Route Chosen */
-    if (route_selected != 0)
+    if (self->route_selected != 0)
         oroad.road_ctrl = ORoad::ROAD_R0_SPLIT;
     else
         oroad.road_ctrl = ORoad::ROAD_R1_SPLIT;
 
     /* Denote road split has been removed (for enemy traFfic logic) */
-    road_remove_split |= BIT_0;
+    self->road_remove_split |= BIT_0;
        
-    if (!road_curve)
-        init_split5();
+    if (!self->road_curve)
+        OInitEngine_init_split5(self);
 }
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Road Split 5: Only Draw One Section Of Road - Wait For Final Curve */
-/* ------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------ */static 
 
-void OInitEngine::init_split5()
+void OInitEngine_init_split5(OInitEngine* self)
 {
-    rd_split_state = 6;
-    if (road_curve)
-        init_split6();
+    self->rd_split_state = 6;
+    if (self->road_curve)
+        OInitEngine_init_split6(self);
 }
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Road Split 6 - Car On Final Curve Of Split */
-/* ------------------------------------------------------------------------------------------------ */
-void OInitEngine::init_split6()
+/* ------------------------------------------------------------------------------------------------ */static 
+void OInitEngine_init_split6(OInitEngine* self)
 {
-    rd_split_state = 7;
-    if (!road_curve)
-        init_split7();
+    self->rd_split_state = 7;
+    if (!self->road_curve)
+        OInitEngine_init_split7(self);
 }
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Road Split 7: Init Road Merge Before Checkpoint (From Normal Section Of Road) */
-/* ------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------ */static 
 
-void OInitEngine::init_split7()
+void OInitEngine_init_split7(OInitEngine* self)
 {
-    rd_split_state = 8;
+    self->rd_split_state = 8;
 
     oroad.road_ctrl = ORoad::ROAD_BOTH_P0;
-    route_selected = ~route_selected; /* invert bits */
+    self->route_selected = ~self->route_selected; /* invert bits */
     int16_t width2 = (oroad.road_width >> 16) << 1;
-    if (route_selected == 0) 
+    if (self->route_selected == 0) 
         width2 = -width2;
-    car_x_pos += width2;
-    car_x_old += width2;
-    road_width_orig = oroad.road_pos >> 16;
-    road_width_merge = oroad.road_width >> 19; /* (>> 16 and then >> 3) */
-    road_remove_split &= ~BIT_0; /* Denote we're back to normal road handling for enemy traffic logic */
+    self->car_x_pos += width2;
+    self->car_x_old += width2;
+    self->road_width_orig = oroad.road_pos >> 16;
+    self->road_width_merge = oroad.road_width >> 19; /* (>> 16 and then >> 3) */
+    self->road_remove_split &= ~BIT_0; /* Denote we're back to normal road handling for enemy traffic logic */
 }
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Road Split 9 - Do Road Merger. Road Gets Narrower Again. */
-/* ------------------------------------------------------------------------------------------------ */
-void OInitEngine::init_split9()
+/* ------------------------------------------------------------------------------------------------ */static 
+void OInitEngine_init_split9(OInitEngine* self)
 {
-    rd_split_state = 10;
+    self->rd_split_state = 10;
 
     /* Calculate narrower road width to merge roads */
-    uint16_t d0 = (road_width_merge - ((oroad.road_pos >> 16) - road_width_orig)) << 3;
+    uint16_t d0 = (self->road_width_merge - ((oroad.road_pos >> 16) - self->road_width_orig)) << 3;
 
     if (d0 <= RD_WIDTH_MERGE)
     {
         oroad.road_width = (RD_WIDTH_MERGE << 16) | (oroad.road_width & 0xFFFF);
-        init_split10();
+        OInitEngine_init_split10(self);
     }
     else
         oroad.road_width = (d0 << 16) | (oroad.road_width & 0xFFFF);
@@ -741,22 +757,22 @@ void OInitEngine::init_split9()
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Road Split A: Checkpoint Sign */
-/* ------------------------------------------------------------------------------------------------ */
-void OInitEngine::init_split10()
+/* ------------------------------------------------------------------------------------------------ */static 
+void OInitEngine_init_split10(OInitEngine* self)
 {
-    rd_split_state = 11;
+    self->rd_split_state = 11;
 
     if (oroad.road_pos >> 16 > 0x180)
     {
-        rd_split_state = 0;
-        init_split_next_level();
+        self->rd_split_state = 0;
+        OInitEngine_init_split_next_level(self);
     }
 }
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Road Split B: Init Next Level */
-/* ------------------------------------------------------------------------------------------------ */
-void OInitEngine::init_split_next_level()
+/* ------------------------------------------------------------------------------------------------ */static 
+void OInitEngine_init_split_next_level(OInitEngine* self)
 {
     oroad.road_pos = 0;
     oroad.tilemap_h_target = 0;
@@ -764,11 +780,11 @@ void OInitEngine::init_split_next_level()
     oroad.stage_lookup_off += 8;    /* Increment lookup to next block of stages */
     ostats.route_info += 0x10;      /* Route Info increments by 10 at each stage */
     OHud_do_mini_map(&ohud);
-    init_road_seg_master();
+    OInitEngine_init_road_seg_master(self);
 
     /* Clear sprite palette lookup */
     if (ostats.cur_stage)
-        osprites.clear_palette_data();
+        OSprites_clear_palette_data(&osprites);
 }
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -777,7 +793,7 @@ void OInitEngine::init_split_next_level()
 
 /* Initialize new segment of road data for bonus sequence */
 /* Source: 0x8A04 */
-void OInitEngine::init_bonus(int16_t seq)
+void OInitEngine_init_bonus(OInitEngine* self, int16_t seq)
 {
     oroad.road_ctrl = ORoad::ROAD_BOTH_P0_INV;
     oroad.road_pos  = 0;
@@ -785,82 +801,82 @@ void OInitEngine::init_bonus(int16_t seq)
     oanimseq.end_seq = (uint8_t) seq; /* Set End Sequence (0 - 4) */
     trackloader.init_track_bonus(oanimseq.end_seq);
     outrun.game_state = GS_INIT_BONUS;
-    rd_split_state = 0x11;
-    bonus1();
-}
+    self->rd_split_state = 0x11;
+    OInitEngine_bonus1(self);
+}static 
 
-void OInitEngine::bonus1()
+void OInitEngine_bonus1(OInitEngine* self)
 {
     if (oroad.road_pos >> 16 >= 0x5B)
     {
         otraffic.bonus_lhs = 1; /* Force traffic spawn on LHS during bonus mode */
-        rd_split_state = 0x12;
-        bonus2();
+        self->rd_split_state = 0x12;
+        OInitEngine_bonus2(self);
     }
-}
+}static 
 
-void OInitEngine::bonus2()
+void OInitEngine_bonus2(OInitEngine* self)
 {
     if (oroad.road_pos >> 16 >= 0xB6)
     {
         otraffic.bonus_lhs = 0; /* Disable forced traffic spawn */
-        road_width_orig = oroad.road_width >> 16;
-        rd_split_state = 0x13;
-        bonus3();
+        self->road_width_orig = oroad.road_width >> 16;
+        self->rd_split_state = 0x13;
+        OInitEngine_bonus3(self);
     }
 }
 
-/* Stretch the road to a wider width. It does this based on the car's current position. */
-void OInitEngine::bonus3()
+/* Stretch the road to a wider width. It does this based on the car's current position. */static 
+void OInitEngine_bonus3(OInitEngine* self)
 {
     /* Manual adjustments to the road width, based on the current position */
-    int16_t pos = (((oroad.road_pos >> 16) - 0xB6) << 3) + road_width_orig;
+    int16_t pos = (((oroad.road_pos >> 16) - 0xB6) << 3) + self->road_width_orig;
     oroad.road_width = (pos << 16) | (oroad.road_width & 0xFFFF);
     if (pos > 0xFF)
     {
-        route_selected = 0;
-        if (car_x_pos > 0)
-            route_selected = ~route_selected; /* invert bits */
-        rd_split_state = 0x14;
-        bonus4();
+        self->route_selected = 0;
+        if (self->car_x_pos > 0)
+            self->route_selected = ~self->route_selected; /* invert bits */
+        self->rd_split_state = 0x14;
+        OInitEngine_bonus4(self);
     }
-}
+}static 
 
-void OInitEngine::bonus4()
+void OInitEngine_bonus4(OInitEngine* self)
 {
     /* Manual adjustments to the road width, based on the current position */
-    int16_t pos = (((oroad.road_pos >> 16) - 0xB6) << 3) + road_width_orig;
+    int16_t pos = (((oroad.road_pos >> 16) - 0xB6) << 3) + self->road_width_orig;
     oroad.road_width = (pos << 16) | (oroad.road_width & 0xFFFF);
     if (pos > 0x300)
     {
          /* Set Appropriate Road Control Value, Dependent On Route Chosen */
-        if (route_selected != 0)
+        if (self->route_selected != 0)
             oroad.road_ctrl = ORoad::ROAD_R0_SPLIT;
         else
             oroad.road_ctrl = ORoad::ROAD_R1_SPLIT;
 
         /* Denote road split has been removed (for enemy traFfic logic) */
-        road_remove_split |= BIT_0;
-        rd_split_state = 0x15;
-        bonus5();
+        self->road_remove_split |= BIT_0;
+        self->rd_split_state = 0x15;
+        OInitEngine_bonus5(self);
     }
 }
 
-/* Check for end of curve. Init next state when ended. */
-void OInitEngine::bonus5()
+/* Check for end of curve. Init next state when ended. */static 
+void OInitEngine_bonus5(OInitEngine* self)
 {
-    if (!road_curve)
+    if (!self->road_curve)
     {
-        rd_split_state = 0x16;
-        bonus6();
+        self->rd_split_state = 0x16;
+        OInitEngine_bonus6(self);
     }
 }
 
-/* This state simply checks for the end of bonus mode */
-void OInitEngine::bonus6()
+/* This state simply checks for the end of bonus mode */static 
+void OInitEngine_bonus6(OInitEngine* self)
 {
     if (obonus.bonus_control >= BONUS_END)
-        rd_split_state = 0;
+        self->rd_split_state = 0;
 }
 
 /* SetGranularPosition */
@@ -875,39 +891,39 @@ void OInitEngine::bonus6()
 /* Notes: */
 /* Disable with - bpset bd3e,1,{pc = bd76; g} */
 
-void OInitEngine::set_granular_position()
+void OInitEngine_set_granular_position(OInitEngine* self)
 {
-    uint16_t car_inc16 = car_increment >> 16;
+    uint16_t car_inc16 = self->car_increment >> 16;
 
     uint16_t result = car_inc16 / 0x40;
     uint16_t rem = car_inc16 % 0x40;
 
-    granular_rem += rem;
+    self->granular_rem += rem;
     /* When the overall counter overflows past 0x40, we must carry a 1 to the unsigned divide :) */
-    if (granular_rem >= 0x40)
+    if (self->granular_rem >= 0x40)
     {
-        granular_rem -= 0x40;
+        self->granular_rem -= 0x40;
         result++;
     }
     oroad.pos_fine += result;
 }
 
-void OInitEngine::set_fine_position()
+void OInitEngine_set_fine_position(OInitEngine* self)
 {
-    uint16_t d0 = oroad.pos_fine - pos_fine_old;
+    uint16_t d0 = oroad.pos_fine - self->pos_fine_old;
     if (d0 > 0xF)
         d0 = 0xF;
 
     d0 <<= 0xB;
     osprites.sprite_scroll_speed = d0;
 
-    pos_fine_old = oroad.pos_fine;
+    self->pos_fine_old = oroad.pos_fine;
 }
 
 /* Check whether to initalize crash or bonus sequence code */
 /* */
 /* Source: 0x984E */
-void OInitEngine::init_crash_bonus()
+void OInitEngine_init_crash_bonus(OInitEngine* self)
 {
     if (outrun.game_state == GS_MUSIC) return;
 
@@ -927,15 +943,15 @@ void OInitEngine::init_crash_bonus()
                     {
                         ocrash.spin_control1 = 1;
                         ocrash.skid_counter_bak = ocrash.skid_counter;
-                        test_bonus_mode(true); /* 9924 fall through */
+                        OInitEngine_test_bonus_mode(self, true); /* 9924 fall through */
                         return;
                     }
-                    test_bonus_mode(false); /* finalise skid                */
+                    OInitEngine_test_bonus_mode(self, false); /* finalise skid                */
                     return;
                 }
                 else
                 {
-                    test_bonus_mode(true); /* test_bonus_mode */
+                    OInitEngine_test_bonus_mode(self, true); /* test_bonus_mode */
                     return;
                 }
             }
@@ -949,7 +965,7 @@ void OInitEngine::init_crash_bonus()
         {
             OCrash_enable(&ocrash);
         }
-        test_bonus_mode(false); /* finalise skid */
+        OInitEngine_test_bonus_mode(self, false); /* finalise skid */
         return;
     }
     else if (ocrash.spin_control1 == 1)
@@ -957,24 +973,24 @@ void OInitEngine::init_crash_bonus()
         /* 98c0 */
         ocrash.spin_control1 = 2;
         OCrash_enable(&ocrash);
-        test_bonus_mode(false); /* finalise skid */
+        OInitEngine_test_bonus_mode(self, false); /* finalise skid */
         return;
     }
 
     /* 0x9924: Section Of Code */
     if (ocrash.coll_count1 == ocrash.coll_count2) 
     {
-        test_bonus_mode(true);  /* test_bonus_mode */
+        OInitEngine_test_bonus_mode(self, true);  /* test_bonus_mode */
     }
     else
     {
         OCrash_enable(&ocrash);
-        test_bonus_mode(false); /* finalise skid */
+        OInitEngine_test_bonus_mode(self, false); /* finalise skid */
     }
 }
 
-/* Source: 0x993C */
-void OInitEngine::test_bonus_mode(bool do_bonus_check)
+/* Source: 0x993C */static 
+void OInitEngine_test_bonus_mode(OInitEngine* self, bool do_bonus_check)
 {
     /* Bonus checking code  */
     if (do_bonus_check && obonus.bonus_control)
@@ -989,7 +1005,7 @@ void OInitEngine::test_bonus_mode(bool do_bonus_check)
             if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
                 outrun.game_state = GS_INIT_GAMEOVER;
             else
-                oanimseq.init_end_seq();
+                OAnimSeq_init_end_seq(&oanimseq);
         }
     }
 

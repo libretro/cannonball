@@ -253,7 +253,7 @@ void Menu::init()
 
     /* Setup palette, road and colours for background */
     oroad.stage_lookup_off = 9;
-    oinitengine.init_road_seg_master();
+    OInitEngine_init_road_seg_master(&oinitengine);
     OPalette_setup_sky_palette(&opalette);
     OPalette_setup_ground_color(&opalette);
     OPalette_setup_road_centre(&opalette);
@@ -266,7 +266,7 @@ void Menu::init()
     oroad.road_ctrl = ORoad::ROAD_R0;
     oroad.horizon_set = 1;
     oroad.horizon_base = HORIZON_DEST + 0x100;
-    oinitengine.rd_split_state = OInitEngine::SPLIT_NONE;
+    oinitengine.rd_split_state = SPLIT_NONE;
     oinitengine.car_increment = 0;
     oinitengine.change_width = 0;
 
@@ -363,8 +363,8 @@ void Menu::tick_ui()
         oroad.road_pos += result;
         if (oroad.road_pos >> 16 > ROAD_END) /* loop to beginning of track data */
             oroad.road_pos = 0;
-        oinitengine.update_road();
-        oinitengine.set_granular_position();
+        OInitEngine_update_road(&oinitengine);
+        OInitEngine_set_granular_position(&oinitengine);
         oroad.road_width_bak = oroad.road_width >> 16; 
         oroad.car_x_bak = -oroad.road_width_bak; 
         oinitengine.car_x_pos = oroad.car_x_bak;
@@ -376,8 +376,8 @@ void Menu::tick_ui()
         || (config.fps == 120 && (frame & 3) == 1))
     {
         OLogo_tick(&ologo);
-        osprites.sprite_copy();
-        osprites.update_sprites();
+        OSprites_sprite_copy(&osprites);
+        OSprites_update_sprites(&osprites);
     }
 
     /* Draw FPS */

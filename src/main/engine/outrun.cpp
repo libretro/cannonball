@@ -94,7 +94,7 @@ void Outrun::boot()
             : FILENAME_CONT);
     OStats_init(&ostats, cannonball_mode == MODE_TTRIAL);
     init_jump_table();
-    oinitengine.init(cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
+    OInitEngine_init(&oinitengine, cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
     osoundint.init();
     outils::reset_random_seed(); /* Ensure we match the genuine boot up of the original game each time */
 }
@@ -174,13 +174,13 @@ void Outrun::tick(bool tick_frame)
 void Outrun::vint()
 {
     otiles.write_tilemap_hw();
-    osprites.update_sprites();
+    OSprites_update_sprites(&osprites);
     otiles.update_tilemaps(cannonball_mode == MODE_ORIGINAL ? ostats.cur_stage : 0);
     OPalette_cycle_sky_palette(&opalette);
     OPalette_fade_palette(&opalette);
     OStats_do_timers(&ostats);
     if (cannonball_mode != MODE_TTRIAL) OHud_draw_timer1(&ohud, ostats.time_counter);
-    oinitengine.set_granular_position();
+    OInitEngine_set_granular_position(&oinitengine);
 }
 
 void Outrun::jump_table()
@@ -207,7 +207,7 @@ void Outrun::jump_table()
 
         case GS_MUSIC:
             if (tick_frame) omusic.check_start(); /* Check for start button */
-            osprites.tick();
+            OSprites_tick(&osprites);
             OLevelObjs_do_sprite_routine(&olevelobjs);
 
             if (!outrun.tick_frame)
@@ -221,7 +221,7 @@ void Outrun::jump_table()
         /* ---------------------------------------------------------------------------------------- */
         case GS_INIT_BEST2:
         case GS_BEST2:
-            osprites.tick();
+            OSprites_tick(&osprites);
             OLevelObjs_do_sprite_routine(&olevelobjs);
 
             if (!tick_frame)
@@ -244,29 +244,29 @@ void Outrun::jump_table()
             if (tick_frame) check_freeplay_start();
         
         default:
-            if (tick_frame) osprites.tick();                /* Address #3 Jump_SetupSprites */
+            if (tick_frame) OSprites_tick(&osprites);                /* Address #3 Jump_SetupSprites */
             OLevelObjs_do_sprite_routine(&olevelobjs);                 /* replaces calling each sprite individually */
             if (!config.engine.disable_traffic)
                 OTraffic_tick(&otraffic);                            /* Spawn & Tick Traffic */
-            if (tick_frame) oinitengine.init_crash_bonus(); /* Initalize crash sequence or bonus code */
+            if (tick_frame) OInitEngine_init_crash_bonus(&oinitengine); /* Initalize crash sequence or bonus code */
             oferrari.tick();
             if (oferrari.state != OFerrari::FERRARI_END_SEQ)
             {
-                oanimseq.flag_seq();
+                OAnimSeq_flag_seq(&oanimseq);
                 OCrash_tick(&ocrash);
-                OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[OSprites::SPRITE_SMOKE1]); /* Do Left Hand Smoke */
+                OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[SPRITE_SMOKE1]); /* Do Left Hand Smoke */
                 oferrari.draw_shadow();                                                   /* (0xF1A2) - Draw Ferrari Shadow */
-                OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[OSprites::SPRITE_SMOKE2]); /* Do Right Hand Smoke */
+                OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[SPRITE_SMOKE2]); /* Do Right Hand Smoke */
             }
             else
             {
-                OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[OSprites::SPRITE_SMOKE1]); /* Do Left Hand Smoke */
-                OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[OSprites::SPRITE_SMOKE2]); /* Do Right Hand Smoke */
+                OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[SPRITE_SMOKE1]); /* Do Left Hand Smoke */
+                OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[SPRITE_SMOKE2]); /* Do Right Hand Smoke */
             }
             break;
     }
 
-    osprites.sprite_copy();
+    OSprites_sprite_copy(&osprites);
 
     /* Libretro force feedback uses the current steering position. */
     if (tick_frame && config.controls.haptic)
@@ -366,7 +366,7 @@ void Outrun::main_switch()
             video.clear_text_ram();
             oferrari.car_ctrl_active = true;
             init_jump_table();
-            oinitengine.init(cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
+            OInitEngine_init(&oinitengine, cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
             /* Timing Hack to ensure horizon is correct */
             /* Note that the original code disables the screen, and waits for the second CPU's interrupt instead */
             oroad.tick();
@@ -514,10 +514,10 @@ void Outrun::main_switch()
         case GS_INIT_BEST2:
             oroad.set_view_mode(ORoad::VIEW_ORIGINAL, true);
             /* bsr.w   EndGame */
-            osprites.disable_sprites();
+            OSprites_disable_sprites(&osprites);
             OTraffic_disable_traffic(&otraffic);
             /* bsr.w   EditJumpTable3 */
-            osprites.clear_palette_data();
+            OSprites_clear_palette_data(&osprites);
             OLevelObjs_init_hiscore_sprites(&olevelobjs);
             ocrash.coll_count1   = 0;
             ocrash.coll_count2   = 0;
@@ -546,7 +546,7 @@ void Outrun::main_switch()
                 /*ROM:0000B700                 bclr    #5,(ppi1_value).l                   ; Turn screen off (not activated until PPI written to) */
                 oferrari.car_ctrl_active = true; /* 0 : Allow road updates */
                 init_jump_table();
-                oinitengine.init(cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
+                OInitEngine_init(&oinitengine, cannonball_mode == MODE_TTRIAL ? ttrial.level : 0);
                 /*ROM:0000B716                 bclr    #0,(byte_260550).l */
                 game_state = GS_REINIT;          /* Reinit game to attract mode */
             }
@@ -561,8 +561,8 @@ void Outrun::main_switch()
             break;
     }
 
-    oinitengine.update_road();
-    oinitengine.update_engine();
+    OInitEngine_update_road(&oinitengine);
+    OInitEngine_update_engine(&oinitengine);
 
     /* -------------------------------------------------------------------------------------------- */
     /* Debugging Only */
@@ -625,7 +625,7 @@ void Outrun::init_jump_table()
     /* Reset value to restore car increment to during attract mode */
     car_inc_bak = 0;
 
-    osprites.init();
+    OSprites_init(&osprites);
     if (cannonball_mode != MODE_TTRIAL) 
     {
         OTraffic_init_stage1_traffic(&otraffic);      /* Hard coded traffic in right hand lane */
@@ -793,7 +793,7 @@ void Outrun::init_best_outrunners()
     video.enabled = false;
     video.sprite_layer->set_x_clip(false); /* Stop clipping in wide-screen mode. */
     otiles.fill_tilemap_color(0); /* Fill Tilemap Black */
-    osprites.disable_sprites();
+    OSprites_disable_sprites(&osprites);
     oroad.horizon_base = 0x154;
     OHiScore_setup_pal_best(&ohiscore);    /* Setup Palettes */
     OHiScore_setup_road_best(&ohiscore);

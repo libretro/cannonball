@@ -57,7 +57,7 @@ int TTrial::tick()
             outrun.select_course(config.engine.jap != 0, config.engine.prototype != 0); /* Need to setup correct course map graphics. */
             config.load_tiletrial_scores();
             OStats_init(&ostats, true);
-            osprites.init();
+            OSprites_init(&osprites);
             video.enabled = true;
             video.sprite_layer->set_x_clip(false);
             OMap_init(&omap);
@@ -111,8 +111,8 @@ int TTrial::tick()
                 OHud_draw_lap_timer(&ohud, OHud_translate(&ohud, 7, 26, 0x110030), best_converted, best_converted[2]);
                 OMap_blit(&omap);
                 oroad.tick();
-                osprites.sprite_copy();
-                osprites.update_sprites();
+                OSprites_sprite_copy(&osprites);
+                OSprites_update_sprites(&osprites);
                 otiles.write_tilemap_hw();
                 otiles.update_tilemaps(0);
             }

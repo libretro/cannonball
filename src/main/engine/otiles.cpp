@@ -459,7 +459,7 @@ void OTiles::scroll_tilemaps()
     h_scroll_tilemaps();        /* Set H-Scroll values for Tilemaps */
 
     /* Denote road not splitting (used by UpdateFGPage and UpdateBGPage)     */
-    if (oinitengine.rd_split_state == oinitengine.SPLIT_NONE)
+    if (oinitengine.rd_split_state == SPLIT_NONE)
         page_split = false;
 
     update_fg_page();           /* Update FG Pages, based on new H-Scroll */
@@ -544,7 +544,7 @@ void OTiles::h_scroll_tilemaps()
     else
     {
         /* scroll_tilemap: */
-        if (oinitengine.rd_split_state != OInitEngine::SPLIT_NONE && 
+        if (oinitengine.rd_split_state != SPLIT_NONE && 
             oinitengine.rd_split_state <= 4) return;
 
         { int32_t tilemap_h_target = (oroad.tilemap_h_target << 5) & 0xFFFF;
@@ -603,7 +603,7 @@ void OTiles::v_scroll_tilemaps()
 void OTiles::update_fg_page()
 {
     int16_t h = tilemap_h_scr >> 16;
-    if (oinitengine.rd_split_state == oinitengine.SPLIT_NONE)
+    if (oinitengine.rd_split_state == SPLIT_NONE)
         h = -h;
 
     fg_h_scroll = h;
@@ -624,7 +624,7 @@ void OTiles::update_bg_page()
 {
     int16_t h = tilemap_h_scr >> 16;
 
-    if (oinitengine.rd_split_state == oinitengine.SPLIT_NONE)
+    if (oinitengine.rd_split_state == SPLIT_NONE)
         h = -h;
 
     h &= 0x7FF;

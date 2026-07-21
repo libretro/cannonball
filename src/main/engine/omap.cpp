@@ -31,7 +31,7 @@ static void OMap_move_mini_car(OMap* self, oentry*);
 OMap omap;
 
 /* Position of Ferrari in Jump Table */
-const uint8_t SPRITE_FERRARI = 25;
+static const uint8_t MAP_FERRARI_SLOT = 25;
 
 
 
@@ -40,9 +40,9 @@ void OMap_init(OMap* self)
 {
     oferrari.car_ctrl_active = false; /* -1 */
     video.clear_text_ram();
-    osprites.disable_sprites();
+    OSprites_disable_sprites(&osprites);
     OTraffic_disable_traffic(&otraffic);
-    osprites.clear_palette_data();
+    OSprites_clear_palette_data(&osprites);
     oinitengine.car_increment = 0;
     oferrari.car_inc_old      = 0;
     osprites.spr_cnt_main     = 0;
@@ -156,8 +156,8 @@ void OMap_blit(OMap* self)
     { uint8_t i; for (i = 0; i <= MAP_PIECES; i++)
     {
         oentry* sprite = &osprites.jump_table[i];
-        if (sprite->control & OSprites::ENABLE)
-            osprites.do_spr_order_shadows(sprite);
+        if (sprite->control & ENABLE)
+            OSprites_do_spr_order_shadows(&osprites, sprite);
     } }
 }
 
@@ -198,8 +198,8 @@ void OMap_draw_course_map(OMap* self)
     /* Draw Backdrop Map Pieces */
     { uint8_t i; for (i = 26; i <= MAP_PIECES; i++)
     {
-        if (sprite->control & OSprites::ENABLE)
-            osprites.do_spr_order_shadows(sprite++);
+        if (sprite->control & ENABLE)
+            OSprites_do_spr_order_shadows(&osprites, sprite++);
     } }
 }
 
@@ -207,8 +207,8 @@ void OMap_draw_course_map(OMap* self)
 void OMap_position_ferrari(OMap* self, uint8_t index)
 {
     oentry* segment = &osprites.jump_table[index];
-    osprites.jump_table[SPRITE_FERRARI].x = segment->x - 8;
-    osprites.jump_table[SPRITE_FERRARI].y = segment->y;
+    osprites.jump_table[MAP_FERRARI_SLOT].x = segment->x - 8;
+    osprites.jump_table[MAP_FERRARI_SLOT].y = segment->y;
 }
 
 /* Initalize Course Map Sprites */
@@ -248,7 +248,7 @@ void OMap_load_sprites(OMap* self)
         
         adr += 4; /* throw this address away */
 
-        osprites.map_palette(sprite);
+        OSprites_map_palette(&osprites, sprite);
     } }
 
     /* Wide-screen hack to extend sea to edge of screen. */
@@ -265,8 +265,8 @@ void OMap_load_sprites(OMap* self)
 
     /* Minicar initalization moved here */
     self->minicar_enable = 0;
-    osprites.jump_table[SPRITE_FERRARI].x = -0x80;
-    osprites.jump_table[SPRITE_FERRARI].y = 0x78;
+    osprites.jump_table[MAP_FERRARI_SLOT].x = -0x80;
+    osprites.jump_table[MAP_FERRARI_SLOT].y = 0x78;
     self->map_state = MAP_INIT;
 }
 
@@ -326,21 +326,21 @@ void OMap_map_display(OMap* self)
 /* Source: 0x3740 */static 
 void OMap_draw_vert_top(OMap* self, oentry* sprite)
 {
-    if (sprite->control & OSprites::ENABLE)
+    if (sprite->control & ENABLE)
         OMap_draw_piece(self, sprite, outrun.adr.sprite_coursemap_top);
 }
 
 /* Source: 0x3736 */static 
 void OMap_draw_vert_bottom(OMap* self, oentry* sprite)
 {
-    if (sprite->control & OSprites::ENABLE)
+    if (sprite->control & ENABLE)
         OMap_draw_piece(self, sprite, outrun.adr.sprite_coursemap_bot);
 }
 
 /* Source: 0x372C */static 
 void OMap_draw_horiz_end(OMap* self, oentry* sprite)
 {
-    if (sprite->control & OSprites::ENABLE)
+    if (sprite->control & ENABLE)
         OMap_draw_piece(self, sprite, outrun.adr.sprite_coursemap_end);
 }
 
@@ -357,10 +357,10 @@ void OMap_draw_piece(OMap* self, oentry* sprite, uint32_t adr)
 
         sprite->addr    = roms.rom0p->read32(adr);
         sprite->pal_src = roms.rom0p->read8(4 + adr);
-        osprites.map_palette(sprite);
+        OSprites_map_palette(&osprites, sprite);
     }
 
-    osprites.do_spr_order_shadows(sprite);
+    OSprites_do_spr_order_shadows(&osprites, sprite);
 }
 
 /* Move mini car sprite on Course Map Screen */
@@ -388,5 +388,5 @@ void OMap_move_mini_car(OMap* self, oentry* sprite)
             sprite->addr = outrun.adr.sprite_minicar_up;
      } }}
 
-    osprites.do_spr_order_shadows(sprite);
+    OSprites_do_spr_order_shadows(&osprites, sprite);
 }

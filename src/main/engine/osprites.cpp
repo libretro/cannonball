@@ -22,48 +22,46 @@
 #include "otraffic.hpp"
 #include "data/ozoom_lookup.hpp"
 
+static void OSprites_sprite_control(OSprites* self);
+static void OSprites_hide_hwsprite(OSprites* self, oentry*, osprite*);
+static void OSprites_finalise_sprites(OSprites* self);
+
 OSprites osprites;
 
-OSprites::OSprites(void)
-{
-}
 
-OSprites::~OSprites(void)
-{
-}
 
-void OSprites::init()
+void OSprites_init(OSprites* self)
 {
     /* Set activated number of sprites based on config */
-    no_sprites = config.engine.level_objects ? SPRITE_ENTRIES : 0x4F;
+    self->no_sprites = config.engine.level_objects ? SPRITE_ENTRIES : 0x4F;
 
     /* Also handled by clear_palette_data() now */
     { uint16_t i; for (i = 0; i < PAL_LOOKUP_LENGTH; i++)
-        pal_lookup[i] = 0; }
+        self->pal_lookup[i] = 0; }
 
     { uint16_t i; for (i = 0; i < 0x2000; i++)
     {
-        sprite_order[i] = 0;
-        sprite_order2[i] = 0;
+        self->sprite_order[i] = 0;
+        self->sprite_order2[i] = 0;
     } }
 
     /* Reset hardware entries */
     { uint16_t i; for (i = 0; i < JUMP_ENTRIES_TOTAL; i++)
-        sprite_entries[i].init(); }
+        self->sprite_entries[i].init(); }
 
     { uint8_t i; for (i = 0; i < SPRITE_ENTRIES; i++)
-        jump_table[i].init(i); }
+        self->jump_table[i].init(i); }
 
     /* Ferrari + Passenger Sprites */
-    jump_table[SPRITE_FERRARI].init(SPRITE_FERRARI);        /* Ferrari */
-    jump_table[SPRITE_PASS1].init(SPRITE_PASS1);
-    jump_table[SPRITE_PASS2].init(SPRITE_PASS2);
-    jump_table[SPRITE_SHADOW].init(SPRITE_SHADOW);          /* Shadow Settings */
-    jump_table[SPRITE_SHADOW].shadow = 7;
-    jump_table[SPRITE_SMOKE1].init(SPRITE_SMOKE1);
-    jump_table[SPRITE_SMOKE2].init(SPRITE_SMOKE2);
+    self->jump_table[SPRITE_FERRARI].init(SPRITE_FERRARI);        /* Ferrari */
+    self->jump_table[SPRITE_PASS1].init(SPRITE_PASS1);
+    self->jump_table[SPRITE_PASS2].init(SPRITE_PASS2);
+    self->jump_table[SPRITE_SHADOW].init(SPRITE_SHADOW);          /* Shadow Settings */
+    self->jump_table[SPRITE_SHADOW].shadow = 7;
+    self->jump_table[SPRITE_SMOKE1].init(SPRITE_SMOKE1);
+    self->jump_table[SPRITE_SMOKE2].init(SPRITE_SMOKE2);
 
-    oferrari.init(&jump_table[SPRITE_FERRARI], &jump_table[SPRITE_PASS1], &jump_table[SPRITE_PASS2], &jump_table[SPRITE_SHADOW]);
+    oferrari.init(&self->jump_table[SPRITE_FERRARI], &self->jump_table[SPRITE_PASS1], &self->jump_table[SPRITE_PASS2], &self->jump_table[SPRITE_SHADOW]);
     
     /* ------------------------------------------------------------------------ */
     /* Traffic in Right Hand Lane At Start of Stage 1 */
@@ -71,9 +69,9 @@ void OSprites::init()
 
     { uint8_t i; for (i = SPRITE_TRAFF1; i <= SPRITE_TRAFF8; i++)
     {
-        jump_table[i].init(i);      
-        jump_table[i].control |= SHADOW;
-        jump_table[i].addr = outrun.adr.sprite_porsche; /* Initial offset of traffic sprites. Will be changed. */
+        self->jump_table[i].init(i);      
+        self->jump_table[i].control |= SHADOW;
+        self->jump_table[i].addr = outrun.adr.sprite_porsche; /* Initial offset of traffic sprites. Will be changed. */
     } }
 
     /* ------------------------------------------------------------------------ */
@@ -82,79 +80,79 @@ void OSprites::init()
 
     { uint8_t i; for (i = SPRITE_CRASH; i <= SPRITE_CRASH_PASS2_S; i++)
     {
-        jump_table[i].init(i);
+        self->jump_table[i].init(i);
     } }
 
-    jump_table[SPRITE_CRASH_PASS1].draw_props = oentry::BOTTOM;
-    jump_table[SPRITE_CRASH_PASS2].draw_props = oentry::BOTTOM;
+    self->jump_table[SPRITE_CRASH_PASS1].draw_props = oentry::BOTTOM;
+    self->jump_table[SPRITE_CRASH_PASS2].draw_props = oentry::BOTTOM;
 
-    jump_table[SPRITE_CRASH_PASS1_S].shadow     = 7;
-    jump_table[SPRITE_CRASH_PASS1_S].addr       = outrun.adr.shadow_data;
-    jump_table[SPRITE_CRASH_PASS2_S].shadow     = 7;
-    jump_table[SPRITE_CRASH_PASS2_S].draw_props = oentry::BOTTOM;
-    jump_table[SPRITE_CRASH_PASS2_S].addr       = outrun.adr.shadow_data;
+    self->jump_table[SPRITE_CRASH_PASS1_S].shadow     = 7;
+    self->jump_table[SPRITE_CRASH_PASS1_S].addr       = outrun.adr.shadow_data;
+    self->jump_table[SPRITE_CRASH_PASS2_S].shadow     = 7;
+    self->jump_table[SPRITE_CRASH_PASS2_S].draw_props = oentry::BOTTOM;
+    self->jump_table[SPRITE_CRASH_PASS2_S].addr       = outrun.adr.shadow_data;
     
-    jump_table[SPRITE_CRASH_SHADOW].shadow     = 7;
-    jump_table[SPRITE_CRASH_SHADOW].zoom       = 0x80;
-    jump_table[SPRITE_CRASH_SHADOW].draw_props = oentry::BOTTOM;
-    jump_table[SPRITE_CRASH_SHADOW].addr       = outrun.adr.shadow_data;
+    self->jump_table[SPRITE_CRASH_SHADOW].shadow     = 7;
+    self->jump_table[SPRITE_CRASH_SHADOW].zoom       = 0x80;
+    self->jump_table[SPRITE_CRASH_SHADOW].draw_props = oentry::BOTTOM;
+    self->jump_table[SPRITE_CRASH_SHADOW].addr       = outrun.adr.shadow_data;
 
     OCrash_init(&ocrash, 
-        &jump_table[SPRITE_CRASH], 
-        &jump_table[SPRITE_CRASH_SHADOW], 
-        &jump_table[SPRITE_CRASH_PASS1],
-        &jump_table[SPRITE_CRASH_PASS1_S],
-        &jump_table[SPRITE_CRASH_PASS2],
-        &jump_table[SPRITE_CRASH_PASS2_S]
+        &self->jump_table[SPRITE_CRASH], 
+        &self->jump_table[SPRITE_CRASH_SHADOW], 
+        &self->jump_table[SPRITE_CRASH_PASS1],
+        &self->jump_table[SPRITE_CRASH_PASS1_S],
+        &self->jump_table[SPRITE_CRASH_PASS2],
+        &self->jump_table[SPRITE_CRASH_PASS2_S]
     );
 
     /* ------------------------------------------------------------------------ */
     /* Animation Sequence Sprites */
     /* ------------------------------------------------------------------------ */
 
-    jump_table[SPRITE_FLAG].init(SPRITE_FLAG);
-    oanimseq.init(jump_table);
+    self->jump_table[SPRITE_FLAG].init(SPRITE_FLAG);
+    OAnimSeq_init(&oanimseq, self->jump_table);
     
-    seg_pos             = 0;
-    seg_total_sprites   = 0;
-    seg_sprite_freq     = 0;
-    seg_spr_offset2     = 0;
-    seg_spr_offset1     = 0;
-    seg_spr_addr        = 0;
+    self->seg_pos             = 0;
+    self->seg_total_sprites   = 0;
+    self->seg_sprite_freq     = 0;
+    self->seg_spr_offset2     = 0;
+    self->seg_spr_offset1     = 0;
+    self->seg_spr_addr        = 0;
 
-    do_sprite_swap      = false;
-    sprite_scroll_speed = 0;
-    shadow_offset       = 0;
-    sprite_count        = 0;
-    spr_cnt_main        = 0;
-    spr_cnt_shadow      = 0;
+    self->do_sprite_swap      = false;
+    self->sprite_scroll_speed = 0;
+    self->shadow_offset       = 0;
+    self->sprite_count        = 0;
+    self->spr_cnt_main        = 0;
+    self->spr_cnt_shadow      = 0;
 
-    spr_col_pal         = 0;
-    pal_copy_count      = 0;    
+    self->spr_col_pal         = 0;
+    self->pal_copy_count      = 0;    
 }
 
 /* Swap Sprite RAM And Update Palette Data */
-void OSprites::update_sprites()
+void OSprites_update_sprites(OSprites* self)
 {
-	if (do_sprite_swap)
+	if (self->do_sprite_swap)
 	{
-        do_sprite_swap = false;
+        self->do_sprite_swap = false;
         video.sprite_layer->swap();
-        copy_palette_data();
+        OSprites_copy_palette_data(self);
 	}
 }
 
 /* Disable All Sprite Entries */
 /* Source: 0x4A50 */
-void OSprites::disable_sprites()
+void OSprites_disable_sprites(OSprites* self)
 {
     { uint8_t i; for (i = 0; i < SPRITE_ENTRIES; i++)
-        jump_table[i].control &= ~OSprites::ENABLE; }
+        self->jump_table[i].control &= ~ENABLE; }
 }
 
-void OSprites::tick()
+void OSprites_tick(OSprites* self)
 {
-    sprite_control();
+    OSprites_sprite_control(self);
 }
 
 /* Sprite Control */
@@ -206,78 +204,78 @@ void OSprites::tick()
 /* */
 /* The entire sequence can repeat, until the max sprites counter expires. */
 /* */
-/* So the above example would draw 3 sprites in succession, then break for three attempts, then three again etc. */
+/* So the above example would draw 3 sprites in succession, then break for three attempts, then three again etc. */static 
 
-void OSprites::sprite_control()
+void OSprites_sprite_control(OSprites* self)
 {
     uint16_t pos = trackloader.read_scenery_pos();
 
     /* Populate next road segment */
     if (pos <= oroad.road_pos >> 16)
     {
-        seg_pos = pos;                                                          /* Position In Level Data [Word] */
-        seg_total_sprites = trackloader.read_total_sprites();                   /* Number of Sprites In Segment */
+        self->seg_pos = pos;                                                          /* Position In Level Data [Word] */
+        self->seg_total_sprites = trackloader.read_total_sprites();                   /* Number of Sprites In Segment */
         uint8_t pattern_index = trackloader.read_sprite_pattern_index();        /* Block Of Sprites */
         trackloader.scenery_offset += 4;                                        /* Advance to next scenery point */
         
         uint32_t a0 = trackloader.read_scenerymap_table(pattern_index);         /* Get Address of Scenery Pattern */
-        seg_sprite_freq = trackloader.read16(trackloader.scenerymap_data, &a0); /* Scenery Frequency */
-        seg_spr_offset2 = trackloader.read16(trackloader.scenerymap_data, &a0); /* Reload value for scenery pattern */
-        seg_spr_addr = a0;                                                      /* Set ROM address for sprite info lookup (x, y, type) */
+        self->seg_sprite_freq = trackloader.read16(trackloader.scenerymap_data, &a0); /* Scenery Frequency */
+        self->seg_spr_offset2 = trackloader.read16(trackloader.scenerymap_data, &a0); /* Reload value for scenery pattern */
+        self->seg_spr_addr = a0;                                                      /* Set ROM address for sprite info lookup (x, y, type) */
                                                                                 /* NOTE: Sets to value of a0 itself, not memory location */
-        seg_spr_offset1 = 0;                                                    /* And Clear the offset into the above table */
+        self->seg_spr_offset1 = 0;                                                    /* And Clear the offset into the above table */
     }
 
     /* Process segment */
-    if (seg_total_sprites == 0) return;
-    if (seg_pos > oroad.road_pos >> 16) return;
+    if (self->seg_total_sprites == 0) return;
+    if (self->seg_pos > oroad.road_pos >> 16) return;
 
     /* ------------------------------------------------------------------------ */
     /* Sprite 1 */
     /* ------------------------------------------------------------------------ */
     /* Rotate 16 bit value left. Stick top bit in low bit. */
-    uint16_t carry = seg_sprite_freq & 0x8000;
-    seg_sprite_freq = ((seg_sprite_freq << 1) | ((seg_sprite_freq & 0x8000) >> 15)) & 0xFFFF;
+    uint16_t carry = self->seg_sprite_freq & 0x8000;
+    self->seg_sprite_freq = ((self->seg_sprite_freq << 1) | ((self->seg_sprite_freq & 0x8000) >> 15)) & 0xFFFF;
 
     if (carry)
     {
-        seg_total_sprites--;
-        seg_spr_offset1 -= 8; /*  Decrement rom address offset to point at next sprite [8 byte boundary] */
-        if (seg_spr_offset1 < 0)
-            seg_spr_offset1 = seg_spr_offset2; /* Reload sprite info offset value */
+        self->seg_total_sprites--;
+        self->seg_spr_offset1 -= 8; /*  Decrement rom address offset to point at next sprite [8 byte boundary] */
+        if (self->seg_spr_offset1 < 0)
+            self->seg_spr_offset1 = self->seg_spr_offset2; /* Reload sprite info offset value */
         OLevelObjs_setup_sprites(&olevelobjs, 0x10400);
     }
  
-    if (seg_total_sprites == 0)
+    if (self->seg_total_sprites == 0)
     {
-        seg_pos++;
+        self->seg_pos++;
         return;
     }
 
     /* ------------------------------------------------------------------------ */
     /* Sprite 2 - Second Sprite is slightly set back from the first. */
     /* ------------------------------------------------------------------------ */
-    carry = seg_sprite_freq & 0x8000;
-    seg_sprite_freq = ((seg_sprite_freq << 1) | ((seg_sprite_freq & 0x8000) >> 15)) & 0xFFFF;
+    carry = self->seg_sprite_freq & 0x8000;
+    self->seg_sprite_freq = ((self->seg_sprite_freq << 1) | ((self->seg_sprite_freq & 0x8000) >> 15)) & 0xFFFF;
 
     if (carry)
     {
-        seg_total_sprites--;
-        seg_spr_offset1 -= 8; /*  Decrement rom address offset to point at next sprite [8 byte boundary] */
-        if (seg_spr_offset1 < 0)
-            seg_spr_offset1 = seg_spr_offset2; /* Reload sprite info offset value */
+        self->seg_total_sprites--;
+        self->seg_spr_offset1 -= 8; /*  Decrement rom address offset to point at next sprite [8 byte boundary] */
+        if (self->seg_spr_offset1 < 0)
+            self->seg_spr_offset1 = self->seg_spr_offset2; /* Reload sprite info offset value */
         OLevelObjs_setup_sprites(&olevelobjs, 0x10000);
     }
 
-     seg_pos++;
+     self->seg_pos++;
 }
 
 /* Source: 0x76F4 */
-void OSprites::clear_palette_data()
+void OSprites_clear_palette_data(OSprites* self)
 {
-    spr_col_pal = 0;
+    self->spr_col_pal = 0;
     { int16_t i; for (i = 0; i < PAL_LOOKUP_LENGTH; i++)
-        pal_lookup[i] = 0; }
+        self->pal_lookup[i] = 0; }
 }
 
 
@@ -288,20 +286,20 @@ void OSprites::clear_palette_data()
 /* Output:         None */
 /* */
 
-void OSprites::copy_palette_data()
+void OSprites_copy_palette_data(OSprites* self)
 {
     /* Return if no palette entries to copy */
-    if (pal_copy_count <= 0) return;
+    if (self->pal_copy_count <= 0) return;
 
-    { int16_t i; for (i = 0; i < pal_copy_count * 2;)
+    { int16_t i; for (i = 0; i < self->pal_copy_count * 2;)
     {
         /* Palette Data Source Offset (aligned to start of 32 byte boundry, * 32) */
-        uint32_t src_addr = pal_addresses[i++] << 3;
-        uint32_t dst_addr = PAL_SPRITES + (pal_addresses[i++] << 5);
+        uint32_t src_addr = self->pal_addresses[i++] << 3;
+        uint32_t dst_addr = PAL_SPRITES + (self->pal_addresses[i++] << 5);
         { uint16_t j; for (j = 0; j < 8; j++)
             video.write_pal32(&dst_addr, PALETTE_EXPANSION[src_addr++]); }
     } }
-    pal_copy_count = 0; /* All entries copied */
+    self->pal_copy_count = 0; /* All entries copied */
 }
 
 /* Map Palettes from ROM to Palette RAM for a particular sprite. */
@@ -319,9 +317,9 @@ void OSprites::copy_palette_data()
 /* 3. pal_copy_count contains the number of entries we need to copy */
 /* 4. pal_addresses contains the address mapping */
 
-void OSprites::map_palette(oentry* spr)
+void OSprites_map_palette(OSprites* self, oentry* spr)
 {
-    uint8_t pal = pal_lookup[spr->pal_src];
+    uint8_t pal = self->pal_lookup[spr->pal_src];
 
     /* ----------------------------------- */
     /* Entry is cached. Use entry. */
@@ -336,15 +334,15 @@ void OSprites::map_palette(oentry* spr)
     /* ----------------------------------- */
 
     /* Increment hw colour palette entry to use */
-    if (++spr_col_pal > 0x7F) return;
+    if (++self->spr_col_pal > 0x7F) return;
     
-    spr->pal_dst = spr_col_pal; /* Set next available hw sprite colour palette */
-    pal_lookup[spr->pal_src] = spr_col_pal;
+    spr->pal_dst = self->spr_col_pal; /* Set next available hw sprite colour palette */
+    self->pal_lookup[spr->pal_src] = self->spr_col_pal;
 
-    pal_addresses[pal_copy_count * 2] = spr->pal_src;
-    pal_addresses[(pal_copy_count * 2) + 1] = spr_col_pal;
+    self->pal_addresses[self->pal_copy_count * 2] = spr->pal_src;
+    self->pal_addresses[(self->pal_copy_count * 2) + 1] = self->spr_col_pal;
 
-    pal_copy_count++;
+    self->pal_copy_count++;
 }
 
 /* Setup Sprite Ordering Table & Shadows */
@@ -361,23 +359,23 @@ void OSprites::map_palette(oentry* spr)
 /* */
 /* The end result is a table of sprite entries at 0x64000 */
 
-void OSprites::do_spr_order_shadows(oentry* input)
+void OSprites_do_spr_order_shadows(OSprites* self, oentry* input)
 {
     /* LayOut specific fix to avoid memory crash on over populated scenery segments */
-    if (spr_cnt_main + spr_cnt_shadow >= JUMP_ENTRIES_TOTAL)
+    if (self->spr_cnt_main + self->spr_cnt_shadow >= JUMP_ENTRIES_TOTAL)
         return;
 
     /* Use priority as lookup into table. Assume we're on boundaries of 0x10 */
     uint16_t priority = (input->priority & 0x1FF) << 4;
-    uint8_t bytes_to_copy = sprite_order[priority];
+    uint8_t bytes_to_copy = self->sprite_order[priority];
 
     /* Maximum number of bytes we want to copy is 0x10 */
     if (bytes_to_copy < 0xE)
     {
         bytes_to_copy++;
-        sprite_order[priority] = bytes_to_copy;
-        sprite_order[priority + bytes_to_copy + 1] = input->jump_index; /* put at offset +2 */
-        spr_cnt_main++;
+        self->sprite_order[priority] = bytes_to_copy;
+        self->sprite_order[priority + bytes_to_copy + 1] = input->jump_index; /* put at offset +2 */
+        self->spr_cnt_main++;
     }
 
     /* Code to handle shadows under sprites */
@@ -385,11 +383,11 @@ void OSprites::do_spr_order_shadows(oentry* input)
     if (!(input->control & SHADOW)) return;
 
     /* LayOut specific fix to avoid memory crash on over populated scenery segments */
-    if (spr_cnt_main + spr_cnt_shadow >= JUMP_ENTRIES_TOTAL)
+    if (self->spr_cnt_main + self->spr_cnt_shadow >= JUMP_ENTRIES_TOTAL)
         return;
 
-    input->dst_index = spr_cnt_shadow;
-    spr_cnt_shadow++;                       /* Increment total shadow count */
+    input->dst_index = self->spr_cnt_shadow;
+    self->spr_cnt_shadow++;                       /* Increment total shadow count */
     
     uint8_t pal_dst = input->pal_dst;       /* Backup Sprite Colour Palette */
     uint8_t shadow = input->shadow;         /* and priority and shadow settings */
@@ -398,7 +396,7 @@ void OSprites::do_spr_order_shadows(oentry* input)
     input->pal_dst = 0;                     /* clear colour palette */
     input->shadow = 7;                      /* Set NEW priority & shadow settings */
     
-    input->x += (input->road_priority * shadow_offset) >> 9; /* d0 = sprite z / distance into screen */
+    input->x += (input->road_priority * self->shadow_offset) >> 9; /* d0 = sprite z / distance into screen */
 
     if (input->control & TRAFFIC_SPRITE)
     {
@@ -410,7 +408,7 @@ void OSprites::do_spr_order_shadows(oentry* input)
         input->addr = roms.rom0p->read32(outrun.adr.shadow_frames + 0x3C);
     }
 
-    do_sprite(input);           /* Create Shadowed Version Of Sprite For Hardware */
+    OSprites_do_sprite(self, input);           /* Create Shadowed Version Of Sprite For Hardware */
     
     input->pal_dst = pal_dst;   /* Restore Sprite Colour Palette */
     input->shadow = shadow;     /* ...and other values */
@@ -425,22 +423,22 @@ void OSprites::do_spr_order_shadows(oentry* input)
 /* Output:         None */
 /* */
 
-void OSprites::sprite_copy()
+void OSprites_sprite_copy(OSprites* self)
 {
-    if (spr_cnt_main == 0)
+    if (self->spr_cnt_main == 0)
     {
-        finalise_sprites();
+        OSprites_finalise_sprites(self);
         return;
     }
 
-    if (spr_cnt_main + spr_cnt_shadow > 0x7F)
+    if (self->spr_cnt_main + self->spr_cnt_shadow > 0x7F)
     {
-        spr_cnt_main = spr_cnt_shadow = 0;
-        finalise_sprites();
+        self->spr_cnt_main = self->spr_cnt_shadow = 0;
+        OSprites_finalise_sprites(self);
         return;
     }
 
-    { uint32_t spr_cnt_main_copy = spr_cnt_main;
+    { uint32_t spr_cnt_main_copy = self->spr_cnt_main;
 
     /* look up in sprite_order */
     int32_t src_addr = -0x10;
@@ -452,7 +450,7 @@ void OSprites::sprite_copy()
     while (spr_cnt_main_copy != 0)
     {
         src_addr += 0x10;
-        { uint8_t bytes_to_copy = sprite_order[src_addr]; /* warning: actually reads a word here normally, so this is wrong */
+        { uint8_t bytes_to_copy = self->sprite_order[src_addr]; /* warning: actually reads a word here normally, so this is wrong */
 
         /* Copy the required number of bytes */
         if (bytes_to_copy != 0)
@@ -462,7 +460,7 @@ void OSprites::sprite_copy()
             do
             {
                 /* Sprite Index To Draw */
-                sprite_order2[dst_index++] = sprite_order[src_offset++];                
+                self->sprite_order2[dst_index++] = self->sprite_order[src_offset++];                
                 if (--spr_cnt_main_copy == 0) break; /* Loop continues until this is zero. */
             }
             /* Decrement number of bytes to copy */
@@ -470,23 +468,23 @@ void OSprites::sprite_copy()
         }
 
         /* Clear number of bytes to copy */
-        sprite_order[src_addr] = 0; 
+        self->sprite_order[src_addr] = 0; 
      }}
 
     /* cont2: */
-    uint16_t cnt_shadow_copy = spr_cnt_shadow;
+    uint16_t cnt_shadow_copy = self->spr_cnt_shadow;
 
     /* next_sprite */
-    { uint16_t i; for (i = 0; i < spr_cnt_main; i++)
+    { uint16_t i; for (i = 0; i < self->spr_cnt_main; i++)
     {
-        uint16_t jump_index = sprite_order2[i];
-        oentry *entry = &jump_table[jump_index];
+        uint16_t jump_index = self->sprite_order2[i];
+        oentry *entry = &self->jump_table[jump_index];
         entry->dst_index = cnt_shadow_copy;
         cnt_shadow_copy++;
-        do_sprite(entry);
+        OSprites_do_sprite(self, entry);
     } }
 
-    finalise_sprites();
+    OSprites_finalise_sprites(self);
  }}
 
 /* Was originally labelled set_end_marker */
@@ -494,24 +492,24 @@ void OSprites::sprite_copy()
 /* Source Address: 0x7942 */
 /* Input:          None */
 /* Output:         None */
-/* */
+/* */static 
 
-void OSprites::finalise_sprites()
+void OSprites_finalise_sprites(OSprites* self)
 {
-    sprite_count = spr_cnt_main + spr_cnt_shadow;
+    self->sprite_count = self->spr_cnt_main + self->spr_cnt_shadow;
     
     /* Set end sprite marker */
-    sprite_entries[sprite_count].data[0] = 0xFFFF;
-    sprite_entries[sprite_count].data[1] = 0xFFFF;
+    self->sprite_entries[self->sprite_count].data[0] = 0xFFFF;
+    self->sprite_entries[self->sprite_count].data[1] = 0xFFFF;
 
     /* TODO: Code to wait for interrupt goes here */
-    blit_sprites();
+    OSprites_blit_sprites(self);
     OTraffic_traffic_logic(&otraffic);
     OTraffic_traffic_sound(&otraffic);
-    spr_cnt_main = spr_cnt_shadow = 0;
+    self->spr_cnt_main = self->spr_cnt_shadow = 0;
 
     /* Ready to swap buffer and blit */
-    do_sprite_swap = true;
+    self->do_sprite_swap = true;
 }
 
 /* Copy Sprite Data to Sprite RAM  */
@@ -521,13 +519,13 @@ void OSprites::finalise_sprites()
 /* Output:         None */
 /* */
 
-void OSprites::blit_sprites()
+void OSprites_blit_sprites(OSprites* self)
 {
     uint32_t dst_addr = SPRITE_RAM;
 
-    { uint16_t i; for (i = 0; i <= sprite_count; i++)
+    { uint16_t i; for (i = 0; i <= self->sprite_count; i++)
     {
-        uint16_t* data = sprite_entries[i].data;
+        uint16_t* data = self->sprite_entries[i].data;
 
         /* Write twelve bytes */
         video.write_sprite16(&dst_addr, data[0]);
@@ -567,12 +565,12 @@ void OSprites::blit_sprites()
 /* + 7 : [Byte] Sprite Bank */
 /* + 8 : [Word] Offset Within Sprite Bank */
 
-void OSprites::do_sprite(oentry* input)
+void OSprites_do_sprite(OSprites* self, oentry* input)
 {
     input->control |= DRAW_SPRITE; /* Display input sprite */
 
     /* Get Correct Output Entry */
-    osprite* output = &sprite_entries[input->dst_index];
+    osprite* output = &self->sprite_entries[input->dst_index];
 
     /* Copy address sprite was copied from. */
     /* todo: pass pointer? */
@@ -581,7 +579,7 @@ void OSprites::do_sprite(oentry* input)
     /* Hide Sprite if zoom lookup not set */
     if (input->zoom == 0)
     {
-        hide_hwsprite(input, output);
+        OSprites_hide_hwsprite(self, input, output);
         return;
     }
 
@@ -644,7 +642,7 @@ void OSprites::do_sprite(oentry* input)
     /* ------------------------------------------------------------------------- */
     /* Set Sprite X & Y Values */
     /* ------------------------------------------------------------------------- */
-    set_sprite_xy(input, output, width, height);
+    OSprites_set_sprite_xy(self, input, output, width, height);
     
     /* Here we need the entire value set by above routine, not just top 0x1FF mask! */
     int16_t sprite_x1 = output->get_x();
@@ -662,7 +660,7 @@ void OSprites::do_sprite(oentry* input)
     if (sprite_y2 < 256 || sprite_y1 > 479 ||
         sprite_x2 < x2_bounds || (config.engine.fix_bugs ? sprite_x1 >= x1_bounds : sprite_x1 > x1_bounds))
     {
-        hide_hwsprite(input, output);
+        OSprites_hide_hwsprite(self, input, output);
         return;
     }
 
@@ -744,7 +742,7 @@ void OSprites::do_sprite(oentry* input)
             int16_t road_elevation = -oroad.road_y[road_y_index + 1] + 0x1DF;
             if (sprite_y1 > road_elevation)
             {
-                hide_hwsprite(input, output);
+                OSprites_hide_hwsprite(self, input, output);
                 return;
             }
             else if (sprite_y2 <= road_elevation)
@@ -760,7 +758,7 @@ void OSprites::do_sprite(oentry* input)
     }
 
     /* cont2: */
-    set_hrender(input, output, roms.rom0p->read16(src_offsets + 4), width);
+    OSprites_set_hrender(self, input, output, roms.rom0p->read16(src_offsets + 4), width);
     
     /* ------------------------------------------------------------------------- */
     /* Set Sprite Pitch & Priority */
@@ -769,8 +767,8 @@ void OSprites::do_sprite(oentry* input)
     output->set_priority(input->shadow << 4); /* todo: where does this get set? */
  } } }}
 
-/* Hide Input And Output Entry */
-void OSprites::hide_hwsprite(oentry* input, osprite* output)
+/* Hide Input And Output Entry */static 
+void OSprites_hide_hwsprite(OSprites* self, oentry* input, osprite* output)
 {
     input->control &= ~DRAW_SPRITE; /* Hide input sprite */
     output->hide();
@@ -783,7 +781,7 @@ void OSprites::hide_hwsprite(oentry* input, osprite* output)
 /* Output:         Updated Sprite Output Entry */
 /* */
 
-void OSprites::set_sprite_xy(oentry* input, osprite* output, uint16_t width, uint16_t height)
+void OSprites_set_sprite_xy(OSprites* self, oentry* input, osprite* output, uint16_t width, uint16_t height)
 {
     uint8_t anchor = input->draw_props;
 
@@ -850,7 +848,7 @@ void OSprites::set_sprite_xy(oentry* input, osprite* output, uint16_t width, uin
 /* Input:          Jump Table Entry, Output Sprite Entry, Offset */
 /* Output:         Updated Sprite Output Entry */
 /* */
-void OSprites::set_hrender(oentry* input, osprite* output, uint16_t offset, uint16_t width)
+void OSprites_set_hrender(OSprites* self, oentry* input, osprite* output, uint16_t offset, uint16_t width)
 {
     uint8_t props = 0x60;
     uint8_t anchor = input->draw_props;
@@ -887,9 +885,9 @@ void OSprites::set_hrender(oentry* input, osprite* output, uint16_t offset, uint
 }
 
 /* Helper function to vary the move distance, based on the current frame-rate. */
-void OSprites::move_sprite(oentry* sprite, uint8_t shift)
+void OSprites_move_sprite(OSprites* self, oentry* sprite, uint8_t shift)
 {
-    uint32_t addr = SPRITE_ZOOM_LOOKUP + (((sprite->z >> 16) << 2) | sprite_scroll_speed);
+    uint32_t addr = SPRITE_ZOOM_LOOKUP + (((sprite->z >> 16) << 2) | self->sprite_scroll_speed);
     uint32_t value = roms.rom0.read32(addr) >> shift;
 
     if (config.tick_fps == 60)

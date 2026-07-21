@@ -59,10 +59,10 @@ void OFerrari::init(oentry *f, oentry *p1, oentry *p2, oentry *s)
     spr_pass2   = p2;
     spr_shadow  = s;
 
-    spr_ferrari->control |= OSprites::ENABLE;
-    spr_pass1->control   |= OSprites::ENABLE;
-    spr_pass2->control   |= OSprites::ENABLE;
-    spr_shadow->control  |= OSprites::ENABLE;
+    spr_ferrari->control |= ENABLE;
+    spr_pass1->control   |= ENABLE;
+    spr_pass2->control   |= ENABLE;
+    spr_shadow->control  |= ENABLE;
 
     state             = 0;
     counter           = 0;
@@ -155,32 +155,32 @@ void OFerrari::tick()
     switch (state)
     {
         case FERRARI_SEQ1:
-            oanimseq.ferrari_seq();
-            oanimseq.anim_seq_intro(&oanimseq.anim_pass1);
-            oanimseq.anim_seq_intro(&oanimseq.anim_pass2);
+            OAnimSeq_ferrari_seq(&oanimseq);
+            OAnimSeq_anim_seq_intro(&oanimseq, &oanimseq.anim_pass1);
+            OAnimSeq_anim_seq_intro(&oanimseq, &oanimseq.anim_pass2);
             break;
 
         case FERRARI_SEQ2:
-            oanimseq.anim_seq_intro(&oanimseq.anim_ferrari);
-            oanimseq.anim_seq_intro(&oanimseq.anim_pass1);
-            oanimseq.anim_seq_intro(&oanimseq.anim_pass2);
+            OAnimSeq_anim_seq_intro(&oanimseq, &oanimseq.anim_ferrari);
+            OAnimSeq_anim_seq_intro(&oanimseq, &oanimseq.anim_pass1);
+            OAnimSeq_anim_seq_intro(&oanimseq, &oanimseq.anim_pass2);
             break;
 
         case FERRARI_INIT:
-            if (spr_ferrari->control & OSprites::ENABLE) 
+            if (spr_ferrari->control & ENABLE) 
                 if (outrun.tick_frame)
                     init_ingame();
             break;
 
         case FERRARI_LOGIC:
-            if (spr_ferrari->control & OSprites::ENABLE) 
+            if (spr_ferrari->control & ENABLE) 
             {
                 if (outrun.tick_frame)
                     logic();
                 else
                     draw_sprite(spr_ferrari);
             }
-            if (spr_pass1->control & OSprites::ENABLE) 
+            if (spr_pass1->control & ENABLE) 
             {
                 if (outrun.tick_frame)
                     set_passenger_sprite(spr_pass1);
@@ -188,7 +188,7 @@ void OFerrari::tick()
                     draw_sprite(spr_pass1);
             }
 
-            if (spr_pass2->control & OSprites::ENABLE)
+            if (spr_pass2->control & ENABLE)
             {
                 if (outrun.tick_frame)
                     set_passenger_sprite(spr_pass2);
@@ -199,7 +199,7 @@ void OFerrari::tick()
 
         /* Ferrari End Sequence Logic */
         case FERRARI_END_SEQ:
-            oanimseq.tick_end_seq();
+            OAnimSeq_tick_end_seq(&oanimseq);
             break;
     }
 }
@@ -410,9 +410,9 @@ void OFerrari::setup_ferrari_sprite()
     if (!ocrash.skid_counter)
     {
         if (d4 >= 0)
-            spr_ferrari->control &= ~OSprites::HFLIP;
+            spr_ferrari->control &= ~HFLIP;
         else
-            spr_ferrari->control |= OSprites::HFLIP;
+            spr_ferrari->control |= HFLIP;
 
         /* 0x9E4E not_skidding: */
 
@@ -448,11 +448,11 @@ void OFerrari::setup_ferrari_sprite()
 
         if (skid_counter < 0)
         {
-            spr_ferrari->control |= OSprites::HFLIP;
+            spr_ferrari->control |= HFLIP;
             skid_counter = -skid_counter; /* Needs to be positive */
         }
         else
-            spr_ferrari->control &= ~OSprites::HFLIP;
+            spr_ferrari->control &= ~HFLIP;
 
         { int16_t frame = 0;
 
@@ -494,9 +494,9 @@ void OFerrari::setup_ferrari_bonus_sprite()
     spr_ferrari->priority = spr_ferrari->road_priority = 0x1FD;
 
     if (oinputs.steering_adjust > 0)
-        spr_ferrari->control &= ~OSprites::HFLIP;
+        spr_ferrari->control &= ~HFLIP;
     else
-        spr_ferrari->control |= OSprites::HFLIP;
+        spr_ferrari->control |= HFLIP;
 
     /* Get abs version of ferrari turn */
     int16_t turn_frame_offset = 0;
@@ -553,8 +553,8 @@ void OFerrari::do_end_seq()
     spr_ferrari->pal_src = ferrari_pal;/*  roms.rom0p->read8(6 + addr); */
     spr_ferrari->control = roms.rom0p->read8(7 + addr) | (spr_ferrari->control & 0xFE); /* HFlip */
 
-    osprites.map_palette(spr_ferrari);
-    osprites.do_spr_order_shadows(spr_ferrari);
+    OSprites_map_palette(&osprites, spr_ferrari);
+    OSprites_do_spr_order_shadows(&osprites, spr_ferrari);
 }
 
 /* - Update Car Palette To Adjust Brake Lamp */
@@ -846,7 +846,7 @@ void OFerrari::set_curve_adjust()
 /* Source: 0xA7BC */
 void OFerrari::draw_shadow()
 {
-    if (spr_shadow->control & OSprites::ENABLE)
+    if (spr_shadow->control & ENABLE)
     {
         if (outrun.game_state == GS_MUSIC) return;
 
@@ -861,7 +861,7 @@ void OFerrari::draw_shadow()
         }
 
         if (oroad.get_view_mode() != ORoad::VIEW_INCAR)
-            osprites.do_spr_order_shadows(spr_shadow);
+            OSprites_do_spr_order_shadows(&osprites, spr_shadow);
     }
 }
 
@@ -888,7 +888,7 @@ void OFerrari::set_passenger_sprite(oentry* sprite)
 
     /* Is this a bug in the original? Note that by negating HFLIP check the passengers */
     /* shift right a few pixels on acceleration. */
-    if ((oinitengine.car_increment >> 16 >= 0x14) && !(spr_ferrari->control & OSprites::HFLIP))
+    if ((oinitengine.car_increment >> 16 >= 0x14) && !(spr_ferrari->control & HFLIP))
         frame += 4;
 
     /* -------------------------------------------------------------------------------------------- */
@@ -1534,11 +1534,11 @@ void OFerrari::update_road_pos()
     uint32_t car_inc = CAR_BASE_INC;
 
     /* Bendy Roads */
-    if (oinitengine.road_type > OInitEngine::ROAD_STRAIGHT)
+    if (oinitengine.road_type > ROAD_STRAIGHT)
     {
         int32_t x = oinitengine.car_x_pos;
         
-        if (oinitengine.road_type == OInitEngine::ROAD_RIGHT)
+        if (oinitengine.road_type == ROAD_RIGHT)
             x = -x;
 
         x = (x / 0x28) + oinitengine.road_curve;
@@ -1581,7 +1581,7 @@ void OFerrari::do_sound_score_slip()
     osoundint.engine_data[SOUND_ENGINE_PITCH_L] = engine_pitch & 0xFF;
 
     /* Curved Road */
-    if (oinitengine.road_type != OInitEngine::ROAD_STRAIGHT)
+    if (oinitengine.road_type != ROAD_STRAIGHT)
     {
         int16_t steering = oinputs.steering_adjust;
         if (steering < 0) steering = -steering;
@@ -1591,13 +1591,13 @@ void OFerrari::do_sound_score_slip()
         {
             /* Move Left */
             if (oinitengine.car_x_pos > oinitengine.car_x_old)
-                cornering = (oinitengine.road_type == OInitEngine::ROAD_LEFT) ? 0 : -1;
+                cornering = (oinitengine.road_type == ROAD_LEFT) ? 0 : -1;
             /* Straight */
             else if (oinitengine.car_x_pos == oinitengine.car_x_old)
                 cornering = 0;
             /* Move Right */
             else
-                cornering = (oinitengine.road_type == OInitEngine::ROAD_RIGHT) ? 0 : -1;
+                cornering = (oinitengine.road_type == ROAD_RIGHT) ? 0 : -1;
         }
         else
             cornering = 0;
@@ -1743,8 +1743,8 @@ void OFerrari::draw_sprite(oentry* sprite)
 {
     if (oroad.get_view_mode() != ORoad::VIEW_INCAR)
     {
-        osprites.map_palette(sprite);
-        osprites.do_spr_order_shadows(sprite);
+        OSprites_map_palette(&osprites, sprite);
+        OSprites_do_spr_order_shadows(&osprites, sprite);
     }
 }
 

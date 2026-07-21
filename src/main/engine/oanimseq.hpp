@@ -17,59 +17,37 @@
 
 #include "oanimsprite.hpp"
 
-class OAnimSeq
+struct OAnimSeq
 {
-public:
-    /* Man at line with start flag */
     oanimsprite anim_flag;
-
-    /* Ferrari Animation Sequence */
-    oanimsprite anim_ferrari;               /* 1 */
-
-    /* Passenger Animation Sequences */
-    oanimsprite anim_pass1;                 /* 2 */
-    oanimsprite anim_pass2;                 /* 3 */
-
-    /* End Sequence Stuff */
-    oanimsprite anim_obj1;                  /* 4 */
-    oanimsprite anim_obj2;                  /* 5 */
-    oanimsprite anim_obj3;                  /* 6 */
-    oanimsprite anim_obj4;                  /* 7 */
-    oanimsprite anim_obj5;                  /* 8 */
-    oanimsprite anim_obj6;                  /* 9 */
-    oanimsprite anim_obj7;                  /* 10 */
-    oanimsprite anim_obj8;                  /* 10 */
-
-    /* End sequence to display (0-4) */
+    oanimsprite anim_ferrari;
+    oanimsprite anim_pass1;
+    oanimsprite anim_pass2;
+    oanimsprite anim_obj1;
+    oanimsprite anim_obj2;
+    oanimsprite anim_obj3;
+    oanimsprite anim_obj4;
+    oanimsprite anim_obj5;
+    oanimsprite anim_obj6;
+    oanimsprite anim_obj7;
+    oanimsprite anim_obj8;
     uint8_t end_seq;
-
-    OAnimSeq(void);
-    ~OAnimSeq(void);
-
-    /*void init(oentry*, oentry*, oentry*, oentry*); */
-    void init(oentry*);
-    void flag_seq();
-    void ferrari_seq();
-    void anim_seq_intro(oanimsprite*);
-    void init_end_seq();
-    void tick_end_seq();
-
-private:
-    /* End Sequence Animation Position */
     int16_t seq_pos;
-
-    /* End Sequence State (0 = Init, 1 = Tick) */
     uint8_t end_seq_state;
-
-    /* Used for Ferrari End Animation Sequence */
     bool ferrari_stopped;
-
-    void init_end_sprites();
-    void tick_ferrari();
-    void anim_seq_outro(oanimsprite*, int pal_override);
-    void anim_seq_shadow(oanimsprite*, oanimsprite*);
-    void anim_seq_outro_ferrari();
-    bool read_anim_data(oanimsprite*);
 };
 
 extern OAnimSeq oanimseq;
+
+void OAnimSeq_init(OAnimSeq* self, oentry*);
+
+void OAnimSeq_flag_seq(OAnimSeq* self);
+
+void OAnimSeq_ferrari_seq(OAnimSeq* self);
+
+void OAnimSeq_anim_seq_intro(OAnimSeq* self, oanimsprite*);
+
+void OAnimSeq_init_end_seq(OAnimSeq* self);
+
+void OAnimSeq_tick_end_seq(OAnimSeq* self);
+
