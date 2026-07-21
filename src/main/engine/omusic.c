@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <compat/msvc.h>
 #include "main.h"
 #include "engine/oferrari.h"
 #include "engine/ohud.h"

@@ -6,6 +6,7 @@
 ***************************************************************************/
 
 #include <stdio.h>
+#include <compat/msvc.h>
 #include "utils.h"
 
 /* Returns a pointer to a rotating static buffer; safe for the one

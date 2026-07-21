@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include <stdio.h>
+#include <compat/msvc.h>
 #include <string.h> /* remove() */
 
 #include <streams/file_stream.h>

@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include <stdio.h>
+#include <compat/msvc.h>
 #include <string.h>
 #include <stdlib.h>
 
