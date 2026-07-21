@@ -99,11 +99,13 @@ void Audio_tick(Audio* self)
 
     { int i; for (i = 0; i < samples_written; i++)
     {
+        /* Scale by volume with round-to-nearest (symmetric about zero)
+           rather than truncation, to avoid a per-sample quantisation bias. */
+        const int64_t wav_scaled =
+            (int64_t)wav_buffer[self->wavfile.pos] *
+            (int64_t)self->custom_wav_volume;
         const int32_t wav_sample =
-            (int32_t)(
-                ((int64_t)wav_buffer[self->wavfile.pos] *
-                 (int64_t)self->custom_wav_volume) /
-                100);
+            (int32_t)((wav_scaled >= 0 ? wav_scaled + 50 : wav_scaled - 50) / 100);
 
         int32_t mix_data =
             wav_sample +
@@ -451,12 +453,13 @@ void Audio_load_wav(Audio* self, const char* filename)
                     next + sample_offset,
                     bits_per_sample);
 
+            const int64_t sample_num =
+                (int64_t)sample_current * inverse_fraction +
+                (int64_t)sample_next   * fraction;
+            const int64_t sample_den = (int64_t)config.sound.rate;
             int64_t sample =
-                ((int64_t)sample_current *
-                    inverse_fraction +
-                 (int64_t)sample_next *
-                    fraction) /
-                (int64_t)config.sound.rate;
+                (sample_num >= 0 ? sample_num + sample_den / 2
+                                 : sample_num - sample_den / 2) / sample_den;
 
             output_data[
                 output_frame * CHANNELS +
