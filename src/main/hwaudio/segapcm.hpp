@@ -16,24 +16,21 @@
 #include "romloader.hpp"
 #include "hwaudio/soundchip.hpp"
 
-class SegaPCM
+static const uint32_t BANK_256    = (11);
+
+static const uint32_t BANK_512    = (12);
+
+static const uint32_t BANK_12M    = (13);
+
+static const uint32_t BANK_MASK7  = (0x70 << 16);
+
+static const uint32_t BANK_MASKF  = (0xf0 << 16);
+
+static const uint32_t BANK_MASKF8 = (0xf8 << 16);
+
+struct SegaPCM
 {
-public:
     SoundChip sc;
-    static const uint32_t BANK_256    = (11);
-    static const uint32_t BANK_512    = (12);
-    static const uint32_t BANK_12M    = (13);
-    static const uint32_t BANK_MASK7  = (0x70 << 16);
-    static const uint32_t BANK_MASKF  = (0xf0 << 16);
-    static const uint32_t BANK_MASKF8 = (0xf8 << 16);
-
-    SegaPCM(uint32_t clock, RomLoader* rom, uint8_t* ram, int32_t bank);
-    ~SegaPCM();
-    void init(int32_t rate, int32_t fps);
-    void stream_update();
-
-private:
-    /* PCM Chip Emulation */
     uint8_t* ram;
     uint8_t* low;
     uint8_t* pcm_rom;
@@ -41,6 +38,13 @@ private:
     int32_t bankshift;
     int32_t bankmask;
     int32_t rgnmask;
-
     double downsample;
 };
+
+void SegaPCM_ctor(SegaPCM* self, uint32_t clock, RomLoader* rom, uint8_t* ram, int32_t bank);
+
+void SegaPCM_dtor(SegaPCM* self);
+
+void SegaPCM_init(SegaPCM* self, int32_t rate, int32_t fps);
+
+void SegaPCM_stream_update(SegaPCM* self);

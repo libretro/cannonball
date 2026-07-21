@@ -9,6 +9,7 @@
     See license.txt for more details.
 ***************************************************************************/
 
+#include <stdlib.h>
 #include "engine/outrun.hpp"
 #include "engine/audio/osound.hpp"
 #include "engine/audio/osoundint.hpp"
@@ -32,12 +33,13 @@ void OSoundInt_dtor(OSoundInt* self)
 void OSoundInt_init(OSoundInt* self)
 {
     if (self->pcm == NULL)
-        self->pcm = new SegaPCM(SOUND_CLOCK, &roms.pcm, self->pcm_ram, SegaPCM::BANK_512);       
+        self->pcm = (SegaPCM*)malloc(sizeof(SegaPCM));
+        SegaPCM_ctor(self->pcm, SOUND_CLOCK, &roms.pcm, self->pcm_ram, BANK_512);       
 
     if (self->ym == NULL)
         self->ym = new YM2151(0.5f, SOUND_CLOCK);
 
-    self->pcm->init(config.sound.rate, config.fps);
+    SegaPCM_init(self->pcm, config.sound.rate, config.fps);
     self->ym->init(config.sound.rate, config.fps);
 
     OSoundInt_reset(self);

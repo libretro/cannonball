@@ -56,65 +56,65 @@
 
 #include "hwaudio/segapcm.hpp"
 
-SegaPCM::SegaPCM(uint32_t clock, RomLoader* rom, uint8_t* ram, int32_t bank)
+void SegaPCM_ctor(SegaPCM* self, uint32_t clock, RomLoader* rom, uint8_t* ram, int32_t bank)
 {
-    SoundChip_ctor(&sc);
-    this->ram = ram;
-    pcm_rom = rom->rom;  
-    low = new uint8_t[16];
-    max_addr = rom->length;
-    bankshift = bank & 0xFF;
-    rgnmask = max_addr - 1;
+    SoundChip_ctor(&self->sc);
+    self->ram = ram;
+    self->pcm_rom = rom->rom;  
+    self->low = new uint8_t[16];
+    self->max_addr = rom->length;
+    self->bankshift = bank & 0xFF;
+    self->rgnmask = self->max_addr - 1;
 
     { int32_t mask = bank >> 16;
     if (mask == 0)
         mask = BANK_MASK7 >> 16;
 
     { int32_t rom_mask;
-    for (rom_mask = 1; rom_mask < max_addr; rom_mask *= 2);
+    for (rom_mask = 1; rom_mask < self->max_addr; rom_mask *= 2);
     rom_mask--;
 
-    bankmask = mask & (rom_mask >> bankshift);
+    self->bankmask = mask & (rom_mask >> self->bankshift);
 
     { int32_t i; for (i = 0; i < 0x100; i++)
         ram[i] = 0xff; }
  } }}
 
-SegaPCM::~SegaPCM()
+void SegaPCM_dtor(SegaPCM* self)
 {
-    SoundChip_dtor(&sc);
-    delete[] low;
+    SoundChip_dtor(&self->sc);
+    delete[] self->low;
 }
 
-void SegaPCM::init(int32_t rate, int32_t fps)
+void SegaPCM_init(SegaPCM* self, int32_t rate, int32_t fps)
 {
-    sc.sample_freq = rate;
-    downsample = (32000.0 / (double) rate);
-    SoundChip_init(&(sc), SNDCHIP_STEREO, rate, fps);
+    self->sc.sample_freq = rate;
+    self->downsample = (32000.0 / (double) rate);
+    SoundChip_init(&(self->sc), SNDCHIP_STEREO, rate, fps);
 }
 
-void SegaPCM::stream_update()
+void SegaPCM_stream_update(SegaPCM* self)
 {
-    SoundChip_clear_buffer(&(sc));
+    SoundChip_clear_buffer(&(self->sc));
 
     /* loop over channels */
     { int ch; for (ch = 0; ch < 16; ch++)
     {
-        uint8_t *regs = ram + 8 * ch;
+        uint8_t *regs = self->ram + 8 * ch;
 
         /* only process active channels */
         if ((regs[0x86] & 1) == 0) 
         {             
-            uint8_t *rom  = pcm_rom + ((regs[0x86] & bankmask) << bankshift);
+            uint8_t *rom  = self->pcm_rom + ((regs[0x86] & self->bankmask) << self->bankshift);
 
-            uint32_t addr = (regs[0x85] << 16) | (regs[0x84] << 8) | low[ch];
+            uint32_t addr = (regs[0x85] << 16) | (regs[0x84] << 8) | self->low[ch];
             uint32_t loop = (regs[0x05] << 16) | (regs[0x04] << 8);
             uint8_t end   =  regs[0x06] + 1;
 
             uint32_t i;
 
             /* loop over samples on this channel */
-            for (i = 0; i < sc.frame_size; i++) 
+            for (i = 0; i < self->sc.frame_size; i++) 
             {
                 int8_t v = 0;
 
@@ -133,22 +133,22 @@ void SegaPCM::stream_update()
                 }
 
                 /* fetch the sample */
-                v = rom[(addr >> 8) & rgnmask] - 0x80;
+                v = rom[(addr >> 8) & self->rgnmask] - 0x80;
 
                 /* apply panning */
-                SoundChip_write_buffer(&(sc), SNDCHIP_LEFT,  i, SoundChip_read_buffer(&(sc), SNDCHIP_LEFT,  i) + (v * regs[2]));
-                SoundChip_write_buffer(&(sc), SNDCHIP_RIGHT, i, SoundChip_read_buffer(&(sc), SNDCHIP_RIGHT, i) + (v * regs[3]));
+                SoundChip_write_buffer(&(self->sc), SNDCHIP_LEFT,  i, SoundChip_read_buffer(&(self->sc), SNDCHIP_LEFT,  i) + (v * regs[2]));
+                SoundChip_write_buffer(&(self->sc), SNDCHIP_RIGHT, i, SoundChip_read_buffer(&(self->sc), SNDCHIP_RIGHT, i) + (v * regs[3]));
 
                 /* Advance. */
                 /* Cannonball Change: Output at a fixed 44,100Hz.  */
-                double increment = ((double)regs[7]) * downsample;
+                double increment = ((double)regs[7]) * self->downsample;
                 addr = (addr + (int) increment) & 0xffffff;
             }
 
             /* store back the updated address and info */
             regs[0x84] = addr >> 8;
             regs[0x85] = addr >> 16;
-            low[ch] = regs[0x86] & 1 ? 0 : addr;
+            self->low[ch] = regs[0x86] & 1 ? 0 : addr;
         }
     } }
 }

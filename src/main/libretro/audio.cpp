@@ -121,7 +121,7 @@ void Audio_tick(Audio* self)
     if (!self->sound_enabled)
         return;
 
-    osoundint.pcm->stream_update();
+    SegaPCM_stream_update(osoundint.pcm);
     osoundint.ym->stream_update();
 
     { int16_t* pcm_buffer = SoundChip_get_buffer(&(osoundint.pcm->sc));
