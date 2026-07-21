@@ -51,6 +51,11 @@ SOURCES_C := \
 	     $(CORE_DIR)/src/main/engine/ocrash.c \
 	     $(CORE_DIR)/src/main/engine/otraffic.c \
 	     $(CORE_DIR)/src/main/engine/omap.c \
+	     $(CORE_DIR)/src/main/libretro/main.c \
+	     $(CORE_DIR)/src/main/libretro/lr_options.c \
+	     $(CORE_DIR)/src/main/libretro/ffeedback.c \
+	     $(CORE_DIR)/src/main/libretro/audio.c \
+	     $(CORE_DIR)/src/main/libretro/input.c \
 
 ifeq ($(STATIC_LINKING),1)
 else
@@ -72,8 +77,4 @@ SOURCES_C += \
 	       $(LIBRETRO_COMM_DIR)/time/rtime.c
 endif
 
-SOURCES_CXX := $(CORE_DIR)/src/main/libretro/main.cpp \
-	       $(CORE_DIR)/src/main/libretro/lr_options.cpp \
-	       $(CORE_DIR)/src/main/libretro/ffeedback.cpp \
-	       $(CORE_DIR)/src/main/libretro/audio.cpp \
-	       $(CORE_DIR)/src/main/libretro/input.cpp
+SOURCES_CXX :=
