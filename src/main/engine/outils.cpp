@@ -11,14 +11,6 @@
 #include "engine/outils.hpp"
 #include "engine/ostats.hpp"
 
-#ifdef __PS3__
-#define rand rand
-#endif
-
-
-
-
-
 /* Generate long random */
 /* */
 /* Source Address: 0x6C8E */

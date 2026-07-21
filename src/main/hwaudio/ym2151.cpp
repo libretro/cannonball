@@ -30,13 +30,8 @@ static void YM2151_advance_eg(YM2151* self);
 static void YM2151_advance(YM2151* self);
 
 #ifdef __PS3__
-#define memset memset
-#define pow pow
-#define floor floor
-#define sin sin
 #define log std::log
 #endif
-
 
 signed int     chanout[8];
 signed int     m2,c1,c2;            /* Phase Modulation input for operators 2,3,4  */
@@ -467,16 +462,7 @@ static void YM2151_init_tables(YM2151* self)
             tl_tab[ x*2+0 + i*2*TL_RES_LEN ] =  tl_tab[ x*2+0 ]>>i;
             tl_tab[ x*2+1 + i*2*TL_RES_LEN ] = -tl_tab[ x*2+0 + i*2*TL_RES_LEN ];
         }
-    #if 0
-        logerror("tl %04i", x*2);
-        for (i=0; i<13; i++)
-            logerror(", [%02i] %4i", i*2, tl_tab[ x*2 /*+1*/ + i*2*TL_RES_LEN ]);
-        logerror("\n");
-    #endif
     }
-    /*logerror("TL_TAB_LEN = %i (%i bytes)\n",TL_TAB_LEN, (int)sizeof(tl_tab));*/
-    /*logerror("ENV_QUIET= %i\n",ENV_QUIET );*/
-
 
     for (i=0; i<SIN_LEN; i++)
     {
@@ -499,14 +485,12 @@ static void YM2151_init_tables(YM2151* self)
             n = n>>1;
 
         sin_tab[ i ] = n*2 + (m>=0.0? 0: 1 );
-        /*logerror("sin [0x%4x]= %4i (tl_tab value=%8x)\n", i, sin_tab[i],tl_tab[sin_tab[i]]);*/
     }
     /* calculate d1l_tab table */
     for (i=0; i<16; i++)
     {
         m = (i!=15 ? i : i+16) * (4.0/ENV_STEP);   /* every 3 'dB' except for all bits = 1 = 45+48 'dB' */
         d1l_tab[i] = (uint32_t) m;
-        /*logerror("d1l_tab[%02x]=%08x\n",i,d1l_tab[i] );*/
     }
 }
 
@@ -519,7 +503,6 @@ static void YM2151_init_chip_tables(YM2151* self)
     double pom;
 
     scaler = ( (double)self->clock / 64.0 ) / ( (double)self->sampfreq );
-    /*logerror("scaler    = %20.15f\n", scaler);*/
 
     /* this loop calculates Hertz values for notes from c-0 to b-7 */
     /* including 64 'cents' (100/64 that is 1.5625 of real cent) per note */
@@ -552,40 +535,19 @@ static void YM2151_init_chip_tables(YM2151* self)
         }
         /* octave 3 to 7 */
         for (j=3; j<8; j++)
-        {
             freq[768 + j*768 + i] = freq[ 768+2*768+i ] << (j-2);
-        }
-
-    #if 0
-            pom = (double)freq[ 768+2*768+i ] / ((double)(1<<FREQ_SH));
-            pom = pom * (double)sampfreq / (double)SIN_LEN;
-            logerror("1freq[%4i][%08x]= real %20.15f Hz  emul %20.15f Hz\n", i, freq[ 768+2*768+i ], Hz, pom);
-    #endif
     }
 
     /* octave -1 (all equal to: oct 0, _KC_00_, _KF_00_) */
     for (i=0; i<768; i++)
-    {
         freq[ 0*768 + i ] = freq[1*768+0];
-    }
 
     /* octave 8 and 9 (all equal to: oct 7, _KC_14_, _KF_63_) */
     for (j=8; j<10; j++)
     {
         for (i=0; i<768; i++)
-        {
             freq[768+ j*768 + i ] = freq[768 + 8*768 -1];
-        }
     }
-
-#if 0
-        for (i=0; i<11*768; i++)
-        {
-            pom = (double)freq[i] / ((double)(1<<FREQ_SH));
-            pom = pom * (double)sampfreq / (double)SIN_LEN;
-            logerror("freq[%4i][%08x]= emul %20.15f Hz\n", i, freq[i], pom);
-        }
-#endif
 
     mult = (1<<FREQ_SH);
     for (j=0; j<4; j++)
@@ -600,16 +562,6 @@ static void YM2151_init_chip_tables(YM2151* self)
             /*positive and negative values*/
             dt1_freq[ (j+0)*32 + i ] = (int32_t) (phaseinc * mult);
             dt1_freq[ (j+4)*32 + i ] = -dt1_freq[ (j+0)*32 + i ];
-
-#if 0
-            {
-                int x = j*32 + i;
-                pom = (double)dt1_freq[x] / mult;
-                pom = pom * (double)sampfreq / (double)SIN_LEN;
-                logerror("DT1(%03i)[%02i %02i][%08x]= real %19.15f Hz  emul %19.15f Hz\n",
-                         x, j, i, dt1_freq[x], Hz, pom);
-            }
-#endif
         }
     }
 
@@ -651,7 +603,6 @@ static void YM2151_init_chip_tables(YM2151* self)
         j = (int) (65536.0 / (double)(j*32.0));    /* number of samples per one shift of the shift register */
         /*noise_tab[i] = j * 64;*/    /* number of chip clock cycles per one shift */
         noise_tab[i] = (uint32_t) (j * 64 * scaler);
-        /*logerror("noise_tab[%02x]=%08x\n", i, noise_tab[i]);*/
     }
 }
 
@@ -1117,7 +1068,6 @@ void YM2151_write_reg(YM2151* self, int r, int v)
             break;
 
         default:
-            /*logerror("YM2151 Write %02x to undocumented register #%02x\n",v,r); */
             break;
         }
         break;
@@ -1307,7 +1257,6 @@ void YM2151_init(YM2151* self, int rate, int fps)
 
     eg_timer_add  = (uint32_t) ((1<<EG_SH)  * (self->clock/64.0) / self->sampfreq);
     eg_timer_overflow = ( 3 ) * (1<<EG_SH);
-    /*logerror("YM2151[init] eg_timer_add=%8x eg_timer_overflow=%8x\n", PSG->eg_timer_add, PSG->eg_timer_overflow);*/
 
 #ifdef USE_MAME_TIMERS
 /* this must be done _before_ a call to ym2151_reset_chip() */
@@ -1318,7 +1267,6 @@ void YM2151_init(YM2151* self, int rate, int fps)
     tim_B      = 0;
 #endif
     YM2151_ym2151_reset_chip(self);
-    /*logerror("YM2151[init] clock=%i sampfreq=%i\n", PSG->clock, PSG->sampfreq);*/
 }
 
 void ym2151_shutdown()
@@ -1408,15 +1356,8 @@ static signed int YM2151_op_calc(YM2151* self, YM2151Operator * OP, unsigned int
 
 static signed int YM2151_op_calc1(YM2151* self, YM2151Operator * OP, unsigned int env, signed int pm)
 {
-    uint32_t p;
-    int32_t  i;
-    i = (OP->phase & ~FREQ_MASK) + pm;
-
-/*logerror("i=%08x (i>>16)&511=%8i phase=%i [pm=%08x] ",i, (i>>16)&511, OP->phase>>FREQ_SH, pm);*/
-
-    p = (env<<3) + sin_tab[ (i>>FREQ_SH) & SIN_MASK];
-
-/*logerror("(p&255=%i p>>8=%i) out= %i\n", p&255,p>>8, tl_tab[p&255]>>(p>>8) );*/
+    int32_t i  = (OP->phase & ~FREQ_MASK) + pm;
+    uint32_t p = (env<<3) + sin_tab[ (i>>FREQ_SH) & SIN_MASK];
 
     if (p >= TL_TAB_LEN)
         return 0;

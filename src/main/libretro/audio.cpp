@@ -24,11 +24,6 @@ static void Audio_pause_audio(Audio* self);
 static void Audio_resume_audio(Audio* self);
 
 extern retro_log_printf_t                 log_cb;
-
-#ifdef __PS3__
-#define free free
-#endif
-
 extern retro_audio_sample_batch_t  audio_batch_cb;
 
 /* Note that these variables are accessed by two separate threads. */

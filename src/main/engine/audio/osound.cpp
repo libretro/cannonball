@@ -75,21 +75,6 @@ static uint8_t OSound_traffic_get_vol(OSound* self, uint16_t pos, uint8_t* pcm);
 static void OSound_traffic_note_changes(OSound* self, uint8_t new_vol, uint8_t* pcm);
 static void OSound_traffic_read_data(OSound* self, uint8_t* pcm);
 
-#ifdef __PS3__
-#define memcpy memcpy
-#endif
-
-/* Use YM2151 Timing */
-#define TIMER_CODE 1
-
-/* Enable Unused code block warnings */
-/*#define UNUSED_WARNINGS 1 */
-
-#ifdef UNUSED_WARNINGS
-#include <stdio.h>
-#endif
-
-
 void OSound_init(OSound* self, YM2151* ym, uint8_t* pcm_ram)
 {
     self->ym      = ym;
@@ -336,12 +321,6 @@ void OSound_process_command(OSound* self)
                 OSound_fm_reset(self);
                 OSound_init_sound(self, cmd, DATA_CUSTOM, CHANNEL_YM1);
                 break;
-
-            #ifdef UNUSED_WARNINGS
-            default:
-                fprintf(stderr, "Missing command: %d\n", cmd);
-                break;
-            #endif
         }
     }
 }
@@ -477,14 +456,6 @@ void OSound_process_channel(OSound* self, uint16_t chan_id)
     /* FM CHANNELS */
     /* ------------------------------------------------------------------------ */
 
-    #ifdef UNUSED_WARNINGS
-    if (chan[CH_CTRL])
-        fprintf(stderr, "process_channel - unimplemented code 0x167\n");
-
-    if (chan[CH_FLAGS] & BIT_5)
-        fprintf(stderr, "process_channel - unimplemented code 0x21A\n");
-    #endif
-
     /* 0xF9:   */
     uint8_t reg;
     { uint8_t chan_index = chan[CH_FM_FLAGS] & 7;
@@ -547,22 +518,6 @@ void OSound_process_section(OSound* self, uint8_t* chan)
     /* ------------------------------------------------------------------------ */
     /* FM Only Code From Here Onwards */
     /* ------------------------------------------------------------------------ */
-
-    #ifdef UNUSED_WARNINGS
-    /* Not sure, unused? */
-    if (chan[CH_FLAGS] & BIT_5)
-    {
-        fprintf(stderr, "Warning: process_section - unimplemented code 0x36D!\n");
-        return;
-    }
-
-    /* Is FM Noise Channel? */
-    if (chan[CH_FLAGS] & BIT_1)
-    {
-        fprintf(stderr, "Warning: process_section - unimplemented code 2!\n");
-        return;
-    }
-    #endif
 
     /* 0x30d set_note_octave */
     /* Command is an offset into the Note Offset table in ROM. */
@@ -706,12 +661,6 @@ void OSound_next_mml_cmd(OSound* self, uint8_t* chan, uint8_t cmd)
         case 0x19:
             OSound_pcm_finalize(self, chan);
             return;
-        
-        #ifdef UNUSED_WARNINGS
-        default:
-            fprintf(stderr, "next_mml_cmd(...) Unsupported command: %x : %x\n", (int16_t) cmd, (int16_t) (cmd & 0x3F));
-            break;
-        #endif
     }
 
     self->pos++;
@@ -1044,11 +993,9 @@ void OSound_pcm_send_cmds(OSound* self, uint8_t* chan, uint16_t pcm_adr, uint8_t
 
 void OSound_fm_dotimera(OSound* self)
 {
-    #ifdef TIMER_CODE
     /* Return if YM2151 is busy */
     if (!(YM2151_read_status(self->ym) & BIT_0))
         return;
-    #endif
     /* Set Timer A, Enable its IRQ and also reset its IRQ */
     YM2151_write_reg(self->ym, 0x14, 0x15); /* %10101 */
 }
@@ -1080,11 +1027,9 @@ void OSound_fm_write_reg_c(OSound* self, uint8_t ix0, uint8_t reg, uint8_t value
 /* Source: 0xA75 */static 
 void OSound_fm_write_reg(OSound* self, uint8_t reg, uint8_t value)
 {
-    #ifdef TIMER_CODE
     /* Return if YM2151 is busy */
     if (YM2151_read_status(self->ym) & BIT_7)
         return;
-    #endif
     YM2151_write_reg(self->ym, reg, value);
 }
 
@@ -1297,10 +1242,6 @@ void OSound_read_mod_table(OSound* self, uint8_t* chan)
         /* Unused special case */
         else if (table_entry == 0xFC)
         {
-            #ifdef UNUSED_WARNINGS
-            /* Missing code here */
-            fprintf(stderr, "read_mod_table: table_entry 0xFC not supported\n");
-            #endif
         }
         /* Increment table position */
         else

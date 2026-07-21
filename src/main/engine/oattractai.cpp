@@ -48,18 +48,12 @@
 static void OAttractAI_check_road(OAttractAI* self);
 static void OAttractAI_set_steering(OAttractAI* self);
 
-#ifdef __PS3__
-#define srand srand
-#endif
-
 OAttractAI oattractai;
 
 void OAttractAI_ctor(OAttractAI* self)
 {
     srand((unsigned int) time(NULL));
 }
-
-
 
 void OAttractAI_init(OAttractAI* self)
 {
