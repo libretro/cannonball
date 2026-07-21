@@ -383,7 +383,7 @@ uint32_t Video::read_pal32(uint32_t* palAddr)
 void Video::refresh_palette(uint32_t palAddr)
 {
     palAddr &= ~1;
-    uint32_t a = (palette[palAddr] << 8) | palette[palAddr + 1];
+    { uint32_t a = (palette[palAddr] << 8) | palette[palAddr + 1];
     uint32_t r = (a & 0x000f) << 1; /* r rrr0 */
     uint32_t g = (a & 0x00f0) >> 3; /* g ggg0 */
     uint32_t b = (a & 0x0f00) >> 7; /* b bbb0 */
@@ -409,4 +409,4 @@ void Video::refresh_palette(uint32_t palAddr)
     /* qualora venga usato il terzo banco della palette. */
     rgb[palAddr + (S16_PALETTE_ENTRIES * 2)] =
         CURRENT_RGB();
-}
+ }}

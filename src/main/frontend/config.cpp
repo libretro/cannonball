@@ -109,7 +109,7 @@ void Config::load_custom_music(const std::string& filename)
             .child("sound")
             .child("custom_music");
 
-    unsigned loaded_tracks = 0;
+    { unsigned loaded_tracks = 0;
 
     /* Scan track1, track2, track3... until the first entry */
     /* without an enabled attribute. */
@@ -153,7 +153,7 @@ void Config::load_custom_music(const std::string& filename)
                 .text()
                 .as_string(default_filename.c_str());
 
-        const size_t filename_length =
+        { const size_t filename_length =
             music.filename.length();
 
         const bool is_wav =
@@ -177,7 +177,7 @@ void Config::load_custom_music(const std::string& filename)
 
         sound.music.push_back(music);
         loaded_tracks++;
-    } }
+     }} }
 
     if (log_cb)
         log_cb(
@@ -186,7 +186,7 @@ void Config::load_custom_music(const std::string& filename)
             "from %s\n",
             loaded_tracks,
             filename.c_str());
-}
+ }}
 
 static std::string get_xml_filename(
     const std::string& filename,
@@ -244,7 +244,7 @@ void Config::load_scores(const std::string &filename)
                     .text()
                     .as_string("0"));
 
-        const char* initial1 =
+        { const char* initial1 =
             score
                 .child("initial1")
                 .text()
@@ -288,7 +288,7 @@ void Config::load_scores(const std::string &filename)
 
         if (e->initial3 == '.')
             e->initial3 = 0x20;
-    } }
+     }} }
 }
 
 
@@ -360,7 +360,7 @@ void Config::save_scores(const std::string &filename)
             .set(Utils::to_hex_string(e->time).c_str());
     } }
 
-    const bool saved =
+    { const bool saved =
         document.save_file(
             xml_filename.c_str(),
             "\t",
@@ -372,7 +372,7 @@ void Config::save_scores(const std::string &filename)
             RETRO_LOG_ERROR,
             "Error saving hiscores: %s\n",
             xml_filename.c_str());
-}
+ }}
 
 
 void Config::load_tiletrial_scores()
@@ -438,7 +438,7 @@ void Config::save_tiletrial_scores()
             .set(ttrial.best_times[i]);
     } }
 
-    const bool saved =
+    { const bool saved =
         document.save_file(
             xml_filename.c_str(),
             "\t",
@@ -450,7 +450,7 @@ void Config::save_tiletrial_scores()
             RETRO_LOG_ERROR,
             "Error saving time-trial scores: %s\n",
             xml_filename.c_str());
-}
+ }}
 
 bool Config::clear_scores()
 {

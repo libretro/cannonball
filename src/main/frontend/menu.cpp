@@ -358,7 +358,7 @@ void Menu::tick_ui()
             oinitengine.car_increment += (1 << 14);
         if (oinitengine.car_increment > scroll_speed << 16)
             oinitengine.car_increment = scroll_speed << 16;
-        uint32_t result = 0x12F * (oinitengine.car_increment >> 16);
+        { uint32_t result = 0x12F * (oinitengine.car_increment >> 16);
         oroad.road_pos_change = result;
         oroad.road_pos += result;
         if (oroad.road_pos >> 16 > ROAD_END) /* loop to beginning of track data */
@@ -368,7 +368,7 @@ void Menu::tick_ui()
         oroad.road_width_bak = oroad.road_width >> 16; 
         oroad.car_x_bak = -oroad.road_width_bak; 
         oinitengine.car_x_pos = oroad.car_x_bak;
-    }
+     }}
 
     /* Do Animations at 30 fps */
     if (config.fps == 30
