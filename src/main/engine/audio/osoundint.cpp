@@ -49,7 +49,7 @@ void OSoundInt_init(OSoundInt* self)
     { uint8_t i; for (i = 0; i < 8; i++)
         self->engine_data[i] = 0; }
 
-    osound.init(self->ym, self->pcm_ram);
+    OSound_init(&osound, self->ym, self->pcm_ram);
 }
 
 /* Clear sound queue */
@@ -75,7 +75,7 @@ void OSoundInt_tick(OSoundInt* self)
     { int i; for (i = 0; i < max_ticks; i++)
     {
         OSoundInt_play_queued_sound(self); /* Process audio commands from main program code */
-        osound.tick();       /* Tick Ported Z80 Audio Code */
+        OSound_tick(&osound);       /* Tick Ported Z80 Audio Code */
     } }
 
     self->audio_ticks -= max_ticks;
