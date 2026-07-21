@@ -199,7 +199,7 @@ static bool val_to_str_car_color(int val, char *str, size_t len)
 static void add_entry(const char *key, uintptr_t addr, lr_options_val_to_str_t val_to_str)
 {
    lr_options_entry_t *entry = NULL;
-   size_t num_entries;
+   { size_t num_entries;
 
    if (!key ||
        (*key == '\0') ||
@@ -226,7 +226,7 @@ static void add_entry(const char *key, uintptr_t addr, lr_options_val_to_str_t v
    entry->key        = strdup(key);
    entry->addr       = addr;
    entry->val_to_str = val_to_str;
-}
+ }}
 
 void lr_options_init()
 {
@@ -378,7 +378,7 @@ static void set_variable(uintptr_t addr, int val)
 {
    lr_options_entry_t *entry = NULL;
    struct retro_variable var = {0};
-   char val_str[32];
+   { char val_str[32];
    size_t i;
 
    val_str[0] = '\0';
@@ -414,12 +414,12 @@ static void set_variable(uintptr_t addr, int val)
    var.key   = entry->key;
    var.value = val_str;
    environ_cb(RETRO_ENVIRONMENT_SET_VARIABLE, &var);
-}
+ }}
 
 void lr_options_set_frontend_variable_bool(const bool *config_var)
 {
    uintptr_t addr;
-   int val;
+   { int val;
 
    if (!config_var)
       return;
@@ -428,12 +428,12 @@ void lr_options_set_frontend_variable_bool(const bool *config_var)
    val  = *config_var ? 1 : 0;
 
    set_variable(addr, val);
-}
+ }}
 
 void lr_options_set_frontend_variable_int(const int *config_var)
 {
    uintptr_t addr;
-   int val;
+   { int val;
 
    if (!config_var)
       return;
@@ -442,5 +442,5 @@ void lr_options_set_frontend_variable_int(const int *config_var)
    val  = *config_var;
 
    set_variable(addr, val);
-}
+ }}
 

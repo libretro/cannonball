@@ -61,7 +61,7 @@ void Audio::start_audio()
 
         /* how many fragments in the dsp buffer */
         const int DSP_BUFFER_FRAGS = 5;
-        int specified_delay_samps = (FREQ * SND_DELAY) / 1000;
+        { int specified_delay_samps = (FREQ * SND_DELAY) / 1000;
         int dsp_buffer_samps = SAMPLES * DSP_BUFFER_FRAGS + specified_delay_samps;
         dsp_buffer_bytes = CHANNELS * dsp_buffer_samps * (BITS / 8);
         dsp_buffer = new uint8_t[dsp_buffer_bytes];
@@ -72,22 +72,22 @@ void Audio::start_audio()
 
         clear_buffers();
         clear_wav();
-    }
+     }}
 }
 
 void Audio::clear_buffers()
 {
     dsp_read_pos  = 0;
-    int specified_delay_samps = (FREQ * SND_DELAY) / 1000;
+    { int specified_delay_samps = (FREQ * SND_DELAY) / 1000;
     dsp_write_pos = (specified_delay_samps+SAMPLES) * bytes_per_sample;
 
     { int i; for (i = 0; i < dsp_buffer_bytes; i++)
         dsp_buffer[i] = 0; }
 
-    uint16_t buffer_size = (FREQ / config.fps) * CHANNELS;
+    { uint16_t buffer_size = (FREQ / config.fps) * CHANNELS;
     { int i; for (i = 0; i < buffer_size; i++)
         mix_buffer[i] = 0; }
-}
+ } }}
 
 void Audio::stop_audio()
 {
@@ -115,7 +115,7 @@ void Audio::tick()
 {
     static const unsigned SND_RATE = 44100;
 
-    int bytes_written = 0;
+    { int bytes_written = 0;
     int newpos = 0;
 
     if (!sound_enabled)
@@ -124,7 +124,7 @@ void Audio::tick()
     osoundint.pcm->stream_update();
     osoundint.ym->stream_update();
 
-    int16_t* pcm_buffer = osoundint.pcm->get_buffer();
+    { int16_t* pcm_buffer = osoundint.pcm->get_buffer();
     int16_t* ym_buffer  = osoundint.ym->get_buffer();
     int16_t* wav_buffer = wavfile.data;
 
@@ -203,13 +203,13 @@ void Audio::tick()
         dsp_read_pos  -= dsp_buffer_bytes;
     }
 
-    const int audio_frames =
+    { const int audio_frames =
         SND_RATE / config.fps;
 
     audio_batch_cb(
         (const int16_t*)mix_buffer,
         audio_frames);
-}
+ } } }}
 
 /* Empty Wav Buffer */
 static int16_t EMPTY_BUFFER[] = {0, 0, 0, 0};
@@ -302,7 +302,7 @@ void Audio::load_wav(const char* filename)
         return;
     }
 
-    const uint8_t* file_data =
+    { const uint8_t* file_data =
         (const uint8_t*)file_buffer;
 
     const size_t file_size =
@@ -321,7 +321,7 @@ void Audio::load_wav(const char* filename)
         return;
     }
 
-    uint16_t audio_format = 0;
+    { uint16_t audio_format = 0;
     uint16_t channels = 0;
     uint16_t bits_per_sample = 0;
     uint32_t sample_rate = 0;
@@ -384,7 +384,7 @@ void Audio::load_wav(const char* filename)
             offset++;
     }
 
-    const bool supported_bits =
+    { const bool supported_bits =
         bits_per_sample == 8  ||
         bits_per_sample == 16 ||
         bits_per_sample == 24 ||
@@ -412,7 +412,7 @@ void Audio::load_wav(const char* filename)
         return;
     }
 
-    const size_t bytes_per_input_sample =
+    { const size_t bytes_per_input_sample =
         bits_per_sample / 8;
 
     const size_t input_frame_bytes =
@@ -433,7 +433,7 @@ void Audio::load_wav(const char* filename)
         return;
     }
 
-    const uint64_t output_frames =
+    { const uint64_t output_frames =
         (input_frames * (uint64_t)FREQ +
          (sample_rate / 2)) /
         sample_rate;
@@ -454,7 +454,7 @@ void Audio::load_wav(const char* filename)
         return;
     }
 
-    int16_t* output_data =
+    { int16_t* output_data =
         (int16_t*)malloc(
             (size_t)output_samples *
             sizeof(int16_t));
@@ -492,12 +492,12 @@ void Audio::load_wav(const char* filename)
         if (source_frame >= input_frames)
             source_frame = input_frames - 1;
 
-        const uint64_t next_frame =
+        { const uint64_t next_frame =
             source_frame + 1 < input_frames
                 ? source_frame + 1
                 : source_frame;
 
-        const uint8_t* current =
+        { const uint8_t* current =
             pcm_data +
             (size_t)source_frame *
                 input_frame_bytes;
@@ -516,7 +516,7 @@ void Audio::load_wav(const char* filename)
                     ? 0
                     : channel;
 
-            const size_t sample_offset =
+            { const size_t sample_offset =
                 source_channel *
                 bytes_per_input_sample;
 
@@ -541,8 +541,8 @@ void Audio::load_wav(const char* filename)
                 output_frame * CHANNELS +
                 channel] =
                     (int16_t)sample;
-        } }
-    } }
+         }} }
+     } }} }
 
     free(file_buffer);
 
@@ -568,7 +568,7 @@ void Audio::load_wav(const char* filename)
             sample_rate,
             channels,
             (unsigned long)output_frames);
-}
+ } } } } } }}
 
 void Audio::clear_wav()
 {
