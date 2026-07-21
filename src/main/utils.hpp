@@ -10,13 +10,8 @@
 #include <stdint.h>
 #include <string>
 
-class Utils
-{
-public:
-    static std::string to_string(int i);
-    static std::string to_string(char c);
-    static std::string to_hex_string(int i);
-    static uint32_t from_hex_string(std::string s);
+std::string Utils_to_string(int i);
+std::string Utils_to_string(char c);
+std::string Utils_to_hex_string(int i);
+uint32_t Utils_from_hex_string(std::string s);
 
-private:
-};

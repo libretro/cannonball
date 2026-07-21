@@ -74,7 +74,7 @@ void OHud_clear_timetrial_text(OHud* self)
 
 void OHud_draw_fps_counter(OHud* self, int16_t fps)
 {
-    std::string str = "FPS " + Utils::to_string(fps);
+    std::string str = "FPS " + Utils_to_string(fps);
     OHud_blit_text_new(self, 30, 0, str.c_str(), GREY);
 }
 
@@ -634,13 +634,13 @@ void OHud_draw_debug_info(OHud* self, uint32_t pos, uint16_t height_pat, uint8_t
 {
     OHud_blit_text_new(&ohud, 0,  4, "LEVEL POS", GREEN);
     OHud_blit_text_new(&ohud, 16, 4, "    ", GREY);
-    OHud_blit_text_new(&ohud, 16, 4, Utils::to_string((int)(pos >> 16)).c_str(), PINK);
+    OHud_blit_text_new(&ohud, 16, 4, Utils_to_string((int)(pos >> 16)).c_str(), PINK);
     OHud_blit_text_new(&ohud, 0,  5, "HEIGHT PATTERN", GREEN);
     OHud_blit_text_new(&ohud, 16, 5, "    ", GREY);
-    OHud_blit_text_new(&ohud, 16, 5, Utils::to_string((int)height_pat).c_str(), PINK);
+    OHud_blit_text_new(&ohud, 16, 5, Utils_to_string((int)height_pat).c_str(), PINK);
     OHud_blit_text_new(&ohud, 0,  6, "SPRITE PATTERN", GREEN);
     OHud_blit_text_new(&ohud, 16, 6, "    ", GREY);
-    OHud_blit_text_new(&ohud, 16, 6, Utils::to_string((int)sprite_pat).c_str(), PINK);
+    OHud_blit_text_new(&ohud, 16, 6, Utils_to_string((int)sprite_pat).c_str(), PINK);
 }
 
 /* Big Yellow Text. Always Centered.  */

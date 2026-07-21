@@ -113,7 +113,7 @@ void Config_load_custom_music(Config* self, const std::string& filename)
     { int i; for (i = 0; ; i++)
     {
         const std::string track_number =
-            Utils::to_string(i + 1);
+            Utils_to_string(i + 1);
 
         const std::string track_name =
             "track" + track_number;
@@ -229,13 +229,13 @@ void Config_load_scores(Config* self, const std::string &filename)
         score_entry* e = &ohiscore.scores[i];
 
         const std::string score_name =
-            "score" + Utils::to_string(i);
+            "score" + Utils_to_string(i);
 
         const pugi::xml_node score =
             document.child(score_name.c_str());
 
         e->score =
-            Utils::from_hex_string(
+            Utils_from_hex_string(
                 score
                     .child("score")
                     .text()
@@ -264,14 +264,14 @@ void Config_load_scores(Config* self, const std::string &filename)
         e->initial3 = initial3[0] ? initial3[0] : '.';
 
         e->maptiles =
-            Utils::from_hex_string(
+            Utils_from_hex_string(
                 score
                     .child("maptiles")
                     .text()
                     .as_string("20202020"));
 
         e->time =
-            Utils::from_hex_string(
+            Utils_from_hex_string(
                 score
                     .child("time")
                     .text()
@@ -303,7 +303,7 @@ void Config_save_scores(Config* self, const std::string &filename)
         score_entry* e = &ohiscore.scores[i];
 
         const std::string score_name =
-            "score" + Utils::to_string(i);
+            "score" + Utils_to_string(i);
 
         pugi::xml_node score =
             document.append_child(score_name.c_str());
@@ -311,24 +311,24 @@ void Config_save_scores(Config* self, const std::string &filename)
         score
             .append_child("score")
             .text()
-            .set(Utils::to_hex_string(e->score).c_str());
+            .set(Utils_to_hex_string(e->score).c_str());
 
         const std::string initial1 =
             e->initial1 == 0x20
                 ? "."
-                : Utils::to_string(
+                : Utils_to_string(
                     (char)(e->initial1));
 
         const std::string initial2 =
             e->initial2 == 0x20
                 ? "."
-                : Utils::to_string(
+                : Utils_to_string(
                     (char)(e->initial2));
 
         const std::string initial3 =
             e->initial3 == 0x20
                 ? "."
-                : Utils::to_string(
+                : Utils_to_string(
                     (char)(e->initial3));
 
         score
@@ -349,12 +349,12 @@ void Config_save_scores(Config* self, const std::string &filename)
         score
             .append_child("maptiles")
             .text()
-            .set(Utils::to_hex_string(e->maptiles).c_str());
+            .set(Utils_to_hex_string(e->maptiles).c_str());
 
         score
             .append_child("time")
             .text()
-            .set(Utils::to_hex_string(e->time).c_str());
+            .set(Utils_to_hex_string(e->time).c_str());
     } }
 
     { const bool saved =
@@ -401,7 +401,7 @@ void Config_load_tiletrial_scores(Config* self)
     { int i; for (i = 0; i < 15; i++)
     {
         const std::string score_name =
-            "score" + Utils::to_string(i);
+            "score" + Utils_to_string(i);
 
         self->ttrial.best_times[i] =
             time_trial
@@ -427,7 +427,7 @@ void Config_save_tiletrial_scores(Config* self)
     { int i; for (i = 0; i < 15; i++)
     {
         const std::string score_name =
-            "score" + Utils::to_string(i);
+            "score" + Utils_to_string(i);
 
         time_trial
             .append_child(score_name.c_str())

@@ -868,14 +868,14 @@ void Menu::refresh_menu()
         if (menu_selected == &menu_timetrial)
         {
             if (SELECTED(ENTRY_LAPS))
-                set_menu_text(ENTRY_LAPS, Utils::to_string(config.ttrial.laps));
+                set_menu_text(ENTRY_LAPS, Utils_to_string(config.ttrial.laps));
             else if (SELECTED(ENTRY_TRAFFIC))
-                set_menu_text(ENTRY_TRAFFIC, config.ttrial.traffic == 0 ? "DISABLED" : Utils::to_string(config.ttrial.traffic));
+                set_menu_text(ENTRY_TRAFFIC, config.ttrial.traffic == 0 ? "DISABLED" : Utils_to_string(config.ttrial.traffic));
         }
         else if (menu_selected == &menu_cont)
         {
             if (SELECTED(ENTRY_TRAFFIC))
-                set_menu_text(ENTRY_TRAFFIC, config.cont_traffic == 0 ? "DISABLED" : Utils::to_string(config.cont_traffic));
+                set_menu_text(ENTRY_TRAFFIC, config.cont_traffic == 0 ? "DISABLED" : Utils_to_string(config.cont_traffic));
         }
         else if (menu_selected == &menu_video)
         {
@@ -889,7 +889,7 @@ void Menu::refresh_menu()
             else if (SELECTED(ENTRY_WIDESCREEN))
                 set_menu_text(ENTRY_WIDESCREEN, config.video.widescreen ? "ON" : "OFF");
             else if (SELECTED(ENTRY_SCALE))
-                set_menu_text(ENTRY_SCALE, Utils::to_string(config.video.scale) + "X");
+                set_menu_text(ENTRY_SCALE, Utils_to_string(config.video.scale) + "X");
             else if (SELECTED(ENTRY_HIRES))
                 set_menu_text(ENTRY_HIRES, config.video.hires ? "ON" : "OFF");
             else if (SELECTED(ENTRY_FPS))
@@ -901,7 +901,7 @@ void Menu::refresh_menu()
                 set_menu_text(ENTRY_FPS, s);
             }
             else if (SELECTED(ENTRY_SCANLINES))
-                set_menu_text(ENTRY_SCANLINES, config.video.scanlines ? Utils::to_string(config.video.scanlines) +"%": "OFF");
+                set_menu_text(ENTRY_SCANLINES, config.video.scanlines ? Utils_to_string(config.video.scanlines) +"%": "OFF");
         }
         else if (menu_selected == &menu_sound)
         {
@@ -932,9 +932,9 @@ void Menu::refresh_menu()
                 set_menu_text(ENTRY_ANALOG, s);
             }
             else if (SELECTED(ENTRY_DSTEER))
-                set_menu_text(ENTRY_DSTEER, Utils::to_string(config.controls.steer_speed));
+                set_menu_text(ENTRY_DSTEER, Utils_to_string(config.controls.steer_speed));
             else if (SELECTED(ENTRY_DPEDAL))
-                set_menu_text(ENTRY_DPEDAL, Utils::to_string(config.controls.pedal_speed));
+                set_menu_text(ENTRY_DPEDAL, Utils_to_string(config.controls.pedal_speed));
         }
         else if (menu_selected == &menu_engine)
         {
