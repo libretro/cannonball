@@ -30,6 +30,26 @@ SOURCES_C += \
 	       $(LIBRETRO_COMM_DIR)/streams/file_stream_transforms.c \
 	       $(LIBRETRO_COMM_DIR)/string/stdstring.c \
 	       $(CORE_DIR)/src/main/engine/osmoke.c \
+	       $(CORE_DIR)/src/main/engine/oferrari.c \
+	       $(CORE_DIR)/src/main/engine/oroad.c \
+	       $(CORE_DIR)/src/main/engine/ohud.c \
+	       $(CORE_DIR)/src/main/engine/outrun.c \
+	       $(CORE_DIR)/src/main/engine/osprites.c \
+	       $(CORE_DIR)/src/main/engine/ooutputs.c \
+	       $(CORE_DIR)/src/main/engine/outils.c \
+	       $(CORE_DIR)/src/main/engine/oinitengine.c \
+	       $(CORE_DIR)/src/main/engine/olevelobjs.c \
+	       $(CORE_DIR)/src/main/engine/oinputs.c \
+	       $(CORE_DIR)/src/main/engine/oattractai.c \
+	       $(CORE_DIR)/src/main/engine/ohiscore.c \
+	       $(CORE_DIR)/src/main/engine/omusic.c \
+	       $(CORE_DIR)/src/main/engine/audio/osound.c \
+	       $(CORE_DIR)/src/main/engine/audio/osoundint.c \
+	       $(CORE_DIR)/src/main/hwvideo/hwsprites.c \
+	       $(CORE_DIR)/src/main/hwvideo/hwtiles.c \
+	       $(CORE_DIR)/src/main/hwvideo/hwroad.c \
+	       $(CORE_DIR)/src/main/hwaudio/segapcm.c \
+	       $(CORE_DIR)/src/main/hwaudio/soundchip.c \
 	       $(CORE_DIR)/src/main/engine/ologo.c \
 	       $(CORE_DIR)/src/main/engine/ostats.c \
 	       $(CORE_DIR)/src/main/engine/otiles.c \
@@ -56,30 +76,10 @@ SOURCES_CXX := \
 	       $(CORE_DIR)/src/main/video.cpp \
 	       \
 
-	       SOURCES_CXX +=			      $(CORE_DIR)/src/main/engine/oattractai.cpp \
-			      $(CORE_DIR)/src/main/engine/oferrari.cpp \
-			      $(CORE_DIR)/src/main/engine/ohiscore.cpp \
-			      $(CORE_DIR)/src/main/engine/ohud.cpp \
-			      $(CORE_DIR)/src/main/engine/oinitengine.cpp \
-			      $(CORE_DIR)/src/main/engine/oinputs.cpp \
-			      $(CORE_DIR)/src/main/engine/olevelobjs.cpp \
-			      $(CORE_DIR)/src/main/engine/omusic.cpp \
-			      $(CORE_DIR)/src/main/engine/ooutputs.cpp \
-			      $(CORE_DIR)/src/main/engine/oroad.cpp \
-			      $(CORE_DIR)/src/main/engine/osprites.cpp \
-			      $(CORE_DIR)/src/main/engine/outils.cpp \
-			      $(CORE_DIR)/src/main/engine/outrun.cpp \
+	       SOURCES_CXX +=			      \
 			      \
-			      $(CORE_DIR)/src/main/engine/audio/osound.cpp \
-			      $(CORE_DIR)/src/main/engine/audio/osoundint.cpp \
-			      \
-			      $(CORE_DIR)/src/main/hwaudio/segapcm.cpp \
-			      $(CORE_DIR)/src/main/hwaudio/soundchip.cpp \
 			      $(CORE_DIR)/src/main/hwaudio/ym2151.cpp \
 			      \
-			      $(CORE_DIR)/src/main/hwvideo/hwroad.cpp \
-			      $(CORE_DIR)/src/main/hwvideo/hwsprites.cpp \
-			      $(CORE_DIR)/src/main/hwvideo/hwtiles.cpp \
 			      \
 			      $(CORE_DIR)/src/main/frontend/config.cpp \
 			      $(CORE_DIR)/src/main/frontend/menu.cpp \
