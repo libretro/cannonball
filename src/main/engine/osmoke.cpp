@@ -12,19 +12,13 @@
 #include "engine/olevelobjs.hpp"
 #include "engine/osmoke.hpp"
 
+static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctrl, uint32_t addr);
+
 OSmoke osmoke;
 
-OSmoke::OSmoke(void)
+void OSmoke_init(OSmoke* self)
 {
-}
-
-OSmoke::~OSmoke(void)
-{
-}
-
-void OSmoke::init()
-{
-    load_smoke_data = 0;
+    self->load_smoke_data = 0;
 }
 
 /* Called twice, once for each plume of smoke from the car */
@@ -46,9 +40,9 @@ void OSmoke::init()
 
 
 /* Source: 0xA816 */
-void OSmoke::draw_ferrari_smoke(oentry *sprite)
+void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry *sprite)
 {
-    setup_smoke_sprite(false);
+    OSmoke_setup_smoke_sprite(self, false);
 
     if (outrun.game_state != GS_ATTRACT)
     {
@@ -63,7 +57,7 @@ void OSmoke::draw_ferrari_smoke(oentry *sprite)
 
     if (olevelobjs.spray_counter)
     {
-        tick_smoke_anim(sprite, 1, roms.rom0p->read32(outrun.adr.spray_data + olevelobjs.spray_type));
+        OSmoke_tick_smoke_anim(self, sprite, 1, roms.rom0p->read32(outrun.adr.spray_data + olevelobjs.spray_type));
         return;
     }
 
@@ -77,7 +71,7 @@ void OSmoke::draw_ferrari_smoke(oentry *sprite)
 
     if (oferrari.is_slipping && oferrari.wheel_state == OFerrari::WHEELS_ON)
     {
-        tick_smoke_anim(sprite, 0, roms.rom0p->read32(outrun.adr.smoke_data + smoke_type_slip));
+        OSmoke_tick_smoke_anim(self, sprite, 0, roms.rom0p->read32(outrun.adr.smoke_data + self->smoke_type_slip));
         return;
     }
 
@@ -87,19 +81,19 @@ void OSmoke::draw_ferrari_smoke(oentry *sprite)
 
     if (oferrari.wheel_state != OFerrari::WHEELS_ON)
     {
-        uint32_t smoke_adr = roms.rom0p->read32(outrun.adr.smoke_data + smoke_type_offroad);
+        uint32_t smoke_adr = roms.rom0p->read32(outrun.adr.smoke_data + self->smoke_type_offroad);
 
         /* Left Wheel Only */
         if (sprite == &osprites.jump_table[OSprites::SPRITE_SMOKE2] && oferrari.wheel_state == OFerrari::WHEELS_LEFT_OFF)
-            tick_smoke_anim(sprite, 1, smoke_adr);
+            OSmoke_tick_smoke_anim(self, sprite, 1, smoke_adr);
 
         /* Right Wheel Only */
         else if (sprite == &osprites.jump_table[OSprites::SPRITE_SMOKE1] && oferrari.wheel_state == OFerrari::WHEELS_RIGHT_OFF)
-            tick_smoke_anim(sprite, 1, smoke_adr);
+            OSmoke_tick_smoke_anim(self, sprite, 1, smoke_adr);
         
         /* Both Wheels */
         else if (oferrari.wheel_state == OFerrari::WHEELS_OFF)
-            tick_smoke_anim(sprite, 1, smoke_adr);
+            OSmoke_tick_smoke_anim(self, sprite, 1, smoke_adr);
 
         return;
     }
@@ -114,7 +108,7 @@ void OSmoke::draw_ferrari_smoke(oentry *sprite)
     /* Smoke from wheels */
     else if (oferrari.car_state == OFerrari::CAR_SMOKE)
     {
-        tick_smoke_anim(sprite, 1, roms.rom0p->read32(outrun.adr.smoke_data + smoke_type_onroad));
+        OSmoke_tick_smoke_anim(self, sprite, 1, roms.rom0p->read32(outrun.adr.smoke_data + self->smoke_type_onroad));
     }
     /* Animation Sequence */
     else
@@ -123,7 +117,7 @@ void OSmoke::draw_ferrari_smoke(oentry *sprite)
             sprite->type = sprite->xw1; /* Copy frame number to type */
         else
         {
-            tick_smoke_anim(sprite, 1, roms.rom0p->read32(outrun.adr.smoke_data + smoke_type_onroad));
+            OSmoke_tick_smoke_anim(self, sprite, 1, roms.rom0p->read32(outrun.adr.smoke_data + self->smoke_type_onroad));
         }
     }
 }
@@ -132,15 +126,15 @@ void OSmoke::draw_ferrari_smoke(oentry *sprite)
 /* - Use Main entry point when we know for a fact road isn't splitting */
 /* - Use SetSmokeSprite1 entry point when road could potentially be splitting */
 /*   Source: 0xA94C */
-void OSmoke::setup_smoke_sprite(bool force_load)
+void OSmoke_setup_smoke_sprite(OSmoke* self, bool force_load)
 {
     uint16_t stage_lookup = outrun.cannonball_mode != Outrun::MODE_ORIGINAL ? oroad.stage_lookup_off : 0;
 
     /* Check whether we should load new sprite data when transitioning between stages */
     if (!force_load)
     {
-        bool set = load_smoke_data & BIT_0;
-        load_smoke_data &= ~BIT_0;
+        bool set = self->load_smoke_data & BIT_0;
+        self->load_smoke_data &= ~BIT_0;
         if (!set) return; /* Don't load new smoke data */
         stage_lookup = oroad.stage_lookup_off + 8;
     }
@@ -155,8 +149,8 @@ void OSmoke::setup_smoke_sprite(bool force_load)
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00  /* Stage 5 */
     };
 
-    smoke_type_onroad = ONROAD_SMOKE[stage_lookup] << 2;
-    smoke_type_slip = smoke_type_onroad;
+    self->smoke_type_onroad = ONROAD_SMOKE[stage_lookup] << 2;
+    self->smoke_type_slip = self->smoke_type_onroad;
 
     /* Set Smoke Colour When Off Road */
     const static uint8_t OFFROAD_SMOKE[] = 
@@ -168,7 +162,7 @@ void OSmoke::setup_smoke_sprite(bool force_load)
         0x08, 0x02, 0x08, 0x06, 0x09, 0x00, 0x00, 0x00  /* Stage 5 */
     };
 
-    smoke_type_offroad = OFFROAD_SMOKE[stage_lookup] << 2;
+    self->smoke_type_offroad = OFFROAD_SMOKE[stage_lookup] << 2;
 }
 
 /* Set the smoke x,y and z co-ordinates */
@@ -181,7 +175,7 @@ void OSmoke::setup_smoke_sprite(bool force_load)
 /* */
 /* a5 = Smoke Sprite Plume */
 /* Source: 0xA9B6 */
-void OSmoke::tick_smoke_anim(oentry* sprite, int8_t anim_ctrl, uint32_t addr)
+static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctrl, uint32_t addr)
 {
     sprite->x = oferrari.spr_ferrari->x;
     sprite->y = oferrari.spr_ferrari->y;
@@ -344,7 +338,7 @@ void OSmoke::tick_smoke_anim(oentry* sprite, int8_t anim_ctrl, uint32_t addr)
 
 /* Draw only helper routine. */
 /* Useful for framerate changes. */
-void OSmoke::draw(oentry* sprite)
+void OSmoke_draw(OSmoke* self, oentry* sprite)
 {
     if (outrun.game_state != GS_ATTRACT)
     {

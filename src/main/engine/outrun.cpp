@@ -254,14 +254,14 @@ void Outrun::jump_table()
             {
                 oanimseq.flag_seq();
                 ocrash.tick();
-                osmoke.draw_ferrari_smoke(&osprites.jump_table[OSprites::SPRITE_SMOKE1]); /* Do Left Hand Smoke */
+                OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[OSprites::SPRITE_SMOKE1]); /* Do Left Hand Smoke */
                 oferrari.draw_shadow();                                                   /* (0xF1A2) - Draw Ferrari Shadow */
-                osmoke.draw_ferrari_smoke(&osprites.jump_table[OSprites::SPRITE_SMOKE2]); /* Do Right Hand Smoke */
+                OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[OSprites::SPRITE_SMOKE2]); /* Do Right Hand Smoke */
             }
             else
             {
-                osmoke.draw_ferrari_smoke(&osprites.jump_table[OSprites::SPRITE_SMOKE1]); /* Do Left Hand Smoke */
-                osmoke.draw_ferrari_smoke(&osprites.jump_table[OSprites::SPRITE_SMOKE2]); /* Do Right Hand Smoke */
+                OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[OSprites::SPRITE_SMOKE1]); /* Do Left Hand Smoke */
+                OSmoke_draw_ferrari_smoke(&osmoke, &osprites.jump_table[OSprites::SPRITE_SMOKE2]); /* Do Right Hand Smoke */
             }
             break;
     }
@@ -636,7 +636,7 @@ void Outrun::init_jump_table()
         olevelobjs.init_timetrial_sprites();
 
     otraffic.init();
-    osmoke.init();
+    OSmoke_init(&osmoke);
     oroad.init();
     otiles.init();
     opalette.init();

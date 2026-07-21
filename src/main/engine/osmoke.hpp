@@ -11,20 +11,11 @@
 
 #include "outrun.hpp"
 
-class OSmoke
+struct OSmoke
 {
-public:
     /* Load smoke sprites for next level? */
     int8_t load_smoke_data;
 
-    OSmoke(void);
-    ~OSmoke(void);
-    void init();
-    void setup_smoke_sprite(bool);
-    void draw_ferrari_smoke(oentry*);
-    void draw(oentry*);
-
-private:
     /* Ferrari wheel smoke type on road */
     uint16_t smoke_type_onroad;
 
@@ -33,8 +24,11 @@ private:
 
     /* Ferrari wheel smoke type after car collision */
     uint16_t smoke_type_slip;
-
-    void tick_smoke_anim(oentry*, int8_t, uint32_t);
 };
 
 extern OSmoke osmoke;
+
+void OSmoke_init(OSmoke* self);
+void OSmoke_setup_smoke_sprite(OSmoke* self, bool force_load);
+void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry* sprite);
+void OSmoke_draw(OSmoke* self, oentry* sprite);

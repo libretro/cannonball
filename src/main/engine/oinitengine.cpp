@@ -122,7 +122,7 @@ void OInitEngine::setup_stage1()
     checkpoint_marker = 0;              /* Denote not past checkpoint marker */
     otraffic.set_max_traffic();         /* Set Number Of Enemy Cars Based On Dip Switches */
     ostats.clear_route_info();
-    osmoke.setup_smoke_sprite(true);
+    OSmoke_setup_smoke_sprite(&osmoke, true);
 }
 
 /* Initialise Master Segment Address For Stage */
@@ -521,7 +521,7 @@ void OInitEngine::check_stage()
             otiles.set_vertical_swap(); /* Tell tilemap to v-scroll off/on */
 
             /* Reload smoke data */
-            osmoke.setup_smoke_sprite(true);
+            OSmoke_setup_smoke_sprite(&osmoke, true);
 
             /* Update palette */
             oinitengine.end_stage_props |= BIT_1; /* Don't bump stage offset when fetching next palette */
@@ -571,7 +571,7 @@ void OInitEngine::reload_stage1()
     end_stage_props |= BIT_1; /* Loop back to stage 1 (Used by tilemap code) */
     end_stage_props |= BIT_2;
     end_stage_props |= BIT_3;
-    osmoke.setup_smoke_sprite(true);
+    OSmoke_setup_smoke_sprite(&osmoke, true);
     init_split_next_level();
 }
 
