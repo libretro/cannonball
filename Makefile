@@ -1,4 +1,5 @@
 DEBUG = 0
+
 FRONTEND_SUPPORTS_RGB565 = 1
 WANT_MODPLUG = 1
 
@@ -200,7 +201,7 @@ else ifneq (,$(filter $(platform), ps3 psl1ght))
    ifeq ($(platform), psl1ght)
         ENDIANNESS_DEFINES += -D__PSL1GHT__ 
    endif
-   EXTRA_INCLUDES := -I./deps/ps3
+   EXTRA_INCLUDES :=
 
 # PSP
 else ifeq ($(platform), psp1)
