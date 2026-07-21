@@ -16,6 +16,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <boolean.h>
+#include <retro_inline.h>
 
 enum {NORMAL = 1, INTERLEAVE2 = 2, INTERLEAVE4 = 4};
 
@@ -50,47 +51,47 @@ int RomLoader_load_mem(RomLoader* self, const uint8_t* data, uint32_t len);
 
 void RomLoader_unload(RomLoader* self);
 
-static uint32_t RomLoader_read32_a(RomLoader* self, uint32_t* addr)
+static INLINE uint32_t RomLoader_read32_a(RomLoader* self, uint32_t* addr)
 {
         uint32_t data = (self->rom[*addr] << 24) | (self->rom[*addr + 1] << 16) |
                         (self->rom[*addr + 2] << 8) | self->rom[*addr + 3];
         *addr += 4;
         return data;
     }
-static uint16_t RomLoader_read16_a(RomLoader* self, uint32_t* addr)
+static INLINE uint16_t RomLoader_read16_a(RomLoader* self, uint32_t* addr)
 {
         uint16_t data = (self->rom[*addr] << 8) | self->rom[*addr + 1];
         *addr += 2;
         return data;
     }
-static uint8_t RomLoader_read8_a(RomLoader* self, uint32_t* addr)
+static INLINE uint8_t RomLoader_read8_a(RomLoader* self, uint32_t* addr)
 {
         return self->rom[(*addr)++];
     }
-static uint32_t RomLoader_read32(RomLoader* self, uint32_t addr)
+static INLINE uint32_t RomLoader_read32(RomLoader* self, uint32_t addr)
 {
         return (self->rom[addr] << 24) | (self->rom[addr + 1] << 16) |
                (self->rom[addr + 2] << 8) | self->rom[addr + 3];
     }
-static uint16_t RomLoader_read16(RomLoader* self, uint32_t addr)
+static INLINE uint16_t RomLoader_read16(RomLoader* self, uint32_t addr)
 {
         return (self->rom[addr] << 8) | self->rom[addr + 1];
     }
-static uint8_t RomLoader_read8(RomLoader* self, uint32_t addr)
+static INLINE uint8_t RomLoader_read8(RomLoader* self, uint32_t addr)
 {
         return self->rom[addr];
     }
-static uint16_t RomLoader_read16_16a(RomLoader* self, uint16_t* addr)
+static INLINE uint16_t RomLoader_read16_16a(RomLoader* self, uint16_t* addr)
 {
         uint16_t data = (self->rom[*addr + 1] << 8) | self->rom[*addr];
         *addr += 2;
         return data;
     }
-static uint8_t RomLoader_read8_16a(RomLoader* self, uint16_t* addr)
+static INLINE uint8_t RomLoader_read8_16a(RomLoader* self, uint16_t* addr)
 {
         return self->rom[(*addr)++];
     }
-static uint16_t RomLoader_read16_16(RomLoader* self, uint16_t addr)
+static INLINE uint16_t RomLoader_read16_16(RomLoader* self, uint16_t addr)
 {
         return (self->rom[addr + 1] << 8) | self->rom[addr];
     }

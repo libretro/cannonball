@@ -18,6 +18,7 @@ extern "C" {
 
 
 #include "oentry.h"
+#include <retro_inline.h>
 
 typedef struct oanimsprite
 {
@@ -56,7 +57,7 @@ typedef struct oanimsprite
     int16_t anim_state;
 } oanimsprite;
 
-static void oanimsprite_init(oanimsprite* self, oentry* s)
+static INLINE void oanimsprite_init(oanimsprite* self, oentry* s)
 {
     self->sprite = s;
         self->sprite->function_holder = -1;

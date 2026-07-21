@@ -31,6 +31,7 @@ extern "C" {
 
 
 #include <stdint.h>
+#include <retro_inline.h>
 
 enum {
         ANCHOR_CENTRE = 0,
@@ -159,7 +160,7 @@ typedef struct oentry
 	/* Initalize to default values */
 } oentry;
 
-static void oentry_init(oentry* self, uint8_t i)
+static INLINE void oentry_init(oentry* self, uint8_t i)
 {
     self->control = 0;
     self->jump_index = i;
