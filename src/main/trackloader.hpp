@@ -87,7 +87,7 @@ typedef struct TrackLoader
     uint32_t pal_gnd_offset;
     uint32_t heightmap_offset;
     uint32_t scenerymap_offset;
-    RomLoader* layout;
+    struct RomLoader* layout;
     int mode;
     Level* levels;
     Level* level_split;
@@ -129,7 +129,7 @@ uint32_t TrackLoader_read_scenerymap_table(TrackLoader* self, uint16_t entry);
 
 int16_t TrackLoader_readPath(TrackLoader* self, uint32_t addr);
 
-int16_t TrackLoader_readPath(TrackLoader* self, uint32_t* addr);
+int16_t TrackLoader_readPath_a(TrackLoader* self, uint32_t* addr);
 
 int16_t TrackLoader_read_width_height(TrackLoader* self, uint32_t* addr);
 

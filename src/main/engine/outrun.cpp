@@ -499,9 +499,9 @@ static void Outrun_main_switch(Outrun* self)
             else if (self->cannonball_mode == MODE_TTRIAL)
             {
                 if (outrun.tick_counter & BIT_4)
-                    OHud_blit_text1(&ohud, 10, 20, TEXT1_PRESS_START);
+                    OHud_blit_text1_xy(&ohud, 10, 20, TEXT1_PRESS_START);
                 else
-                    OHud_blit_text1(&ohud, 10, 20, TEXT1_CLEAR_START);
+                    OHud_blit_text1_xy(&ohud, 10, 20, TEXT1_CLEAR_START);
 
                 if (Input_is_pressed(&input, START))
                     cannonball_state = STATE_INIT_MENU;

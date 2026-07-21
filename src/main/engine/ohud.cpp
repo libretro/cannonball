@@ -49,8 +49,8 @@ void OHud_draw_main_hud(OHud* self)
     else if (outrun.cannonball_mode == MODE_TTRIAL)
     {
         OHud_draw_score(self, OHud_translate(self, 3, 2, 0x110030), 0, 2);
-        OHud_blit_text1(self, 2, 1, HUD_SCORE1);
-        OHud_blit_text1(self, 2, 2, HUD_SCORE2);
+        OHud_blit_text1_xy(self, 2, 1, HUD_SCORE1);
+        OHud_blit_text1_xy(self, 2, 2, HUD_SCORE2);
         OHud_blit_text_big(self, 4, "TIME TO BEAT", false);
         OHud_draw_lap_timer(self, OHud_translate(self, 16, 7, 0x110030), outrun.ttrial.best_lap, outrun.ttrial.best_lap[2]);
     }
@@ -563,7 +563,7 @@ void OHud_blit_text1(OHud* self, uint32_t src_addr)
     } }
 }
 
-void OHud_blit_text1(OHud* self, uint8_t x, uint8_t y, uint32_t src_addr)
+void OHud_blit_text1_xy(OHud* self, uint8_t x, uint8_t y, uint32_t src_addr)
 {
     uint32_t dst_addr = OHud_translate(self, x, y, 0x110030);
     src_addr += 4;

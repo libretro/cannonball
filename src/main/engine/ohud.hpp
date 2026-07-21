@@ -58,7 +58,7 @@ void OHud_draw_debug_info(OHud* self, uint32_t pos, uint16_t height_pat, uint8_t
 
 void OHud_blit_text1(OHud* self, uint32_t);
 
-void OHud_blit_text1(OHud* self, uint8_t x, uint8_t y, uint32_t src_addr);
+void OHud_blit_text1_xy(OHud* self, uint8_t x, uint8_t y, uint32_t src_addr);
 
 void OHud_blit_text2(OHud* self, uint32_t);
 

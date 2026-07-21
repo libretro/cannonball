@@ -440,8 +440,8 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
             else
             {
                 OHud_draw_score(&ohud, OHud_translate(&ohud, 3, 2, 0x110030), outils_convert16_dechex(++outrun.ttrial.overtakes), 2);
-                OHud_blit_text1(&ohud, 2, 1, HUD_SCORE1);
-                OHud_blit_text1(&ohud, 2, 2, HUD_SCORE2);
+                OHud_blit_text1_xy(&ohud, 2, 1, HUD_SCORE1);
+                OHud_blit_text1_xy(&ohud, 2, 2, HUD_SCORE2);
             }
         }
 

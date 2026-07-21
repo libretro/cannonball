@@ -460,14 +460,14 @@ void ORoad_set_tilemap_x(ORoad* self, uint32_t addr)
     /* d0 = Word 0 + Word 2 + Word 4 + Word 6 [Next 4 x positions] */
     /* d1 = Word 1 + Word 3 + Word 5 + Word 7 [Next 4 y positions] */
     
-    int16_t x = TrackLoader_readPath(&trackloader, &addr);
-    int16_t y = TrackLoader_readPath(&trackloader, &addr);
-    x += TrackLoader_readPath(&trackloader, &addr);
-    y += TrackLoader_readPath(&trackloader, &addr);
-    x += TrackLoader_readPath(&trackloader, &addr);
-    y += TrackLoader_readPath(&trackloader, &addr);
-    x += TrackLoader_readPath(&trackloader, &addr);
-    y += TrackLoader_readPath(&trackloader, &addr);
+    int16_t x = TrackLoader_readPath_a(&trackloader, &addr);
+    int16_t y = TrackLoader_readPath_a(&trackloader, &addr);
+    x += TrackLoader_readPath_a(&trackloader, &addr);
+    y += TrackLoader_readPath_a(&trackloader, &addr);
+    x += TrackLoader_readPath_a(&trackloader, &addr);
+    y += TrackLoader_readPath_a(&trackloader, &addr);
+    x += TrackLoader_readPath_a(&trackloader, &addr);
+    y += TrackLoader_readPath_a(&trackloader, &addr);
 
     { int16_t x_abs = x;
     int16_t y_abs = y;

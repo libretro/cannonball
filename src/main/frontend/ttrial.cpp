@@ -60,8 +60,8 @@ int TTrial_tick(TTrial* self)
             OMap_load_sprites(&omap);
             OMap_position_ferrari(&omap, FERRARI_POS[self->level_selected = 0]);
             OHud_blit_text_big(&ohud, 1, "STEER TO SELECT TRACK", false);
-            OHud_blit_text1(&ohud, 2, 25, TEXT1_LAPTIME1);
-            OHud_blit_text1(&ohud, 2, 26, TEXT1_LAPTIME2);
+            OHud_blit_text1_xy(&ohud, 2, 25, TEXT1_LAPTIME1);
+            OHud_blit_text1_xy(&ohud, 2, 26, TEXT1_LAPTIME2);
             OSoundInt_queue_sound(&osoundint, SOUND_PCM_WAVE);
             outrun.ttrial.laps    = config.ttrial.laps;
             outrun.custom_traffic = config.ttrial.traffic;

@@ -372,7 +372,7 @@ int16_t TrackLoader_readPath(TrackLoader* self, uint32_t addr)
     return (self->current_path[addr] << 8) | self->current_path[addr+1];
 }
 
-int16_t TrackLoader_readPath(TrackLoader* self, uint32_t* addr)
+int16_t TrackLoader_readPath_a(TrackLoader* self, uint32_t* addr)
 {
     int16_t value = (self->current_path[*addr] << 8) | (self->current_path[*addr+1]);
     *addr += 2;
