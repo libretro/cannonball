@@ -46,7 +46,7 @@ void Audio_start_audio(Audio* self)
         /* One frame of interleaved stereo samples is mixed and pushed to
            the libretro frontend every retro_run; that is the only buffer
            we need. */
-        { uint16_t buffer_size = (FREQ / config.fps) * CHANNELS;
+        { uint16_t buffer_size = (config.sound.rate / config.fps) * CHANNELS;
         self->mix_buffer = (uint16_t*)malloc((buffer_size) * sizeof(uint16_t));
 
         Audio_clear_buffers(self);
@@ -56,7 +56,7 @@ void Audio_start_audio(Audio* self)
 
 void Audio_clear_buffers(Audio* self)
 {
-    { uint16_t buffer_size = (FREQ / config.fps) * CHANNELS;
+    { uint16_t buffer_size = (config.sound.rate / config.fps) * CHANNELS;
     { int i; for (i = 0; i < buffer_size; i++)
         self->mix_buffer[i] = 0; } }
 }
@@ -355,7 +355,7 @@ void Audio_load_wav(Audio* self, const char* filename)
     }
 
     { const uint64_t output_frames =
-        (input_frames * (uint64_t)FREQ +
+        (input_frames * (uint64_t)config.sound.rate +
          (sample_rate / 2)) /
         sample_rate;
 
@@ -401,14 +401,14 @@ void Audio_load_wav(Audio* self, const char* filename)
             (uint64_t)sample_rate;
 
         uint64_t source_frame =
-            source_position / FREQ;
+            source_position / config.sound.rate;
 
         const int64_t fraction =
             (int64_t)(
-                source_position % FREQ);
+                source_position % config.sound.rate);
 
         const int64_t inverse_fraction =
-            (int64_t)FREQ - fraction;
+            (int64_t)config.sound.rate - fraction;
 
         if (source_frame >= input_frames)
             source_frame = input_frames - 1;
@@ -456,7 +456,7 @@ void Audio_load_wav(Audio* self, const char* filename)
                     inverse_fraction +
                  (int64_t)sample_next *
                     fraction) /
-                (int64_t)FREQ;
+                (int64_t)config.sound.rate;
 
             output_data[
                 output_frame * CHANNELS +

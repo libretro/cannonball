@@ -26,7 +26,6 @@ typedef struct wav_t {
     uint32_t length;
 } wav_t;
 
-static const uint32_t FREQ = 44100;
 
 static const uint32_t CHANNELS = 2;
 

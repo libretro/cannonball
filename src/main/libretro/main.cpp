@@ -848,10 +848,14 @@ void retro_get_system_av_info(struct retro_system_av_info *info) {
    memset(info, 0, sizeof(*info));
 
    info->timing.fps            = config.fps;
-   /* Due to integer rounding errors (44100/102 = 367.5),
-    * we produce fewer than the expected 44100 samples
-    * per second when running at 120 fps... */
-   info->timing.sample_rate    = (config.fps == 120) ? 44040 : 44100;
+   /* The chips (and mixer) emit exactly config.sound.rate / fps samples
+    * per frame, an integer, so the true output rate is that count times
+    * fps. This equals config.sound.rate when it divides evenly (30/60 fps)
+    * and is slightly lower otherwise (e.g. 44040 at 120 fps, since
+    * 44100/120 truncates to 367). Reporting the effective rate keeps the
+    * frontend's A/V sync exact. */
+   info->timing.sample_rate    =
+      (double)((config.sound.rate / (unsigned)config.fps) * (unsigned)config.fps);
 
    info->geometry.max_width    = S16_WIDTH_WIDE << 1;
    info->geometry.max_height   = S16_HEIGHT     << 1;
