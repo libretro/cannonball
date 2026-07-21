@@ -68,7 +68,7 @@ void OTiles::setup_palette_hud()
     /* Write longs of palette data. Read from ROM. */
     { int i; for (i = 0; i <= 0x1F; i++)
     {
-        Video_write_pal32(&video, &pal_addr, roms.rom0.read32(&src_addr));
+        Video_write_pal32(&video, &pal_addr, RomLoader_read32(&(roms.rom0), &src_addr));
     } }
 }
 
@@ -85,14 +85,14 @@ void OTiles::setup_palette_tilemap()
     
     { int i; for (i = 0; i < 120; i++)
     {    
-        uint16_t offset = roms.rom0.read8(&src_addr) << 4;
+        uint16_t offset = RomLoader_read8(&(roms.rom0), &src_addr) << 4;
         uint32_t tile_data_addr = 0x17050 + offset;
         
         /* Write 4 x longs of palette data. Read from ROM. */
-        Video_write_pal32(&video, &pal_addr, roms.rom0.read32(&tile_data_addr));
-        Video_write_pal32(&video, &pal_addr, roms.rom0.read32(&tile_data_addr));
-        Video_write_pal32(&video, &pal_addr, roms.rom0.read32(&tile_data_addr));
-        Video_write_pal32(&video, &pal_addr, roms.rom0.read32(&tile_data_addr));
+        Video_write_pal32(&video, &pal_addr, RomLoader_read32(&(roms.rom0), &tile_data_addr));
+        Video_write_pal32(&video, &pal_addr, RomLoader_read32(&(roms.rom0), &tile_data_addr));
+        Video_write_pal32(&video, &pal_addr, RomLoader_read32(&(roms.rom0), &tile_data_addr));
+        Video_write_pal32(&video, &pal_addr, RomLoader_read32(&(roms.rom0), &tile_data_addr));
     } }
 }
 
@@ -209,8 +209,8 @@ void OTiles::clear_tile_info()
     Video_clear_tile_ram(&video);
 
     /* 4. Setup new values */
-    fg_psel = roms.rom0.read16(TILES_PAGE_FG1);
-    bg_psel = roms.rom0.read16(TILES_PAGE_BG1);
+    fg_psel = RomLoader_read16(&(roms.rom0), TILES_PAGE_FG1);
+    bg_psel = RomLoader_read16(&(roms.rom0), TILES_PAGE_BG1);
     Video_write_text16(&video, HW_FG_PSEL, fg_psel);    /* Also write values to hardware */
     Video_write_text16(&video, HW_BG_PSEL, bg_psel);
 
@@ -228,14 +228,14 @@ void OTiles::clear_tile_info()
 /* Source: 0xD8B2 */
 void OTiles::init_tilemap(int16_t stage_id)
 {
-    uint8_t offset = (roms.rom0p->read8(outrun.adr.tiles_def_lookup + stage_id) << 2) * 3;
+    uint8_t offset = (RomLoader_read8(roms.rom0p, outrun.adr.tiles_def_lookup + stage_id) << 2) * 3;
     uint32_t addr = outrun.adr.tiles_table + offset;
 
-    fg_v_tiles    = roms.rom0p->read8(&addr);   /* Write Default FG Tilemap Height */
-    bg_v_tiles    = roms.rom0p->read8(&addr);   /* Write Default BG Tilemap Height */
-    fg_addr       = roms.rom0p->read32(&addr);  /* Write Default FG Tilemap Address */
-    bg_addr       = roms.rom0p->read32(&addr);  /* Write Default BG Tilemap Address */
-    tilemap_v_off = roms.rom0p->read16(&addr);
+    fg_v_tiles    = RomLoader_read8(roms.rom0p, &addr);   /* Write Default FG Tilemap Height */
+    bg_v_tiles    = RomLoader_read8(roms.rom0p, &addr);   /* Write Default BG Tilemap Height */
+    fg_addr       = RomLoader_read32(roms.rom0p, &addr);  /* Write Default FG Tilemap Address */
+    bg_addr       = RomLoader_read32(roms.rom0p, &addr);  /* Write Default BG Tilemap Address */
+    tilemap_v_off = RomLoader_read16(roms.rom0p, &addr);
     { int16_t v_off = 0x68 - tilemap_v_off;
     oroad.horizon_y_bak = oroad.horizon_y2;
 
@@ -260,14 +260,14 @@ void OTiles::init_tilemap(int16_t stage_id)
 /* Source: DC02 */
 void OTiles::init_tilemap_props(uint16_t stage_id)
 {
-    uint8_t offset = (roms.rom0p->read8(outrun.adr.tiles_def_lookup + stage_id) << 2) * 3;
+    uint8_t offset = (RomLoader_read8(roms.rom0p, outrun.adr.tiles_def_lookup + stage_id) << 2) * 3;
     uint32_t addr = outrun.adr.tiles_table + offset;
 
-    fg_v_tiles    = roms.rom0p->read8(&addr);   /* Write Default FG Tilemap Height */
-    bg_v_tiles    = roms.rom0p->read8(&addr);   /* Write Default BG Tilemap Height */
-    fg_addr       = roms.rom0p->read32(&addr);  /* Write Default FG Tilemap Address */
-    bg_addr       = roms.rom0p->read32(&addr);  /* Write Default BG Tilemap Address */
-    tilemap_v_off = roms.rom0p->read16(&addr);  /* Set Tilemap v-scroll offset    */
+    fg_v_tiles    = RomLoader_read8(roms.rom0p, &addr);   /* Write Default FG Tilemap Height */
+    bg_v_tiles    = RomLoader_read8(roms.rom0p, &addr);   /* Write Default BG Tilemap Height */
+    fg_addr       = RomLoader_read32(roms.rom0p, &addr);  /* Write Default FG Tilemap Address */
+    bg_addr       = RomLoader_read32(roms.rom0p, &addr);  /* Write Default BG Tilemap Address */
+    tilemap_v_off = RomLoader_read16(roms.rom0p, &addr);  /* Set Tilemap v-scroll offset    */
 }
 
 
@@ -298,13 +298,13 @@ void OTiles::copy_fg_tiles(uint32_t dst_addr)
             /* next_tilex: */
             do
             {
-                uint32_t data = roms.rom0.read16(&src_addr);
+                uint32_t data = RomLoader_read16(&(roms.rom0), &src_addr);
 
                 /* Compression */
                 if (data == 0)
                 {
-                    uint16_t value = roms.rom0.read16(&src_addr); /* tile index to copy */
-                    uint16_t count = roms.rom0.read16(&src_addr); /* number of times to copy value */
+                    uint16_t value = RomLoader_read16(&(roms.rom0), &src_addr); /* tile index to copy */
+                    uint16_t count = RomLoader_read16(&(roms.rom0), &src_addr); /* number of times to copy value */
                 
                     /* copy_compressed: */
                     { uint16_t i; for (i = 0; i <= count; i++)
@@ -360,13 +360,13 @@ void OTiles::copy_bg_tiles(uint32_t dst_addr)
             /* next_tilex: */
             do
             {
-                uint32_t data = roms.rom0.read16(&src_addr);
+                uint32_t data = RomLoader_read16(&(roms.rom0), &src_addr);
 
                 /* Compression */
                 if (data == 0)
                 {
-                    uint16_t value = roms.rom0.read16(&src_addr); /* tile index to copy */
-                    uint16_t count = roms.rom0.read16(&src_addr); /* number of times to copy value */
+                    uint16_t value = RomLoader_read16(&(roms.rom0), &src_addr); /* tile index to copy */
+                    uint16_t count = RomLoader_read16(&(roms.rom0), &src_addr); /* number of times to copy value */
                 
                     /* copy_compressed: */
                     { uint16_t i; for (i = 0; i <= count; i++)
@@ -521,7 +521,7 @@ void OTiles::h_scroll_tilemaps()
     if (oinitengine.end_stage_props & BIT_0)
     {
         /* Road position is used as an offset into the table. (Note it's reset at beginning of road split) */
-        h_scroll_lookup = roms.rom0.read16(H_SCROLL_TABLE + ((oroad.road_pos >> 16) << 1));
+        h_scroll_lookup = RomLoader_read16(&(roms.rom0), H_SCROLL_TABLE + ((oroad.road_pos >> 16) << 1));
         
         int32_t tilemap_h_target = h_scroll_lookup << 5;
         tilemap_h_target <<= 16;
@@ -617,7 +617,7 @@ void OTiles::update_fg_page()
     cur_stage &= 1;
     cur_stage *= 8;
     h += cur_stage;
-    fg_psel = roms.rom0.read16(TILES_PAGE_FG1 + h);
+    fg_psel = RomLoader_read16(&(roms.rom0), TILES_PAGE_FG1 + h);
  }}
 
 void OTiles::update_bg_page()
@@ -641,7 +641,7 @@ void OTiles::update_bg_page()
     cur_stage &= 1;
     cur_stage = ((cur_stage * 2) + cur_stage) << 1;
     h += cur_stage;
-    bg_psel = roms.rom0.read16(TILES_PAGE_BG1 + h);
+    bg_psel = RomLoader_read16(&(roms.rom0), TILES_PAGE_BG1 + h);
  }}
 
 /* Initalize Next Tilemap. On Level Switch. */
@@ -761,10 +761,10 @@ void OTiles::copy_to_palram(const uint8_t blocks, uint32_t src, uint32_t dst)
 {
     { uint8_t i; for (i = 0; i <= blocks; i++)
     {
-        Video_write_pal32(&video, &dst, roms.rom0.read32(src));
-        Video_write_pal32(&video, &dst, roms.rom0.read32(src + 0x4));
-        Video_write_pal32(&video, &dst, roms.rom0.read32(src + 0x8));
-        Video_write_pal32(&video, &dst, roms.rom0.read32(src + 0xc));
+        Video_write_pal32(&video, &dst, RomLoader_read32(&(roms.rom0), src));
+        Video_write_pal32(&video, &dst, RomLoader_read32(&(roms.rom0), src + 0x4));
+        Video_write_pal32(&video, &dst, RomLoader_read32(&(roms.rom0), src + 0x8));
+        Video_write_pal32(&video, &dst, RomLoader_read32(&(roms.rom0), src + 0xc));
     } }
 }
 
@@ -798,7 +798,7 @@ void OTiles::split_tilemaps()
 void OTiles::update_fg_page_split()
 {
     fg_h_scroll = tilemap_h_scr >> 16;
-    fg_psel = roms.rom0.read16(TILES_PAGE_FG2 + ((page & 1) ? 0x6 : 0xE));
+    fg_psel = RomLoader_read16(&(roms.rom0), TILES_PAGE_FG2 + ((page & 1) ? 0x6 : 0xE));
 }
 
 /* Setup Background tilemap, with relevant h-scroll and page information. Ready for forthcoming HW write. */
@@ -807,7 +807,7 @@ void OTiles::update_fg_page_split()
 void OTiles::update_bg_page_split()
 {
     bg_h_scroll = (((tilemap_h_scr >> 16) & 0xFFF) * 3) >> 2;
-    bg_psel = roms.rom0.read16(TILES_PAGE_BG2 + ((page & 1) ? 0x4 : 0xA));
+    bg_psel = RomLoader_read16(&(roms.rom0), TILES_PAGE_BG2 + ((page & 1) ? 0x4 : 0xA));
 }
 
 /* Fill tilemap background with a solid color */

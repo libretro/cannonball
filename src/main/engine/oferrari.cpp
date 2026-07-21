@@ -451,9 +451,9 @@ void OFerrari_setup_ferrari_sprite(OFerrari* self)
 
         /* Set Ferrari Sprite Properties */
         uint32_t offset = outrun.adr.sprite_ferrari_frames + turn_frame_offset + incline_frame_offset;
-        self->spr_ferrari->addr = roms.rom0p->read32(offset);     /* Set Ferrari Frame Address */
-        self->sprite_pass_y = roms.rom0p->read16(offset + 4); /* Set Passenger Y Offset */
-        x_off = roms.rom0p->read16(offset + 6); /* Set Ferrari Sprite X Offset */
+        self->spr_ferrari->addr = RomLoader_read32(roms.rom0p, offset);     /* Set Ferrari Frame Address */
+        self->sprite_pass_y = RomLoader_read16(roms.rom0p, offset + 4); /* Set Passenger Y Offset */
+        x_off = RomLoader_read16(roms.rom0p, offset + 6); /* Set Ferrari Sprite X Offset */
 
         if (d4 < 0) x_off = -x_off;
      }}
@@ -486,9 +486,9 @@ void OFerrari_setup_ferrari_sprite(OFerrari* self)
         if (y >= 0x13) incline_frame_offset += 0x20;
 
         { uint32_t offset = outrun.adr.sprite_skid_frames + frame + incline_frame_offset;
-        self->spr_ferrari->addr = roms.rom0p->read32(offset); /* Set Ferrari Frame Address */
-        self->sprite_pass_y = roms.rom0p->read16(offset + 4); /* Set Passenger Y Offset */
-        x_off = roms.rom0p->read16(offset + 6);         /* Set Ferrari Sprite X Offset */
+        self->spr_ferrari->addr = RomLoader_read32(roms.rom0p, offset); /* Set Ferrari Frame Address */
+        self->sprite_pass_y = RomLoader_read16(roms.rom0p, offset + 4); /* Set Passenger Y Offset */
+        x_off = RomLoader_read16(roms.rom0p, offset + 6);         /* Set Ferrari Sprite X Offset */
         self->wheel_traction = TRACTION_OFF;                  /* Both wheels have lost traction */
 
         if (ocrash.skid_counter >= 0) x_off = -x_off;
@@ -525,9 +525,9 @@ void OFerrari_setup_ferrari_bonus_sprite(OFerrari* self)
 
     /* Set Ferrari Sprite Properties */
     uint32_t offset   = outrun.adr.sprite_ferrari_frames + turn_frame_offset + 8; /* 8 denotes the 'level' frames, no slope. */
-    self->spr_ferrari->addr = roms.rom0p->read32(offset);     /* Set Ferrari Frame Address */
-    self->sprite_pass_y     = roms.rom0p->read16(offset + 4); /* Set Passenger Y Offset */
-    int16_t x_off     = roms.rom0p->read16(offset + 6); /* Set Ferrari Sprite X Offset */
+    self->spr_ferrari->addr = RomLoader_read32(roms.rom0p, offset);     /* Set Ferrari Frame Address */
+    self->sprite_pass_y     = RomLoader_read16(roms.rom0p, offset + 4); /* Set Passenger Y Offset */
+    int16_t x_off     = RomLoader_read16(roms.rom0p, offset + 6); /* Set Ferrari Sprite X Offset */
 
     if (oinputs.steering_adjust < 0) x_off = -x_off;
     self->spr_ferrari->x = x_off;
@@ -565,11 +565,11 @@ void OFerrari_do_end_seq(OFerrari* self)
 
     uint32_t addr = outrun.adr.anim_ferrari_frames + ((obonus.bonus_control - 0xC) << 1);
 
-    self->spr_ferrari->addr    = roms.rom0p->read32(addr);
-    self->sprite_pass_y        = roms.rom0p->read8(4 + addr);  /* Set Passenger Y Offset */
-    self->spr_ferrari->x       = roms.rom0p->read8(5 + addr);
+    self->spr_ferrari->addr    = RomLoader_read32(roms.rom0p, addr);
+    self->sprite_pass_y        = RomLoader_read8(roms.rom0p, 4 + addr);  /* Set Passenger Y Offset */
+    self->spr_ferrari->x       = RomLoader_read8(roms.rom0p, 5 + addr);
     self->spr_ferrari->pal_src = self->ferrari_pal;/*  roms.rom0p->read8(6 + addr); */
-    self->spr_ferrari->control = roms.rom0p->read8(7 + addr) | (self->spr_ferrari->control & 0xFE); /* HFlip */
+    self->spr_ferrari->control = RomLoader_read8(roms.rom0p, 7 + addr) | (self->spr_ferrari->control & 0xFE); /* HFlip */
 
     OSprites_map_palette(&osprites, self->spr_ferrari);
     OSprites_do_spr_order_shadows(&osprites, self->spr_ferrari);
@@ -933,8 +933,8 @@ void OFerrari_set_passenger_sprite(OFerrari* self, oentry* sprite)
 
     sprite->pal_src = pal;
     { uint32_t offset_table = ((sprite == self->spr_pass1) ? PASS1_OFFSET : PASS2_OFFSET) + frame;
-    sprite->x = self->spr_ferrari->x + roms.rom0.read16(&offset_table);
-    sprite->y = self->spr_ferrari->y + roms.rom0.read16(offset_table);
+    sprite->x = self->spr_ferrari->x + RomLoader_read16(&(roms.rom0), &offset_table);
+    sprite->y = self->spr_ferrari->y + RomLoader_read16(&(roms.rom0), offset_table);
     
     sprite->zoom = 0x7F;
     sprite->draw_props = 8;
@@ -996,7 +996,7 @@ void OFerrari_set_passenger_frame(OFerrari* self, oentry* sprite)
         }
     }
     else
-        sprite->addr = roms.rom0p->read32(addr + inc);
+        sprite->addr = RomLoader_read32(roms.rom0p, addr + inc);
 }
 
 /* ------------------------------------------------------------------------------------------------ */

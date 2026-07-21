@@ -521,10 +521,10 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
     /* 3/ Position of Car in relation to player on x axis */
     /* ------------------------------------------------------------------------ */
     
-    sprite->pal_src = roms.rom0p->read8(outrun.adr.traffic_props + sprite->type + 4) + self->traffic_pal_cycle;
+    sprite->pal_src = RomLoader_read8(roms.rom0p, outrun.adr.traffic_props + sprite->type + 4) + self->traffic_pal_cycle;
 
-    { int16_t traffic_type = (roms.rom0p->read8(outrun.adr.traffic_props + sprite->type + 7) << 5) + (traffic_frame << 2) + incline;
-    sprite->addr = roms.rom0p->read32(outrun.adr.traffic_data + traffic_type);
+    { int16_t traffic_type = (RomLoader_read8(roms.rom0p, outrun.adr.traffic_props + sprite->type + 7) << 5) + (traffic_frame << 2) + incline;
+    sprite->addr = RomLoader_read32(roms.rom0p, outrun.adr.traffic_data + traffic_type);
 
     OSprites_map_palette(&osprites, sprite);
     self->traffic_speed_total += sprite->traffic_speed;
@@ -545,7 +545,7 @@ void OTraffic_set_zoom_lookup(OTraffic* self, oentry* sprite)
     /* +6 [Byte] Zoom Lookup Value for Width/Height */
     /* +7 [Byte] Traffic Type */
 
-    uint8_t zoom_lookup = roms.rom0p->read8(outrun.adr.traffic_props + sprite->type + 6);
+    uint8_t zoom_lookup = RomLoader_read8(roms.rom0p, outrun.adr.traffic_props + sprite->type + 6);
 
     switch (zoom_lookup)
     {
@@ -754,7 +754,7 @@ void OTraffic_check_collision(OTraffic* self, oentry* sprite)
         if (x1 < 0 && x2 > 0)
         {
             /* Set collision settings from property table */
-            self->collision_mask = roms.rom0p->read8(outrun.adr.traffic_props + sprite->type + 5);
+            self->collision_mask = RomLoader_read8(roms.rom0p, outrun.adr.traffic_props + sprite->type + 5);
             d0 = (sprite->x < 0) ? -SKID_RESET : SKID_RESET;
 
             /* Enhancement: Bumper enabled, reduce skid distance */

@@ -78,7 +78,7 @@ void OMap_tick(OMap* self)
         /* Initialise Route Info */
         case MAP_INIT:
             hwsprites_set_x_clip(video.sprite_layer, false); /* Don't clip the area in wide-screen mode */
-            self->map_route  = roms.rom0.read8(MAP_ROUTE_LOOKUP + ostats.routes[1]);
+            self->map_route  = RomLoader_read8(&(roms.rom0), MAP_ROUTE_LOOKUP + ostats.routes[1]);
             self->map_pos    = 0;
             self->map_stage1 = 0;
             self->map_stage2 = ostats.cur_stage;
@@ -102,11 +102,11 @@ void OMap_tick(OMap* self)
                     { uint16_t route_info = ostats.routes[1 + self->map_stage1];
                     if (route_info)
                     {
-                        self->map_route = roms.rom0.read8(MAP_ROUTE_LOOKUP + route_info);                      
+                        self->map_route = RomLoader_read8(&(roms.rom0), MAP_ROUTE_LOOKUP + route_info);                      
                     }
                     else
                     {
-                        self->map_route = roms.rom0.read8(MAP_ROUTE_LOOKUP + ostats.routes[0 + self->map_stage1] + 0x10);
+                        self->map_route = RomLoader_read8(&(roms.rom0), MAP_ROUTE_LOOKUP + ostats.routes[0 + self->map_stage1] + 0x10);
                     }
 
                     self->map_state = MAP_ROUTE_FINAL;
@@ -116,7 +116,7 @@ void OMap_tick(OMap* self)
                 {
                     self->map_pos = 0;
                     self->map_stage1++;
-                    self->map_route = roms.rom0.read8(MAP_ROUTE_LOOKUP + ostats.routes[1 + self->map_stage1]);
+                    self->map_route = RomLoader_read8(&(roms.rom0), MAP_ROUTE_LOOKUP + ostats.routes[1 + self->map_stage1]);
                 }
             }
             break;
@@ -235,15 +235,15 @@ void OMap_load_sprites(OMap* self)
     {
         oentry* sprite     = &osprites.jump_table[i];
         sprite->id         = i+1;
-        sprite->control    = roms.rom0p->read8(&adr);
-        sprite->draw_props = roms.rom0p->read8(&adr);
-        sprite->shadow     = roms.rom0p->read8(&adr);
-        sprite->zoom       = roms.rom0p->read8(&adr);
-        sprite->pal_src    = (uint8_t) roms.rom0p->read16(&adr);
-        sprite->priority   = sprite->road_priority = roms.rom0p->read16(&adr);
-        sprite->x          = roms.rom0p->read16(&adr);
-        sprite->y          = roms.rom0p->read16(&adr);
-        sprite->addr       = roms.rom0p->read32(&adr);
+        sprite->control    = RomLoader_read8(roms.rom0p, &adr);
+        sprite->draw_props = RomLoader_read8(roms.rom0p, &adr);
+        sprite->shadow     = RomLoader_read8(roms.rom0p, &adr);
+        sprite->zoom       = RomLoader_read8(roms.rom0p, &adr);
+        sprite->pal_src    = (uint8_t) RomLoader_read16(roms.rom0p, &adr);
+        sprite->priority   = sprite->road_priority = RomLoader_read16(roms.rom0p, &adr);
+        sprite->x          = RomLoader_read16(roms.rom0p, &adr);
+        sprite->y          = RomLoader_read16(roms.rom0p, &adr);
+        sprite->addr       = RomLoader_read32(roms.rom0p, &adr);
         sprite->counter    = 0;  
         
         adr += 4; /* throw this address away */
@@ -355,8 +355,8 @@ void OMap_draw_piece(OMap* self, oentry* sprite, uint32_t adr)
 
         adr += (self->map_pos << 3);
 
-        sprite->addr    = roms.rom0p->read32(adr);
-        sprite->pal_src = roms.rom0p->read8(4 + adr);
+        sprite->addr    = RomLoader_read32(roms.rom0p, adr);
+        sprite->pal_src = RomLoader_read8(roms.rom0p, 4 + adr);
         OSprites_map_palette(&osprites, sprite);
     }
 
@@ -376,8 +376,8 @@ void OMap_move_mini_car(OMap* self, oentry* sprite)
         { int16_t pos = (self->map_stage1 < 4) ? self->map_pos : self->map_pos >> 1;
         pos <<= 1; /* do not try to merge with previous line */
 
-        sprite->x += roms.rom0.read16(movement_table + pos);
-        { int16_t y_change = roms.rom0.read16(movement_table + pos + 0x40);
+        sprite->x += RomLoader_read16(&(roms.rom0), movement_table + pos);
+        { int16_t y_change = RomLoader_read16(&(roms.rom0), movement_table + pos + 0x40);
         sprite->y -= y_change;
 
         if (y_change == 0)

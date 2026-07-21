@@ -405,7 +405,7 @@ void OSprites_do_spr_order_shadows(OSprites* self, oentry* input)
     }
     else
     {
-        input->addr = roms.rom0p->read32(outrun.adr.shadow_frames + 0x3C);
+        input->addr = RomLoader_read32(roms.rom0p, outrun.adr.shadow_frames + 0x3C);
     }
 
     OSprites_do_sprite(self, input);           /* Create Shadowed Version Of Sprite For Hardware */
@@ -614,10 +614,10 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
             d0 = lookup_mask;
         }
 
-        d0 = (d0 & 0xFF00) + roms.rom0p->read8(src_offsets + 1);
-        width = roms.rom0p->read8(WH_TABLE + d0);
-        d0 = (d0 & 0xFF00) + roms.rom0p->read8(src_offsets + 3);
-        height = roms.rom0p->read8(WH_TABLE + d0);
+        d0 = (d0 & 0xFF00) + RomLoader_read8(roms.rom0p, src_offsets + 1);
+        width = RomLoader_read8(roms.rom0p, WH_TABLE + d0);
+        d0 = (d0 & 0xFF00) + RomLoader_read8(roms.rom0p, src_offsets + 3);
+        height = RomLoader_read8(roms.rom0p, WH_TABLE + d0);
     }
     /* loc_9560: */
     else
@@ -625,13 +625,13 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
         d0 &= 0x7C00;
         { uint16_t h = d0;
 
-        d0 = (d0 & 0xFF00) + roms.rom0p->read8(src_offsets + 1);
-        width = roms.rom0p->read8(WH_TABLE + d0);
+        d0 = (d0 & 0xFF00) + RomLoader_read8(roms.rom0p, src_offsets + 1);
+        width = RomLoader_read8(roms.rom0p, WH_TABLE + d0);
         d0 &= 0xFF;
         width += d0;
         
-        h |= roms.rom0p->read8(src_offsets + 3);
-        height = roms.rom0p->read8(WH_TABLE + h);
+        h |= RomLoader_read8(roms.rom0p, src_offsets + 3);
+        height = RomLoader_read8(roms.rom0p, WH_TABLE + h);
         h &= 0xFF;
         height += h;
 
@@ -668,8 +668,8 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
     /* Set Palette & Sprite Bank Information */
     /* ------------------------------------------------------------------------- */
     osprite_set_pal(output, input->pal_dst); /* Set Sprite Colour Palette */
-    osprite_set_offset(output, roms.rom0p->read16(src_offsets + 8)); /* Set Offset within selected sprite bank */
-    osprite_set_bank(output, roms.rom0p->read8(src_offsets + 7) << 1); /* Set Sprite Bank Value */
+    osprite_set_offset(output, RomLoader_read16(roms.rom0p, src_offsets + 8)); /* Set Offset within selected sprite bank */
+    osprite_set_bank(output, RomLoader_read8(roms.rom0p, src_offsets + 7) << 1); /* Set Sprite Bank Value */
 
     /* ------------------------------------------------------------------------- */
     /* Set Sprite Height */
@@ -677,9 +677,9 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
     if (sprite_y1 < 256)
     {
         int16_t y_adj = -(sprite_y1 - 256);
-        y_adj *= roms.rom0p->read16(src_offsets + 2); /* Width of line data (Unsigned multiply) */
+        y_adj *= RomLoader_read16(roms.rom0p, src_offsets + 2); /* Width of line data (Unsigned multiply) */
         y_adj /= height; /* Unsigned divide */
-        y_adj *= roms.rom0p->read16(src_offsets + 4); /* Length of line data (Unsigned multiply) */
+        y_adj *= RomLoader_read16(roms.rom0p, src_offsets + 4); /* Length of line data (Unsigned multiply) */
         osprite_inc_offset(output, y_adj);
         output->data[0x0] = (output->data[0x0] & 0xFF00) | 0x100; /* Mask on negative y index */
         osprite_set_height(output, (uint8_t) sprite_y2);
@@ -758,12 +758,12 @@ void OSprites_do_sprite(OSprites* self, oentry* input)
     }
 
     /* cont2: */
-    OSprites_set_hrender(self, input, output, roms.rom0p->read16(src_offsets + 4), width);
+    OSprites_set_hrender(self, input, output, RomLoader_read16(roms.rom0p, src_offsets + 4), width);
     
     /* ------------------------------------------------------------------------- */
     /* Set Sprite Pitch & Priority */
     /* ------------------------------------------------------------------------- */
-    osprite_set_pitch(output, roms.rom0p->read8(src_offsets + 5) << 1);
+    osprite_set_pitch(output, RomLoader_read8(roms.rom0p, src_offsets + 5) << 1);
     osprite_set_priority(output, input->shadow << 4); /* todo: where does this get set? */
  } } }}
 
@@ -888,7 +888,7 @@ void OSprites_set_hrender(OSprites* self, oentry* input, osprite* output, uint16
 void OSprites_move_sprite(OSprites* self, oentry* sprite, uint8_t shift)
 {
     uint32_t addr = SPRITE_ZOOM_LOOKUP + (((sprite->z >> 16) << 2) | self->sprite_scroll_speed);
-    uint32_t value = roms.rom0.read32(addr) >> shift;
+    uint32_t value = RomLoader_read32(&(roms.rom0), addr) >> shift;
 
     if (config.tick_fps == 60)
         value >>= 1;

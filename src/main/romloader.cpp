@@ -20,6 +20,8 @@
 
 #include "romloader.hpp"
 
+static int RomLoader_create_map(RomLoader* self);
+
 extern retro_log_printf_t log_cb;
 extern char rom_path[1024];
 
@@ -98,34 +100,31 @@ static bool calculate_crc32(const std::string& path, uint32_t& checksum)
     return true;
 }
 
-RomLoader::RomLoader()
-    : rom(NULL), length(0), loaded(false)
+
+
+void RomLoader_dtor(RomLoader* self)
 {
+    RomLoader_unload(self);
 }
 
-RomLoader::~RomLoader()
+void RomLoader_init(RomLoader* self, const uint32_t new_length)
 {
-    unload();
+    RomLoader_unload(self);
+
+    self->length = new_length;
+    self->rom = new uint8_t[self->length];
+    self->loaded = false;
 }
 
-void RomLoader::init(const uint32_t new_length)
+void RomLoader_unload(RomLoader* self)
 {
-    unload();
-
-    length = new_length;
-    rom = new uint8_t[length];
-    loaded = false;
+    delete[] self->rom;
+    self->rom = NULL;
+    self->length = 0;
+    self->loaded = false;
 }
 
-void RomLoader::unload(void)
-{
-    delete[] rom;
-    rom = NULL;
-    length = 0;
-    loaded = false;
-}
-
-int RomLoader::load_auto(const char* filename,
+int RomLoader_load_auto(RomLoader* self, const char* filename,
                          const int offset,
                          const int file_length,
                          const uint32_t expected_crc,
@@ -135,13 +134,13 @@ int RomLoader::load_auto(const char* filename,
     /* Prefer content identification, matching the modern upstream loader. */
     /* The canonical filename remains a compatibility fallback for frontends */
     /* where directory enumeration is unavailable or for legacy ROM sets. */
-    if (load_crc32(filename, offset, file_length, expected_crc,
+    if (RomLoader_load_crc32(self, filename, offset, file_length, expected_crc,
                    interleave, false) == 0)
     {
         return 0;
     }
 
-    if (load_rom(filename, offset, file_length, expected_crc,
+    if (RomLoader_load_rom(self, filename, offset, file_length, expected_crc,
                  interleave, verbose) == 0)
     {
         if (verbose && log_cb)
@@ -159,11 +158,11 @@ int RomLoader::load_auto(const char* filename,
                filename,
                (unsigned)(expected_crc));
 
-    loaded = false;
+    self->loaded = false;
     return 1;
 }
 
-int RomLoader::load_rom(const char* filename,
+int RomLoader_load_rom(RomLoader* self, const char* filename,
                         const int offset,
                         const int file_length,
                         const uint32_t expected_crc,
@@ -179,7 +178,7 @@ int RomLoader::load_rom(const char* filename,
 
     if (!source)
     {
-        loaded = false;
+        self->loaded = false;
         return 1;
     }
 
@@ -194,7 +193,7 @@ int RomLoader::load_rom(const char* filename,
                    "ROM has an unexpected size: %s\n",
                    path.c_str());
 
-        loaded = false;
+        self->loaded = false;
         return 1;
     }
 
@@ -212,13 +211,13 @@ int RomLoader::load_rom(const char* filename,
     }
 
     { int i; for (i = 0; i < file_length; i++)
-        rom[(i * interleave) + offset] = buffer[(size_t)(i)]; }
+        self->rom[(i * interleave) + offset] = buffer[(size_t)(i)]; }
 
-    loaded = true;
+    self->loaded = true;
     return 0;
-}
+}static 
 
-int RomLoader::create_map()
+int RomLoader_create_map(RomLoader* self)
 {
     const std::string path = rom_path;
 
@@ -269,16 +268,16 @@ int RomLoader::create_map()
     return 0;
 }
 
-int RomLoader::load_crc32(const char* debug,
+int RomLoader_load_crc32(RomLoader* self, const char* debug,
                           const int offset,
                           const int file_length,
                           const uint32_t expected_crc,
                           const uint8_t interleave,
                           const bool verbose)
 {
-    if ((!map_created || mapped_path != rom_path) && create_map() != 0)
+    if ((!map_created || mapped_path != rom_path) && RomLoader_create_map(self) != 0)
     {
-        loaded = false;
+        self->loaded = false;
         return 1;
     }
 
@@ -293,7 +292,7 @@ int RomLoader::load_crc32(const char* debug,
                    debug,
                    (unsigned)(expected_crc));
 
-        loaded = false;
+        self->loaded = false;
         return 1;
     }
 
@@ -304,7 +303,7 @@ int RomLoader::load_crc32(const char* debug,
 
     if (!source)
     {
-        loaded = false;
+        self->loaded = false;
         return 1;
     }
 
@@ -319,23 +318,23 @@ int RomLoader::load_crc32(const char* debug,
                    "ROM has an unexpected size: %s\n",
                    match->second.c_str());
 
-        loaded = false;
+        self->loaded = false;
         return 1;
     }
 
     { int i; for (i = 0; i < file_length; i++)
-        rom[(i * interleave) + offset] = buffer[(size_t)(i)]; }
+        self->rom[(i * interleave) + offset] = buffer[(size_t)(i)]; }
 
     if (verbose && log_cb)
         log_cb(RETRO_LOG_INFO,
                "Loaded renamed ROM by CRC32: %s\n",
                match->second.c_str());
 
-    loaded = true;
+    self->loaded = true;
     return 0;
 }
 
-int RomLoader::load_binary(const char* filename)
+int RomLoader_load_binary(RomLoader* self, const char* filename)
 {
     RFILE* source = filestream_open(
         filename,
@@ -347,7 +346,7 @@ int RomLoader::load_binary(const char* filename)
         if (log_cb)
             log_cb(RETRO_LOG_ERROR, "Cannot open file: %s\n", filename);
 
-        loaded = false;
+        self->loaded = false;
         return 1;
     }
 
@@ -355,24 +354,24 @@ int RomLoader::load_binary(const char* filename)
     if (file_length <= 0)
     {
         filestream_close(source);
-        loaded = false;
+        self->loaded = false;
         return 1;
     }
 
-    unload();
+    RomLoader_unload(self);
 
-    length = (uint32_t)(file_length);
-    rom = new uint8_t[length];
+    self->length = (uint32_t)(file_length);
+    self->rom = new uint8_t[self->length];
 
-    const bool read_ok = read_exact(source, rom, length);
+    const bool read_ok = read_exact(source, self->rom, self->length);
     filestream_close(source);
 
     if (!read_ok)
     {
-        unload();
+        RomLoader_unload(self);
         return 1;
     }
 
-    loaded = true;
+    self->loaded = true;
     return 0;
 }

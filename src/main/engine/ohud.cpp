@@ -122,16 +122,16 @@ void OHud_draw_mini_map(OHud* self, uint32_t tile_addr)
     /* Base Tile to use */
     const uint16_t BASE = 0x8B00;
 
-    uint16_t tile = (BASE | roms.rom0.read8(&tile_addr));
+    uint16_t tile = (BASE | RomLoader_read8(&(roms.rom0), &tile_addr));
     Video_write_text16(&video, dst, tile);
 
-    tile = BASE | roms.rom0.read8(&tile_addr);
+    tile = BASE | RomLoader_read8(&(roms.rom0), &tile_addr);
     Video_write_text16(&video, 2 + dst, tile);
 
-    tile = BASE | roms.rom0.read8(&tile_addr);
+    tile = BASE | RomLoader_read8(&(roms.rom0), &tile_addr);
     Video_write_text16(&video, 0x80 + dst, tile);
 
-    tile = BASE | roms.rom0.read8(&tile_addr);
+    tile = BASE | RomLoader_read8(&(roms.rom0), &tile_addr);
     Video_write_text16(&video, 0x82 + dst, tile);
 }
 
@@ -551,14 +551,14 @@ void OHud_draw_credits(OHud* self)
 
 void OHud_blit_text1(OHud* self, uint32_t src_addr)
 {
-    uint32_t dst_addr = roms.rom0.read32(&src_addr); /* Text RAM destination address */
-    uint16_t counter = roms.rom0.read16(&src_addr);  /* Number of tiles to blit */
-    uint16_t data = roms.rom0.read16(&src_addr);     /* Tile data to blit */
+    uint32_t dst_addr = RomLoader_read32(&(roms.rom0), &src_addr); /* Text RAM destination address */
+    uint16_t counter = RomLoader_read16(&(roms.rom0), &src_addr);  /* Number of tiles to blit */
+    uint16_t data = RomLoader_read16(&(roms.rom0), &src_addr);     /* Tile data to blit */
     
     /* Blit each tile */
     { uint16_t i; for (i = 0; i <= counter; i++)
     {
-        data = (data & 0xFF00) | roms.rom0.read8(&src_addr);
+        data = (data & 0xFF00) | RomLoader_read8(&(roms.rom0), &src_addr);
         Video_write_text16(&video, &dst_addr, data);
     } }
 }
@@ -567,13 +567,13 @@ void OHud_blit_text1(OHud* self, uint8_t x, uint8_t y, uint32_t src_addr)
 {
     uint32_t dst_addr = OHud_translate(self, x, y, 0x110030);
     src_addr += 4;
-    { uint16_t counter = roms.rom0.read16(&src_addr);  /* Number of tiles to blit */
-    uint16_t data = roms.rom0.read16(&src_addr);     /* Tile data to blit */
+    { uint16_t counter = RomLoader_read16(&(roms.rom0), &src_addr);  /* Number of tiles to blit */
+    uint16_t data = RomLoader_read16(&(roms.rom0), &src_addr);     /* Tile data to blit */
 
     /* Blit each tile */
     { uint16_t i; for (i = 0; i <= counter; i++)
     {
-        data = (data & 0xFF00) | roms.rom0.read8(&src_addr);
+        data = (data & 0xFF00) | RomLoader_read8(&(roms.rom0), &src_addr);
         Video_write_text16(&video, &dst_addr, data);
     } }
  }}
@@ -595,17 +595,17 @@ void OHud_blit_text1(OHud* self, uint8_t x, uint8_t y, uint32_t src_addr)
 
 void OHud_blit_text2(OHud* self, uint32_t src_addr)
 {
-    uint32_t dst_addr = 0x110000 + roms.rom0.read16(&src_addr); /* Text RAM destination address */
+    uint32_t dst_addr = 0x110000 + RomLoader_read16(&(roms.rom0), &src_addr); /* Text RAM destination address */
 
-    uint16_t pal = roms.rom0.read8(&src_addr); 
+    uint16_t pal = RomLoader_read8(&(roms.rom0), &src_addr); 
     pal = 0x80A0 | ((pal << 9) | ((pal >> 7) & 1));
     /* same as ror 7 and extending to word */
-    uint16_t counter = roms.rom0.read8(&src_addr); /* Number of tiles to blit */
+    uint16_t counter = RomLoader_read8(&(roms.rom0), &src_addr); /* Number of tiles to blit */
 
     /* Blit each tile */
     { uint16_t i; for (i = 0; i <= counter; i++)
     {
-        uint16_t data = roms.rom0.read8(&src_addr); /* Tile data to blit */
+        uint16_t data = RomLoader_read8(&(roms.rom0), &src_addr); /* Tile data to blit */
         
         /* Blank space */
         if (data == 0x20)

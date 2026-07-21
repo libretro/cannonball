@@ -1634,13 +1634,13 @@ void ORoad_copy_bg_color(ORoad* self)
     /* Copy 1K */
     { int i; for (i = 0; i < 32; i++)
     {
-        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
-        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
-        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
-        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
-        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
-        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
-        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
-        HWRoad_write32(&hwroad, &dst, roms.rom1p->read32(&src));
+        HWRoad_write32(&hwroad, &dst, RomLoader_read32(roms.rom1p, &src));
+        HWRoad_write32(&hwroad, &dst, RomLoader_read32(roms.rom1p, &src));
+        HWRoad_write32(&hwroad, &dst, RomLoader_read32(roms.rom1p, &src));
+        HWRoad_write32(&hwroad, &dst, RomLoader_read32(roms.rom1p, &src));
+        HWRoad_write32(&hwroad, &dst, RomLoader_read32(roms.rom1p, &src));
+        HWRoad_write32(&hwroad, &dst, RomLoader_read32(roms.rom1p, &src));
+        HWRoad_write32(&hwroad, &dst, RomLoader_read32(roms.rom1p, &src));
+        HWRoad_write32(&hwroad, &dst, RomLoader_read32(roms.rom1p, &src));
     } }
 }

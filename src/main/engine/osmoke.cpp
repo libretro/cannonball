@@ -57,7 +57,7 @@ void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry *sprite)
 
     if (olevelobjs.spray_counter)
     {
-        OSmoke_tick_smoke_anim(self, sprite, 1, roms.rom0p->read32(outrun.adr.spray_data + olevelobjs.spray_type));
+        OSmoke_tick_smoke_anim(self, sprite, 1, RomLoader_read32(roms.rom0p, outrun.adr.spray_data + olevelobjs.spray_type));
         return;
     }
 
@@ -71,7 +71,7 @@ void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry *sprite)
 
     if (oferrari.is_slipping && oferrari.wheel_state == WHEELS_ON)
     {
-        OSmoke_tick_smoke_anim(self, sprite, 0, roms.rom0p->read32(outrun.adr.smoke_data + self->smoke_type_slip));
+        OSmoke_tick_smoke_anim(self, sprite, 0, RomLoader_read32(roms.rom0p, outrun.adr.smoke_data + self->smoke_type_slip));
         return;
     }
 
@@ -81,7 +81,7 @@ void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry *sprite)
 
     if (oferrari.wheel_state != WHEELS_ON)
     {
-        uint32_t smoke_adr = roms.rom0p->read32(outrun.adr.smoke_data + self->smoke_type_offroad);
+        uint32_t smoke_adr = RomLoader_read32(roms.rom0p, outrun.adr.smoke_data + self->smoke_type_offroad);
 
         /* Left Wheel Only */
         if (sprite == &osprites.jump_table[SPRITE_SMOKE2] && oferrari.wheel_state == WHEELS_LEFT_OFF)
@@ -108,7 +108,7 @@ void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry *sprite)
     /* Smoke from wheels */
     else if (oferrari.car_state == CAR_SMOKE)
     {
-        OSmoke_tick_smoke_anim(self, sprite, 1, roms.rom0p->read32(outrun.adr.smoke_data + self->smoke_type_onroad));
+        OSmoke_tick_smoke_anim(self, sprite, 1, RomLoader_read32(roms.rom0p, outrun.adr.smoke_data + self->smoke_type_onroad));
     }
     /* Animation Sequence */
     else
@@ -117,7 +117,7 @@ void OSmoke_draw_ferrari_smoke(OSmoke* self, oentry *sprite)
             sprite->type = sprite->xw1; /* Copy frame number to type */
         else
         {
-            OSmoke_tick_smoke_anim(self, sprite, 1, roms.rom0p->read32(outrun.adr.smoke_data + self->smoke_type_onroad));
+            OSmoke_tick_smoke_anim(self, sprite, 1, RomLoader_read32(roms.rom0p, outrun.adr.smoke_data + self->smoke_type_onroad));
         }
     }
 }
@@ -282,9 +282,9 @@ static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctr
     }
     /* setup_smoke: */
     uint16_t frame   = (sprite->xw1 & 7) << 3;
-    sprite->addr     = roms.rom0p->read32(addr + frame);
-    sprite->pal_src  = roms.rom0p->read8(addr + frame + 5);
-    { uint16_t smoke_z = roms.rom0p->read8(addr + frame + 4) + sprite->z;
+    sprite->addr     = RomLoader_read32(roms.rom0p, addr + frame);
+    sprite->pal_src  = RomLoader_read8(roms.rom0p, addr + frame + 5);
+    { uint16_t smoke_z = RomLoader_read8(roms.rom0p, addr + frame + 4) + sprite->z;
     if (smoke_z > 0xFF) smoke_z = 0xFF;
 
     /* inc_crash_z: */
@@ -296,21 +296,21 @@ static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctr
 
     /* Set Sprite Zoom */
     if (smoke_z <= 0x40) smoke_z = 0x40;
-    { uint8_t shift = (roms.rom0p->read8(addr + frame + 7) & 2) >> 1;
+    { uint8_t shift = (RomLoader_read8(roms.rom0p, addr + frame + 7) & 2) >> 1;
     uint8_t zoom = smoke_z >> shift;
     if (zoom <= 0x40) zoom = 0x40;
     sprite->zoom = zoom;
 
     /* Set Sprite Y */
-    sprite->y += ((roms.rom0p->read8(addr + frame + 6) & 0xF) * zoom) >> 8;
+    sprite->y += ((RomLoader_read8(roms.rom0p, addr + frame + 6) & 0xF) * zoom) >> 8;
 
     /* Set Sprite Priority */
-    sprite->priority = oferrari.spr_ferrari->priority + ((roms.rom0p->read8(addr + frame + 7) >> 4) & 0xF);
+    sprite->priority = oferrari.spr_ferrari->priority + ((RomLoader_read8(roms.rom0p, addr + frame + 7) >> 4) & 0xF);
     sprite->road_priority = sprite->priority;
 
     /* Set Sprite X */
-    uint8_t hflip = (roms.rom0p->read8(addr + frame + 7) & 1);
-    { int8_t x = ((roms.rom0p->read8(addr + frame + 6) >> 3) & 0x1E);
+    uint8_t hflip = (RomLoader_read8(roms.rom0p, addr + frame + 7) & 1);
+    { int8_t x = ((RomLoader_read8(roms.rom0p, addr + frame + 6) >> 3) & 0x1E);
 
     /* Enhancement: When viewing in-car, spread the spray out */
     if (ORoad_get_view_mode(&oroad) == VIEW_INCAR)

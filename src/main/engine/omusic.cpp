@@ -40,13 +40,13 @@ bool OMusic::load_widescreen_map(std::string path)
     if (tilemap == NULL)
     {
         tilemap = new RomLoader();
-        status += tilemap->load_binary(std::string(path + "tilemap.bin").c_str());
+        status += RomLoader_load_binary(tilemap, std::string(path + "tilemap.bin").c_str());
     }
 
     if (tile_patch == NULL)
     {
         tile_patch = new RomLoader();
-        status += tile_patch->load_binary(std::string(path + "tilepatch.bin").c_str());
+        status += RomLoader_load_binary(tile_patch, std::string(path + "tilepatch.bin").c_str());
     }
 
     return status == 0;
@@ -222,7 +222,7 @@ void OMusic::tick()
     /* Animated EQ Sprite (Cycle the graphical equalizer on the radio) */
     oentry *e = &osprites.jump_table[entry_start + 1];
     e->reload++; /* Increment palette entry */
-    e->pal_src = roms.rom0.read8((e->reload & 0x3E) >> 1 | MUSIC_EQ_PAL);
+    e->pal_src = RomLoader_read8(&(roms.rom0), (e->reload & 0x3E) >> 1 | MUSIC_EQ_PAL);
     OSprites_map_palette(&osprites, e);
     OSprites_do_spr_order_shadows(&osprites, e);
 
@@ -416,7 +416,7 @@ void OMusic::blit_music_select()
 
     /* Write 32 Palette Longs to Palette RAM */
     { int i; for (i = 0; i < 32; i++)
-        Video_write_pal32(&video, &dst_addr, roms.rom0.read32(&src_addr)); }
+        Video_write_pal32(&video, &dst_addr, RomLoader_read32(&(roms.rom0), &src_addr)); }
 
     /* Set Tilemap Scroll */
     otiles.set_scroll(config.s16_x_off, 0);
@@ -429,14 +429,14 @@ void OMusic::blit_music_select()
         uint32_t tilemap16 = TILEMAP_RAM_16 - 20;
         src_addr = 0;
 
-        { const uint16_t rows = tilemap->read16(&src_addr);
-        const uint16_t cols = tilemap->read16(&src_addr);
+        { const uint16_t rows = RomLoader_read16(tilemap, &src_addr);
+        const uint16_t cols = RomLoader_read16(tilemap, &src_addr);
 
         { int y; for (y = 0; y < rows; y++)
         {
             dst_addr = tilemap16;
             { int x; for (x = 0; x < cols; x++)
-                Video_write_tile16(&video, &dst_addr, tilemap->read16(&src_addr)); }
+                Video_write_tile16(&video, &dst_addr, RomLoader_read16(tilemap, &src_addr)); }
             tilemap16 += 0x80; /* next line of tiles */
         } }
      }}
@@ -454,7 +454,7 @@ void OMusic::blit_music_select()
             { int x; for (x = 0; x < 40;)
             {
                 /* get next tile */
-                uint32_t data = roms.rom0.read16(&src_addr);
+                uint32_t data = RomLoader_read16(&(roms.rom0), &src_addr);
                 /* No Compression: write tile directly to tile ram */
                 if (data != 0)
                 {
@@ -464,8 +464,8 @@ void OMusic::blit_music_select()
                 /* Compression */
                 else
                 {
-                    uint16_t value = roms.rom0.read16(&src_addr); /* tile index to copy */
-                    uint16_t count = roms.rom0.read16(&src_addr); /* number of times to copy value */
+                    uint16_t value = RomLoader_read16(&(roms.rom0), &src_addr); /* tile index to copy */
+                    uint16_t count = RomLoader_read16(&(roms.rom0), &src_addr); /* number of times to copy value */
 
                     { uint16_t i; for (i = 0; i <= count; i++)
                     {

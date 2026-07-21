@@ -122,11 +122,11 @@ void TrackLoader::init_original_tracks(bool jap)
         const uint16_t STAGE_OFFSET = stage_data[STAGE_ORDER[i]] << 2;
 
         /* CPU 0 Data */
-        const uint32_t STAGE_ADR = roms.rom0p->read32(outrun.adr.road_seg_table + STAGE_OFFSET);
+        const uint32_t STAGE_ADR = RomLoader_read32(roms.rom0p, outrun.adr.road_seg_table + STAGE_OFFSET);
         setup_level(&levels[i], roms.rom0p, STAGE_ADR);
 
         /* CPU 1 Data */
-        const uint32_t PATH_ADR = roms.rom1p->read32(ROAD_DATA_LOOKUP + STAGE_OFFSET);
+        const uint32_t PATH_ADR = RomLoader_read32(roms.rom1p, ROAD_DATA_LOOKUP + STAGE_OFFSET);
         levels[i].path = &roms.rom1p->rom[PATH_ADR];        
     } }
 
@@ -140,7 +140,7 @@ void TrackLoader::init_original_tracks(bool jap)
 
     { int i; for (i = 0; i < 5; i++)
     {
-        const uint32_t STAGE_ADR = roms.rom0p->read32(outrun.adr.road_seg_end + (i << 2));
+        const uint32_t STAGE_ADR = RomLoader_read32(roms.rom0p, outrun.adr.road_seg_end + (i << 2));
         setup_section(&levels_end[i], roms.rom0p, STAGE_ADR);
         levels_end[i].path  = &roms.rom1p->rom[ROAD_DATA_BONUS];
     } }
@@ -153,32 +153,32 @@ void TrackLoader::init_layout_tracks(bool jap)
     /* -------------------------------------------------------------------------------------------- */
     /* Check Version is Correct */
     /* -------------------------------------------------------------------------------------------- */
-    if (layout->read32(LayOut::HEADER) != LayOut::EXPECTED_VERSION)
+    if (RomLoader_read32(layout, LayOut::HEADER) != LayOut::EXPECTED_VERSION)
     {
         log_cb(RETRO_LOG_WARN, "Incompatible LayOut Version Detected. Try upgrading CannonBall to the latest version\n");
         init_original_tracks(jap);
         return;
     }
 
-    display_start_line = layout->read8((uint32_t)LayOut::HEADER + (uint32_t)sizeof(uint32_t));
+    display_start_line = RomLoader_read8(layout, (uint32_t)LayOut::HEADER + (uint32_t)sizeof(uint32_t));
 
     /* -------------------------------------------------------------------------------------------- */
     /* Setup Shared Data */
     /* -------------------------------------------------------------------------------------------- */
 
     /* Height Map Entries */
-    heightmap_offset  = layout->read32(LayOut::HEIGHT_MAPS);
+    heightmap_offset  = RomLoader_read32(layout, LayOut::HEIGHT_MAPS);
     heightmap_data    = &layout->rom[0];  
 
     /* Scenery Map Entries */
-    scenerymap_offset = layout->read32(LayOut::SPRITE_MAPS);
+    scenerymap_offset = RomLoader_read32(layout, LayOut::SPRITE_MAPS);
     scenerymap_data   = &layout->rom[0]; 
 
     /* Palette Entries */
-    pal_sky_offset    = layout->read32(LayOut::PAL_SKY);
+    pal_sky_offset    = RomLoader_read32(layout, LayOut::PAL_SKY);
     pal_sky_data      = &layout->rom[0];
 
-    pal_gnd_offset    = layout->read32(LayOut::PAL_GND);
+    pal_gnd_offset    = RomLoader_read32(layout, LayOut::PAL_GND);
     pal_gnd_data      = &layout->rom[0];
 
     /* -------------------------------------------------------------------------------------------- */
@@ -187,11 +187,11 @@ void TrackLoader::init_layout_tracks(bool jap)
     { int i; for (i = 0; i < STAGES; i++)
     {
         /* CPU 0 Data */
-        const uint32_t STAGE_ADR = layout->read32(LayOut::LEVELS + (i * sizeof(uint32_t)));
+        const uint32_t STAGE_ADR = RomLoader_read32(layout, LayOut::LEVELS + (i * sizeof(uint32_t)));
         setup_level(&levels[i], layout, STAGE_ADR);
 
         /* CPU 1 Data */
-        const uint32_t PATH_ADR = layout->read32(LayOut::PATH);
+        const uint32_t PATH_ADR = RomLoader_read32(layout, LayOut::PATH);
         levels[i].path = &layout->rom[ PATH_ADR + ((ROAD_END_CPU1 * sizeof(uint32_t)) * i) ];
     } }
 
@@ -200,14 +200,14 @@ void TrackLoader::init_layout_tracks(bool jap)
     /* -------------------------------------------------------------------------------------------- */
 
     /* Split stages don't contain palette information */
-    setup_section(level_split, layout, layout->read32(LayOut::SPLIT_LEVEL));
-    level_split->path = &layout->rom[ layout->read32(LayOut::SPLIT_PATH) ];
+    setup_section(level_split, layout, RomLoader_read32(layout, LayOut::SPLIT_LEVEL));
+    level_split->path = &layout->rom[ RomLoader_read32(layout, LayOut::SPLIT_PATH) ];
 
     /* End sections don't contain palette information. Shared path. */
-    uint8_t* end_path = &layout->rom[ layout->read32(LayOut::END_PATH) ];
+    uint8_t* end_path = &layout->rom[ RomLoader_read32(layout, LayOut::END_PATH) ];
     { int i; for (i = 0; i < 5; i++)
     {
-        const uint32_t STAGE_ADR = layout->read32(LayOut::END_LEVELS + (i * sizeof(uint32_t)));
+        const uint32_t STAGE_ADR = RomLoader_read32(layout, LayOut::END_LEVELS + (i * sizeof(uint32_t)));
         setup_section(&levels_end[i], layout, STAGE_ADR);
         levels_end[i].path = end_path;
     } }
@@ -217,40 +217,40 @@ void TrackLoader::init_layout_tracks(bool jap)
 void TrackLoader::setup_level(Level* l, RomLoader* data, const int STAGE_ADR)
 {
     /* Sky Palette */
-    uint32_t adr = data->read32(STAGE_ADR + 0);
-    l->pal_sky   = data->read16(adr);
+    uint32_t adr = RomLoader_read32(data, STAGE_ADR + 0);
+    l->pal_sky   = RomLoader_read16(data, adr);
 
     /* Load Road Pallete */
-    adr = data->read32(STAGE_ADR + 4);
-    l->palr1.stripe_centre = data->read32(&adr);
-    l->palr2.stripe_centre = data->read32(adr);
+    adr = RomLoader_read32(data, STAGE_ADR + 4);
+    l->palr1.stripe_centre = RomLoader_read32(data, &adr);
+    l->palr2.stripe_centre = RomLoader_read32(data, adr);
 
-    adr = data->read32(STAGE_ADR + 8);
-    l->palr1.stripe = data->read32(&adr);
-    l->palr2.stripe = data->read32(adr);
+    adr = RomLoader_read32(data, STAGE_ADR + 8);
+    l->palr1.stripe = RomLoader_read32(data, &adr);
+    l->palr2.stripe = RomLoader_read32(data, adr);
 
-    adr = data->read32(STAGE_ADR + 12);
-    l->palr1.side = data->read32(&adr);
-    l->palr2.side = data->read32(adr);
+    adr = RomLoader_read32(data, STAGE_ADR + 12);
+    l->palr1.side = RomLoader_read32(data, &adr);
+    l->palr2.side = RomLoader_read32(data, adr);
 
-    adr = data->read32(STAGE_ADR + 16);
-    l->palr1.road = data->read32(&adr);
-    l->palr2.road = data->read32(adr);
+    adr = RomLoader_read32(data, STAGE_ADR + 16);
+    l->palr1.road = RomLoader_read32(data, &adr);
+    l->palr2.road = RomLoader_read32(data, adr);
 
     /* Ground Palette */
-    adr = data->read32(STAGE_ADR + 20);
-    l->pal_gnd = data->read16(adr);
+    adr = RomLoader_read32(data, STAGE_ADR + 20);
+    l->pal_gnd = RomLoader_read16(data, adr);
 
     /* Curve Data */
-    curve_offset = data->read32(STAGE_ADR + 24);
+    curve_offset = RomLoader_read32(data, STAGE_ADR + 24);
     l->curve = &data->rom[curve_offset];
 
     /* Width / Height Lookup */
-    wh_offset = data->read32(STAGE_ADR + 28);
+    wh_offset = RomLoader_read32(data, STAGE_ADR + 28);
     l->width_height = &data->rom[wh_offset];
 
     /* Sprite Information */
-    scenery_offset = data->read32(STAGE_ADR + 32);
+    scenery_offset = RomLoader_read32(data, STAGE_ADR + 32);
     l->scenery = &data->rom[scenery_offset];
 }
 
@@ -259,15 +259,15 @@ void TrackLoader::setup_level(Level* l, RomLoader* data, const int STAGE_ADR)
 void TrackLoader::setup_section(Level* l, RomLoader* data, const int STAGE_ADR)
 {
     /* Curve Data */
-    curve_offset = data->read32(STAGE_ADR + 0);
+    curve_offset = RomLoader_read32(data, STAGE_ADR + 0);
     l->curve = &data->rom[curve_offset];
 
     /* Width / Height Lookup */
-    wh_offset = data->read32(STAGE_ADR + 4);
+    wh_offset = RomLoader_read32(data, STAGE_ADR + 4);
     l->width_height = &data->rom[wh_offset];
 
     /* Sprite Information */
-    scenery_offset = data->read32(STAGE_ADR + 8);
+    scenery_offset = RomLoader_read32(data, STAGE_ADR + 8);
     l->scenery = &data->rom[scenery_offset];
 }
 

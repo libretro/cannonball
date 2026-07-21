@@ -66,7 +66,7 @@ void OHiScore_setup_pal_best(OHiScore* self)
     uint32_t dst = 0x120F00;
 
     { int i; for (i = 0; i <= 0x1F; i++)
-        Video_write_pal32(&video, &dst, roms.rom0.read32(&src)); }
+        Video_write_pal32(&video, &dst, RomLoader_read32(&(roms.rom0), &src)); }
 }
 
 /* Setup road colour for Best Outrunners High Score Entry */
@@ -89,19 +89,19 @@ void OHiScore_init_def_scores(OHiScore* self)
     { int i; for (i = 0; i < NO_SCORES; i++)
     {
         /* Read default score */
-        self->scores[i].score = roms.rom0.read32(&adr);
+        self->scores[i].score = RomLoader_read32(&(roms.rom0), &adr);
 
         /* Read initials */
-        uint32_t initials = roms.rom0.read32(&adr);
+        uint32_t initials = RomLoader_read32(&(roms.rom0), &adr);
         self->scores[i].initial1 = (initials >> 24) & 0xFF;
         self->scores[i].initial2 = (initials >> 16) & 0xFF;
         self->scores[i].initial3 = (initials >> 8) & 0xFF;
 
         /* Read default time */
-        self->scores[i].time = roms.rom0.read16(&adr);
+        self->scores[i].time = RomLoader_read16(&(roms.rom0), &adr);
         /*scores[i].time = (i & 1) ? 0x4321 : 0x1234; // hack to display 4m 43 51 or 1m 16 56 */
         /* Read map tiles */
-        self->scores[i].maptiles = roms.rom0.read32(&adr);
+        self->scores[i].maptiles = RomLoader_read32(&(roms.rom0), &adr);
         /*scores[i].maptiles = 0xe5c8c2d1; // hack to populate map tiles for testing */
     } }
 }
@@ -206,7 +206,7 @@ void OHiScore_insert_score(OHiScore* self)
     }
 
     /* Setup Appropriate Minimap Tiles */
-    self->scores[self->score_pos].maptiles = roms.rom0.read32(OHud_setup_mini_map(&ohud));
+    self->scores[self->score_pos].maptiles = RomLoader_read32(&(roms.rom0), OHud_setup_mini_map(&ohud));
 }
 
 /* Set Table Position To Display Score From. Store Result in $26 */
@@ -312,7 +312,7 @@ void OHiScore_flash_entry(OHiScore* self, uint32_t adr)
 
     if (self->flash & BIT_3)
     {
-        tile = (roms.rom0.read8(self->letter_selected + TILES_ALPHABET) & 0xFF) | 0x8600;
+        tile = (RomLoader_read8(&(roms.rom0), self->letter_selected + TILES_ALPHABET) & 0xFF) | 0x8600;
     }
 
     Video_write_text16(&video, adr + (self->initial_selected << 1), tile);
@@ -367,7 +367,7 @@ void OHiScore_do_input(OHiScore* self, uint32_t adr)
     /* Normal character selected */
     else
     {
-        uint8_t tile = roms.rom0.read8(TILES_ALPHABET + self->letter_selected);
+        uint8_t tile = RomLoader_read8(&(roms.rom0), TILES_ALPHABET + self->letter_selected);
         
         /* Store initial to score structure */
         if (self->initial_selected == 0)
@@ -537,18 +537,18 @@ void OHiScore_tick_minicars(OHiScore* self)
             /* Two versions of routine, one that only blits the car in two tiles */
             if ((minicar->pos >> 8) & BIT_0)
             {
-                Video_write_text32(&video, &textram_adr, roms.rom0.read32(tiles_adr)); /* blit car in 2 tiles */
-                Video_write_text32(&video, &textram_adr, roms.rom0.read32(&tiles_smoke_adr)); /* smoke trail tile 1 */
-                Video_write_text16(&video, &textram_adr, roms.rom0.read16(&tiles_smoke_adr)); /* smoke trail tile 2 */
+                Video_write_text32(&video, &textram_adr, RomLoader_read32(&(roms.rom0), tiles_adr)); /* blit car in 2 tiles */
+                Video_write_text32(&video, &textram_adr, RomLoader_read32(&(roms.rom0), &tiles_smoke_adr)); /* smoke trail tile 1 */
+                Video_write_text16(&video, &textram_adr, RomLoader_read16(&(roms.rom0), &tiles_smoke_adr)); /* smoke trail tile 2 */
             }
             /* Blit at an offset */
             /* The second blits the mini-car at an offset halfway into the tile (and hence takes 3 tiles) */
             else
             {
-                Video_write_text32(&video, &textram_adr, roms.rom0.read32(4 + tiles_adr)); /* blit car in 3 tiles */
-                Video_write_text16(&video, &textram_adr, roms.rom0.read16(8 + tiles_adr)); /* blit car in 3 tiles */
-                Video_write_text32(&video, &textram_adr, roms.rom0.read32(&tiles_smoke_adr)); /* smoke trail tile 1 */
-                Video_write_text16(&video, &textram_adr, roms.rom0.read16(&tiles_smoke_adr)); /* smoke trail tile 2 */
+                Video_write_text32(&video, &textram_adr, RomLoader_read32(&(roms.rom0), 4 + tiles_adr)); /* blit car in 3 tiles */
+                Video_write_text16(&video, &textram_adr, RomLoader_read16(&(roms.rom0), 8 + tiles_adr)); /* blit car in 3 tiles */
+                Video_write_text32(&video, &textram_adr, RomLoader_read32(&(roms.rom0), &tiles_smoke_adr)); /* smoke trail tile 1 */
+                Video_write_text16(&video, &textram_adr, RomLoader_read16(&(roms.rom0), &tiles_smoke_adr)); /* smoke trail tile 2 */
             }
 
             /* Erase Minicar tiles (0xCFB2) */

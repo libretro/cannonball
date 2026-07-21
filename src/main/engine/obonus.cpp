@@ -103,10 +103,10 @@ static void OBonus_init_bonus_text(OBonus* self)
     /* Blit big 100K number */
     uint32_t src_addr = TEXT1_BONUS_100K;
     uint32_t dst_addr = 0x11065A;
-    int8_t count = roms.rom0.read8(&src_addr);
+    int8_t count = RomLoader_read8(&(roms.rom0), &src_addr);
 
     { int8_t i; for (i = 0; i <= count; i++)
-        OHud_blit_large_digit(&ohud, &dst_addr, (roms.rom0.read8(&src_addr) - 0x30) << 1); }
+        OHud_blit_large_digit(&ohud, &dst_addr, (RomLoader_read8(&(roms.rom0), &src_addr) - 0x30) << 1); }
 
     OBonus_blit_bonus_secs(self);
  } } }}

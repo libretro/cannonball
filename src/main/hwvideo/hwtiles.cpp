@@ -134,15 +134,15 @@ void hwtiles::patch_tiles(RomLoader* patch)
 
     { uint32_t i; for (i = 0; i < patch->length;)
     {
-        uint32_t tile_index = patch->read16(&i) << 3;
-        tiles[tile_index++] = patch->read32(&i);
-        tiles[tile_index++] = patch->read32(&i);
-        tiles[tile_index++] = patch->read32(&i);
-        tiles[tile_index++] = patch->read32(&i);
-        tiles[tile_index++] = patch->read32(&i);
-        tiles[tile_index++] = patch->read32(&i);
-        tiles[tile_index++] = patch->read32(&i);
-        tiles[tile_index++] = patch->read32(&i);
+        uint32_t tile_index = RomLoader_read16(patch, &i) << 3;
+        tiles[tile_index++] = RomLoader_read32(patch, &i);
+        tiles[tile_index++] = RomLoader_read32(patch, &i);
+        tiles[tile_index++] = RomLoader_read32(patch, &i);
+        tiles[tile_index++] = RomLoader_read32(patch, &i);
+        tiles[tile_index++] = RomLoader_read32(patch, &i);
+        tiles[tile_index++] = RomLoader_read32(patch, &i);
+        tiles[tile_index++] = RomLoader_read32(patch, &i);
+        tiles[tile_index++] = RomLoader_read32(patch, &i);
     } }
 }
 

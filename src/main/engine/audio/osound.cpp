@@ -362,8 +362,8 @@ void OSound_new_command(OSound* self)
         /* Send four level commands */
         { uint8_t i; for (i = 0; i < 4; i++)
         {
-            uint8_t reg = roms.z80.read8(&adr);
-            uint8_t val = roms.z80.read8(&adr);
+            uint8_t reg = RomLoader_read8(&(roms.z80), &adr);
+            uint8_t val = RomLoader_read8(&(roms.z80), &adr);
             OSound_fm_write_reg(self, reg, val);
         } }
      }}
@@ -536,7 +536,7 @@ void OSound_process_channel(OSound* self, uint16_t chan_id)
 /* Source: 0x2E1 */static 
 void OSound_process_section(OSound* self, uint8_t* chan)
 {
-    uint8_t cmd = roms.z80.read8(&self->pos);
+    uint8_t cmd = RomLoader_read8(&(roms.z80), &self->pos);
     self->cmd_prev = cmd;
     if (cmd >= 0x80)
     {
@@ -569,7 +569,7 @@ void OSound_process_section(OSound* self, uint8_t* chan)
     if (cmd)
     {
         uint16_t adr = YM_NOTE_OCTAVE + (cmd - 1 + (int8_t) chan[CH_NOTE_OFFSET]);
-        chan[CH_FM_NOTE] = roms.z80.read8(adr);
+        chan[CH_FM_NOTE] = RomLoader_read8(&(roms.z80), adr);
     }
     /* If Channel is mute, clear note information. */
     else if (!(chan[CH_FM_FLAGS] & BIT_6))
@@ -583,7 +583,7 @@ void OSound_process_section(OSound* self, uint8_t* chan)
 /* Source: 0x31C */static 
 void OSound_calc_end_marker(OSound* self, uint8_t* chan)
 {
-    uint16_t end_marker = roms.z80.read8(self->pos);
+    uint16_t end_marker = RomLoader_read8(&(roms.z80), self->pos);
     
     /* 32d */
     if (chan[CH_FM_MARKER] & BIT_1)
@@ -592,7 +592,7 @@ void OSound_calc_end_marker(OSound* self, uint8_t* chan)
         if (chan[CH_FM_MARKER] & BIT_0)
         {
             chan[CH_FM_MARKER] &= ~BIT_0;
-            end_marker += (roms.z80.read8(++self->pos) << 8); 
+            end_marker += (RomLoader_read8(&(roms.z80), ++self->pos) << 8); 
         }
     }
     /* 325 */
@@ -634,7 +634,7 @@ void OSound_next_mml_cmd(OSound* self, uint8_t* chan, uint8_t cmd)
 
         /* YM: Enable/Disable Modulation table */
         case MML_KEY_FRACTIONS:
-            chan[CH_FM_PHASETBL] = roms.z80.read8(self->pos);
+            chan[CH_FM_PHASETBL] = RomLoader_read8(&(roms.z80), self->pos);
             break;
 
         /* Write Sequence Address (Used by PCM Drum Samples) */
@@ -654,7 +654,7 @@ void OSound_next_mml_cmd(OSound* self, uint8_t* chan, uint8_t cmd)
 
         /* YM: Set Note/Octave Offset */
         case MML_TRANSPOSE:
-            chan[CH_NOTE_OFFSET] += roms.z80.read8(self->pos);
+            chan[CH_NOTE_OFFSET] += RomLoader_read8(&(roms.z80), self->pos);
             break;
 
         /* LOOP	loopNumber, loopCount, loopAddress */
@@ -722,7 +722,7 @@ void OSound_next_mml_cmd(OSound* self, uint8_t* chan, uint8_t cmd)
 /* Source: 0x3D7 */static 
 void OSound_setvol(OSound* self, uint8_t* chan)
 {  
-    uint8_t vol_l = roms.z80.read8(self->pos);
+    uint8_t vol_l = RomLoader_read8(&(roms.z80), self->pos);
 
     /* PCM Percussion Sample */
     if (chan[CH_FM_FLAGS] & BIT_6)
@@ -733,7 +733,7 @@ void OSound_setvol(OSound* self, uint8_t* chan)
         chan[CH_VOL_L] = vol_l > VOL_MAX ? 0 : vol_l;
 
         /* Set right volume */
-        uint8_t vol_r = roms.z80.read8(++self->pos);
+        uint8_t vol_r = RomLoader_read8(&(roms.z80), ++self->pos);
         chan[CH_VOL_R] = vol_r > VOL_MAX ? 0 : vol_r;
     }
     /* YM */
@@ -749,7 +749,7 @@ void OSound_pcm_setpitch(OSound* self, uint8_t* chan)
 {
     /* PCM Percussion Sample (Pitch can't be applied to voices) */
     if (chan[CH_FM_FLAGS] & BIT_6)
-        chan[CH_PCM_PITCH] = roms.z80.read8(self->pos);
+        chan[CH_PCM_PITCH] = RomLoader_read8(&(roms.z80), self->pos);
 }
 
 /* Sets Loop Address For FM & PCM Commands. */
@@ -757,7 +757,7 @@ void OSound_pcm_setpitch(OSound* self, uint8_t* chan)
 /* Source: 0x446 */static 
 void OSound_set_loop_adr(OSound* self)
 {
-    self->pos = roms.z80.read16(self->pos) - 1;
+    self->pos = RomLoader_read16(&(roms.z80), self->pos) - 1;
 }
 
 /* Set Loop Counter For FM & PCM Data */
@@ -765,13 +765,13 @@ void OSound_set_loop_adr(OSound* self)
 /* Source: 0x454 */static 
 void OSound_do_loop(OSound* self, uint8_t* chan)
 {
-    uint8_t offset = roms.z80.read8(self->pos++) + 0x18;
+    uint8_t offset = RomLoader_read8(&(roms.z80), self->pos++) + 0x18;
     uint8_t a = chan[offset];
 
     /* Reload counter */
     if (a == 0)
     {
-        chan[offset] = roms.z80.read8(self->pos);
+        chan[offset] = RomLoader_read8(&(roms.z80), self->pos);
     }
 
     self->pos++;
@@ -844,10 +844,10 @@ void OSound_play_pcm_index(OSound* self, uint8_t* chan, uint8_t cmd)
         /* First sample is at index 0xD0, so reset to 0 */
         uint16_t pcm_index = PCM_INFO + ((cmd - 0xD0) << 2);
 
-        chan[CH_PCM_ADR1L] = roms.z80.read8(&pcm_index);           /* Wave Start Address */
-        chan[CH_PCM_ADR1H] = roms.z80.read8(&pcm_index);
-        chan[CH_PCM_ADR2]  = roms.z80.read8(&pcm_index);           /* Wave End Address */
-        chan[CH_CTRL]      = roms.z80.read8(&pcm_index);           /* Sample Flags */
+        chan[CH_PCM_ADR1L] = RomLoader_read8(&(roms.z80), &pcm_index);           /* Wave Start Address */
+        chan[CH_PCM_ADR1H] = RomLoader_read8(&(roms.z80), &pcm_index);
+        chan[CH_PCM_ADR2]  = RomLoader_read8(&(roms.z80), &pcm_index);           /* Wave End Address */
+        chan[CH_CTRL]      = RomLoader_read8(&(roms.z80), &pcm_index);           /* Sample Flags */
     }
     /* ------------------------------------------------------------------------ */
     /* Initalize PCM Percussion Samples */
@@ -877,20 +877,20 @@ void OSound_init_sound(OSound* self, uint8_t cmd, uint16_t src, uint16_t dst)
     self->command_index = cmd - 0x81;
     
     /* Get offset to channel setup */
-    src = roms.z80.read16(src);
+    src = RomLoader_read16(&(roms.z80), src);
 
     /* Get number of channels */
-    uint8_t channels = roms.z80.read8(&src);
+    uint8_t channels = RomLoader_read8(&(roms.z80), &src);
 
     /* next_channel */
     { uint8_t ch; for (ch = 0; ch < channels; ch++)
     {
         /* Address of default channel setup data */
-        uint16_t adr = roms.z80.read16(&src);
+        uint16_t adr = RomLoader_read16(&(roms.z80), &src);
 
         /* Copy default setup code for block of sound (14 bytes) */
         { int i; for (i = 0; i < 0xE; i++)
-            self->chan_ram[dst++] = roms.z80.read8(&adr); }
+            self->chan_ram[dst++] = RomLoader_read8(&(roms.z80), &adr); }
 
         /* Write command byte (at position 0xE) */
         self->chan_ram[dst++] = self->command_index;
@@ -1102,7 +1102,7 @@ void OSound_fm_write_reg(OSound* self, uint8_t reg, uint8_t value)
 /* Source: 0xA84 */static 
 void OSound_fm_write_block(OSound* self, uint8_t ix0, uint16_t adr, uint8_t chan)
 {
-    uint8_t cmd = roms.z80.read8(&adr);
+    uint8_t cmd = RomLoader_read8(&(roms.z80), &adr);
 
     /* Return if end of data block */
     if (cmd == 2) return;
@@ -1110,12 +1110,12 @@ void OSound_fm_write_block(OSound* self, uint8_t ix0, uint16_t adr, uint8_t chan
     /* Next word specifies next address in memory */
     if (cmd == 3)
     {
-        adr = roms.z80.read16(adr);
+        adr = RomLoader_read16(&(roms.z80), adr);
     }
     else
     {
         uint8_t reg = cmd + chan;
-        uint8_t val = roms.z80.read8(&adr);
+        uint8_t val = RomLoader_read8(&(roms.z80), &adr);
         OSound_fm_write_reg_c(self, 0, reg, val);
     }
 
@@ -1137,8 +1137,8 @@ void OSound_ym_set_levels(OSound* self)
     /* Write Level Info */
     { uint8_t i; for (i = 0; i < entries; i++)
     {
-        uint8_t reg = roms.z80.read8(&adr);
-        uint8_t val = roms.z80.read8(&adr);
+        uint8_t reg = RomLoader_read8(&(roms.z80), &adr);
+        uint8_t val = RomLoader_read8(&(roms.z80), &adr);
         OSound_fm_write_reg(self, reg, val);
     } }
  }}
@@ -1190,7 +1190,7 @@ const static uint16_t FM_DATA_TABLE[] =
 void OSound_ym_load_patch(OSound* self, uint8_t* chan)
 {
     /* Set block address */
-    chan[CH_FM_BLOCK] = roms.z80.read8(self->pos);
+    chan[CH_FM_BLOCK] = RomLoader_read8(&(roms.z80), self->pos);
     
     if (!chan[CH_FM_BLOCK])
         return;
@@ -1205,8 +1205,8 @@ uint16_t OSound_ym_lookup_data(OSound* self, uint8_t cmd, uint8_t offset, uint8_
     block = (block - 1) << 1;
     
     /* Address of data for FM routine */
-    uint16_t adr = roms.z80.read16((uint16_t) (FM_DATA_TABLE[cmd] + (offset << 1)));
-    return roms.z80.read16((uint16_t) (adr + block));
+    uint16_t adr = RomLoader_read16(&(roms.z80), (uint16_t) (FM_DATA_TABLE[cmd] + (offset << 1)));
+    return RomLoader_read16(&(roms.z80), (uint16_t) (adr + block));
 }
 
 /* "Connect" Channels To Play Out of Left/Right Speakers. */
@@ -1221,7 +1221,7 @@ void OSound_ym_set_connect(OSound* self, uint8_t* chan, uint8_t pan)
     uint8_t chan_ctrl_reg = (chan[CH_FM_FLAGS] & 7) + 0x20;
 
     /* Register Value */
-    uint8_t reg_value = (roms.z80.read8(adr) & 0x3F) | pan;
+    uint8_t reg_value = (RomLoader_read8(&(roms.z80), adr) & 0x3F) | pan;
 
     self->pos--;
 
@@ -1286,7 +1286,7 @@ void OSound_read_mod_table(OSound* self, uint8_t* chan)
     while (true)
     {
         uint16_t offset = chan[CH_FM_PHASEOFF];
-        uint8_t table_entry = roms.z80.read8((uint16_t) (adr + offset));
+        uint8_t table_entry = RomLoader_read8(&(roms.z80), (uint16_t) (adr + offset));
 
         /* Reset table position */
         if (table_entry == 0xFD)
@@ -1322,7 +1322,7 @@ void OSound_read_mod_table(OSound* self, uint8_t* chan)
 /* Source: 0x418 */static 
 void OSound_call_adr(OSound* self, uint8_t* chan)
 {
-    uint16_t value = roms.z80.read16(self->pos);
+    uint16_t value = RomLoader_read16(&(roms.z80), self->pos);
     self->pos++;
 
     chan[CH_MEM_OFFSET]--;
@@ -1618,14 +1618,14 @@ void OSound_ferrari_vol_pan(OSound* self, uint8_t* chan, uint8_t* pcm)
     OSound_engine_set_adr(self, pos, chan, pcm);
 
     /* Set PCM Sample End Address */
-    pcm[0x6] = roms.z80.read8(++pos);
+    pcm[0x6] = RomLoader_read8(&(roms.z80), ++pos);
 
     /* Set Volume Pan */
     OSound_engine_set_pan(self, pos, chan, pcm);
 
     /* Set Pitch */
     pos = ENGINE_ADR_TABLE + 4; /* Set position to pitch offset */
-    uint16_t pitch = roms.z80.read8(pos); /* bc */
+    uint16_t pitch = RomLoader_read8(&(roms.z80), pos); /* bc */
     pitch += OSound_r16(self, chan + CH_ENGINES_PITCH_L) >> 1;
     if (pitch > 0xFF) pitch = 0xFF;
 
@@ -1670,7 +1670,7 @@ uint16_t OSound_engine_get_table_adr(OSound* self, uint8_t* chan, uint8_t* pcm)
 /*bpset 77b0,1,{printf "start adr:%02x pos:=%02x",bc, hl; g} */static 
 uint16_t OSound_engine_set_adr(OSound* self, uint16_t& pos, uint8_t* chan, uint8_t* pcm)
 {
-    uint16_t start_adr = roms.z80.read16(pos++);
+    uint16_t start_adr = RomLoader_read16(&(roms.z80), pos++);
     OSound_w16(self, pcm + 0x4, start_adr); /* Set Wave Start Address */
 
     /* TRAFFIC */
@@ -1705,7 +1705,7 @@ uint16_t OSound_engine_set_adr(OSound* self, uint16_t& pos, uint8_t* chan, uint8
 void OSound_engine_set_adr_end(OSound* self, uint16_t& pos, uint16_t loop_adr, uint8_t* chan, uint8_t* pcm)
 {
     /* Set wave end address from table */
-    pcm[0x6] = roms.z80.read8(++pos);
+    pcm[0x6] = RomLoader_read8(&(roms.z80), ++pos);
 
     /* Loop Disabled */
     if (chan[CH_ENGINES_FLAGS] & BIT_2)
@@ -1743,7 +1743,7 @@ void OSound_vol_thicken(OSound* self, uint16_t& pos, uint8_t* chan, uint8_t* pcm
 /* Source: 0x78A7 */static 
 uint8_t OSound_get_adjusted_vol(OSound* self, uint16_t& pos, uint8_t* chan)
 {
-    uint8_t multiply =  roms.z80.read8(pos);
+    uint8_t multiply =  RomLoader_read8(&(roms.z80), pos);
     uint16_t vol = (chan[CH_ENGINES_VOL1] * multiply) >> 6;
 
     if (vol > 0x3F)
@@ -1765,7 +1765,7 @@ void OSound_engine_set_pitch(OSound* self, uint16_t& pos, uint8_t* pcm)
     if (bc & 0xFF00)
         bc = (bc & 0xFF00) | 0xFF;
 
-    { uint16_t pitch = roms.z80.read8(pos);
+    { uint16_t pitch = RomLoader_read8(&(roms.z80), pos);
 
     /*std::cout << std::hex << pos << std::endl; */
 
@@ -1828,7 +1828,7 @@ void OSound_engine_adjust_volume(OSound* self, uint8_t* chan)
 void OSound_engine_set_pan(OSound* self, uint16_t& pos, uint8_t* chan, uint8_t* pcm)
 {
     uint16_t pitch = OSound_r16(self, chan + CH_ENGINES_PITCH_L) >> 1;
-    pitch += roms.z80.read8(++pos);
+    pitch += RomLoader_read8(&(roms.z80), ++pos);
 
     { uint16_t vol = (chan[CH_ENGINES_VOL1] * pitch) >> 6;
 
@@ -2015,7 +2015,7 @@ void OSound_traffic_set_vol(OSound* self, uint8_t* pcm)
     { uint16_t multiply = TRAFFIC_VOL_MULTIPLY + vol_entry - 1;
 
     /* Set traffic volume multiplier */
-    pcm[0x83] = roms.z80.read8(multiply);
+    pcm[0x83] = RomLoader_read8(&(roms.z80), multiply);
 
     if (pcm[0x83] < 0x10)
         pcm[0x82] &= ~BIT_3; /* Disable Traffic Sound */

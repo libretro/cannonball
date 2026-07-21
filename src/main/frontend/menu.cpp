@@ -406,7 +406,7 @@ void Menu::draw_menu_options()
         {
             /* Draw minicar */
             if (i == cursor)
-                Video_write_text32(&video, OHud_translate(&ohud, x - 3, y, 0x110030), roms.rom0.read32(TILES_MINICARS1));
+                Video_write_text32(&video, OHud_translate(&ohud, x - 3, y, 0x110030), RomLoader_read32(&(roms.rom0), TILES_MINICARS1));
             /* Erase minicar from this position */
             else
                 Video_write_text32(&video, OHud_translate(&ohud, x - 3, y, 0x110030), 0x20202020);
