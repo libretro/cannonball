@@ -635,13 +635,13 @@ void OHiScore_blit_digit(OHiScore* self)
         if (!(tile & 0xFFFF))
         {
             tile = (tile & 0xFFFF0000) | 0x20;
-            outils_swap32(tile);
+            outils_swap32(&tile);
             tile |= 0x30;
         }
         /* Draw tile */
         else
         {
-            outils_swap32(tile);
+            outils_swap32(&tile);
             tile |= 0x300030;
         }
 

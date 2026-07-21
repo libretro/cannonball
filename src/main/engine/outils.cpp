@@ -49,11 +49,11 @@ uint32_t outils_random()
 	seed <<= 3;
 	seed += rnd;
 
-	outils_move16(seed, rnd);
-	outils_swap32(seed);
-	outils_add16(seed, rnd);
-	outils_move16(rnd, seed);
-	outils_swap32(seed);
+	outils_move16(seed, &rnd);
+	outils_swap32u(&seed);
+	outils_add16(seed, &rnd);
+	outils_move16(rnd, &seed);
+	outils_swap32u(&seed);
 
 	rnd_seed = seed; /* Set new seed */
 
