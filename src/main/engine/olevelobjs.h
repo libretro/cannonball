@@ -20,7 +20,7 @@ extern "C" {
 #endif
 
 
-#include "outrun.hpp"
+#include "outrun.h"
 
 static const uint8_t DEF_SPRITE_ENTRIES = 0x44;
 

@@ -18,28 +18,28 @@
 #include <libretro.h>
 #include "libretro_core_options.h"
 
-#include "input.hpp"
-#include "video.hpp"
+#include "input.h"
+#include "video.h"
 
-#include "romloader.hpp"
-#include "trackloader.hpp"
-#include "main.hpp"
-#include "../setup.hpp"
-#include "../engine/outrun.hpp"
-#include "../engine/oinputs.hpp"
-#include "../engine/ooutputs.hpp"
-#include "../engine/omusic.hpp"
-#include "../engine/ostats.hpp"
-#include "../frontend/config.hpp"
-#include "roms.hpp"
-#include "engine/audio/osoundint.hpp"
-#include "engine/oattractai.hpp"
-#include "../frontend/menu.hpp"
+#include "romloader.h"
+#include "trackloader.h"
+#include "main.h"
+#include "../setup.h"
+#include "../engine/outrun.h"
+#include "../engine/oinputs.h"
+#include "../engine/ooutputs.h"
+#include "../engine/omusic.h"
+#include "../engine/ostats.h"
+#include "../frontend/config.h"
+#include "roms.h"
+#include "engine/audio/osoundint.h"
+#include "engine/oattractai.h"
+#include "../frontend/menu.h"
 
-#include "lr_options.hpp"
+#include "lr_options.h"
 
 /* Haptic Support. */
-#include "ffeedback.hpp"
+#include "ffeedback.h"
 
 /* Initialize Shared Variables */
 int    cannonball_state       = STATE_BOOT;

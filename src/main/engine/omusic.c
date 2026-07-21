@@ -9,16 +9,16 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "main.hpp"
-#include "engine/oferrari.hpp"
-#include "engine/ohud.hpp"
-#include "engine/oinputs.hpp"
-#include "engine/ologo.hpp"
-#include "engine/omusic.hpp"
+#include "main.h"
+#include "engine/oferrari.h"
+#include "engine/ohud.h"
+#include "engine/oinputs.h"
+#include "engine/ologo.h"
+#include "engine/omusic.h"
 #include "engine/tilemap_data.h"
-#include "engine/otiles.hpp"
-#include "engine/otraffic.hpp"
-#include "engine/ostats.hpp"
+#include "engine/otiles.h"
+#include "engine/otraffic.h"
+#include "engine/ostats.h"
 
 static void OMusic_setup_sprite1(OMusic* self);
 static void OMusic_setup_sprite2(OMusic* self);

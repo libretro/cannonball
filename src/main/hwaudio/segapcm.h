@@ -17,8 +17,8 @@ extern "C" {
 
 
 #include <stdint.h>
-#include "romloader.hpp"
-#include "hwaudio/soundchip.hpp"
+#include "romloader.h"
+#include "hwaudio/soundchip.h"
 
 static const uint32_t BANK_256    = (11);
 

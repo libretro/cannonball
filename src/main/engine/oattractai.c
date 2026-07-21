@@ -39,11 +39,11 @@
 #include <stdlib.h> 
 #include <time.h>
 
-#include "oattractai.hpp"
-#include "oferrari.hpp"
-#include "oinputs.hpp"
-#include "ostats.hpp"
-#include "otraffic.hpp"
+#include "oattractai.h"
+#include "oferrari.h"
+#include "oinputs.h"
+#include "ostats.h"
+#include "otraffic.h"
 
 static void OAttractAI_check_road(OAttractAI* self);
 static void OAttractAI_set_steering(OAttractAI* self);

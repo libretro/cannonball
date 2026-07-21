@@ -8,8 +8,8 @@
     See license.txt for more details.
 ***************************************************************************/
 #include <stdlib.h> 
-#include "engine/outils.hpp"
-#include "engine/ostats.hpp"
+#include "engine/outils.h"
+#include "engine/ostats.h"
 
 /* Generate long random */
 /* */

@@ -12,15 +12,15 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "../trackloader.hpp"
+#include "../trackloader.h"
 
-#include "oanimseq.hpp"
-#include "ocrash.hpp"
-#include "oferrari.hpp"
-#include "olevelobjs.hpp"
-#include "osprites.hpp"
-#include "otraffic.hpp"
-#include "data/ozoom_lookup.hpp"
+#include "oanimseq.h"
+#include "ocrash.h"
+#include "oferrari.h"
+#include "olevelobjs.h"
+#include "osprites.h"
+#include "otraffic.h"
+#include "data/ozoom_lookup.h"
 
 static void OSprites_sprite_control(OSprites* self);
 static void OSprites_hide_hwsprite(OSprites* self, oentry*, osprite*);

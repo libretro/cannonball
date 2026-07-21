@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 
-#include "outrun.hpp"
+#include "outrun.h"
 
 /* Bonus Control */
 enum

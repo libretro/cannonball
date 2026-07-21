@@ -10,9 +10,9 @@
 ***************************************************************************/
 
 #include <stdlib.h>
-#include "engine/outrun.hpp"
-#include "engine/audio/osound.hpp"
-#include "engine/audio/osoundint.hpp"
+#include "engine/outrun.h"
+#include "engine/audio/osound.h"
+#include "engine/audio/osoundint.h"
 
 static void OSoundInt_add_to_queue(OSoundInt* self, uint8_t snd);
 

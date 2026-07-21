@@ -7,8 +7,8 @@
 
 #include <string.h>
 
-#include "ffeedback.hpp"
-#include "frontend/config.hpp"
+#include "ffeedback.h"
+#include "frontend/config.h"
 
 static struct retro_rumble_interface rumble = {0};
 static uint16_t rumble_strength_last        = 0;

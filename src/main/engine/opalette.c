@@ -7,11 +7,11 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "../trackloader.hpp"
+#include "../trackloader.h"
 
-#include "engine/ohud.hpp"
-#include "engine/oinputs.hpp"
-#include "engine/opalette.hpp"
+#include "engine/ohud.h"
+#include "engine/oinputs.h"
+#include "engine/opalette.h"
 
 static void OPalette_setup_fade_data(OPalette* self);
 static void OPalette_repack_rgb(OPalette* self, const uint32_t);

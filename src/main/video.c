@@ -10,13 +10,13 @@
 ***************************************************************************/
 
 #include <stdlib.h>
-#include "video.hpp"
-#include "globals.hpp"
-#include "frontend/config.hpp"
-#include "engine/oroad.hpp"
+#include "video.h"
+#include "globals.h"
+#include "frontend/config.h"
+#include "engine/oroad.h"
 
 #include <libretro.h>
-#include "setup.hpp"
+#include "setup.h"
 
 static void Video_refresh_palette(Video* self, uint32_t);
 

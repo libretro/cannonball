@@ -15,7 +15,7 @@ TODO:
 */
 
 #include <string.h> /* For memset on GCC */
-#include "engine/audio/osound.hpp"
+#include "engine/audio/osound.h"
 
 static uint8_t OSound_pcm_r(OSound* self, uint16_t adr);
 static void OSound_pcm_w(OSound* self, uint16_t adr, uint8_t v);

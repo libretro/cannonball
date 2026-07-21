@@ -13,8 +13,8 @@
 #include <compat/strl.h>
 #include <array/rbuf.h>
 
-#include "lr_options.hpp"
-#include "frontend/config.hpp"
+#include "lr_options.h"
+#include "frontend/config.h"
 
 extern retro_environment_t environ_cb;
 

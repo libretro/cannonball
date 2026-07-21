@@ -7,10 +7,10 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "ostats.hpp"
-#include "ohud.hpp"
-#include "outils.hpp"
-#include "obonus.hpp"
+#include "ostats.h"
+#include "ohud.h"
+#include "outils.h"
+#include "obonus.h"
 
 static void OBonus_init_bonus_text(OBonus* self);
 static void OBonus_decrement_bonus_secs(OBonus* self);

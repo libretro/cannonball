@@ -6,7 +6,7 @@
 ***************************************************************************/
 
 #include <stdio.h>
-#include "utils.hpp"
+#include "utils.h"
 
 /* Returns a pointer to a rotating static buffer; safe for the one
    conversion-per-expression usage in the HUD and menu code. */

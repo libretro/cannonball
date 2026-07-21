@@ -14,9 +14,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <streams/file_stream.h>
-#include "audio.hpp"
-#include "frontend/config.hpp" /* fps */
-#include "engine/audio/osoundint.hpp"
+#include "audio.h"
+#include "frontend/config.h" /* fps */
+#include "engine/audio/osoundint.h"
 #include <libretro.h>
 
 static void Audio_clear_buffers(Audio* self);

@@ -21,11 +21,11 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "engine/oferrari.hpp"
-#include "engine/oinputs.hpp"
-#include "engine/olevelobjs.hpp"
-#include "engine/outils.hpp"
-#include "engine/ocrash.hpp"
+#include "engine/oferrari.h"
+#include "engine/oinputs.h"
+#include "engine/olevelobjs.h"
+#include "engine/outils.h"
+#include "engine/ocrash.h"
 
 static void OCrash_do_crash(OCrash* self);
 static void OCrash_spin_switch(OCrash* self, const uint16_t);

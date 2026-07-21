@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 
-#include "outrun.hpp"
+#include "outrun.h"
 
 /* Forward definition of video for cyclic dependency */
 struct video;

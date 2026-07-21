@@ -11,9 +11,9 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "../trackloader.hpp"
-#include "engine/opalette.hpp"
-#include "engine/otiles.hpp"
+#include "../trackloader.h"
+#include "engine/opalette.h"
+#include "engine/otiles.h"
 
 static void OTiles_clear_tile_info(OTiles* self);
 static void OTiles_init_tilemap(OTiles* self, int16_t stage_id);

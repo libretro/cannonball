@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 
-#include "outrun.hpp"
+#include "outrun.h"
 
 enum {
         /* Initialise Intro Animation Sequences */

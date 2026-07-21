@@ -8,9 +8,9 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "ocrash.hpp"
-#include "oinputs.hpp"
-#include "ostats.hpp"
+#include "ocrash.h"
+#include "oinputs.h"
+#include "ostats.h"
 
 static void OInputs_digital_steering(OInputs* self);
 static void OInputs_digital_pedals(OInputs* self);

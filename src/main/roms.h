@@ -13,7 +13,7 @@ extern "C" {
 
 #include <boolean.h>
 
-#include "romloader.hpp"
+#include "romloader.h"
 
 static const bool VERBOSE = true;
 

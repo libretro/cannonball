@@ -9,9 +9,9 @@
 
 #include <stdint.h>
 
-#include "osprites.hpp"
-#include "outils.hpp"
-#include "ologo.hpp"
+#include "osprites.h"
+#include "outils.h"
+#include "ologo.h"
 
 static void OLogo_setup_sprite1(OLogo* self);
 static void OLogo_setup_sprite2(OLogo* self);

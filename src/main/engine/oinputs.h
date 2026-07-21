@@ -14,9 +14,9 @@ extern "C" {
 #endif
 
 
-#include "libretro/input.hpp"
+#include "libretro/input.h"
 
-#include "outrun.hpp"
+#include "outrun.h"
 
 static const uint8_t BRAKE_THRESHOLD1 = 0x80;
 

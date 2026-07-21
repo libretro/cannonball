@@ -17,7 +17,7 @@
 #include <retro_dirent.h>
 #include <streams/file_stream.h>
 
-#include "romloader.hpp"
+#include "romloader.h"
 #include <string.h>
 
 static int RomLoader_create_map(RomLoader* self);

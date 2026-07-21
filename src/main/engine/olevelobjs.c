@@ -14,10 +14,10 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "../trackloader.hpp"
-#include "engine/outils.hpp"
-#include "engine/olevelobjs.hpp"
-#include "engine/ostats.hpp"
+#include "../trackloader.h"
+#include "engine/outils.h"
+#include "engine/olevelobjs.h"
+#include "engine/ostats.h"
 
 static void OLevelObjs_init_entries(OLevelObjs* self, uint32_t, const uint8_t start_index, const uint8_t);
 static void OLevelObjs_setup_sprite(OLevelObjs* self, oentry*, uint32_t);

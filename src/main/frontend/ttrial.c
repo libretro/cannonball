@@ -6,16 +6,16 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "libretro/input.hpp"
+#include "libretro/input.h"
 
-#include "frontend/ttrial.hpp"
+#include "frontend/ttrial.h"
 
-#include "engine/ohud.hpp"
-#include "engine/oinputs.hpp"
-#include "engine/outils.hpp"
-#include "engine/omap.hpp"
-#include "engine/ostats.hpp"
-#include "engine/otiles.hpp"
+#include "engine/ohud.h"
+#include "engine/oinputs.h"
+#include "engine/outils.h"
+#include "engine/omap.h"
+#include "engine/ostats.h"
+#include "engine/otiles.h"
 
 /* Track Selection: Ferrari Position Per Track */
 /* This is a link to a sprite object that represents part of the course map. */

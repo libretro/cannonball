@@ -9,11 +9,11 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "engine/ohud.hpp"
-#include "engine/omusic.hpp"
-#include "engine/outils.hpp"
-#include "engine/ostats.hpp"
-#include "engine/otraffic.hpp"
+#include "engine/ohud.h"
+#include "engine/omusic.h"
+#include "engine/outils.h"
+#include "engine/ostats.h"
+#include "engine/otraffic.h"
 
 static void OStats_inc_lap_timer(OStats* self);
 

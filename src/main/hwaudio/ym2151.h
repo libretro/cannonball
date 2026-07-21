@@ -17,8 +17,8 @@ extern "C" {
 
 
 #include <stdint.h>
-#include "romloader.hpp"
-#include "hwaudio/soundchip.hpp"
+#include "romloader.h"
+#include "hwaudio/soundchip.h"
 
 /* struct describing a single operator */
 typedef struct

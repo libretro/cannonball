@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 
-#include "globals.hpp"
+#include "globals.h"
 
 /* Road Generator Palette Representation */
 typedef struct RoadPalette

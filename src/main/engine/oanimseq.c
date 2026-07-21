@@ -13,12 +13,12 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "../frontend/config.hpp"
+#include "../frontend/config.h"
 
-#include "obonus.hpp"
-#include "oferrari.hpp"
-#include "oinputs.hpp"
-#include "oanimseq.hpp"
+#include "obonus.h"
+#include "oferrari.h"
+#include "oinputs.h"
+#include "oanimseq.h"
 
 static void OAnimSeq_init_end_sprites(OAnimSeq* self);
 static void OAnimSeq_tick_ferrari(OAnimSeq* self);

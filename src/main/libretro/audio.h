@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 
-#include "globals.hpp"
+#include "globals.h"
 
 typedef struct wav_t {
     uint8_t loaded;

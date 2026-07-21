@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 
-#include "outrun.hpp"
+#include "outrun.h"
 
 static const int16_t frame_reset = 30;
 

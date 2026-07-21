@@ -21,7 +21,7 @@ extern "C" {
 
 #include <boolean.h>
 
-#include "oanimsprite.hpp"
+#include "oanimsprite.h"
 
 typedef struct OAnimSeq
 {

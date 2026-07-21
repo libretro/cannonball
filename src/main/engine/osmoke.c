@@ -7,10 +7,10 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "engine/ocrash.hpp"
-#include "engine/oferrari.hpp"
-#include "engine/olevelobjs.hpp"
-#include "engine/osmoke.hpp"
+#include "engine/ocrash.h"
+#include "engine/oferrari.h"
+#include "engine/olevelobjs.h"
+#include "engine/osmoke.h"
 
 static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctrl, uint32_t addr);
 

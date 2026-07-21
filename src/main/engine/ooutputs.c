@@ -19,15 +19,15 @@
 
 #include <stdlib.h> /* abs */
 
-#include "utils.hpp"
+#include "utils.h"
 
-#include "engine/outrun.hpp"
-#include "engine/ocrash.hpp"
-#include "engine/oferrari.hpp"
-#include "engine/ohud.hpp"
-#include "engine/oinputs.hpp"
-#include "engine/ooutputs.hpp"
-#include "libretro/ffeedback.hpp"
+#include "engine/outrun.h"
+#include "engine/ocrash.h"
+#include "engine/oferrari.h"
+#include "engine/ohud.h"
+#include "engine/oinputs.h"
+#include "engine/ooutputs.h"
+#include "libretro/ffeedback.h"
 
 static void OOutputs_diag_left(OOutputs* self, int16_t input_motor, uint8_t hw_motor_limit);
 static void OOutputs_diag_right(OOutputs* self, int16_t input_motor, uint8_t hw_motor_limit);

@@ -5,13 +5,13 @@ extern "C" {
 
 
 #include <stdint.h>
-#include "globals.hpp"
-#include "roms.hpp"
+#include "globals.h"
+#include "roms.h"
 
-#include "hwaudio/ym2151.hpp"
+#include "hwaudio/ym2151.h"
 
-#include "engine/audio/commands.hpp"
-#include "engine/audio/osoundadr.hpp"
+#include "engine/audio/commands.h"
+#include "engine/audio/osoundadr.h"
 
 /* PCM Sample Indexes */
 enum

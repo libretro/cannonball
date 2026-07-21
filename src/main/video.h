@@ -16,11 +16,11 @@ extern "C" {
 
 
 #include <stdint.h>
-#include "globals.hpp"
-#include "roms.hpp"
-#include "hwvideo/hwtiles.hpp"
-#include "hwvideo/hwsprites.hpp"
-#include "hwvideo/hwroad.hpp"
+#include "globals.h"
+#include "roms.h"
+#include "hwvideo/hwtiles.h"
+#include "hwvideo/hwsprites.h"
+#include "hwvideo/hwroad.h"
 
 const static float SHADOW_ORIGINAL = 0.63f; /* Hardware Intensity (63%) */
 const static float SHADOW_MAME = 0.78f;     /* Mame Intensity (78%) */

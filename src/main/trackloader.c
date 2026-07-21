@@ -15,10 +15,10 @@
 #include <stdlib.h>
 #include <libretro.h>
 
-#include "trackloader.hpp"
-#include "roms.hpp"
-#include "engine/outrun.hpp"
-#include "engine/oaddresses.hpp"
+#include "trackloader.h"
+#include "roms.h"
+#include "engine/outrun.h"
+#include "engine/oaddresses.h"
 
 static void TrackLoader_setup_level(TrackLoader* self, Level* l, RomLoader* data, const int STAGE_ADR);
 static void TrackLoader_setup_section(TrackLoader* self, Level* l, RomLoader* data, const int STAGE_ADR);

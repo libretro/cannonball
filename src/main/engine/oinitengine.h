@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 
-#include "outrun.hpp"
+#include "outrun.h"
 
 enum {SPLIT_NONE, SPLIT_INIT, SPLIT_CHOICE1, SPLIT_CHOICE2};
 

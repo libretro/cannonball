@@ -19,16 +19,16 @@
 ***************************************************************************/
 
 #include <stdint.h>
-#include "globals.hpp"
-#include "roms.hpp"
-#include "trackloader.hpp"
+#include "globals.h"
+#include "roms.h"
+#include "trackloader.h"
 
-#include "engine/oaddresses.hpp"
-#include "engine/outils.hpp"
-#include "engine/oinitengine.hpp"
+#include "engine/oaddresses.h"
+#include "engine/outils.h"
+#include "engine/oinitengine.h"
 
-#include "engine/oroad.hpp"
-#include "engine/ostats.hpp"
+#include "engine/oroad.h"
+#include "engine/ostats.h"
 
 static void ORoad_set_default_hscroll(ORoad* self);
 static void ORoad_clear_road_ram(ORoad* self);

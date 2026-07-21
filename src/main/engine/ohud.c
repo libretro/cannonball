@@ -15,12 +15,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../utils.hpp"
-#include "engine/oferrari.hpp"
-#include "engine/outils.hpp"
-#include "engine/ohud.hpp"
-#include "engine/ooutputs.hpp"
-#include "engine/ostats.hpp"
+#include "../utils.h"
+#include "engine/oferrari.h"
+#include "engine/outils.h"
+#include "engine/ohud.h"
+#include "engine/ooutputs.h"
+#include "engine/ostats.h"
 
 static void OHud_draw_mini_map(OHud* self, uint32_t);
 

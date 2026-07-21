@@ -1,7 +1,7 @@
-#include "video.hpp"
-#include "hwvideo/hwsprites.hpp"
-#include "globals.hpp"
-#include "frontend/config.hpp"
+#include "video.h"
+#include "hwvideo/hwsprites.h"
+#include "globals.h"
+#include "frontend/config.h"
 
 /***************************************************************************
     Video Emulation: OutRun Sprite Rendering Hardware.

@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 
-#include "oentry.hpp"
+#include "oentry.h"
 
 typedef struct oanimsprite
 {

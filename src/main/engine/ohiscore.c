@@ -6,13 +6,13 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "../setup.hpp"
-#include "main.hpp"
-#include "ohud.hpp"
-#include "oinputs.hpp"
-#include "ostats.hpp"
-#include "outils.hpp"
-#include "ohiscore.hpp"
+#include "../setup.h"
+#include "main.h"
+#include "ohud.h"
+#include "oinputs.h"
+#include "ostats.h"
+#include "outils.h"
+#include "ohiscore.h"
 
 static void OHiScore_get_score_pos(OHiScore* self);
 static void OHiScore_insert_score(OHiScore* self);

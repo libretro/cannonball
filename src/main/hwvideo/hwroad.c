@@ -1,7 +1,7 @@
 #include <string.h> /* memcpy */
-#include "hwvideo/hwroad.hpp"
-#include "globals.hpp"
-#include "frontend/config.hpp"
+#include "hwvideo/hwroad.h"
+#include "globals.h"
+#include "frontend/config.h"
 
 static void HWRoad_decode_road(HWRoad* self, const uint8_t*);
 static void HWRoad_render_background_lores(HWRoad* self, uint16_t*);

@@ -11,24 +11,24 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "trackloader.hpp"
+#include "trackloader.h"
 
-#include "engine/oanimseq.hpp"
-#include "engine/obonus.hpp"
-#include "engine/ocrash.hpp"
-#include "engine/oferrari.hpp"
-#include "engine/ohud.hpp"
-#include "engine/oinputs.hpp"
-#include "engine/olevelobjs.hpp"
-#include "engine/omusic.hpp"
-#include "engine/ooutputs.hpp"
-#include "engine/ostats.hpp"
-#include "engine/outils.hpp"
-#include "engine/opalette.hpp"
-#include "engine/osmoke.hpp"
-#include "engine/otiles.hpp"
-#include "engine/otraffic.hpp"
-#include "engine/oinitengine.hpp"
+#include "engine/oanimseq.h"
+#include "engine/obonus.h"
+#include "engine/ocrash.h"
+#include "engine/oferrari.h"
+#include "engine/ohud.h"
+#include "engine/oinputs.h"
+#include "engine/olevelobjs.h"
+#include "engine/omusic.h"
+#include "engine/ooutputs.h"
+#include "engine/ostats.h"
+#include "engine/outils.h"
+#include "engine/opalette.h"
+#include "engine/osmoke.h"
+#include "engine/otiles.h"
+#include "engine/otraffic.h"
+#include "engine/oinitengine.h"
 
 static void OInitEngine_setup_stage1(OInitEngine* self);
 static void OInitEngine_check_road_split(OInitEngine* self);

@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 
-#include "outrun.hpp"
+#include "outrun.h"
 
 enum { CRASH_BUMP = 0, CRASH_SPIN = 1, CRASH_FLIP = 2 };
 

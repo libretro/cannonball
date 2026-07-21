@@ -18,10 +18,10 @@ extern "C" {
 #endif
 
 
-#include "oentry.hpp"
-#include "osprite.hpp"
-#include "outrun.hpp"
-#include "engine/data/sprite_pals.hpp"
+#include "oentry.h"
+#include "osprite.h"
+#include "outrun.h"
+#include "engine/data/sprite_pals.h"
 
 enum {
 		HFLIP = 0x1,			/* Bit 0: Horizontally flip sprite */

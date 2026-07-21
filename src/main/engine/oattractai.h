@@ -42,7 +42,7 @@ extern "C" {
 #endif
 
 
-#include "outrun.hpp"
+#include "outrun.h"
 
 typedef struct OAttractAI
 {

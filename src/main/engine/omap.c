@@ -12,11 +12,11 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "engine/oferrari.hpp"
-#include "engine/omap.hpp"
-#include "engine/otiles.hpp"
-#include "engine/otraffic.hpp"
-#include "engine/ostats.hpp"
+#include "engine/oferrari.h"
+#include "engine/omap.h"
+#include "engine/otiles.h"
+#include "engine/otraffic.h"
+#include "engine/ostats.h"
 
 static void OMap_draw_horiz_end(OMap* self, oentry*);
 static void OMap_draw_vert_bottom(OMap* self, oentry*);

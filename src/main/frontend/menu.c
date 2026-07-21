@@ -10,21 +10,21 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "main.hpp"
-#include "menu.hpp"
-#include "../setup.hpp"
-#include "../utils.hpp"
+#include "main.h"
+#include "menu.h"
+#include "../setup.h"
+#include "../utils.h"
 
-#include "../engine/ohud.hpp"
-#include "../engine/oinputs.hpp"
-#include "../engine/osprites.hpp"
-#include "../engine/ologo.hpp"
-#include "../engine/opalette.hpp"
-#include "../engine/otiles.hpp"
+#include "../engine/ohud.h"
+#include "../engine/oinputs.h"
+#include "../engine/osprites.h"
+#include "../engine/ologo.h"
+#include "../engine/opalette.h"
+#include "../engine/otiles.h"
 
-#include "../frontend/ttrial.hpp"
+#include "../frontend/ttrial.h"
 
-#include "lr_options.hpp"
+#include "lr_options.h"
 
 static void Menu_tick_ui(Menu* self);
 static void Menu_draw_menu_options(Menu* self);

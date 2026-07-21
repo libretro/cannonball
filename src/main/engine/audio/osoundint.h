@@ -15,9 +15,9 @@ extern "C" {
 #endif
 
 
-#include "hwaudio/segapcm.hpp"
-#include "hwaudio/ym2151.hpp"
-#include "engine/audio/commands.hpp"
+#include "hwaudio/segapcm.h"
+#include "hwaudio/ym2151.h"
+#include "engine/audio/commands.h"
 
 enum { QUEUE_LENGTH = 0x1F };
 

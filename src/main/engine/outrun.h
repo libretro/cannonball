@@ -14,19 +14,19 @@ extern "C" {
 
 
 #include <stdint.h>
-#include "roms.hpp"
-#include "globals.hpp"
+#include "roms.h"
+#include "globals.h"
 
-#include "video.hpp"
+#include "video.h"
 
-#include "frontend/config.hpp"
+#include "frontend/config.h"
 
 /* Main include for Ported OutRun Code */
-#include "oaddresses.hpp"
-#include "osprites.hpp"
-#include "oroad.hpp"
-#include "oinitengine.hpp"
-#include "audio/osoundint.hpp"
+#include "oaddresses.h"
+#include "osprites.h"
+#include "oroad.h"
+#include "oinitengine.h"
+#include "audio/osoundint.h"
 
 /* Globals */
 enum 

@@ -14,7 +14,7 @@
 #include <math.h>
 #include <string.h>  /* For memset on GCC */
 
-#include "hwaudio/ym2151.hpp"
+#include "hwaudio/ym2151.h"
 
 static void YM2151_init_tables(YM2151* self);
 static void YM2151_init_chip_tables(YM2151* self);

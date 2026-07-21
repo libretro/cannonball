@@ -9,7 +9,7 @@
 
 #include <stdlib.h> /* abs */
 #include <string.h>
-#include "input.hpp"
+#include "input.h"
 
 Input input;
 

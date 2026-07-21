@@ -55,7 +55,7 @@
  */
 
 #include <stdlib.h>
-#include "hwaudio/segapcm.hpp"
+#include "hwaudio/segapcm.h"
 
 void SegaPCM_ctor(SegaPCM* self, uint32_t clock, RomLoader* rom, uint8_t* ram, int32_t bank)
 {

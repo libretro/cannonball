@@ -14,16 +14,16 @@
 
 #include <libretro.h>
 
-#include "../main.hpp"
-#include "config.hpp"
-#include "../globals.hpp"
-#include "../setup.hpp"
-#include "../utils.hpp"
+#include "../main.h"
+#include "config.h"
+#include "../globals.h"
+#include "../setup.h"
+#include "../utils.h"
 
-#include "../engine/ohiscore.hpp"
+#include "../engine/ohiscore.h"
 
 enum { COUNTER_1M_15 = 0x11D0 };
-#include "../engine/audio/osoundint.hpp"
+#include "../engine/audio/osoundint.h"
 
 extern retro_log_printf_t                 log_cb;
 

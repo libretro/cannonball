@@ -4,9 +4,9 @@ extern "C" {
 #endif
 
 
-#include "globals.hpp"
+#include "globals.h"
 
-#include "libretro/audio.hpp"
+#include "libretro/audio.h"
 
 extern Audio cannonball_audio;
 

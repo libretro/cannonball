@@ -10,7 +10,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include "hwaudio/soundchip.hpp"
+#include "hwaudio/soundchip.h"
 
 void SoundChip_ctor(SoundChip* self)
 {

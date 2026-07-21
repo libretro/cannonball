@@ -18,17 +18,17 @@
 ***************************************************************************/
 
 #include <stdio.h>
-#include "oanimseq.hpp"
-#include "oattractai.hpp"
-#include "obonus.hpp"
-#include "ocrash.hpp"
-#include "ohud.hpp"
-#include "oinputs.hpp"
-#include "olevelobjs.hpp"
-#include "ooutputs.hpp"
-#include "ostats.hpp"
-#include "outils.hpp"
-#include "oferrari.hpp"
+#include "oanimseq.h"
+#include "oattractai.h"
+#include "obonus.h"
+#include "ocrash.h"
+#include "ohud.h"
+#include "oinputs.h"
+#include "olevelobjs.h"
+#include "ooutputs.h"
+#include "ostats.h"
+#include "outils.h"
+#include "oferrari.h"
 
 static void OFerrari_logic(OFerrari* self);
 static void OFerrari_ferrari_normal(OFerrari* self);

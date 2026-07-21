@@ -10,14 +10,14 @@
     See license.txt for more details.
 ***************************************************************************/
 
-#include "engine/obonus.hpp"
-#include "engine/ocrash.hpp"
-#include "engine/oferrari.hpp"
-#include "engine/ohud.hpp"
-#include "engine/olevelobjs.hpp"
-#include "engine/outils.hpp"
-#include "engine/ostats.hpp"
-#include "engine/otraffic.hpp"
+#include "engine/obonus.h"
+#include "engine/ocrash.h"
+#include "engine/oferrari.h"
+#include "engine/ohud.h"
+#include "engine/olevelobjs.h"
+#include "engine/outils.h"
+#include "engine/ostats.h"
+#include "engine/otraffic.h"
 
 static void OTraffic_spawn_car(OTraffic* self, oentry* sprite);
 static void OTraffic_spawn_traffic(OTraffic* self);
