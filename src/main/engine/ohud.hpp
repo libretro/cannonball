@@ -15,52 +15,67 @@
 
 #include "outrun.hpp"
 
-class OHud
-{
-public:
-
-    /* Colours for default text palette */
-    enum 
-    {
+enum {
         GREY  = 0x84,
         PINK  = 0x86,
         GREEN = 0x92
-    } colors;
+    };
 
-    /* Base for digits, for fast digit drawing */
-    const static uint16_t DIGIT_BASE = 0x30;
+static const uint16_t DIGIT_BASE = 0x30;
 
-    OHud(void);
-    ~OHud(void);
-
-    void draw_main_hud();
-    void draw_fps_counter(int16_t);
-    void clear_timetrial_text();
-    void do_mini_map();
-    void draw_timer1(uint16_t);
-    void draw_timer2(uint16_t, uint32_t, uint16_t);
-    void draw_lap_timer(uint32_t, uint8_t*, uint8_t);
-    void draw_score_ingame(uint32_t);
-    void draw_score(uint32_t, const uint32_t, const uint8_t);
-    void draw_score_tile(uint32_t, const uint32_t, const uint8_t);
-    void draw_stage_number(uint32_t, uint8_t, uint16_t col);
-    void draw_rev_counter();
-    void draw_debug_info(uint32_t pos, uint16_t height_pat, uint8_t sprite_pat);
-	void blit_text1(uint32_t);
-    void blit_text1(uint8_t x, uint8_t y, uint32_t src_addr);
-	void blit_text2(uint32_t);
-    void blit_text_big(const uint8_t Y, const char* text, bool do_notes);
-    void blit_text_new(uint16_t, uint16_t, const char* text, uint16_t col);
-    void blit_speed(uint32_t, uint16_t);
-    void blit_large_digit(uint32_t*, uint8_t);
-	void draw_copyright_text();
-    void draw_insert_coin();
-    void draw_credits();
-    uint32_t setup_mini_map();
-    uint32_t translate(const uint16_t x, const uint16_t y, const uint32_t BASE_POS);
-
-private:
-    void draw_mini_map(uint32_t);
+struct OHud
+{
+    int colors;
 };
 
 extern OHud ohud;
+
+void OHud_draw_main_hud(OHud* self);
+
+void OHud_draw_fps_counter(OHud* self, int16_t);
+
+void OHud_clear_timetrial_text(OHud* self);
+
+void OHud_do_mini_map(OHud* self);
+
+void OHud_draw_timer1(OHud* self, uint16_t);
+
+void OHud_draw_timer2(OHud* self, uint16_t, uint32_t, uint16_t);
+
+void OHud_draw_lap_timer(OHud* self, uint32_t, uint8_t*, uint8_t);
+
+void OHud_draw_score_ingame(OHud* self, uint32_t);
+
+void OHud_draw_score(OHud* self, uint32_t, const uint32_t, const uint8_t);
+
+void OHud_draw_score_tile(OHud* self, uint32_t, const uint32_t, const uint8_t);
+
+void OHud_draw_stage_number(OHud* self, uint32_t, uint8_t, uint16_t col);
+
+void OHud_draw_rev_counter(OHud* self);
+
+void OHud_draw_debug_info(OHud* self, uint32_t pos, uint16_t height_pat, uint8_t sprite_pat);
+
+void OHud_blit_text1(OHud* self, uint32_t);
+
+void OHud_blit_text1(OHud* self, uint8_t x, uint8_t y, uint32_t src_addr);
+
+void OHud_blit_text2(OHud* self, uint32_t);
+
+void OHud_blit_text_big(OHud* self, const uint8_t Y, const char* text, bool do_notes);
+
+void OHud_blit_text_new(OHud* self, uint16_t, uint16_t, const char* text, uint16_t col);
+
+void OHud_blit_speed(OHud* self, uint32_t, uint16_t);
+
+void OHud_blit_large_digit(OHud* self, uint32_t*, uint8_t);
+
+void OHud_draw_copyright_text(OHud* self);
+
+void OHud_draw_insert_coin(OHud* self);
+
+void OHud_draw_credits(OHud* self);
+
+uint32_t OHud_setup_mini_map(OHud* self);
+
+uint32_t OHud_translate(OHud* self, const uint16_t x, const uint16_t y, const uint32_t BASE_POS);

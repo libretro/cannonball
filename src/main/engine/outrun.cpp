@@ -86,7 +86,7 @@ void Outrun::boot()
 {
     game_state = config.engine.layout_debug ? GS_INIT_GAME : GS_INIT;
     /* Initialize default hi-score entries */
-    ohiscore.init_def_scores();
+    OHiScore_init_def_scores(&ohiscore);
     /* Load saved hi-score entries */
     config.load_scores(
         cannonball_mode == Outrun::MODE_ORIGINAL
@@ -109,7 +109,7 @@ void Outrun::tick(bool tick_frame)
 
         if (game_state >= GS_START1 && game_state <= GS_INGAME)
         {
-            if (input.has_pressed(Input::VIEWPOINT))
+            if (Input_has_pressed(&input, VIEWPOINT))
             {
                 int mode = oroad.get_view_mode() + 1;
                 if (mode > ORoad::VIEW_INCAR)
@@ -167,7 +167,7 @@ void Outrun::tick(bool tick_frame)
 
     /* Draw FPS */
     if (config.video.fps_count)
-        ohud.draw_fps_counter(cannonball_fps_counter);
+        OHud_draw_fps_counter(&ohud, cannonball_fps_counter);
 }
 
 /* Vertical Interrupt */
@@ -179,7 +179,7 @@ void Outrun::vint()
     OPalette_cycle_sky_palette(&opalette);
     OPalette_fade_palette(&opalette);
     OStats_do_timers(&ostats);
-    if (cannonball_mode != MODE_TTRIAL) ohud.draw_timer1(ostats.time_counter);
+    if (cannonball_mode != MODE_TTRIAL) OHud_draw_timer1(&ohud, ostats.time_counter);
     oinitengine.set_granular_position();
 }
 
@@ -227,7 +227,7 @@ void Outrun::jump_table()
             if (!tick_frame)
             {
                 /* Check for start button if credits are remaining and set state to Music Selection */
-                if (ostats.credits && input.is_pressed_clear(Input::START))
+                if (ostats.credits && Input_is_pressed_clear(&input, START))
                     game_state = GS_INIT_MUSIC;
             }
             break;
@@ -295,16 +295,16 @@ void Outrun::main_switch()
             oferrari.car_inc_old = 0;
             ostats.time_counter = 5;
             ostats.frame_counter = frame_reset;
-            ohiscore.init();
+            OHiScore_init(&ohiscore);
             osoundint.queue_sound(SOUND_FM_RESET);
             cannonball_audio.clear_wav();
             game_state = GS_BEST1;
 
         case GS_BEST1:
-            ohud.draw_copyright_text();
-            ohiscore.display_scores();
-            ohud.draw_credits();
-            ohud.draw_insert_coin();
+            OHud_draw_copyright_text(&ohud);
+            OHiScore_display_scores(&ohiscore);
+            OHud_draw_credits(&ohud);
+            OHud_draw_insert_coin(&ohud);
             if (ostats.credits)
                 game_state = GS_INIT_MUSIC;
             else if (decrement_timers())
@@ -323,9 +323,9 @@ void Outrun::main_switch()
             game_state = GS_LOGO;
 
         case GS_LOGO:
-            ohud.draw_credits();
-            ohud.draw_copyright_text();
-            ohud.draw_insert_coin();
+            OHud_draw_credits(&ohud);
+            OHud_draw_copyright_text(&ohud);
+            OHud_draw_insert_coin(&ohud);
             OLogo_tick(&ologo);
 
             if (ostats.credits)
@@ -346,8 +346,8 @@ void Outrun::main_switch()
             game_state = GS_MUSIC;
 
         case GS_MUSIC:
-            ohud.draw_credits();
-            ohud.draw_insert_coin();
+            OHud_draw_credits(&ohud);
+            OHud_draw_insert_coin(&ohud);
             omusic.tick();
             if (decrement_timers())
             {
@@ -384,12 +384,12 @@ void Outrun::main_switch()
 
             ostats.frame_counter = frame_reset + 50;
             ostats.credits--;                                   /* Update Credits */
-            ohud.blit_text1(TEXT1_CLEAR_START);
-            ohud.blit_text1(TEXT1_CLEAR_CREDITS);
+            OHud_blit_text1(&ohud, TEXT1_CLEAR_START);
+            OHud_blit_text1(&ohud, TEXT1_CLEAR_CREDITS);
             osoundint.queue_sound(SOUND_INIT_CHEERS);
             video.enabled = true;
             game_state = GS_START1;
-            ohud.draw_main_hud();
+            OHud_draw_main_hud(&ohud);
             /* fall through */
 
         /*  Start Game - Car Driving In */
@@ -408,7 +408,7 @@ void Outrun::main_switch()
             {
                 if (cannonball_mode == MODE_TTRIAL)
                 {
-                    ohud.clear_timetrial_text();
+                    OHud_clear_timetrial_text(&ohud);
                 }
 
                 osoundint.queue_sound(SOUND_SIGNAL2);
@@ -453,22 +453,22 @@ void Outrun::main_switch()
                 oferrari.car_inc_old = 0;
                 ostats.time_counter = 3;
                 ostats.frame_counter = frame_reset;
-                ohud.blit_text2(TEXT2_GAMEOVER);
+                OHud_blit_text2(&ohud, TEXT2_GAMEOVER);
             }
             else
             {
-                ohud.blit_text_big(7, ttrial.new_high_score ? "NEW RECORD" : "BAD LUCK", false);
+                OHud_blit_text_big(&ohud, 7, ttrial.new_high_score ? "NEW RECORD" : "BAD LUCK", false);
 
-                ohud.blit_text1(TEXT1_LAPTIME1);
-                ohud.blit_text1(TEXT1_LAPTIME2);
-                ohud.draw_lap_timer(0x110554, ttrial.best_lap, ttrial.best_lap[2]);
+                OHud_blit_text1(&ohud, TEXT1_LAPTIME1);
+                OHud_blit_text1(&ohud, TEXT1_LAPTIME2);
+                OHud_draw_lap_timer(&ohud, 0x110554, ttrial.best_lap, ttrial.best_lap[2]);
 
-                ohud.blit_text_new(9,  14, "OVERTAKES          - ", OHud::GREY);
-                ohud.blit_text_new(31, 14, Utils::to_string((int) ttrial.overtakes).c_str(), OHud::GREEN);
-                ohud.blit_text_new(9,  16, "VEHICLE COLLISIONS - ", OHud::GREY);
-                ohud.blit_text_new(31, 16, Utils::to_string((int) ttrial.vehicle_cols).c_str(), OHud::GREEN);
-                ohud.blit_text_new(9,  18, "CRASHES            - ", OHud::GREY);
-                ohud.blit_text_new(31, 18, Utils::to_string((int) ttrial.crashes).c_str(), OHud::GREEN);
+                OHud_blit_text_new(&ohud, 9,  14, "OVERTAKES          - ", GREY);
+                OHud_blit_text_new(&ohud, 31, 14, Utils::to_string((int) ttrial.overtakes).c_str(), GREEN);
+                OHud_blit_text_new(&ohud, 9,  16, "VEHICLE COLLISIONS - ", GREY);
+                OHud_blit_text_new(&ohud, 31, 16, Utils::to_string((int) ttrial.vehicle_cols).c_str(), GREEN);
+                OHud_blit_text_new(&ohud, 9,  18, "CRASHES            - ", GREY);
+                OHud_blit_text_new(&ohud, 31, 18, Utils::to_string((int) ttrial.crashes).c_str(), GREEN);
             }
             osoundint.queue_sound(SOUND_NEW_COMMAND);
             game_state = GS_GAMEOVER;
@@ -487,11 +487,11 @@ void Outrun::main_switch()
             else if (cannonball_mode == MODE_TTRIAL)
             {
                 if (outrun.tick_counter & BIT_4)
-                    ohud.blit_text1(10, 20, TEXT1_PRESS_START);
+                    OHud_blit_text1(&ohud, 10, 20, TEXT1_PRESS_START);
                 else
-                    ohud.blit_text1(10, 20, TEXT1_CLEAR_START);
+                    OHud_blit_text1(&ohud, 10, 20, TEXT1_CLEAR_START);
 
-                if (input.is_pressed(Input::START))
+                if (Input_is_pressed(&input, START))
                     cannonball_state = STATE_INIT_MENU;
             }
             break;
@@ -501,7 +501,7 @@ void Outrun::main_switch()
         /* ---------------------------------------------------------------------------------------- */
         case GS_INIT_MAP:
             OMap_init(&omap);
-            ohud.blit_text2(TEXT2_COURSEMAP);
+            OHud_blit_text2(&ohud, TEXT2_COURSEMAP);
             game_state = GS_MAP;
             /* fall through */
 
@@ -529,7 +529,7 @@ void Outrun::main_switch()
             oferrari.car_inc_old = 0;
             ostats.time_counter = config.engine.hiscore_timer;
             ostats.frame_counter = frame_reset;
-            ohiscore.init();
+            OHiScore_init(&ohiscore);
             osoundint.queue_sound(SOUND_NEW_COMMAND);
             osoundint.queue_sound(SOUND_FM_RESET);
             cannonball_audio.clear_wav();
@@ -537,8 +537,8 @@ void Outrun::main_switch()
             /* fall through */
 
         case GS_BEST2:
-            ohiscore.tick(); /* Do High Score Logic */
-            ohud.draw_credits();
+            OHiScore_tick(&ohiscore); /* Do High Score Logic */
+            OHud_draw_credits(&ohud);
 
             /* If countdown has expired */
             if (decrement_timers())
@@ -674,7 +674,7 @@ bool Outrun::decrement_timers()
 
         /* We need to manually refresh the HUD here to display '0' seconds */
         if (ostats.time_counter == 0)
-            ohud.draw_timer1(0);
+            OHud_draw_timer1(&ohud, 0);
 
         return (ostats.time_counter == 0);
     }
@@ -744,9 +744,9 @@ void Outrun::init_attract()
 
 void Outrun::tick_attract()
 {
-    ohud.draw_credits();
-    ohud.draw_copyright_text();
-    ohud.draw_insert_coin();
+    OHud_draw_credits(&ohud);
+    OHud_draw_copyright_text(&ohud);
+    OHud_draw_insert_coin(&ohud);
 
     /* Enhanced Attract Mode (Switch Between Views) */
     if (config.engine.new_attract)
@@ -777,7 +777,7 @@ void Outrun::check_freeplay_start()
 {
     if (config.engine.freeplay)
     {
-        if (!ostats.credits && input.has_pressed(Input::START))
+        if (!ostats.credits && Input_has_pressed(&input, START))
         {
             ostats.credits = 1;
         }
@@ -795,8 +795,8 @@ void Outrun::init_best_outrunners()
     otiles.fill_tilemap_color(0); /* Fill Tilemap Black */
     osprites.disable_sprites();
     oroad.horizon_base = 0x154;
-    ohiscore.setup_pal_best();    /* Setup Palettes */
-    ohiscore.setup_road_best();
+    OHiScore_setup_pal_best(&ohiscore);    /* Setup Palettes */
+    OHiScore_setup_road_best(&ohiscore);
     game_state = GS_INIT_BEST2;
 }
 

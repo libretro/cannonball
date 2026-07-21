@@ -74,7 +74,7 @@ void OMusic::enable()
     ostats.frame_counter      = frame_reset;  
      
     blit_music_select();
-    ohud.blit_text2(TEXT2_SELECT_MUSIC); /* Select Music By Steering */
+    OHud_blit_text2(&ohud, TEXT2_SELECT_MUSIC); /* Select Music By Steering */
   
     osoundint.queue_sound(SOUND_RESET);
     if (!config.sound.preview)
@@ -205,7 +205,7 @@ void OMusic::setup_sprite5()
 /* Source: 0xB768 */
 void OMusic::check_start()
 {
-    if (ostats.credits && input.has_pressed(Input::START))
+    if (ostats.credits && Input_has_pressed(&input, START))
     {
         outrun.game_state = GS_INIT_GAME;
         OLogo_disable(&ologo);
@@ -303,7 +303,7 @@ void OMusic::tick_original(oentry* fm, oentry* dial, oentry* hand)
     if (oinputs.steering_adjust + 0x80 <= 0x55)
     {
         set_hand(HAND_LEFT, fm, dial, hand);
-        ohud.blit_text2(TEXT2_MAGICAL);
+        OHud_blit_text2(&ohud, TEXT2_MAGICAL);
         video.write_text32(0x1105C0, NOTE_TILES1);
         video.write_text32(0x110640, NOTE_TILES2);
         music_selected = 0;
@@ -312,7 +312,7 @@ void OMusic::tick_original(oentry* fm, oentry* dial, oentry* hand)
     else if (oinputs.steering_adjust + 0x80 <= 0xAA)
     {
         set_hand(HAND_CENTRE, fm, dial, hand);
-        ohud.blit_text2(TEXT2_BREEZE);
+        OHud_blit_text2(&ohud, TEXT2_BREEZE);
         video.write_text32(0x1105C6, NOTE_TILES1);
         video.write_text32(0x110646, NOTE_TILES2);
         music_selected = 1;
@@ -321,7 +321,7 @@ void OMusic::tick_original(oentry* fm, oentry* dial, oentry* hand)
     else
     {
         set_hand(HAND_RIGHT, fm, dial, hand);
-        ohud.blit_text2(TEXT2_SPLASH);
+        OHud_blit_text2(&ohud, TEXT2_SPLASH);
         video.write_text32(0x1105C8, NOTE_TILES1);
         video.write_text32(0x110648, NOTE_TILES2);
         music_selected = 2;
@@ -331,9 +331,9 @@ void OMusic::tick_original(oentry* fm, oentry* dial, oentry* hand)
 /* Enhanced Version of music selection with infinite tracks. */
 void OMusic::tick_enhanced(oentry* fm, oentry* dial, oentry* hand)
 {
-    if (input.has_pressed(Input::LEFT) || OInputs_is_analog_l(&oinputs))
+    if (Input_has_pressed(&input, LEFT) || OInputs_is_analog_l(&oinputs))
         if (--cursor_pos < 0) cursor_pos = total_tracks - 1;
-    if (input.has_pressed(Input::RIGHT) || OInputs_is_analog_r(&oinputs))
+    if (Input_has_pressed(&input, RIGHT) || OInputs_is_analog_r(&oinputs))
         if (++cursor_pos >= total_tracks) cursor_pos = 0;
 
     if (oinputs.steering_adjust + 0x80 <= 0x70)
@@ -344,7 +344,7 @@ void OMusic::tick_enhanced(oentry* fm, oentry* dial, oentry* hand)
         set_hand(HAND_RIGHT, fm, dial, hand);
 
     music_selected = cursor_pos;
-    ohud.blit_text_big(11, config.sound.music.at(music_selected).title.c_str(), true);
+    OHud_blit_text_big(&ohud, 11, config.sound.music.at(music_selected).title.c_str(), true);
 }
 
 void OMusic::set_hand(short direction, oentry* fm, oentry* dial, oentry* hand)

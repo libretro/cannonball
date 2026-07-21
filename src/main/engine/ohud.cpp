@@ -20,79 +20,75 @@
 #include "engine/ooutputs.hpp"
 #include "engine/ostats.hpp"
 
+static void OHud_draw_mini_map(OHud* self, uint32_t);
+
 OHud ohud;
 
-OHud::OHud(void)
-{
-}
 
 
-OHud::~OHud(void)
-{
-}
 
 /* Draw Text Labels For HUD */
 /*  */
 /* Source: 0xB462 */
-void OHud::draw_main_hud()
+void OHud_draw_main_hud(OHud* self)
 {
-    blit_text1(HUD_LAP1);
-    blit_text1(HUD_LAP2);
+    OHud_blit_text1(self, HUD_LAP1);
+    OHud_blit_text1(self, HUD_LAP2);
 
     if (outrun.cannonball_mode == Outrun::MODE_ORIGINAL)
     {
-        blit_text1(HUD_TIME1);
-        blit_text1(HUD_TIME2);
-        blit_text1(HUD_SCORE1);
-        blit_text1(HUD_SCORE2);
-        blit_text1(HUD_STAGE1);
-        blit_text1(HUD_STAGE2);
-        blit_text1(HUD_ONE);
-        do_mini_map();
+        OHud_blit_text1(self, HUD_TIME1);
+        OHud_blit_text1(self, HUD_TIME2);
+        OHud_blit_text1(self, HUD_SCORE1);
+        OHud_blit_text1(self, HUD_SCORE2);
+        OHud_blit_text1(self, HUD_STAGE1);
+        OHud_blit_text1(self, HUD_STAGE2);
+        OHud_blit_text1(self, HUD_ONE);
+        OHud_do_mini_map(self);
     }
     else if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
     {
-        draw_score(translate(3, 2, 0x110030), 0, 2);
-        blit_text1(2, 1, HUD_SCORE1);
-        blit_text1(2, 2, HUD_SCORE2);
-        blit_text_big(4, "TIME TO BEAT", false);
-        draw_lap_timer(translate(16, 7, 0x110030), outrun.ttrial.best_lap, outrun.ttrial.best_lap[2]);
+        OHud_draw_score(self, OHud_translate(self, 3, 2, 0x110030), 0, 2);
+        OHud_blit_text1(self, 2, 1, HUD_SCORE1);
+        OHud_blit_text1(self, 2, 2, HUD_SCORE2);
+        OHud_blit_text_big(self, 4, "TIME TO BEAT", false);
+        OHud_draw_lap_timer(self, OHud_translate(self, 16, 7, 0x110030), outrun.ttrial.best_lap, outrun.ttrial.best_lap[2]);
     }
     else if (outrun.cannonball_mode == Outrun::MODE_CONT)
     {
-        blit_text1(HUD_TIME1);
-        blit_text1(HUD_TIME2);
-        blit_text1(HUD_SCORE1);
-        blit_text1(HUD_SCORE2);
-        blit_text1(HUD_STAGE1);
-        blit_text1(HUD_STAGE2);
-        blit_text1(HUD_ONE);
+        OHud_blit_text1(self, HUD_TIME1);
+        OHud_blit_text1(self, HUD_TIME2);
+        OHud_blit_text1(self, HUD_SCORE1);
+        OHud_blit_text1(self, HUD_SCORE2);
+        OHud_blit_text1(self, HUD_STAGE1);
+        OHud_blit_text1(self, HUD_STAGE2);
+        OHud_blit_text1(self, HUD_ONE);
     }
 }
 
-void OHud::clear_timetrial_text()
+void OHud_clear_timetrial_text(OHud* self)
 {
-    blit_text_big(4,     "            ", false);
-    blit_text_new(16, 7, "            ", OHud::GREY);
+    OHud_blit_text_big(self, 4,     "            ", false);
+    OHud_blit_text_new(self, 16, 7, "            ", GREY);
 }
 
-void OHud::draw_fps_counter(int16_t fps)
+void OHud_draw_fps_counter(OHud* self, int16_t fps)
 {
     std::string str = "FPS " + Utils::to_string(fps);
-    blit_text_new(30, 0, str.c_str(), OHud::GREY);
+    OHud_blit_text_new(self, 30, 0, str.c_str(), GREY);
 }
 
 
 /* Routine to setup and draw mini-map (bottom RHS of HUD) */
 /* */
 /* Source: 0x8B52 */
-void OHud::do_mini_map()
+void OHud_do_mini_map(OHud* self)
 {
     if (outrun.game_state == GS_ATTRACT)
         return;
     
-    { uint32_t tile_addr = setup_mini_map();
-    draw_mini_map(tile_addr);
+    { uint32_t tile_addr = OHud_setup_mini_map(self);
+    OHud_draw_mini_map(self, tile_addr);
  }}
 
 /* Setup Appropriate Tile Address For Minimap. */
@@ -100,7 +96,7 @@ void OHud::do_mini_map()
 /* Returns start address of block of 4 tiles. Represents square of route on mini-map screen. */
 /*  */
 /* Source: 0x8B68 */
-uint32_t OHud::setup_mini_map()
+uint32_t OHud_setup_mini_map(OHud* self)
 {
     if (ostats.route_info > 0x4F)
         ostats.route_info = 0x4F;
@@ -116,9 +112,9 @@ uint32_t OHud::setup_mini_map()
     };
 
     return TILES_MINIMAP + (ROUTE_MAPPING[ostats.route_info] << 2);
-} 
+}static  
 
-void OHud::draw_mini_map(uint32_t tile_addr)
+void OHud_draw_mini_map(OHud* self, uint32_t tile_addr)
 {
     /* Address in text ram to copy this to */
     uint32_t dst = 0x110CFA;
@@ -142,7 +138,7 @@ void OHud::draw_mini_map(uint32_t tile_addr)
 /* Print Timer To Top Left Hand Corner Of Screen */
 /* */
 /* Source: 0x8216 */
-void OHud::draw_timer1(uint16_t time)
+void OHud_draw_timer1(OHud* self, uint16_t time)
 {
     if (outrun.game_state < GS_START1 || outrun.game_state > GS_INGAME)
         return;
@@ -150,7 +146,7 @@ void OHud::draw_timer1(uint16_t time)
     if (!outrun.freeze_timer)
     {
         const uint16_t BASE_TILE = 0x8C80;
-        draw_timer2(time > 0x99 ? 0x99 : time, 0x1100BE, BASE_TILE);
+        OHud_draw_timer2(self, time > 0x99 ? 0x99 : time, 0x1100BE, BASE_TILE);
 
         /* Blank out the OFF text area */
         video.write_text16(0x110C2, 0);
@@ -158,7 +154,7 @@ void OHud::draw_timer1(uint16_t time)
     }
     else
     {
-        uint32_t dst_addr = translate(7, 1, 0x110030);
+        uint32_t dst_addr = OHud_translate(self, 7, 1, 0x110030);
         const uint16_t PAL = 0x8AA0;
         const uint16_t O = (('O' - 0x41) * 2) + PAL; /* Convert character to real index (D0-0x41) so A is 0x01 */
         const uint16_t F = (('F' - 0x41) * 2) + PAL;
@@ -175,7 +171,7 @@ void OHud::draw_timer1(uint16_t time)
 /* Called directly by High Score Table */
 /* */
 /* Source: 0x8234 */
-void OHud::draw_timer2(uint16_t time_counter, uint32_t addr, uint16_t base_tile)
+void OHud_draw_timer2(OHud* self, uint16_t time_counter, uint32_t addr, uint16_t base_tile)
 {
     uint16_t digit1 = time_counter & 0xF;
     uint16_t digit2 = (time_counter & 0xF0) >> 4;
@@ -201,7 +197,7 @@ void OHud::draw_timer2(uint16_t time_counter, uint32_t addr, uint16_t base_tile)
     }
 }
 
-void OHud::draw_lap_timer(uint32_t addr, uint8_t* digits, uint8_t ms_value)
+void OHud_draw_lap_timer(OHud* self, uint32_t addr, uint8_t* digits, uint8_t ms_value)
 {
     const uint16_t BASE = 0x8230;
     const uint16_t APOSTROPHE1 = 0x835E;
@@ -224,12 +220,12 @@ void OHud::draw_lap_timer(uint32_t addr, uint8_t* digits, uint8_t ms_value)
 /* Draw Score (In-Game HUD) */
 /* */
 /* Source: 0x7382 */
-void OHud::draw_score_ingame(uint32_t score)
+void OHud_draw_score_ingame(OHud* self, uint32_t score)
 {
     if (outrun.game_state < GS_START1 || outrun.game_state > GS_BONUS)
         return;
 
-    draw_score(0x110150, score, 2);
+    OHud_draw_score(self, 0x110150, score, 2);
 }
 
 /* Draw Score */
@@ -238,7 +234,7 @@ void OHud::draw_score_ingame(uint32_t score)
 /* + 8531 = Digit 1 */
 /* */
 /* Source: 0x7146 */
-void OHud::draw_score(uint32_t addr, const uint32_t score, uint8_t font)
+void OHud_draw_score(OHud* self, uint32_t addr, const uint32_t score, uint8_t font)
 {
     /* Base address of Digit 0 setup here */
     const uint16_t BASE = 0x30 | (font << 9) | 0x8100;
@@ -279,7 +275,7 @@ void OHud::draw_score(uint32_t addr, const uint32_t score, uint8_t font)
 
 /* Same as above function but writes to tile ram instead. */
 /* Not an ideal solution, really a workaround because text and tile ram are not one big lump in my implementation */
-void OHud::draw_score_tile(uint32_t addr, const uint32_t score, uint8_t font)
+void OHud_draw_score_tile(OHud* self, uint32_t addr, const uint32_t score, uint8_t font)
 {
     /* Base address of Digit 0 setup here */
     const uint16_t BASE = 0x30 | (font << 9) | 0x8100;
@@ -321,7 +317,7 @@ void OHud::draw_score_tile(uint32_t addr, const uint32_t score, uint8_t font)
 /* Modified Version Of Draw Digits */
 /* */
 /* Source: C3A0 */
-void OHud::draw_stage_number(uint32_t addr, uint8_t digit, uint16_t col)
+void OHud_draw_stage_number(OHud* self, uint32_t addr, uint8_t digit, uint16_t col)
 {
     if (digit < 10)
     {
@@ -339,7 +335,7 @@ void OHud::draw_stage_number(uint32_t addr, uint8_t digit, uint16_t col)
 /* Draw Rev Counter */
 /* */
 /* Source: 0x6B08 */
-void OHud::draw_rev_counter()
+void OHud_draw_rev_counter(OHud* self)
 {
     /* Return in attract mode and don't draw rev counter */
     if (outrun.game_state <= GS_INIT_GAME) return;
@@ -396,7 +392,7 @@ void OHud::draw_rev_counter()
 /* Convert & Blit car speed to screen */
 /* */
 /* Source: 0xBB72 */
-void OHud::blit_speed(uint32_t dst_addr, uint16_t speed)
+void OHud_blit_speed(OHud* self, uint32_t dst_addr, uint16_t speed)
 {
     const uint16_t TILE_BASE = 0x8C60; /* Base tile number */
 
@@ -441,7 +437,7 @@ void OHud::blit_speed(uint32_t dst_addr, uint16_t speed)
 /* Blit large digit spanning two rows. */
 /* */
 /* Source: 0x9BF2 */
-void OHud::blit_large_digit(uint32_t* addr, uint8_t digit)
+void OHud_blit_large_digit(OHud* self, uint32_t* addr, uint8_t digit)
 {
     video.write_text16(*addr,        (digit + 0x80) | 0x8C00);
     video.write_text16(*addr + 0x80, (digit + 0x81) | 0x8C00);
@@ -455,16 +451,16 @@ void OHud::blit_large_digit(uint32_t* addr, uint8_t digit)
 /* Input:          None */
 /* Output:         None */
 
-void OHud::draw_copyright_text()
+void OHud_draw_copyright_text(OHud* self)
 {
-    blit_text1(TEXT1_1986_SEGA);
-    blit_text1(TEXT1_COPYRIGHT);
+    OHud_blit_text1(self, TEXT1_1986_SEGA);
+    OHud_blit_text1(self, TEXT1_COPYRIGHT);
 }
 
 /* Draw Insert Coin text */
 /* */
 /* Source: 0xB7D0 */
-void OHud::draw_insert_coin()
+void OHud_draw_insert_coin(OHud* self)
 {
     /* Update text */
     if ((outrun.tick_counter ^ (outrun.tick_counter - 1)) & BIT_4)
@@ -474,12 +470,12 @@ void OHud::draw_insert_coin()
         {
             if (outrun.tick_counter & BIT_4)
             {
-                blit_text1(TEXT1_PRESS_START);
+                OHud_blit_text1(self, TEXT1_PRESS_START);
                 outrun.outputs->set_digital(OOutputs::D_START_LAMP);
             }
             else
             {
-                blit_text1(TEXT1_CLEAR_START);
+                OHud_blit_text1(self, TEXT1_CLEAR_START);
                 outrun.outputs->clear_digital(OOutputs::D_START_LAMP);
             }
         }
@@ -505,23 +501,23 @@ void OHud::draw_insert_coin()
             }
             else
             {
-                blit_text1((outrun.tick_counter & BIT_4) ? TEXT1_INSERT_COINS : TEXT1_CLEAR_COINS);
+                OHud_blit_text1(self, (outrun.tick_counter & BIT_4) ? TEXT1_INSERT_COINS : TEXT1_CLEAR_COINS);
             }
         }
     }
 }
 
 /* Source: 0x6CDE */
-void OHud::draw_credits()
+void OHud_draw_credits(OHud* self)
 {
     if (config.engine.freeplay)
     {
-        blit_text1(TEXT1_FREEPLAY);
+        OHud_blit_text1(self, TEXT1_FREEPLAY);
     }
     else
     {
         video.write_text16(0x110D44, ostats.credits | 0x8630); /* blit digit */
-        blit_text1(ostats.credits >= 2 ? TEXT1_CREDITS : TEXT1_CREDIT);
+        OHud_blit_text1(self, ostats.credits >= 2 ? TEXT1_CREDITS : TEXT1_CREDIT);
     }
 }
 
@@ -553,7 +549,7 @@ void OHud::draw_credits()
 /* n : Tile index to use */
 /* ? : Unknown */
 
-void OHud::blit_text1(uint32_t src_addr)
+void OHud_blit_text1(OHud* self, uint32_t src_addr)
 {
     uint32_t dst_addr = roms.rom0.read32(&src_addr); /* Text RAM destination address */
     uint16_t counter = roms.rom0.read16(&src_addr);  /* Number of tiles to blit */
@@ -567,9 +563,9 @@ void OHud::blit_text1(uint32_t src_addr)
     } }
 }
 
-void OHud::blit_text1(uint8_t x, uint8_t y, uint32_t src_addr)
+void OHud_blit_text1(OHud* self, uint8_t x, uint8_t y, uint32_t src_addr)
 {
-    uint32_t dst_addr = translate(x, y, 0x110030);
+    uint32_t dst_addr = OHud_translate(self, x, y, 0x110030);
     src_addr += 4;
     { uint16_t counter = roms.rom0.read16(&src_addr);  /* Number of tiles to blit */
     uint16_t data = roms.rom0.read16(&src_addr);     /* Tile data to blit */
@@ -597,7 +593,7 @@ void OHud::blit_text1(uint8_t x, uint8_t y, uint32_t src_addr)
 /* Byte 4: Start of text to display */
 
 
-void OHud::blit_text2(uint32_t src_addr)
+void OHud_blit_text2(OHud* self, uint32_t src_addr)
 {
     uint32_t dst_addr = 0x110000 + roms.rom0.read16(&src_addr); /* Text RAM destination address */
 
@@ -634,21 +630,21 @@ void OHud::blit_text2(uint32_t src_addr)
 /* Enhanced Cannonball Routines Below */
 /* ------------------------------------------------------------------------------------------------ */
 
-void OHud::draw_debug_info(uint32_t pos, uint16_t height_pat, uint8_t sprite_pat)
+void OHud_draw_debug_info(OHud* self, uint32_t pos, uint16_t height_pat, uint8_t sprite_pat)
 {
-    ohud.blit_text_new(0,  4, "LEVEL POS", OHud::GREEN);
-    ohud.blit_text_new(16, 4, "    ", OHud::GREY);
-    ohud.blit_text_new(16, 4, Utils::to_string((int)(pos >> 16)).c_str(), OHud::PINK);
-    ohud.blit_text_new(0,  5, "HEIGHT PATTERN", OHud::GREEN);
-    ohud.blit_text_new(16, 5, "    ", OHud::GREY);
-    ohud.blit_text_new(16, 5, Utils::to_string((int)height_pat).c_str(), OHud::PINK);
-    ohud.blit_text_new(0,  6, "SPRITE PATTERN", OHud::GREEN);
-    ohud.blit_text_new(16, 6, "    ", OHud::GREY);
-    ohud.blit_text_new(16, 6, Utils::to_string((int)sprite_pat).c_str(), OHud::PINK);
+    OHud_blit_text_new(&ohud, 0,  4, "LEVEL POS", GREEN);
+    OHud_blit_text_new(&ohud, 16, 4, "    ", GREY);
+    OHud_blit_text_new(&ohud, 16, 4, Utils::to_string((int)(pos >> 16)).c_str(), PINK);
+    OHud_blit_text_new(&ohud, 0,  5, "HEIGHT PATTERN", GREEN);
+    OHud_blit_text_new(&ohud, 16, 5, "    ", GREY);
+    OHud_blit_text_new(&ohud, 16, 5, Utils::to_string((int)height_pat).c_str(), PINK);
+    OHud_blit_text_new(&ohud, 0,  6, "SPRITE PATTERN", GREEN);
+    OHud_blit_text_new(&ohud, 16, 6, "    ", GREY);
+    OHud_blit_text_new(&ohud, 16, 6, Utils::to_string((int)sprite_pat).c_str(), PINK);
 }
 
 /* Big Yellow Text. Always Centered.  */
-void OHud::blit_text_big(const uint8_t Y, const char* text, bool do_notes)
+void OHud_blit_text_big(OHud* self, const uint8_t Y, const char* text, bool do_notes)
 {
     uint16_t length = (uint16_t) strlen(text);
 
@@ -657,8 +653,8 @@ void OHud::blit_text_big(const uint8_t Y, const char* text, bool do_notes)
     /* Clear complete row in text ram before blitting */
     { uint8_t x; for (x = 0; x < 40; x++)
     {
-        video.write_text16(translate(x, Y, 0x110030) + 0x110000, 0); /* Write blank space to text ram */
-        video.write_text16(translate(x, Y, 0x110030) + 0x11007E, 0); /* Write blank space to text ram */
+        video.write_text16(OHud_translate(self, x, Y, 0x110030) + 0x110000, 0); /* Write blank space to text ram */
+        video.write_text16(OHud_translate(self, x, Y, 0x110030) + 0x11007E, 0); /* Write blank space to text ram */
     } }
 
     /* Draw Notes */
@@ -668,11 +664,11 @@ void OHud::blit_text_big(const uint8_t Y, const char* text, bool do_notes)
         const uint32_t NOTE_TILES1 = 0x8A7A8A7B;
         const uint32_t NOTE_TILES2 = 0x8A7C8A7D;
 
-        video.write_text32(translate(X - 2, Y, 0x110030) + 0x110000, NOTE_TILES1);
-        video.write_text32(translate(X - 2, Y, 0x110030) + 0x110080, NOTE_TILES2);
+        video.write_text32(OHud_translate(self, X - 2, Y, 0x110030) + 0x110000, NOTE_TILES1);
+        video.write_text32(OHud_translate(self, X - 2, Y, 0x110030) + 0x110080, NOTE_TILES2);
     }
 
-    uint32_t dst_addr = translate(X, Y, 0x110030) + 0x110000;
+    uint32_t dst_addr = OHud_translate(self, X, Y, 0x110030) + 0x110000;
 
     /* Blit each tile */
     { uint16_t i; for (i = 0; i < length; i++)
@@ -717,9 +713,9 @@ void OHud::blit_text_big(const uint8_t Y, const char* text, bool do_notes)
 /* screen columns 0 through 39. */
 /* */
 /* Normal font: 41 onwards */
-void OHud::blit_text_new(uint16_t x, uint16_t y, const char* text, uint16_t pal)
+void OHud_blit_text_new(OHud* self, uint16_t x, uint16_t y, const char* text, uint16_t pal)
 {
-    uint32_t dst_addr = translate(x, y, 0x110030); 
+    uint32_t dst_addr = OHud_translate(self, x, y, 0x110030); 
     uint16_t length = (uint16_t) strlen(text);
 
     { uint16_t i; for (i = 0; i < length; i++)
@@ -742,7 +738,7 @@ void OHud::blit_text_new(uint16_t x, uint16_t y, const char* text, uint16_t pal)
 
 /* Translate x, y column position to tilemap address */
 /* Base Position defaults to 0,0 */
-uint32_t OHud::translate(uint16_t x, uint16_t y, const uint32_t BASE_POS)
+uint32_t OHud_translate(OHud* self, uint16_t x, uint16_t y, const uint32_t BASE_POS)
 {
     if (x > 63) x = 63;
     if (y > 27) y = 27;

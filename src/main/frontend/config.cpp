@@ -227,7 +227,7 @@ void Config::load_scores(const std::string &filename)
         return;
 
     /* Game Scores */
-    { int i; for (i = 0; i < ohiscore.NO_SCORES; i++)
+    { int i; for (i = 0; i < NO_SCORES; i++)
     {
         score_entry* e = &ohiscore.scores[i];
 
@@ -301,7 +301,7 @@ void Config::save_scores(const std::string &filename)
 
     append_xml_declaration(document);
 
-    { int i; for (i = 0; i < ohiscore.NO_SCORES; i++)
+    { int i; for (i = 0; i < NO_SCORES; i++)
     {
         score_entry* e = &ohiscore.scores[i];
 
@@ -455,7 +455,7 @@ void Config::save_tiletrial_scores()
 bool Config::clear_scores()
 {
     /* Init Default Hiscores */
-    ohiscore.init_def_scores();
+    OHiScore_init_def_scores(&ohiscore);
 
     bool files_removed = false;
 

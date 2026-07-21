@@ -439,9 +439,9 @@ void OTraffic_update_props(OTraffic* self, oentry* sprite)
                 OStats_update_score(&ostats, 0x20000);
             else
             {
-                ohud.draw_score(ohud.translate(3, 2, 0x110030), outils::convert16_dechex(++outrun.ttrial.overtakes), 2);
-                ohud.blit_text1(2, 1, HUD_SCORE1);
-                ohud.blit_text1(2, 2, HUD_SCORE2);
+                OHud_draw_score(&ohud, OHud_translate(&ohud, 3, 2, 0x110030), outils::convert16_dechex(++outrun.ttrial.overtakes), 2);
+                OHud_blit_text1(&ohud, 2, 1, HUD_SCORE1);
+                OHud_blit_text1(&ohud, 2, 2, HUD_SCORE2);
             }
         }
 

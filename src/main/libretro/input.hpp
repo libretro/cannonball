@@ -11,11 +11,7 @@
 
 #include <stdint.h>
 
-class Input
-{
-public:
-    enum presses
-    {
+enum presses {
         LEFT  = 0,
         RIGHT = 1,
         UP    = 2,
@@ -35,55 +31,46 @@ public:
         MENU  = 14
     };
 
+static const int CENTRE = 0x80;
+
+static const int DIGITAL_DEAD = 3200;
+
+struct Input
+{
     bool keys[15];
     bool keys_old[15];
-
-    /* Has gamepad been found? */
     bool gamepad;
-
-    /* Use analog controls */
     int analog;
-
-    /* Latch last key press for redefines */
     int key_press;
-
-    /* Latch last joystick button press for redefines */
     int16_t joy_button;
-
-    /* Analog Controls */
     int a_wheel;
     int a_accel;
     int a_brake;
-
-    Input(void);
-    ~Input(void);
-
-    void init(int, int*, int*, const int, int*, int*);
-    void close();
-
-
-    void handle_joy_axis(int, int, int);
-    void frame_done();
-    bool is_pressed(presses p);
-    bool is_pressed_clear(presses p);
-    bool has_pressed(presses p);
-    void handle_key(const int, const bool);
-    void handle_joy(const uint8_t, const bool);
-
-private:
-    static const int CENTRE = 0x80;
-
-    /* Digital Dead Zone */
-    static const int DIGITAL_DEAD = 3200;
-
-    /* Configurations for keyboard and joypad */
     int* pad_config;
     int* key_config;
     int* axis;
-
     int wheel_zone;
     int wheel_dead;
     int pedals_dead;
 };
 
 extern Input input;
+
+void Input_init(Input* self, int, int*, int*, const int, int*, int*);
+
+void Input_close(Input* self);
+
+void Input_handle_joy_axis(Input* self, int, int, int);
+
+void Input_frame_done(Input* self);
+
+bool Input_is_pressed(Input* self, presses p);
+
+bool Input_is_pressed_clear(Input* self, presses p);
+
+bool Input_has_pressed(Input* self, presses p);
+
+void Input_handle_key(Input* self, const int, const bool);
+
+void Input_handle_joy(Input* self, const uint8_t, const bool);
+

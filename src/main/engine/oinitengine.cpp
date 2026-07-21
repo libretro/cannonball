@@ -285,20 +285,20 @@ void OInitEngine::update_engine()
     if (outrun.game_state >= GS_START1 && outrun.game_state <= GS_BONUS)
     {
         /* Convert & Blit Car Speed */
-        ohud.blit_speed(0x110CB6, car_increment >> 16);
-        ohud.blit_text1(HUD_KPH1);
-        ohud.blit_text1(HUD_KPH2);
+        OHud_blit_speed(&ohud, 0x110CB6, car_increment >> 16);
+        OHud_blit_text1(&ohud, HUD_KPH1);
+        OHud_blit_text1(&ohud, HUD_KPH2);
 
         /* Blit High/Low Gear. */
         /* Libretro displays the current transmission state in every gear mode, */
         /* including automatic transmission. */
         if (oinputs.gear)
-            ohud.blit_text_new(9, 26, "H", OHud::GREEN);
+            OHud_blit_text_new(&ohud, 9, 26, "H", GREEN);
         else
-            ohud.blit_text_new(9, 26, "L", OHud::GREY);
+            OHud_blit_text_new(&ohud, 9, 26, "L", GREY);
 
         if (config.engine.layout_debug)
-            ohud.draw_debug_info(oroad.road_pos, oroad.height_lookup_wrk, trackloader.read_sprite_pattern_index());
+            OHud_draw_debug_info(&ohud, oroad.road_pos, oroad.height_lookup_wrk, trackloader.read_sprite_pattern_index());
     }
 
     if (olevelobjs.spray_counter > 0)
@@ -473,9 +473,9 @@ void OInitEngine::check_stage()
 
             /* Draw best laptime */
             ostats.extend_play_timer = 0x80;
-            ohud.blit_text1(TEXT1_LAPTIME1);
-            ohud.blit_text1(TEXT1_LAPTIME2);
-            ohud.draw_lap_timer(0x110554, laptimes, ostats.lap_ms[laptimes[2]]);
+            OHud_blit_text1(&ohud, TEXT1_LAPTIME1);
+            OHud_blit_text1(&ohud, TEXT1_LAPTIME2);
+            OHud_draw_lap_timer(&ohud, 0x110554, laptimes, ostats.lap_ms[laptimes[2]]);
 
             outrun.ttrial.new_high_score = true;
         }
@@ -763,7 +763,7 @@ void OInitEngine::init_split_next_level()
     ostats.cur_stage++;
     oroad.stage_lookup_off += 8;    /* Increment lookup to next block of stages */
     ostats.route_info += 0x10;      /* Route Info increments by 10 at each stage */
-    ohud.do_mini_map();
+    OHud_do_mini_map(&ohud);
     init_road_seg_master();
 
     /* Clear sprite palette lookup */

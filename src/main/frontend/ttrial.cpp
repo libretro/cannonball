@@ -63,9 +63,9 @@ int TTrial::tick()
             OMap_init(&omap);
             OMap_load_sprites(&omap);
             OMap_position_ferrari(&omap, FERRARI_POS[level_selected = 0]);
-            ohud.blit_text_big(1, "STEER TO SELECT TRACK", false);
-            ohud.blit_text1(2, 25, TEXT1_LAPTIME1);
-            ohud.blit_text1(2, 26, TEXT1_LAPTIME2);
+            OHud_blit_text_big(&ohud, 1, "STEER TO SELECT TRACK", false);
+            OHud_blit_text1(&ohud, 2, 25, TEXT1_LAPTIME1);
+            OHud_blit_text1(&ohud, 2, 26, TEXT1_LAPTIME2);
             osoundint.queue_sound(SOUND_PCM_WAVE);
             outrun.ttrial.laps    = config.ttrial.laps;
             outrun.custom_traffic = config.ttrial.traffic;
@@ -73,21 +73,21 @@ int TTrial::tick()
 
         case TICK_COURSEMAP:
             {
-                if (input.has_pressed(Input::MENU))
+                if (Input_has_pressed(&input, MENU))
                 {
                     return BACK_TO_MENU;
                 }
-                else if (input.has_pressed(Input::LEFT) || OInputs_is_analog_l(&oinputs))
+                else if (Input_has_pressed(&input, LEFT) || OInputs_is_analog_l(&oinputs))
                 {
                     if (--level_selected < 0)
                         level_selected = sizeof(FERRARI_POS) - 1;
                 }
-                else if (input.has_pressed(Input::RIGHT)|| OInputs_is_analog_r(&oinputs))
+                else if (Input_has_pressed(&input, RIGHT)|| OInputs_is_analog_r(&oinputs))
                 {
                     if (++level_selected > sizeof(FERRARI_POS) - 1)
                         level_selected = 0;
                 }
-                else if (input.has_pressed(Input::START) || input.has_pressed(Input::ACCEL) || OInputs_is_analog_select(&oinputs))
+                else if (Input_has_pressed(&input, START) || Input_has_pressed(&input, ACCEL) || OInputs_is_analog_select(&oinputs))
                 {
                     outils::convert_counter_to_time(best_times[level_selected], best_converted);
 
@@ -108,7 +108,7 @@ int TTrial::tick()
                 }
                 OMap_position_ferrari(&omap, FERRARI_POS[level_selected]);
                 outils::convert_counter_to_time(best_times[level_selected], best_converted);
-                ohud.draw_lap_timer(ohud.translate(7, 26, 0x110030), best_converted, best_converted[2]);
+                OHud_draw_lap_timer(&ohud, OHud_translate(&ohud, 7, 26, 0x110030), best_converted, best_converted[2]);
                 OMap_blit(&omap);
                 oroad.tick();
                 osprites.sprite_copy();

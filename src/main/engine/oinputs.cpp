@@ -73,7 +73,7 @@ void OInputs_digital_steering(OInputs* self)
     /* ------------------------------------------------------------------------ */
     /* STEERING */
     /* ------------------------------------------------------------------------ */
-    if (input.is_pressed(Input::LEFT))
+    if (Input_is_pressed(&input, LEFT))
     {
         /* Recentre wheel immediately if facing other way */
         if (self->input_steering > STEERING_CENTRE) self->input_steering = STEERING_CENTRE;
@@ -81,7 +81,7 @@ void OInputs_digital_steering(OInputs* self)
         self->input_steering -= self->steering_inc;
         if (self->input_steering < STEERING_MIN) self->input_steering = STEERING_MIN;
     }
-    else if (input.is_pressed(Input::RIGHT))
+    else if (Input_is_pressed(&input, RIGHT))
     {
         /* Recentre wheel immediately if facing other way */
         if (self->input_steering < STEERING_CENTRE) self->input_steering = STEERING_CENTRE;
@@ -114,7 +114,7 @@ void OInputs_digital_pedals(OInputs* self)
     /* ACCELERATION */
     /* ------------------------------------------------------------------------ */
 
-    if (input.is_pressed(Input::ACCEL))
+    if (Input_is_pressed(&input, ACCEL))
     {
         self->input_acc += self->acc_inc;
         if (self->input_acc > 0xFF) self->input_acc = 0xFF;
@@ -129,7 +129,7 @@ void OInputs_digital_pedals(OInputs* self)
     /* BRAKE */
     /* ------------------------------------------------------------------------ */
 
-    if (input.is_pressed(Input::BRAKE))
+    if (Input_is_pressed(&input, BRAKE))
     {
         self->input_brake += self->brake_inc;
         if (self->input_brake > 0xFF) self->input_brake = 0xFF;
@@ -155,21 +155,21 @@ void OInputs_do_gear(OInputs* self)
     {
         /* Manual: Cabinet Shifter */
         if (config.controls.gear == config.controls.GEAR_PRESS)
-            self->gear = !(input.is_pressed(Input::GEAR1) || input.is_pressed(Input::GEAR2));
+            self->gear = !(Input_is_pressed(&input, GEAR1) || Input_is_pressed(&input, GEAR2));
 
         /* Manual: Two Separate Buttons for gears */
         else if (config.controls.gear == config.controls.GEAR_SEPARATE)
         {
-            if (input.has_pressed(Input::GEAR1))
+            if (Input_has_pressed(&input, GEAR1))
                 self->gear = false;
-            else if (input.has_pressed(Input::GEAR2))
+            else if (Input_has_pressed(&input, GEAR2))
                 self->gear = true;
         }
 
         /* Manual: Keyboard/Digital Button */
         else
         {
-            if (input.has_pressed(Input::GEAR1) || input.has_pressed(Input::GEAR2))
+            if (Input_has_pressed(&input, GEAR1) || Input_has_pressed(&input, GEAR2))
                 self->gear = !self->gear;
         }
     }
@@ -242,7 +242,7 @@ void OInputs_adjust_inputs(OInputs* self)
 /* Source: 0x6DE0 */
 uint8_t OInputs_do_credits(OInputs* self)
 {
-    if (input.has_pressed(Input::COIN))
+    if (Input_has_pressed(&input, COIN))
     {
         if (!config.engine.freeplay && ostats.credits < 9)
         {

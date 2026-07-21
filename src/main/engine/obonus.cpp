@@ -46,9 +46,9 @@ void OBonus_do_bonus_text(OBonus* self)
                 self->bonus_counter++;
             else
             {
-                ohud.blit_text2(TEXT2_BONUS_CLEAR1);
-                ohud.blit_text2(TEXT2_BONUS_CLEAR2);
-                ohud.blit_text2(TEXT2_BONUS_CLEAR3);
+                OHud_blit_text2(&ohud, TEXT2_BONUS_CLEAR1);
+                OHud_blit_text2(&ohud, TEXT2_BONUS_CLEAR2);
+                OHud_blit_text2(&ohud, TEXT2_BONUS_CLEAR3);
             }
             break;
     }
@@ -94,11 +94,11 @@ static void OBonus_init_bonus_text(OBonus* self)
     self->bonus_secs = digit_bot + digit_mid + digit_top;
 
     /* Write to text layer */
-    ohud.blit_text2(TEXT2_BONUS_POINTS); /* Print "BONUS POINTS" */
-    ohud.blit_text1(TEXT1_BONUS_STOP);   /* Print full stop after Bonus Points text */
-    ohud.blit_text1(TEXT1_BONUS_SEC);    /* Print "SEC" */
-    ohud.blit_text1(TEXT1_BONUS_X);      /* Print 'X' symbol after SEC */
-    ohud.blit_text1(TEXT1_BONUS_PTS);    /* Print "PTS" */
+    OHud_blit_text2(&ohud, TEXT2_BONUS_POINTS); /* Print "BONUS POINTS" */
+    OHud_blit_text1(&ohud, TEXT1_BONUS_STOP);   /* Print full stop after Bonus Points text */
+    OHud_blit_text1(&ohud, TEXT1_BONUS_SEC);    /* Print "SEC" */
+    OHud_blit_text1(&ohud, TEXT1_BONUS_X);      /* Print 'X' symbol after SEC */
+    OHud_blit_text1(&ohud, TEXT1_BONUS_PTS);    /* Print "PTS" */
 
     /* Blit big 100K number */
     uint32_t src_addr = TEXT1_BONUS_100K;
@@ -106,7 +106,7 @@ static void OBonus_init_bonus_text(OBonus* self)
     int8_t count = roms.rom0.read8(&src_addr);
 
     { int8_t i; for (i = 0; i <= count; i++)
-        ohud.blit_large_digit(&dst_addr, (roms.rom0.read8(&src_addr) - 0x30) << 1); }
+        OHud_blit_large_digit(&ohud, &dst_addr, (roms.rom0.read8(&src_addr) - 0x30) << 1); }
 
     OBonus_blit_bonus_secs(self);
  } } }}
@@ -171,7 +171,7 @@ static void OBonus_blit_bonus_secs(OBonus* self)
     /* Blit Digit 1 */
     if (d1)
     {
-        ohud.blit_large_digit(&text_addr, d1);
+        OHud_blit_large_digit(&ohud, &text_addr, d1);
     }
     else
     {
@@ -181,10 +181,10 @@ static void OBonus_blit_bonus_secs(OBonus* self)
     }
 
     /* Blit Digit 2 */
-    ohud.blit_large_digit(&text_addr, d2);
+    OHud_blit_large_digit(&ohud, &text_addr, d2);
     /* Blit Dot */
     video.write_text16(text_addr | COL2, TILE_DOT);
     text_addr += 2;
     /* Blit Digit 3 */
-    ohud.blit_large_digit(&text_addr, d3);
+    OHud_blit_large_digit(&ohud, &text_addr, d3);
  }}

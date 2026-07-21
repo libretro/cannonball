@@ -1061,7 +1061,7 @@ bool retro_load_game(const struct retro_game_info *info)
    cannonball_state = config.menu.enabled ? STATE_INIT_MENU : STATE_INIT_GAME;
 
    /* Initialize controls */
-   input.init(config.controls.pad_id,
+   Input_init(&input, config.controls.pad_id,
          config.controls.keyconfig, config.controls.padconfig, 
          config.controls.analog,    config.controls.axis, config.controls.asettings);
 
@@ -1091,7 +1091,7 @@ bool retro_load_game_special(unsigned game_type,
 void retro_unload_game(void)
 {
     cannonball_audio.stop_audio();
-    input.close();
+    Input_close(&input);
     forcefeedback_close();
     delete menu;
 }
@@ -1247,9 +1247,9 @@ static void process_events(void)
    for (i = 0; i < (sizeof(binds) / sizeof(binds[0])); i++)
    {
       if (ret & (1 << binds[i].joy_id))
-         input.handle_key(binds[i].id, true);
+         Input_handle_key(&input, binds[i].id, true);
       else
-         input.handle_key(binds[i].id, false);
+         Input_handle_key(&input, binds[i].id, false);
    }
 
    analog_left_x = input_state_cb(0, RETRO_DEVICE_ANALOG,
@@ -1273,7 +1273,7 @@ static void process_events(void)
       }
    }
 
-   input.handle_joy_axis(analog_left_x, analog_r2, analog_l2);
+   Input_handle_joy_axis(&input, analog_left_x, analog_r2, analog_l2);
 }
 
 void retro_run(void)
@@ -1323,15 +1323,15 @@ void retro_run(void)
         {
             if (cannonball_tick_frame)
             {
-                if (input.has_pressed(Input::TIMER)) outrun.freeze_timer = !outrun.freeze_timer;
-                if (input.has_pressed(Input::PAUSE)) pause_engine = !pause_engine;
-                if (input.has_pressed(Input::MENU))  cannonball_state = STATE_INIT_MENU;
+                if (Input_has_pressed(&input, TIMER)) outrun.freeze_timer = !outrun.freeze_timer;
+                if (Input_has_pressed(&input, PAUSE)) pause_engine = !pause_engine;
+                if (Input_has_pressed(&input, MENU))  cannonball_state = STATE_INIT_MENU;
             }
 
-            if (!pause_engine || input.has_pressed(Input::STEP))
+            if (!pause_engine || Input_has_pressed(&input, STEP))
             {
                 outrun.tick(cannonball_tick_frame);
-                if (cannonball_tick_frame) input.frame_done();
+                if (cannonball_tick_frame) Input_frame_done(&input);
 
                 /* Tick audio program code */
                 osoundint.tick();
@@ -1340,7 +1340,7 @@ void retro_run(void)
             }
             else
             {                
-                if (cannonball_tick_frame) input.frame_done();
+                if (cannonball_tick_frame) Input_frame_done(&input);
             }
         }
         break;
@@ -1361,7 +1361,7 @@ void retro_run(void)
         case STATE_MENU:
         {
             menu->tick();
-            input.frame_done();
+            Input_frame_done(&input);
             /* Tick audio program code */
             osoundint.tick();
             /* Tick Audio */

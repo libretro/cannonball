@@ -79,14 +79,14 @@ void OStats_do_timers(OStats* self)
     {
         /* Each stage has a standard counter that just increments. Do this here. */
         self->stage_counters[self->cur_stage]++;
-        ohud.draw_lap_timer(0x11016C, self->stage_times[self->cur_stage], self->ms_value);
+        OHud_draw_lap_timer(&ohud, 0x11016C, self->stage_times[self->cur_stage], self->ms_value);
     }
 
     else if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
     {
         self->stage_counters[outrun.ttrial.current_lap]++;
-        ohud.draw_stage_number(ohud.translate(30, 2 + outrun.ttrial.current_lap, 0x110030), (outrun.ttrial.current_lap + 1), OHud::GREY);
-        ohud.draw_lap_timer(ohud.translate(32, 2 + outrun.ttrial.current_lap, 0x110030), self->stage_times[self->cur_stage], self->ms_value);
+        OHud_draw_stage_number(&ohud, OHud_translate(&ohud, 30, 2 + outrun.ttrial.current_lap, 0x110030), (outrun.ttrial.current_lap + 1), GREY);
+        OHud_draw_lap_timer(&ohud, OHud_translate(&ohud, 32, 2 + outrun.ttrial.current_lap, 0x110030), self->stage_times[self->cur_stage], self->ms_value);
     }
 }
 
@@ -142,7 +142,7 @@ void OStats_update_score(OStats* self, uint32_t value)
     if (self->score > 0x99999999)
         self->score = 0x99999999;
 
-    ohud.draw_score_ingame(self->score);
+    OHud_draw_score_ingame(&ohud, self->score);
 }
 
 /* Initialize Next Level */
@@ -163,10 +163,10 @@ void OStats_init_next_level(OStats* self)
         /* End Extend Play: Clear Text From Screen */
         if (--self->extend_play_timer <= 0)
         {
-            ohud.blit_text1(TEXT1_EXTEND_CLEAR1);
-            ohud.blit_text1(TEXT1_EXTEND_CLEAR2);
-            ohud.blit_text1(TEXT1_LAPTIME_CLEAR1);
-            ohud.blit_text1(TEXT1_LAPTIME_CLEAR2);
+            OHud_blit_text1(&ohud, TEXT1_EXTEND_CLEAR1);
+            OHud_blit_text1(&ohud, TEXT1_EXTEND_CLEAR2);
+            OHud_blit_text1(&ohud, TEXT1_LAPTIME_CLEAR1);
+            OHud_blit_text1(&ohud, TEXT1_LAPTIME_CLEAR2);
         }
         /* Extend Play: Flash Text */
         else
@@ -178,17 +178,17 @@ void OStats_init_next_level(OStats* self)
                 if (self->extend_play_timer & BIT_3)
                 {
                     if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
-                        ohud.blit_text_new(15, 8, "BEST LAP!", OHud::PINK);
+                        OHud_blit_text_new(&ohud, 15, 8, "BEST LAP!", PINK);
                     else
                     {
-                        ohud.blit_text1(TEXT1_EXTEND1);
-                        ohud.blit_text1(TEXT1_EXTEND2);
+                        OHud_blit_text1(&ohud, TEXT1_EXTEND1);
+                        OHud_blit_text1(&ohud, TEXT1_EXTEND2);
                     }
                 }
                 else
                 {
-                    ohud.blit_text1(TEXT1_EXTEND_CLEAR1);
-                    ohud.blit_text1(TEXT1_EXTEND_CLEAR2);
+                    OHud_blit_text1(&ohud, TEXT1_EXTEND_CLEAR1);
+                    OHud_blit_text1(&ohud, TEXT1_EXTEND_CLEAR2);
                 }
             }
         }
@@ -212,16 +212,16 @@ void OStats_init_next_level(OStats* self)
 
         /* Draw last laptime */
         /* Note there is a bug in the original code here, where the current ms value is displayed, instead of the ms value from the last lap time */
-        ohud.blit_text1(TEXT1_LAPTIME1);
-        ohud.blit_text1(TEXT1_LAPTIME2);
-        ohud.draw_lap_timer(0x110554, self->stage_times[self->cur_stage-1], config.engine.fix_bugs ? self->lap_ms[self->stage_times[self->cur_stage-1][2]] : self->ms_value);
+        OHud_blit_text1(&ohud, TEXT1_LAPTIME1);
+        OHud_blit_text1(&ohud, TEXT1_LAPTIME2);
+        OHud_draw_lap_timer(&ohud, 0x110554, self->stage_times[self->cur_stage-1], config.engine.fix_bugs ? self->lap_ms[self->stage_times[self->cur_stage-1][2]] : self->ms_value);
 
         OTraffic_set_max_traffic(&otraffic);
         osoundint.queue_sound(SOUND_YM_CHECKPOINT);
         osoundint.queue_sound(SOUND_VOICE_CHECKPOINT);
         
         /* Update Stage Number on HUD */
-        ohud.draw_stage_number(0x110d76, self->cur_stage+1, OHud::GREEN);
+        OHud_draw_stage_number(&ohud, 0x110d76, self->cur_stage+1, GREEN);
         /* No need to redraw the stage info as that was a bug in the original game */
     }
 }

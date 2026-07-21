@@ -339,7 +339,7 @@ void Menu::tick_ui()
     if (message_counter > 0)
     {
         message_counter--;
-        ohud.blit_text_new(0, 1, msg.c_str(), ohud.GREY);
+        OHud_blit_text_new(&ohud, 0, 1, msg.c_str(), GREY);
     }
      
     /* Shift horizon */
@@ -382,7 +382,7 @@ void Menu::tick_ui()
 
     /* Draw FPS */
     if (config.video.fps_count)
-        ohud.draw_fps_counter(cannonball_fps_counter);
+        OHud_draw_fps_counter(&ohud, cannonball_fps_counter);
 
     oroad.tick();
 }
@@ -400,16 +400,16 @@ void Menu::draw_menu_options()
 
         /* Centre the menu option */
         x = 20 - (s.length() >> 1);
-        ohud.blit_text_new(x, y, s.c_str(), ohud.GREEN);
+        OHud_blit_text_new(&ohud, x, y, s.c_str(), GREEN);
 
         if (!is_text_menu)
         {
             /* Draw minicar */
             if (i == cursor)
-                video.write_text32(ohud.translate(x - 3, y, 0x110030), roms.rom0.read32(TILES_MINICARS1));
+                video.write_text32(OHud_translate(&ohud, x - 3, y, 0x110030), roms.rom0.read32(TILES_MINICARS1));
             /* Erase minicar from this position */
             else
-                video.write_text32(ohud.translate(x - 3, y, 0x110030), 0x20202020);
+                video.write_text32(OHud_translate(&ohud, x - 3, y, 0x110030), 0x20202020);
         }
         y += 2;
     } }
@@ -424,7 +424,7 @@ void Menu::draw_text(std::string s)
     /* Find central column in screen.  */
     int8_t y = 13 + ((ROWS - 13) >> 1) - 1;
 
-    ohud.blit_text_new(x, y, s.c_str(), ohud.GREEN);
+    OHud_blit_text_new(&ohud, x, y, s.c_str(), GREEN);
 }
 
 static bool menu_starts_with(
@@ -445,21 +445,21 @@ static bool menu_starts_with(
 void Menu::tick_menu()
 {
     /* Tick Controls */
-    if (input.has_pressed(Input::DOWN) || OInputs_is_analog_r(&oinputs))
+    if (Input_has_pressed(&input, DOWN) || OInputs_is_analog_r(&oinputs))
     {
         osoundint.queue_sound(SOUND_BEEP1);
 
         if (++cursor >= (int16_t) menu_selected->size())
             cursor = 0;
     }
-    else if (input.has_pressed(Input::UP) || OInputs_is_analog_l(&oinputs))
+    else if (Input_has_pressed(&input, UP) || OInputs_is_analog_l(&oinputs))
     {
         osoundint.queue_sound(SOUND_BEEP1);
 
         if (--cursor < 0)
             cursor = menu_selected->size() - 1;
     }
-    else if (input.has_pressed(Input::ACCEL) || input.has_pressed(Input::START) || OInputs_is_analog_select(&oinputs))
+    else if (Input_has_pressed(&input, ACCEL) || Input_has_pressed(&input, START) || OInputs_is_analog_select(&oinputs))
     {
         /* Get option that was selected */
         const char* OPTION = menu_selected->at(cursor).c_str();
@@ -1018,7 +1018,7 @@ void Menu::redefine_keyboard()
         case 9:
         case 10:
         case 11:
-            if (input.has_pressed(Input::MENU))
+            if (Input_has_pressed(&input, MENU))
             {
                 message_counter = 0;
                 state = STATE_MENU;
@@ -1056,7 +1056,7 @@ void Menu::redefine_joystick()
         case 5:
         case 6:
         case 7:
-            if (input.has_pressed(Input::MENU))
+            if (Input_has_pressed(&input, MENU))
             {
                 message_counter = 0;
                 state = STATE_MENU;
