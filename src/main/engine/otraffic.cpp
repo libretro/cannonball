@@ -59,13 +59,13 @@ void OTraffic_init_stage1_traffic(OTraffic* self)
     oentry* t = &osprites.jump_table[SPRITE_TRAFF1];
     t->function_holder = TRAFFIC_INIT;
     t->control        |= flags;
-    t->draw_props     |= oentry::BOTTOM;
+    t->draw_props     |= ANCHOR_BOTTOM;
     t->z               = 0x140F520;
 
     t = &osprites.jump_table[SPRITE_TRAFF2];
     t->function_holder = TRAFFIC_INIT;
     t->control        |= flags;
-    t->draw_props     |= oentry::BOTTOM;
+    t->draw_props     |= ANCHOR_BOTTOM;
     t->xw1             = 0x70;
     t->z               = 0x14004E0;
     t->type            = 0x18;
@@ -74,7 +74,7 @@ void OTraffic_init_stage1_traffic(OTraffic* self)
     t = &osprites.jump_table[SPRITE_TRAFF3];
     t->function_holder = TRAFFIC_INIT;
     t->control        |= flags;
-    t->draw_props     |= oentry::BOTTOM;
+    t->draw_props     |= ANCHOR_BOTTOM;
     t->xw1             = -0x70;
     t->z               = 0x14004E0;
     t->type            = 0x20; 
@@ -83,7 +83,7 @@ void OTraffic_init_stage1_traffic(OTraffic* self)
     t = &osprites.jump_table[SPRITE_TRAFF4];
     t->function_holder = TRAFFIC_INIT;
     t->control        |= flags;
-    t->draw_props     |= oentry::BOTTOM;
+    t->draw_props     |= ANCHOR_BOTTOM;
     t->xw1             = 0x70;
     t->z               = 0x1D004E0;
     t->type            = 0x28; 
@@ -92,7 +92,7 @@ void OTraffic_init_stage1_traffic(OTraffic* self)
     t = &osprites.jump_table[SPRITE_TRAFF5];
     t->function_holder = TRAFFIC_INIT;
     t->control        |= flags;
-    t->draw_props     |= oentry::BOTTOM;
+    t->draw_props     |= ANCHOR_BOTTOM;
     t->xw1             = -0x70;
     t->z               = 0x1D004E0;
     t->type            = 0x30; 
@@ -204,7 +204,7 @@ void OTraffic_spawn_traffic(OTraffic* self)
 void OTraffic_spawn_car(OTraffic* self, oentry* sprite)
 {
     sprite->control |= ENABLE | TRAFFIC_SPRITE;
-    sprite->draw_props = oentry::BOTTOM;
+    sprite->draw_props = ANCHOR_BOTTOM;
     sprite->shadow = 7;     /* Used as priority */
     sprite->width = 0;
     sprite->traffic_proximity = 0;

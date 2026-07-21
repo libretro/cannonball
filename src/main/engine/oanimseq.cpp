@@ -62,7 +62,7 @@ void OAnimSeq_init(OAnimSeq* self, oentry* jump_table)
 
     /* Jump table initalisations */
     sprite_flag->shadow = 7;
-    sprite_flag->draw_props = oentry::BOTTOM;
+    sprite_flag->draw_props = ANCHOR_BOTTOM;
 
     /* Routine initalisations */
     sprite_flag->control |= ENABLE;
@@ -76,19 +76,19 @@ void OAnimSeq_init(OAnimSeq* self, oentry* jump_table)
     self->anim_ferrari.anim_addr_curr = outrun.adr.anim_ferrari_curr;
     self->anim_ferrari.anim_addr_next = outrun.adr.anim_ferrari_next;
     sprite_ferrari->control |= ENABLE;
-    sprite_ferrari->draw_props = oentry::BOTTOM;
+    sprite_ferrari->draw_props = ANCHOR_BOTTOM;
 
     oentry* sprite_pass1 = &jump_table[SPRITE_PASS1];
     self->anim_pass1.init(sprite_pass1);
     self->anim_pass1.anim_addr_curr = outrun.adr.anim_pass1_curr;
     self->anim_pass1.anim_addr_next = outrun.adr.anim_pass1_next;
-    sprite_pass1->draw_props = oentry::BOTTOM;
+    sprite_pass1->draw_props = ANCHOR_BOTTOM;
 
     oentry* sprite_pass2 = &jump_table[SPRITE_PASS2];
     self->anim_pass2.init(sprite_pass2);
     self->anim_pass2.anim_addr_curr = outrun.adr.anim_pass2_curr;
     self->anim_pass2.anim_addr_next = outrun.adr.anim_pass2_next;
-    sprite_pass2->draw_props = oentry::BOTTOM;
+    sprite_pass2->draw_props = ANCHOR_BOTTOM;
 
     /* -------------------------------------------------------------------------------------------- */
     /* End Sequence Animation */
@@ -329,7 +329,7 @@ void OAnimSeq_init_end_seq(OAnimSeq* self)
     /* Setup Ferrari Sprite */
     self->anim_ferrari.sprite->control |= ENABLE; 
     self->anim_ferrari.sprite->id = 0;
-    self->anim_ferrari.sprite->draw_props = oentry::BOTTOM;
+    self->anim_ferrari.sprite->draw_props = ANCHOR_BOTTOM;
     self->anim_ferrari.anim_frame = 0;
     self->anim_ferrari.frame_delay = 0;
 
@@ -385,7 +385,7 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     self->anim_obj1.sprite->control |= ENABLE;
     self->anim_obj1.sprite->id = 1;
     self->anim_obj1.sprite->shadow = 3;
-    self->anim_obj1.sprite->draw_props = oentry::BOTTOM;
+    self->anim_obj1.sprite->draw_props = ANCHOR_BOTTOM;
     self->anim_obj1.anim_frame = 0;
     self->anim_obj1.frame_delay = 0;
     self->anim_obj1.anim_props = 0;
@@ -396,7 +396,7 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     /* 0x58EC: Interior of Ferrari (Note this wobbles a little when passengers exit) [seq_sprite_entry] */
     self->anim_obj2.sprite->control |= ENABLE;
     self->anim_obj2.sprite->id = 2;
-    self->anim_obj2.sprite->draw_props = oentry::BOTTOM;
+    self->anim_obj2.sprite->draw_props = ANCHOR_BOTTOM;
     self->anim_obj2.anim_frame = 0;
     self->anim_obj2.frame_delay = 0;
     self->anim_obj2.anim_props = 0;
@@ -407,7 +407,7 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     /* 0x592A: Car Shadow [SeqSpriteShadow] */
     self->anim_obj3.sprite->control |= ENABLE;
     self->anim_obj3.sprite->id = 3;
-    self->anim_obj3.sprite->draw_props = oentry::BOTTOM;
+    self->anim_obj3.sprite->draw_props = ANCHOR_BOTTOM;
     self->anim_obj3.anim_frame = 0;
     self->anim_obj3.frame_delay = 0;
     self->anim_obj3.anim_props = 0;
@@ -416,7 +416,7 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     /* 0x5960: Man Sprite [seq_sprite_entry] */
     self->anim_pass1.sprite->control |= ENABLE;
     self->anim_pass1.sprite->id = 4;
-    self->anim_pass1.sprite->draw_props = oentry::BOTTOM;
+    self->anim_pass1.sprite->draw_props = ANCHOR_BOTTOM;
     self->anim_pass1.anim_frame = 0;
     self->anim_pass1.frame_delay = 0;
     self->anim_pass1.anim_props = 0;
@@ -428,7 +428,7 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     self->anim_obj4.sprite->control = ENABLE;
     self->anim_obj4.sprite->id = 5;
     self->anim_obj4.sprite->shadow = 7;
-    self->anim_obj4.sprite->draw_props = oentry::BOTTOM;
+    self->anim_obj4.sprite->draw_props = ANCHOR_BOTTOM;
     self->anim_obj4.anim_frame = 0;
     self->anim_obj4.frame_delay = 0;
     self->anim_obj4.anim_props = 0;
@@ -437,7 +437,7 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     /* 0x59BE: Female Sprite [seq_sprite_entry] */
     self->anim_pass2.sprite->control |= ENABLE;
     self->anim_pass2.sprite->id = 6;
-    self->anim_pass2.sprite->draw_props = oentry::BOTTOM;
+    self->anim_pass2.sprite->draw_props = ANCHOR_BOTTOM;
     self->anim_pass2.anim_frame = 0;
     self->anim_pass2.frame_delay = 0;
     self->anim_pass2.anim_props = 0;
@@ -449,7 +449,7 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     self->anim_obj5.sprite->control = ENABLE;
     self->anim_obj5.sprite->id = 7;
     self->anim_obj5.sprite->shadow = 7;
-    self->anim_obj5.sprite->draw_props = oentry::BOTTOM;
+    self->anim_obj5.sprite->draw_props = ANCHOR_BOTTOM;
     self->anim_obj5.anim_frame = 0;
     self->anim_obj5.frame_delay = 0;
     self->anim_obj5.anim_props = 0;
@@ -458,7 +458,7 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     /* 0x5A2C: Person Presenting Trophy [seq_sprite_entry] */
     self->anim_obj6.sprite->control |= ENABLE;
     self->anim_obj6.sprite->id = 8;
-    self->anim_obj6.sprite->draw_props = oentry::BOTTOM;
+    self->anim_obj6.sprite->draw_props = ANCHOR_BOTTOM;
     self->anim_obj6.anim_frame = 0;
     self->anim_obj6.frame_delay = 0;
     self->anim_obj6.anim_props = 0;
@@ -469,7 +469,7 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     /* Alternate Use Based On End Sequence */
     self->anim_obj7.sprite->control |= ENABLE;
     self->anim_obj7.sprite->id = 9;
-    self->anim_obj7.sprite->draw_props = oentry::BOTTOM;
+    self->anim_obj7.sprite->draw_props = ANCHOR_BOTTOM;
     self->anim_obj7.anim_frame = 0;
     self->anim_obj7.frame_delay = 0;
     self->anim_obj7.anim_props = 0;
@@ -491,7 +491,7 @@ void OAnimSeq_init_end_sprites(OAnimSeq* self)
     /* 0x5AD0: Enable After Effects (e.g. cloud of smoke for genie) [seq_sprite_entry] */
     self->anim_obj8.sprite->control |= ENABLE;
     self->anim_obj8.sprite->id = 10;
-    self->anim_obj8.sprite->draw_props = oentry::BOTTOM;
+    self->anim_obj8.sprite->draw_props = ANCHOR_BOTTOM;
     self->anim_obj8.anim_frame = 0;
     self->anim_obj8.frame_delay = 0;
     self->anim_obj8.anim_props = 0xFF00;

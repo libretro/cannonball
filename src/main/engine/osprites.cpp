@@ -83,18 +83,18 @@ void OSprites_init(OSprites* self)
         self->jump_table[i].init(i);
     } }
 
-    self->jump_table[SPRITE_CRASH_PASS1].draw_props = oentry::BOTTOM;
-    self->jump_table[SPRITE_CRASH_PASS2].draw_props = oentry::BOTTOM;
+    self->jump_table[SPRITE_CRASH_PASS1].draw_props = ANCHOR_BOTTOM;
+    self->jump_table[SPRITE_CRASH_PASS2].draw_props = ANCHOR_BOTTOM;
 
     self->jump_table[SPRITE_CRASH_PASS1_S].shadow     = 7;
     self->jump_table[SPRITE_CRASH_PASS1_S].addr       = outrun.adr.shadow_data;
     self->jump_table[SPRITE_CRASH_PASS2_S].shadow     = 7;
-    self->jump_table[SPRITE_CRASH_PASS2_S].draw_props = oentry::BOTTOM;
+    self->jump_table[SPRITE_CRASH_PASS2_S].draw_props = ANCHOR_BOTTOM;
     self->jump_table[SPRITE_CRASH_PASS2_S].addr       = outrun.adr.shadow_data;
     
     self->jump_table[SPRITE_CRASH_SHADOW].shadow     = 7;
     self->jump_table[SPRITE_CRASH_SHADOW].zoom       = 0x80;
-    self->jump_table[SPRITE_CRASH_SHADOW].draw_props = oentry::BOTTOM;
+    self->jump_table[SPRITE_CRASH_SHADOW].draw_props = ANCHOR_BOTTOM;
     self->jump_table[SPRITE_CRASH_SHADOW].addr       = outrun.adr.shadow_data;
 
     OCrash_init(&ocrash, 

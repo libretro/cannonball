@@ -355,7 +355,7 @@ void OCrash_init_collision(OCrash* self)
     self->spr_ferrari->x = oferrari.spr_ferrari->x;
     self->spr_ferrari->y = 221;
     self->spr_ferrari->counter = 0x1FC;
-    self->spr_ferrari->draw_props = oentry::BOTTOM;
+    self->spr_ferrari->draw_props = ANCHOR_BOTTOM;
 
     /* Collided with another vechicle */
     if (self->spin_control2)
@@ -1111,7 +1111,7 @@ void OCrash_do_shadow(OCrash* self, oentry* src_sprite, oentry* dst_sprite)
     /* Ferrari Shadow */
     if (src_sprite == self->spr_ferrari)
     {
-        dst_sprite->draw_props = oentry::BOTTOM;
+        dst_sprite->draw_props = ANCHOR_BOTTOM;
         shadow_shift = 1;
     }
     else

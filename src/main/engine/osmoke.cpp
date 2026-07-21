@@ -318,12 +318,12 @@ static void OSmoke_tick_smoke_anim(OSmoke* self, oentry* sprite, int8_t anim_ctr
 
     if (sprite == &osprites.jump_table[SPRITE_SMOKE1])
     {
-        sprite->draw_props = oentry::BOTTOM | oentry::LEFT; /* Anchor bottom left */
+        sprite->draw_props = ANCHOR_BOTTOM | ANCHOR_LEFT; /* Anchor bottom left */
         hflip++;
     }
     else
     {
-        sprite->draw_props = oentry::BOTTOM | oentry::RIGHT; /* Anchor bottom right */
+        sprite->draw_props = ANCHOR_BOTTOM | ANCHOR_RIGHT; /* Anchor bottom right */
         x = -x;        
     }
     sprite->x += (x * zoom) >> 8;

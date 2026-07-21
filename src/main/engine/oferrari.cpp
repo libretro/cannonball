@@ -402,7 +402,7 @@ void OFerrari_setup_ferrari_sprite(OFerrari* self)
     /* Setup Default Ferrari Properties */
     self->spr_ferrari->x = 0;
     self->spr_ferrari->zoom = 0x7F;
-    self->spr_ferrari->draw_props = oentry::BOTTOM    ; /* Anchor Bottom */
+    self->spr_ferrari->draw_props = ANCHOR_BOTTOM    ; /* Anchor Bottom */
     self->spr_ferrari->shadow = 3;
     self->spr_ferrari->width = 0;
     self->spr_ferrari->priority = self->spr_ferrari->road_priority = 0x1FD;

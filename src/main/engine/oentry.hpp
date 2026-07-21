@@ -28,9 +28,16 @@
 
 #include <stdint.h>
 
-class oentry
+enum {
+        ANCHOR_CENTRE = 0,
+        ANCHOR_LEFT = 1,
+        ANCHOR_RIGHT = 2,
+        ANCHOR_TOP = 4,
+        ANCHOR_BOTTOM = 8
+    };
+struct oentry
 {
-public:
+
 	/* +00 [Byte] Bit 7 Enables/Disables Address */
 	/*            Bit 6 */
 	/*            Bit 5 Set to Draw Sprite */
@@ -70,14 +77,7 @@ public:
 	/* yy 0 = Anchor Centre. 01 = Anchor Top.  10 = Anchor Bottom. */
 	uint8_t draw_props;
 
-    enum
-    {
-        CENTRE = 0,
-        LEFT = 1,
-        RIGHT = 2,
-        TOP = 4,
-        BOTTOM = 8
-    };
+    
 
 	/* +0A [Byte] Sprite Colour Palette: Source index into ROM. */
 	/*            For the car sprite: */
@@ -186,3 +186,4 @@ public:
         pass_props = 0;
 	}
 };
+
