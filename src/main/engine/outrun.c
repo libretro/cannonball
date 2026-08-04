@@ -188,11 +188,20 @@ void Outrun_vint(Outrun* self)
     OTiles_write_tilemap_hw(&otiles);
     OSprites_update_sprites(&osprites);
     OTiles_update_tilemaps(&otiles, self->cannonball_mode == MODE_ORIGINAL ? ostats.cur_stage : 0);
-    OPalette_cycle_sky_palette(&opalette);
-    OPalette_fade_palette(&opalette);
-    OStats_do_timers(&ostats);
-    if (self->cannonball_mode != MODE_TTRIAL) OHud_draw_timer1(&ohud, ostats.time_counter);
-    OInitEngine_set_granular_position(&oinitengine);
+    /* The engine assumes this block runs at the hardware v-blank rate of 60Hz. */
+    /* At 120 FPS Outrun_vint() is called once per frame (120Hz), so halve it here. */
+    /* Running set_granular_position() at 120Hz advances oroad.pos_fine twice as */
+    /* fast as OSprites_sprite_control() can pump out level objects, which silently */
+    /* drops sprites - including checkpoint signs - from the tail of a scenery */
+    /* segment, and makes OStats_do_timers() count at double rate. */
+    if (config.fps < 120 || (cannonball_frame & 1))
+    {
+        OPalette_cycle_sky_palette(&opalette);
+        OPalette_fade_palette(&opalette);
+        OStats_do_timers(&ostats);
+        if (self->cannonball_mode != MODE_TTRIAL) OHud_draw_timer1(&ohud, ostats.time_counter);
+        OInitEngine_set_granular_position(&oinitengine);
+    }
 }
 
 static void Outrun_jump_table(Outrun* self)
